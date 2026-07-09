@@ -1,0 +1,27 @@
+kind = "web"
+previewPath = "/"
+title = "Tropical Island Game"
+version = "1.0.0"
+id = "artifacts/island-game"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 21919
+
+[services.development]
+run = "pnpm --filter @workspace/island-game run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/island-game", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/island-game/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "21919"
+BASE_PATH = "/"
