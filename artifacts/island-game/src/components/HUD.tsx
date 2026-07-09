@@ -3,7 +3,7 @@ import { useGame } from '../game/GameContext';
 import { ResourceType } from '../game/types';
 import { EMOJI_MAP } from '../game/gameData';
 
-export const HUD = () => {
+export const HUD = ({ onOpenCollections, onOpenWeather }: { onOpenCollections: () => void, onOpenWeather: () => void }) => {
   const { state, setShopOpen, activeTool, setActiveTool, activeBuildItem, setActiveBuildItem } = useGame();
   const { level, xp, inventory, energy, maxEnergy } = state;
   const nextLevelXp = Math.floor(100 * Math.pow(level, 1.5));
@@ -13,7 +13,7 @@ export const HUD = () => {
   return (
     <>
       {/* TOP BAR */}
-      <div className="absolute top-0 left-0 right-0 h-16 bg-[#8b5a2b] border-b-4 border-[#5c3a21] flex items-center justify-between px-6 z-10 shadow-lg text-white font-bold select-none whitespace-nowrap">
+      <div className="absolute top-0 left-0 right-0 h-16 bg-[#8b5a2b] border-b-4 border-[#5c3a21] flex items-center justify-between px-6 z-30 shadow-lg text-white font-bold select-none whitespace-nowrap">
         {/* Left: Level */}
         <div className="flex items-center gap-3">
           <div className="relative flex items-center justify-center w-12 h-12 bg-yellow-400 rounded-full border-2 border-yellow-600 shadow-md transform -translate-y-1">
@@ -27,15 +27,17 @@ export const HUD = () => {
         </div>
 
         {/* Middle: Resources */}
-        <div className="flex items-center gap-6 bg-black/20 px-6 py-2 rounded-2xl border border-black/30 shadow-inner">
-           <div className="flex items-center gap-2"><span className="text-2xl">🪙</span> <span className="text-lg">{inventory.coins}</span></div>
-           <div className="flex items-center gap-2"><span className="text-2xl">🪵</span> <span className="text-lg">{inventory.wood}</span></div>
-           <div className="flex items-center gap-2"><span className="text-2xl">🪨</span> <span className="text-lg">{inventory.stone}</span></div>
+        <div className="flex items-center gap-4 bg-black/20 px-4 py-2 rounded-2xl border border-black/30 shadow-inner">
+           <div className="flex items-center gap-1" title="Coins"><span className="text-2xl">🪙</span> <span className="text-lg w-8">{inventory.coins}</span></div>
+           <div className="flex items-center gap-1" title="Wood"><span className="text-2xl">🪵</span> <span className="text-lg w-6">{inventory.wood}</span></div>
+           <div className="flex items-center gap-1" title="Stone"><span className="text-2xl">🪨</span> <span className="text-lg w-6">{inventory.stone}</span></div>
+           <div className="flex items-center gap-1" title="Food"><span className="text-2xl">🍎</span> <span className="text-lg w-6">{inventory.food}</span></div>
+           <div className="flex items-center gap-1" title="Shells"><span className="text-2xl">🐚</span> <span className="text-lg w-6">{inventory.shells}</span></div>
         </div>
 
-        {/* Right: Energy & Shop */}
-        <div className="flex items-center gap-4">
-          <div className="flex items-center gap-2 bg-black/20 px-4 py-2 rounded-2xl border border-black/30 shadow-inner">
+        {/* Right: Energy & Menus */}
+        <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 bg-black/20 px-4 py-2 rounded-2xl border border-black/30 shadow-inner mr-2">
              <span className="text-2xl">⚡</span>
              <div className="flex flex-col">
                <div className="text-xs leading-tight text-blue-200">ENERGY</div>
@@ -45,19 +47,25 @@ export const HUD = () => {
              </div>
              <div className="ml-2 font-mono text-lg">{energy}/{maxEnergy}</div>
           </div>
-          <button onClick={() => setShopOpen(true)} className="bg-green-500 hover:bg-green-400 active:scale-95 transition-transform px-5 py-2 rounded-xl border-b-4 border-green-700 shadow-md text-white font-bold flex items-center gap-2 text-lg">
+          
+          <button onClick={onOpenCollections} className="bg-purple-500 hover:bg-purple-400 active:scale-95 transition-transform px-3 py-2 rounded-xl border-b-4 border-purple-700 shadow-md text-white font-bold flex items-center gap-2 text-lg" title="Collections">
+            🗃️
+          </button>
+          
+          <button onClick={onOpenWeather} className="bg-blue-400 hover:bg-blue-300 active:scale-95 transition-transform px-3 py-2 rounded-xl border-b-4 border-blue-600 shadow-md text-white font-bold flex items-center gap-2 text-lg" title="Weather">
+            🌤️
+          </button>
+          
+          <button onClick={() => setShopOpen(true)} className="bg-green-500 hover:bg-green-400 active:scale-95 transition-transform px-4 py-2 rounded-xl border-b-4 border-green-700 shadow-md text-white font-bold flex items-center gap-2 text-lg">
             🏪 Shop
           </button>
         </div>
       </div>
 
       {/* BOTTOM BAR */}
-      <div className="absolute bottom-0 left-0 right-0 h-24 bg-[#8b5a2b] border-t-4 border-[#5c3a21] flex items-center justify-between px-8 z-10 text-white font-bold select-none shadow-[0_-10px_20px_rgba(0,0,0,0.2)]">
+      <div className="absolute bottom-0 left-0 right-0 h-24 bg-[#8b5a2b] border-t-4 border-[#5c3a21] flex items-center justify-between px-8 z-30 text-white font-bold select-none shadow-[0_-10px_20px_rgba(0,0,0,0.2)]">
         {/* Inventory items */}
         <div className="flex items-center gap-4">
-           <div className="bg-black/20 px-5 py-3 rounded-xl flex items-center gap-3 border border-black/30 shadow-inner">
-             <span className="text-3xl">🌱</span> <span className="text-xl">{inventory.seeds} Seeds</span>
-           </div>
            <div className="bg-black/20 px-5 py-3 rounded-xl flex items-center gap-3 border border-black/30 shadow-inner">
              <span className="text-3xl">🌽</span> <span className="text-xl">{inventory.produce} Produce</span>
            </div>

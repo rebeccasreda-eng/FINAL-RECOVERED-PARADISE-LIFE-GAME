@@ -1,94 +1,96 @@
 import React, { useState } from 'react';
 import { useGame } from '../game/GameContext';
+import { ResourceType } from '../game/types';
+import { EMOJI_MAP } from '../game/gameData';
 
-const ShopItem = ({ title, icon, cost, onBuy, canAfford }: any) => (
-  <div className={`p-4 rounded-2xl border-4 flex flex-col items-center gap-3 ${canAfford ? 'bg-white border-[#d2b48c]' : 'bg-gray-100 border-gray-300 opacity-70'}`}>
-    <div className="text-6xl mb-2 drop-shadow-md">{icon}</div>
-    <div className="font-bold text-[#5c3a21] text-xl text-center leading-tight">{title}</div>
-    <button 
-      onClick={onBuy} 
-      disabled={!canAfford}
-      className={`w-full py-3 rounded-xl font-black flex items-center justify-center gap-2 border-b-4 active:border-b-0 active:translate-y-1 transition-all text-lg ${canAfford ? 'bg-green-500 hover:bg-green-400 text-white border-green-700' : 'bg-gray-400 text-gray-200 border-gray-600'}`}
-    >
-      Buy {cost} 🪙
-    </button>
-  </div>
-)
+const STRUCTURES: { id: ResourceType, name: string, cost: number, desc: string }[] = [
+  { id: 'HUT', name: 'Wooden Hut', cost: 200, desc: 'A cozy place to rest.' },
+  { id: 'DOCK', name: 'Fishing Dock', cost: 300, desc: 'Perfect for catching fish.' },
+  { id: 'WELL', name: 'Water Well', cost: 150, desc: 'Fresh water source.' },
+  { id: 'FLOWER_POT', name: 'Flower Pot', cost: 50, desc: 'Decorative plants.' },
+  { id: 'FENCE', name: 'Wood Fence', cost: 20, desc: 'Keep the crabs out!' },
+  { id: 'LANTERN', name: 'Lantern', cost: 80, desc: 'Lights up the night.' },
+];
 
 export const ShopModal = () => {
   const { state, dispatch, setShopOpen } = useGame();
-  const [tab, setTab] = useState<'seeds'|'structures'|'decorations'|'sell'>('seeds');
+  const [tab, setTab] = useState<'BUY' | 'SELL'>('BUY');
 
   return (
-    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-in fade-in duration-200 select-none">
-       <div className="bg-[#fff5d7] w-full max-w-3xl rounded-[2rem] border-[12px] border-[#8b5a2b] shadow-2xl overflow-hidden flex flex-col animate-in zoom-in-95 duration-200">
-          
-          <div className="bg-[#8b5a2b] text-white p-6 flex justify-between items-center border-b-4 border-[#5c3a21]">
-            <h2 className="text-3xl font-black tracking-widest uppercase">🏪 Island Shop</h2>
-            <div className="flex items-center gap-6">
-              <span className="bg-yellow-400 text-yellow-900 px-4 py-2 rounded-full font-black text-xl border-2 border-yellow-600 shadow-inner">
-                🪙 {state.inventory.coins}
-              </span>
-              <button 
-                onClick={() => setShopOpen(false)} 
-                className="w-12 h-12 bg-red-500 text-white rounded-full font-black text-2xl border-b-4 border-red-700 hover:bg-red-400 active:translate-y-1 active:border-b-0 transition-all flex items-center justify-center shadow-md"
-              >
-                ✖
-              </button>
-            </div>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-md animate-in fade-in" onClick={() => setShopOpen(false)}>
+      <div className="bg-[#fff5d7] rounded-[2rem] border-[12px] border-[#8b5a2b] shadow-2xl flex flex-col w-[800px] h-[600px] overflow-hidden relative" onClick={e => e.stopPropagation()}>
+        {/* Header */}
+        <div className="bg-[#8b5a2b] text-white p-6 flex justify-between items-center shadow-md relative z-10">
+          <h2 className="text-4xl font-black uppercase tracking-widest flex items-center gap-4">
+            <span className="text-5xl">🏪</span> Island Shop
+          </h2>
+          <div className="flex items-center gap-4 bg-black/30 px-4 py-2 rounded-full border-2 border-[#5c3a21]">
+            <span className="text-2xl">🪙</span>
+            <span className="text-2xl font-bold">{state.inventory.coins}</span>
           </div>
-          
-          <div className="flex bg-[#d2b48c] p-3 gap-2 border-b-4 border-[#8b5a2b]/30">
-             {['seeds', 'structures', 'decorations', 'sell'].map(t => (
-               <button 
-                 key={t} 
-                 onClick={() => setTab(t as any)} 
-                 className={`flex-1 py-3 font-black rounded-xl text-xl capitalize transition-colors ${tab === t ? 'bg-[#fff5d7] text-[#5c3a21] shadow-sm' : 'bg-transparent text-[#8b5a2b] hover:bg-white/30'}`}
-               >
-                 {t}
-               </button>
-             ))}
-          </div>
-          
-          <div className="p-8 h-[450px] overflow-y-auto">
-             {tab === 'seeds' && (
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
-                  <ShopItem title="1 Seed" icon="🌱" cost={10} onBuy={() => dispatch({type:'BUY', itemType:'seeds', cost: 10, count: 1})} canAfford={state.inventory.coins >= 10} />
-                  <ShopItem title="5 Seeds" icon="🌱" cost={45} onBuy={() => dispatch({type:'BUY', itemType:'seeds', cost: 45, count: 5})} canAfford={state.inventory.coins >= 45} />
-                </div>
-             )}
-             
-             {tab === 'structures' && (
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
-                  <ShopItem title="Hut" icon="🏚️" cost={200} onBuy={() => dispatch({type:'BUY', itemType:'HUT', cost: 200})} canAfford={state.inventory.coins >= 200} />
-                  <ShopItem title="Dock" icon="⛵" cost={150} onBuy={() => dispatch({type:'BUY', itemType:'DOCK', cost: 150})} canAfford={state.inventory.coins >= 150} />
-                  <ShopItem title="Well" icon="💧" cost={100} onBuy={() => dispatch({type:'BUY', itemType:'WELL', cost: 100})} canAfford={state.inventory.coins >= 100} />
-                </div>
-             )}
-             
-             {tab === 'decorations' && (
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
-                  <ShopItem title="Flower Pot" icon="🪴" cost={20} onBuy={() => dispatch({type:'BUY', itemType:'FLOWER_POT', cost: 20})} canAfford={state.inventory.coins >= 20} />
-                  <ShopItem title="Fence" icon="🚧" cost={30} onBuy={() => dispatch({type:'BUY', itemType:'FENCE', cost: 30})} canAfford={state.inventory.coins >= 30} />
-                  <ShopItem title="Lantern" icon="🏮" cost={40} onBuy={() => dispatch({type:'BUY', itemType:'LANTERN', cost: 40})} canAfford={state.inventory.coins >= 40} />
-                </div>
-             )}
+          <button onClick={() => setShopOpen(false)} className="w-12 h-12 bg-red-500 hover:bg-red-400 rounded-full border-4 border-red-800 text-white font-black text-xl flex items-center justify-center transition-transform hover:scale-110 shadow-lg absolute -right-6 -top-6">×</button>
+        </div>
 
-             {tab === 'sell' && (
-                <div className="flex flex-col items-center justify-center h-full">
-                  <div className="text-8xl mb-6 drop-shadow-xl">🌽</div>
-                  <h3 className="text-3xl font-black text-[#5c3a21] mb-8">You have {state.inventory.produce} Produce</h3>
-                  <button 
-                    onClick={() => dispatch({type: 'SELL_PRODUCE'})} 
-                    disabled={state.inventory.produce < 1}
-                    className="bg-yellow-400 hover:bg-yellow-300 disabled:bg-gray-400 disabled:border-gray-600 disabled:text-gray-200 text-yellow-900 px-12 py-6 rounded-3xl text-3xl font-black border-b-8 border-yellow-600 active:border-b-0 active:translate-y-2 transition-all shadow-xl disabled:shadow-none"
-                  >
-                    Sell All (+{state.inventory.produce * 5} 🪙)
-                  </button>
+        {/* Tabs */}
+        <div className="flex bg-[#d2b48c] p-2 gap-2 shadow-inner border-b-4 border-[#5c3a21]">
+          <button onClick={() => setTab('BUY')} className={`flex-1 py-3 text-xl font-black rounded-xl transition-all ${tab === 'BUY' ? 'bg-white text-[#5c3a21] shadow-md scale-[1.02]' : 'text-[#8b5a2b] hover:bg-[#e6d0a7]'}`}>🛒 Buy Structures</button>
+          <button onClick={() => setTab('SELL')} className={`flex-1 py-3 text-xl font-black rounded-xl transition-all ${tab === 'SELL' ? 'bg-white text-[#5c3a21] shadow-md scale-[1.02]' : 'text-[#8b5a2b] hover:bg-[#e6d0a7]'}`}>💰 Sell Produce</button>
+        </div>
+
+        {/* Content */}
+        <div className="flex-1 overflow-y-auto p-6 bg-[#fff5d7]">
+          {tab === 'BUY' && (
+            <div className="grid grid-cols-2 gap-6">
+              {STRUCTURES.map(s => (
+                <div key={s.id} className="bg-white border-4 border-[#d2b48c] rounded-2xl p-4 flex gap-4 items-center shadow-sm hover:shadow-md transition-shadow">
+                   <div className="w-24 h-24 bg-blue-100 rounded-xl border-2 border-blue-200 flex items-center justify-center text-6xl drop-shadow-md">
+                     {EMOJI_MAP[s.id]}
+                   </div>
+                   <div className="flex-1 flex flex-col justify-center">
+                     <h3 className="text-xl font-black text-[#5c3a21]">{s.name}</h3>
+                     <p className="text-sm text-[#8b5a2b] font-medium leading-tight mt-1 h-10">{s.desc}</p>
+                     <div className="mt-2 flex justify-between items-center">
+                       <span className="font-black text-yellow-600 text-lg">{s.cost} 🪙</span>
+                       <button 
+                         onClick={() => dispatch({ type: 'BUY', itemType: s.id, cost: s.cost })}
+                         disabled={state.inventory.coins < s.cost}
+                         className={`px-4 py-2 rounded-lg font-bold border-b-4 transition-transform active:scale-95 ${state.inventory.coins >= s.cost ? 'bg-green-500 hover:bg-green-400 border-green-700 text-white' : 'bg-gray-300 border-gray-400 text-gray-500 cursor-not-allowed'}`}
+                       >
+                         Buy
+                       </button>
+                     </div>
+                   </div>
                 </div>
-             )}
-          </div>
-       </div>
+              ))}
+            </div>
+          )}
+
+          {tab === 'SELL' && (
+            <div className="flex flex-col items-center justify-center h-full gap-8">
+              <div className="bg-white border-4 border-[#d2b48c] rounded-3xl p-8 flex flex-col items-center shadow-lg w-[400px] text-center">
+                <div className="text-8xl drop-shadow-lg mb-4">🌽</div>
+                <h3 className="text-3xl font-black text-[#5c3a21]">Harvested Produce</h3>
+                <p className="text-lg text-[#8b5a2b] font-medium mt-2">You have <span className="font-black text-xl">{state.inventory.produce}</span> in stock.</p>
+                
+                <div className="w-full h-1 bg-gray-200 rounded-full my-6"></div>
+                
+                <div className="flex justify-between w-full mb-6 text-xl font-bold">
+                  <span className="text-[#8b5a2b]">Value:</span>
+                  <span className="text-yellow-600">{state.inventory.produce * 5} 🪙</span>
+                </div>
+
+                <button 
+                  onClick={() => dispatch({ type: 'SELL_PRODUCE' })}
+                  disabled={state.inventory.produce <= 0}
+                  className={`w-full py-4 rounded-xl font-black text-2xl border-b-4 transition-transform active:scale-95 ${state.inventory.produce > 0 ? 'bg-yellow-400 hover:bg-yellow-300 border-yellow-600 text-yellow-900 shadow-md' : 'bg-gray-300 border-gray-400 text-gray-500 cursor-not-allowed'}`}
+                >
+                  Sell All
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
     </div>
   )
 }
