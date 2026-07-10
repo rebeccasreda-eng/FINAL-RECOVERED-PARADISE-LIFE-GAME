@@ -144,22 +144,66 @@ const StageBg = () => (
     <circle cx="346" cy="174" r="6.5" fill="#7a5a20"/>
     <circle cx="357" cy="171" r="5.5" fill="#8a6a28"/>
 
-    {/* ── Flower/plant decorations ── */}
-    <circle cx="18"  cy="218" r="9"   fill="#dd2222" opacity="0.95"/>
-    <circle cx="11"  cy="217" r="6.5" fill="#ffaa00" opacity="0.90"/>
-    <circle cx="30"  cy="213" r="8"   fill="#ffdd00" opacity="0.90"/>
-    <circle cx="46"  cy="219" r="8.5" fill="#ee3333" opacity="0.90"/>
-    <circle cx="58"  cy="215" r="7"   fill="#ff8822" opacity="0.85"/>
-    <path d="M18 224 L18 240"  stroke="#229922" strokeWidth="2.5"/>
-    <path d="M30 218 L28 238"  stroke="#229922" strokeWidth="2.5"/>
-    <path d="M46 225 L44 240"  stroke="#229922" strokeWidth="2.5"/>
-    <path d="M58 221 L56 238"  stroke="#229922" strokeWidth="2.5"/>
-    <path d="M18 228 Q10 222 13 216" stroke="#22bb22" strokeWidth="3" fill="none" strokeLinecap="round"/>
-    <path d="M30 223 Q22 218 24 212" stroke="#22bb22" strokeWidth="3" fill="none" strokeLinecap="round"/>
-    <circle cx="358" cy="220" r="8"   fill="#ff4488" opacity="0.90"/>
-    <circle cx="370" cy="217" r="6.5" fill="#ffcc00" opacity="0.90"/>
-    <path d="M358 226 L356 240" stroke="#229922" strokeWidth="2.5"/>
-    <path d="M370 223 L368 238" stroke="#229922" strokeWidth="2.5"/>
+    {/* ── Thin beach grass + water channels ──────────────────────────────── */}
+    {/* Layout: 5 sparse clumps (A x≈5-44, B x≈90-132, C x≈170-208, D x≈252-292, E x≈338-376)
+        with open water-flow gaps between each pair. Two sinuous water channels snake
+        the full width; they're most visible in the gaps. strokeWidth=1.5 keeps blades thin. */}
+
+    {/* ── Water channel 1 (upper, y≈225-231) ─ runs full width behind the grass ── */}
+    <path d="M0 228 Q22 223 44 228 Q68 233 90 228 Q112 223 132 228 Q152 233 170 228 Q190 223 208 228 Q230 233 252 228 Q272 223 292 228 Q314 233 338 228 Q358 223 380 228"
+          stroke="#3aaedd" strokeWidth="2" fill="none" opacity="0.72" strokeLinecap="round"/>
+
+    {/* ── Water channel 2 (lower, y≈233-239) ─ wider, fills the gaps prominently ── */}
+    <path d="M0 236 Q44 232 58 237 Q76 242 96 236 Q118 230 136 236 Q158 242 172 236 Q194 230 212 236 Q234 242 256 236 Q278 230 296 236 Q318 242 340 236 Q362 231 380 236"
+          stroke="#44b8ee" strokeWidth="2.5" fill="none" opacity="0.65" strokeLinecap="round"/>
+
+    {/* ── Clump A (x=5-44, left edge) — 7 thin blades ── */}
+    <path d="M8  240 Q7  231 6  220"  stroke="#58b828" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
+    <path d="M15 240 Q14 230 16 219" stroke="#4a9e20" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
+    <path d="M22 240 Q22 230 20 219" stroke="#62bc2e" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
+    <path d="M30 240 Q30 231 32 221" stroke="#4a9e20" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
+    <path d="M37 240 Q36 232 34 222" stroke="#58b028" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
+    <path d="M43 240 Q44 231 46 221" stroke="#4a9e20" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
+    {/* tiny accent flowers on a couple blades */}
+    <circle cx="6"  cy="218" r="2.5" fill="#ee3322" opacity="0.9"/>
+    <circle cx="20" cy="217" r="2"   fill="#ffcc00" opacity="0.9"/>
+    <circle cx="34" cy="220" r="2.5" fill="#ff8822" opacity="0.85"/>
+
+    {/* ── Clump B (x=90-132) — 6 thin blades ── */}
+    <path d="M92  240 Q91  231 90  220" stroke="#58b828" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
+    <path d="M100 240 Q100 230 102 220" stroke="#4a9e20" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
+    <path d="M108 240 Q107 231 106 221" stroke="#62bc2e" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
+    <path d="M116 240 Q117 230 119 220" stroke="#4a9e20" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
+    <path d="M124 240 Q123 231 122 221" stroke="#58b028" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
+    <path d="M132 240 Q133 231 135 221" stroke="#4a9e20" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
+    <circle cx="90"  cy="218" r="2"   fill="#dd2255" opacity="0.85"/>
+    <circle cx="119" cy="218" r="2.5" fill="#ffdd00" opacity="0.9"/>
+
+    {/* ── Clump C (x=170-208, very sparse — center) — 4 thin blades ── */}
+    <path d="M172 240 Q171 232 170 222" stroke="#58b828" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
+    <path d="M182 240 Q183 232 185 223" stroke="#4a9e20" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
+    <path d="M196 240 Q195 232 194 222" stroke="#62bc2e" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
+    <path d="M208 240 Q209 232 211 222" stroke="#4a9e20" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
+    <circle cx="185" cy="221" r="2" fill="#ff8822" opacity="0.85"/>
+
+    {/* ── Clump D (x=252-292) — 6 thin blades ── */}
+    <path d="M254 240 Q253 231 252 220" stroke="#58b828" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
+    <path d="M262 240 Q262 230 264 220" stroke="#4a9e20" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
+    <path d="M270 240 Q269 231 268 221" stroke="#62bc2e" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
+    <path d="M278 240 Q279 230 281 220" stroke="#4a9e20" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
+    <path d="M286 240 Q285 231 284 221" stroke="#58b028" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
+    <path d="M292 240 Q293 231 295 221" stroke="#4a9e20" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
+    <circle cx="252" cy="218" r="2.5" fill="#ee3322" opacity="0.9"/>
+    <circle cx="281" cy="219" r="2"   fill="#ffcc00" opacity="0.85"/>
+
+    {/* ── Clump E (x=338-376, right edge) — 6 thin blades ── */}
+    <path d="M340 240 Q339 231 338 220" stroke="#58b828" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
+    <path d="M348 240 Q348 230 350 220" stroke="#4a9e20" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
+    <path d="M356 240 Q355 231 354 221" stroke="#62bc2e" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
+    <path d="M364 240 Q365 230 367 220" stroke="#4a9e20" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
+    <path d="M372 240 Q371 231 370 221" stroke="#58b028" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
+    <circle cx="338" cy="218" r="2"   fill="#ff4488" opacity="0.9"/>
+    <circle cx="367" cy="219" r="2.5" fill="#ffcc00" opacity="0.85"/>
 
     {/* ── Fish/sea creature ── */}
     <ellipse cx="140" cy="175" rx="8"  ry="3"   fill="#5588cc" opacity="0.75"/>
