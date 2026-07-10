@@ -332,12 +332,12 @@ export const NeighborPanel = ({ playerName = 'Player', playerLevel = 1 }: Neighb
 
       {/* ── NEIGHBOUR CARDS: Player + Marina + 5 empty slots ── */}
       <div
-        className="flex items-center gap-2 px-3 overflow-x-auto"
+        className="flex items-center justify-evenly px-2"
         style={{
-          borderRight: '2px solid #5a3a10',
-          maxWidth: 380,
+          flex: 1,
           minWidth: 0,
-          flexShrink: 1,
+          borderRight: '2px solid #5a3a10',
+          overflow: 'hidden',
         }}
       >
         {/* 5 empty Add Neighbor slots — come first */}
