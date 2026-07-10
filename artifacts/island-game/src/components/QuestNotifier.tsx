@@ -362,40 +362,47 @@ export const QuestNotifier = ({ onOpenPanel }: { onOpenPanel: (questId: string) 
             key={group.id}
             style={{ display: 'flex', alignItems: 'center', gap: 8 }}
           >
-            {/* NPC icon — white glow pulse when new quests available */}
-            <div
+            {/* NPC icon — tap to open quest; glows when new quests available */}
+            <button
+              onClick={() => {
+                if (newSigns.length > 0) {
+                  dispatch({ type: 'ACCEPT_QUEST', questId: newSigns[0].id });
+                  onOpenPanel(newSigns[0].id);
+                } else {
+                  // No new quests — open the most recent accepted/active quest
+                  const activeId = group.quests
+                    .slice()
+                    .reverse()
+                    .find(qid => state.quests[qid]?.accepted && !state.quests[qid]?.completed);
+                  if (activeId) onOpenPanel(activeId);
+                }
+              }}
               style={{
-                position: 'relative',
+                background: 'none',
+                border: 'none',
+                padding: 0,
+                cursor: 'pointer',
                 flexShrink: 0,
                 animation: newSigns.length > 0
                   ? 'questIconGlow 1.8s ease-in-out infinite'
                   : 'none',
                 filter: newSigns.length > 0
-                  ? undefined  // handled by animation
+                  ? undefined
                   : 'drop-shadow(2px 4px 6px rgba(0,0,0,0.4))',
               }}
             >
               <NpcIcon />
-            </div>
+            </button>
 
-            {/* Stacked NEW QUEST signs — nudge leftward to gesture toward the icon */}
+            {/* NEW QUEST badge — non-interactive nudge indicator */}
             {newSigns.length > 0 && (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
-                {newSigns.map((q, i) => (
-                  <div
-                    key={q.id}
-                    style={{
-                      animation: `questSignNudge 2.2s ease-in-out ${i * 0.18}s infinite`,
-                    }}
-                  >
-                    <QuestSign
-                      onClick={() => {
-                        dispatch({ type: 'ACCEPT_QUEST', questId: q.id });
-                        onOpenPanel(q.id);
-                      }}
-                    />
-                  </div>
-                ))}
+              <div
+                style={{
+                  animation: 'questSignNudge 2.2s ease-in-out infinite',
+                  pointerEvents: 'none',
+                }}
+              >
+                <QuestSign onClick={() => {}} />
               </div>
             )}
           </div>
