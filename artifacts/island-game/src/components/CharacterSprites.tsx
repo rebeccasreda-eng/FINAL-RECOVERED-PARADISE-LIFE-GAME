@@ -515,6 +515,184 @@ export const ChNora = ({ size = 120, isWalking, facing }: SpriteProps) => {
   );
 };
 
+/* ═══════════════════════════════════════════════════════════════════════════
+   ChPlayer — custom chibi: auburn hair with sway, maroon jacket, amber eyes
+   ═══════════════════════════════════════════════════════════════════════════ */
+export const ChPlayer = ({ size = 120, isWalking, facing }: SpriteProps) => {
+  const SK  = '#fde8d0'; const SKS = '#f0c4a0';
+  const H   = '#c85028'; const HD  = '#8a3018'; const HL = '#e88040';
+  const J   = '#7a3820'; const JD  = '#5a2010';
+  const SH  = '#eadbb8'; const P   = '#3e3028'; const SHO = '#1e1008';
+  const EY  = '#8a5028';
+
+  if (facing === 'back') return (
+    <svg viewBox="0 0 100 140" width={size} height={size * 1.4} xmlns="http://www.w3.org/2000/svg">
+      <ellipse cx="50" cy="137" rx="22" ry="4" fill="#00000025"/>
+      <g className={isWalking ? 'char-leg-a' : undefined} style={{ transformOrigin: '41px 108px' }}>
+        <rect x="36" y="108" width="11" height="26" rx="5.5" fill={P}/>
+        <ellipse cx="41" cy="134" rx="10" ry="5" fill={SHO}/>
+      </g>
+      <g className={isWalking ? 'char-leg-b' : undefined} style={{ transformOrigin: '59px 108px' }}>
+        <rect x="54" y="108" width="11" height="26" rx="5.5" fill={P}/>
+        <ellipse cx="59" cy="134" rx="10" ry="5" fill={SHO}/>
+      </g>
+      <path d="M29 88 Q31 116 43 116 L57 116 Q69 116 71 88Z" fill={J}/>
+      <rect x="29" y="85" width="42" height="5" rx="2.5" fill={JD}/>
+      <rect x="29" y="63" width="42" height="24" rx="7" fill={J}/>
+      <g className={isWalking ? 'char-arm-b' : undefined} style={{ transformOrigin: '29px 68px' }}>
+        <path d="M29 68 Q16 76 18 88" stroke={J}  strokeWidth="11" fill="none" strokeLinecap="round"/>
+        <path d="M18 88 Q17 93 21 95" stroke={SK} strokeWidth="9"  fill="none" strokeLinecap="round"/>
+      </g>
+      <g className={isWalking ? 'char-arm-a' : undefined} style={{ transformOrigin: '71px 68px' }}>
+        <path d="M71 68 Q84 76 82 88" stroke={J}  strokeWidth="11" fill="none" strokeLinecap="round"/>
+        <path d="M82 88 Q83 93 79 95" stroke={SK} strokeWidth="9"  fill="none" strokeLinecap="round"/>
+      </g>
+      <rect x="44" y="56" width="12" height="10" rx="3" fill={SK}/>
+      <circle cx="50" cy="35" r="27" fill={SK}/>
+      <ellipse cx="50" cy="20" rx="28" ry="23" fill={HD}/>
+      <g className="char-hair-l" style={{ transformOrigin: '24px 30px' }}>
+        <path d="M24 30 Q8 50 12 74"  stroke={H}  strokeWidth="14" fill="none" strokeLinecap="round"/>
+        <path d="M24 30 Q10 52 14 74" stroke={HD} strokeWidth="7"  fill="none" strokeLinecap="round" opacity="0.45"/>
+      </g>
+      <g className="char-hair-r" style={{ transformOrigin: '76px 30px' }}>
+        <path d="M76 30 Q92 50 88 74"  stroke={H}  strokeWidth="14" fill="none" strokeLinecap="round"/>
+        <path d="M76 30 Q90 52 86 74"  stroke={HD} strokeWidth="7"  fill="none" strokeLinecap="round" opacity="0.45"/>
+      </g>
+      <path d="M24 30 Q28 7 50 5 Q72 7 76 30 Q68 13 50 11 Q32 13 24 30Z" fill={H}/>
+      <path d="M36 13 Q50 8 64 13" stroke={HL} strokeWidth="5" fill="none" strokeLinecap="round" opacity="0.38"/>
+    </svg>
+  );
+
+  return (
+    <svg viewBox="0 0 100 140" width={size} height={size * 1.4} xmlns="http://www.w3.org/2000/svg">
+      <ellipse cx="50" cy="137" rx="22" ry="4" fill="#00000025"/>
+
+      {/* ── LEGS ── */}
+      <g className={isWalking ? 'char-leg-a' : undefined} style={{ transformOrigin: '41px 108px' }}>
+        <rect x="36" y="108" width="11" height="26" rx="5.5" fill={P}/>
+        <ellipse cx="41" cy="134" rx="10" ry="5" fill={SHO}/>
+      </g>
+      <g className={isWalking ? 'char-leg-b' : undefined} style={{ transformOrigin: '59px 108px' }}>
+        <rect x="54" y="108" width="11" height="26" rx="5.5" fill={P}/>
+        <ellipse cx="59" cy="134" rx="10" ry="5" fill={SHO}/>
+      </g>
+
+      {/* ── LOWER BODY ── */}
+      <path d="M29 88 Q31 116 43 116 L57 116 Q69 116 71 88Z" fill={J}/>
+      <path d="M29 88 L71 88" stroke={JD} strokeWidth="1.5" fill="none"/>
+      <rect x="29" y="85" width="42" height="5" rx="2.5" fill={JD}/>
+      <rect x="46" y="85" width="8" height="5" rx="1" fill="#c09040"/>
+
+      {/* ── JACKET TORSO ── */}
+      <rect x="29" y="63" width="42" height="25" rx="7" fill={J}/>
+      <path d="M29 68 L29 88" stroke={JD} strokeWidth="1" fill="none" opacity="0.4"/>
+      <path d="M71 68 L71 88" stroke={JD} strokeWidth="1" fill="none" opacity="0.4"/>
+      {/* collar + shirt */}
+      <path d="M38 63 Q50 75 62 63 L55 63 Q50 71 45 63Z" fill={SH}/>
+      <path d="M50 75 L50 88" stroke={JD} strokeWidth="1" fill="none" opacity="0.4"/>
+      <circle cx="50" cy="77" r="1.8" fill={SH} opacity="0.9"/>
+      <circle cx="50" cy="83" r="1.8" fill={SH} opacity="0.9"/>
+
+      {/* ── ARMS ── */}
+      <g className={isWalking ? 'char-arm-b' : undefined} style={{ transformOrigin: '29px 68px' }}>
+        <path d="M29 68 Q15 76 17 89" stroke={J}  strokeWidth="12" fill="none" strokeLinecap="round"/>
+        <path d="M15 86 Q14 91 17 89" stroke={JD} strokeWidth="10" fill="none" strokeLinecap="round" opacity="0.55"/>
+        <path d="M17 89 Q16 94 20 96" stroke={SK} strokeWidth="10" fill="none" strokeLinecap="round"/>
+      </g>
+      <g className={isWalking ? 'char-arm-a' : undefined} style={{ transformOrigin: '71px 68px' }}>
+        <path d="M71 68 Q85 76 83 89" stroke={J}  strokeWidth="12" fill="none" strokeLinecap="round"/>
+        <path d="M85 86 Q86 91 83 89" stroke={JD} strokeWidth="10" fill="none" strokeLinecap="round" opacity="0.55"/>
+        <path d="M83 89 Q84 94 80 96" stroke={SK} strokeWidth="10" fill="none" strokeLinecap="round"/>
+      </g>
+
+      {/* ── NECK ── */}
+      <rect x="44" y="56" width="12" height="10" rx="3" fill={SK}/>
+
+      {/* ── HAIR BACK ── */}
+      <ellipse cx="50" cy="20" rx="28" ry="23" fill={HD}/>
+
+      {/* ── HEAD ── */}
+      <circle cx="50" cy="35" r="27" fill={SK}/>
+
+      {/* ── EARS ── */}
+      <ellipse cx="23" cy="37" rx="5.5" ry="7" fill={SK}/>
+      <ellipse cx="77" cy="37" rx="5.5" ry="7" fill={SK}/>
+      <ellipse cx="23" cy="37" rx="3.5" ry="5" fill={SKS} opacity="0.5"/>
+      <ellipse cx="77" cy="37" rx="3.5" ry="5" fill={SKS} opacity="0.5"/>
+
+      {/* ── SIDE HAIR — sways idle ── */}
+      <g className="char-hair-l" style={{ transformOrigin: '24px 28px' }}>
+        <path d="M24 28 Q7 50 11 75"  stroke={H}  strokeWidth="15" fill="none" strokeLinecap="round"/>
+        <path d="M24 28 Q9 52 13 75"  stroke={HD} strokeWidth="8"  fill="none" strokeLinecap="round" opacity="0.5"/>
+        <path d="M27 32 Q14 54 18 74" stroke={HL} strokeWidth="3"  fill="none" strokeLinecap="round" opacity="0.28"/>
+      </g>
+      <g className="char-hair-r" style={{ transformOrigin: '76px 28px' }}>
+        <path d="M76 28 Q93 50 89 75"  stroke={H}  strokeWidth="15" fill="none" strokeLinecap="round"/>
+        <path d="M76 28 Q91 52 87 75"  stroke={HD} strokeWidth="8"  fill="none" strokeLinecap="round" opacity="0.5"/>
+        <path d="M73 32 Q86 54 82 74"  stroke={HL} strokeWidth="3"  fill="none" strokeLinecap="round" opacity="0.28"/>
+      </g>
+
+      {/* ── HAIR TOP ── */}
+      <path d="M24 28 Q28 5 50 3 Q72 5 76 28 Q67 11 50 9 Q33 11 24 28Z" fill={H}/>
+
+      {/* ── BANGS ── */}
+      <path d="M24 28 Q33 43 44 35" fill={HD}/>
+      <path d="M76 28 Q67 43 56 35" fill={HD}/>
+      <path d="M27 31 Q36 42 44 36" stroke={H}  strokeWidth="2.5" fill="none" opacity="0.7"/>
+      <path d="M73 31 Q64 42 56 36" stroke={H}  strokeWidth="2.5" fill="none" opacity="0.7"/>
+
+      {/* hair strand details */}
+      <path d="M35 12 Q44 7 54 11"  stroke={HD} strokeWidth="1.6" fill="none" strokeLinecap="round" opacity="0.5"/>
+      <path d="M47 10 Q57 6 67 11"  stroke={HD} strokeWidth="1.6" fill="none" strokeLinecap="round" opacity="0.5"/>
+      <path d="M31 18 Q41 12 51 16" stroke={HD} strokeWidth="1.3" fill="none" strokeLinecap="round" opacity="0.38"/>
+      <path d="M36 11 Q50 6 64 11"  stroke={HL} strokeWidth="5"   fill="none" strokeLinecap="round" opacity="0.38"/>
+
+      {/* ── EYES (large, clear, expressive) ── */}
+      <ellipse cx="37" cy="37" rx="9"   ry="11"  fill="white"/>
+      <ellipse cx="63" cy="37" rx="9"   ry="11"  fill="white"/>
+      <ellipse cx="37" cy="29.5" rx="9" ry="5.5" fill="rgba(100,40,8,0.17)"/>
+      <ellipse cx="63" cy="29.5" rx="9" ry="5.5" fill="rgba(100,40,8,0.17)"/>
+      {/* iris */}
+      <ellipse cx="37" cy="38.5" rx="6.5" ry="7.5" fill={EY}/>
+      <ellipse cx="63" cy="38.5" rx="6.5" ry="7.5" fill={EY}/>
+      {/* inner iris depth */}
+      <ellipse cx="37" cy="39"   rx="5"   ry="6"   fill="#6a3018"/>
+      <ellipse cx="63" cy="39"   rx="5"   ry="6"   fill="#6a3018"/>
+      {/* pupil */}
+      <circle cx="37.5" cy="39.5" r="4"   fill="#120800"/>
+      <circle cx="63.5" cy="39.5" r="4"   fill="#120800"/>
+      {/* big highlight */}
+      <circle cx="41"   cy="32"   r="3.5" fill="white"/>
+      <circle cx="67"   cy="32"   r="3.5" fill="white"/>
+      {/* small secondary highlight */}
+      <circle cx="34.5" cy="44"   r="1.4" fill="rgba(255,255,255,0.7)"/>
+      <circle cx="60.5" cy="44"   r="1.4" fill="rgba(255,255,255,0.7)"/>
+
+      {/* upper lid / lashes */}
+      <path d="M28 31 Q37 23 46 31" stroke="#3a1008" strokeWidth="3"   fill="none" strokeLinecap="round"/>
+      <path d="M54 31 Q63 23 72 31" stroke="#3a1008" strokeWidth="3"   fill="none" strokeLinecap="round"/>
+      {/* lower lid subtle */}
+      <path d="M29 44 Q37 48 45 44" stroke="#3a1008" strokeWidth="1.2" fill="none" strokeLinecap="round" opacity="0.35"/>
+      <path d="M55 44 Q63 48 71 44" stroke="#3a1008" strokeWidth="1.2" fill="none" strokeLinecap="round" opacity="0.35"/>
+
+      {/* ── EYEBROWS ── */}
+      <path d="M28 24 Q37 18 46 23" stroke={HD} strokeWidth="3"   fill="none" strokeLinecap="round"/>
+      <path d="M54 23 Q63 18 72 24" stroke={HD} strokeWidth="3"   fill="none" strokeLinecap="round"/>
+
+      {/* ── NOSE ── */}
+      <ellipse cx="50" cy="48" rx="2.5" ry="1.5" fill="#e0a880" opacity="0.6"/>
+
+      {/* ── MOUTH ── */}
+      <path d="M43 54 Q50 62 57 54" stroke="#cc3355" strokeWidth="2.5" fill="none" strokeLinecap="round"/>
+      <path d="M46 54 L54 54"       stroke="#cc3355" strokeWidth="1.3" fill="none" opacity="0.45"/>
+
+      {/* ── CHEEK BLUSH ── */}
+      <ellipse cx="29" cy="49" rx="8" ry="5" fill="#ffaaaa" opacity="0.17"/>
+      <ellipse cx="71" cy="49" rx="8" ry="5" fill="#ffaaaa" opacity="0.17"/>
+    </svg>
+  );
+};
+
 export const CHARACTER_COMPONENTS: Record<string, React.FC<SpriteProps>> = {
-  mia: ChMia, leo: ChLeo, ava: ChAva, kai: ChKai, nora: ChNora,
+  mia: ChMia, leo: ChLeo, ava: ChAva, kai: ChKai, nora: ChNora, player: ChPlayer,
 };

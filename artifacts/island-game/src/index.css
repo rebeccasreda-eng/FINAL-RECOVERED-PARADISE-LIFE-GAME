@@ -244,6 +244,18 @@
 .char-arm-a { animation: charArmA 0.7s ease-in-out infinite; }
 .char-arm-b { animation: charArmB 0.7s ease-in-out infinite; }
 
+/* ── Hair sway — idle pendulum on side strands ─────────────── */
+@keyframes charHairSwayL {
+  0%, 100% { transform: rotate(-6deg) translateX(-1px); }
+  50%       { transform: rotate(5deg)  translateX(1px);  }
+}
+@keyframes charHairSwayR {
+  0%, 100% { transform: rotate(6deg)  translateX(1px);  }
+  50%       { transform: rotate(-5deg) translateX(-1px); }
+}
+.char-hair-l { animation: charHairSwayL 2.4s ease-in-out infinite; }
+.char-hair-r { animation: charHairSwayR 2.4s ease-in-out infinite; }
+
 /* ── Walk destination marker pulse ─────────────────────── */
 @keyframes destPulse {
   0%,100% { opacity: 0.8; transform: scale(1); }
