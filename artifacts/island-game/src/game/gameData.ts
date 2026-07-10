@@ -227,5 +227,23 @@ export function generateIsland(): Record<string, TileData> {
   const waterTiles = Object.values(tiles).filter(t => t.type === 'WATER');
   for (let i = 0; i < 6 && waterTiles.length; i++) pick(waterTiles).object = 'FISH_SPOT';
 
+  // ── Clear trees blocking garden patches and rocks ───────────────────────
+  // In isometric view, trees on any neighboring tile can visually overlap a
+  // GARDEN_PATCH or ROCK.  After all objects are placed, remove any tree from
+  // the 8-directional neighborhood of every protected tile so they stay visible.
+  const TREE_TYPES: ObjectType[] = ['TREE_PALM', 'TREE_APPLE', 'TREE_COCONUT', 'TREE_MANGO'];
+  const PROTECTED: ObjectType[]  = ['GARDEN_PATCH', 'ROCK'];
+  const NEIGHBORS = [[-1,-1],[-1,0],[-1,1],[0,-1],[0,1],[1,-1],[1,0],[1,1]] as const;
+
+  for (const tile of Object.values(tiles)) {
+    if (!tile.object || !PROTECTED.includes(tile.object)) continue;
+    for (const [dx, dy] of NEIGHBORS) {
+      const nb = tiles[`${tile.x + dx},${tile.y + dy}`];
+      if (nb?.object && TREE_TYPES.includes(nb.object as ObjectType)) {
+        nb.object = undefined;
+      }
+    }
+  }
+
   return tiles;
 }
