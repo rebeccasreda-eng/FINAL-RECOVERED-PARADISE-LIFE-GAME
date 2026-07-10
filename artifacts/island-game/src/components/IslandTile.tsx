@@ -736,58 +736,65 @@ const ObjectSVG: React.FC<{ object: string; tileX: number; tileY: number }> = ({
       </svg>
     );
 
-    /* ── WEEDS (overgrown grass clump — clearable) ─────────────────────── */
+    /* ── WEEDS (tall reed/cattail cluster — clearable) ──────────────────── */
     case 'WEEDS': {
-      // 3 deterministic color variants per tile
       const wv = (tx * 5 + ty * 11) % 3;
-      const [ws1, ws2, ws3, ws4, wseed] = ([
-        ['#327016','#4e8e20','#6aa828','#92b830','#b89830'],  // dark green
-        ['#4a7810','#669a18','#88b424','#aabe2c','#c8a828'],  // olive-yellow
-        ['#266010','#3e7e1c','#5a9a24','#7aae2c','#a89030'],  // cool green
+      // Three green palette variants matching the reference (no yellowing — all live green)
+      const [cDark, cMid, cFront, cHi] = ([
+        ['#266c10','#3a9018','#52b020','#78d038'],  // pure cool green
+        ['#2a7012','#40981a','#56b422','#7acc3a'],  // slightly warmer
+        ['#246810','#368c18','#4eac1e','#72c836'],  // deep forest
       ] as const)[wv];
+
+      // Helper: filled sword-blade shape — base centered at (cx,by), height h,
+      // tip leaning by `lean` px, half-width bw at widest point.
+      // Returns an SVG path "d" string.
+      const blade = (cx: number, by: number, h: number, lean: number, bw: number) => {
+        const tx = cx + lean, ty = by - h;
+        // Cubic bezier: base → bulge out mid → taper to tip (both sides)
+        return `M ${cx - bw},${by} `
+          + `C ${cx - bw * 0.85},${by - h * 0.35} ${tx - bw * 0.45},${by - h * 0.65} ${tx},${ty} `
+          + `C ${tx + bw * 0.45},${by - h * 0.65} ${cx + bw * 0.85},${by - h * 0.35} ${cx + bw},${by} Z`;
+      };
+      // Midrib highlight down the center of each blade
+      const rib = (cx: number, by: number, h: number, lean: number) =>
+        `M ${cx},${by} C ${cx + lean * 0.3},${by - h * 0.35} ${cx + lean * 0.7},${by - h * 0.65} ${cx + lean},${by - h}`;
+
+      const by = 55; // base y (below visible bottom — creates ground-anchored look)
       return (
-        <svg viewBox="0 0 52 46" width="50" height="44" style={{ display:'block' }}>
+        <svg viewBox="0 0 56 56" width="54" height="52" style={{ display:'block' }}>
           {/* Ground shadow */}
-          <ellipse cx="26" cy="45" rx="21" ry="4" fill="rgba(0,0,0,0.22)"/>
-          {/* Base vine / sprawl */}
-          <path d="M4,41 Q14,38 26,39 Q38,40 49,38" stroke="#3a5a0e" strokeWidth="1.8" fill="none" strokeLinecap="round" opacity="0.60"/>
-          <path d="M2,39 Q11,36 20,38 Q30,40 38,37 Q44,35 51,37" stroke="#4a700a" strokeWidth="1.4" fill="none" strokeLinecap="round" opacity="0.45"/>
+          <ellipse cx="28" cy="55" rx="24" ry="4.5" fill="rgba(0,0,0,0.22)"/>
 
-          {/* ── BACK ROW — tallest blades ── */}
-          <path d="M9,43  Q7,31  6,19  Q5,11  8,2"   stroke={ws1} strokeWidth="2.8" fill="none" strokeLinecap="round"/>
-          <path d="M18,43 Q16,31 14,20 Q12,11 14,3"  stroke={ws3} strokeWidth="2.6" fill="none" strokeLinecap="round"/>
-          <path d="M26,43 Q25,30 24,18 Q23,10 26,2"  stroke={ws1} strokeWidth="2.8" fill="none" strokeLinecap="round"/>
-          <path d="M35,43 Q37,30 39,19 Q40,10 38,2"  stroke={ws3} strokeWidth="2.6" fill="none" strokeLinecap="round"/>
-          <path d="M44,43 Q46,31 47,19 Q48,11 46,3"  stroke={ws1} strokeWidth="2.8" fill="none" strokeLinecap="round"/>
+          {/* ── BACK ROW — tallest, darkest ── */}
+          <path d={blade(9,  by, 52, -3, 2.8)} fill={cDark}/>
+          <path d={blade(18, by, 55, -1, 3.2)} fill={cDark}/>
+          <path d={blade(28, by, 57,  0, 3.4)} fill={cDark}/>
+          <path d={blade(37, by, 53,  2, 3.0)} fill={cDark}/>
+          <path d={blade(46, by, 50,  4, 2.8)} fill={cDark}/>
 
-          {/* ── MID ROW — angled blades ── */}
-          <path d="M7,43  Q9,31  13,19 Q16,10 13,2"  stroke={ws2} strokeWidth="2.5" fill="none" strokeLinecap="round"/>
-          <path d="M22,43 Q21,31 20,21 Q19,12 21,3"  stroke={ws4} strokeWidth="2.4" fill="none" strokeLinecap="round"/>
-          <path d="M31,43 Q32,31 33,21 Q34,12 32,3"  stroke={ws2} strokeWidth="2.4" fill="none" strokeLinecap="round"/>
-          <path d="M46,43 Q44,31 43,21 Q42,12 44,3"  stroke={ws4} strokeWidth="2.5" fill="none" strokeLinecap="round"/>
+          {/* ── MID ROW — medium height ── */}
+          <path d={blade(4,  by, 40, -5, 2.4)} fill={cMid}/>
+          <path d={blade(13, by, 42, -2, 2.6)} fill={cMid}/>
+          <path d={blade(22, by, 44,  0, 2.8)} fill={cMid}/>
+          <path d={blade(32, by, 42,  1, 2.6)} fill={cMid}/>
+          <path d={blade(41, by, 40,  3, 2.4)} fill={cMid}/>
+          <path d={blade(50, by, 38,  5, 2.2)} fill={cMid}/>
 
-          {/* ── FRONT ROW — leaning outward ── */}
-          <path d="M14,44 Q10,33  7,22  Q5,13  8,5"  stroke={ws2} strokeWidth="2.7" fill="none" strokeLinecap="round"/>
-          <path d="M38,44 Q42,33 45,22 Q47,13 45,5"  stroke={ws2} strokeWidth="2.7" fill="none" strokeLinecap="round"/>
+          {/* ── FRONT ROW — shorter, brightest ── */}
+          <path d={blade(8,  by, 28, -4, 2.2)} fill={cFront}/>
+          <path d={blade(17, by, 30, -1, 2.5)} fill={cFront}/>
+          <path d={blade(27, by, 28,  0, 2.4)} fill={cFront}/>
+          <path d={blade(37, by, 26,  2, 2.2)} fill={cFront}/>
+          <path d={blade(47, by, 24,  4, 2.0)} fill={cFront}/>
 
-          {/* ── YELLOWED / dried blades (overgrown look) ── */}
-          <path d="M21,44 Q23,33 24,22 Q25,13 22,4"  stroke="#98ac28" strokeWidth="2.2" fill="none" strokeLinecap="round" opacity="0.80"/>
-          <path d="M31,44 Q29,33 28,22 Q27,13 30,4"  stroke="#a4b020" strokeWidth="2.0" fill="none" strokeLinecap="round" opacity="0.75"/>
-
-          {/* ── Seed heads on tallest blades ── */}
-          <ellipse cx="8"  cy="1.5" rx="2.0" ry="3.6" fill={wseed} opacity="0.90"/>
-          <ellipse cx="14" cy="2.5" rx="1.6" ry="2.8" fill={wseed} opacity="0.80"/>
-          <ellipse cx="26" cy="1.5" rx="2.2" ry="4.0" fill={wseed} opacity="0.88"/>
-          <ellipse cx="38" cy="2.5" rx="1.6" ry="2.8" fill={wseed} opacity="0.80"/>
-          <ellipse cx="46" cy="1.5" rx="2.0" ry="3.6" fill={wseed} opacity="0.88"/>
-
-          {/* ── Small weed flowers ── */}
-          <circle cx="17" cy="9"  r="2.4" fill="#dcd030" opacity="0.72"/>
-          <circle cx="35" cy="8"  r="2.1" fill="#e4d828" opacity="0.68"/>
-
-          {/* ── Subtle blade edge highlights ── */}
-          <path d="M9,43  Q7,31 6,19"  stroke="rgba(255,255,255,0.18)" strokeWidth="1.1" fill="none" strokeLinecap="round"/>
-          <path d="M44,43 Q46,31 47,19" stroke="rgba(255,255,255,0.16)" strokeWidth="1.1" fill="none" strokeLinecap="round"/>
+          {/* ── Midrib highlights ── */}
+          <path d={rib(18, by, 55, -1)} stroke={cHi} strokeWidth="0.9" fill="none" opacity="0.55" strokeLinecap="round"/>
+          <path d={rib(28, by, 57,  0)} stroke={cHi} strokeWidth="1.0" fill="none" opacity="0.60" strokeLinecap="round"/>
+          <path d={rib(37, by, 53,  2)} stroke={cHi} strokeWidth="0.9" fill="none" opacity="0.55" strokeLinecap="round"/>
+          <path d={rib(22, by, 44,  0)} stroke={cHi} strokeWidth="0.8" fill="none" opacity="0.45" strokeLinecap="round"/>
+          <path d={rib(17, by, 30, -1)} stroke={cHi} strokeWidth="0.7" fill="none" opacity="0.40" strokeLinecap="round"/>
+          <path d={rib(27, by, 28,  0)} stroke={cHi} strokeWidth="0.7" fill="none" opacity="0.38" strokeLinecap="round"/>
         </svg>
       );
     }
