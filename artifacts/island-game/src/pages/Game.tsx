@@ -128,8 +128,11 @@ const GameInner = ({ profile }: { profile: PlayerProfile }) => {
   const viewportRef  = useRef<HTMLDivElement>(null);
   const worldRef     = useRef<HTMLDivElement>(null);
   const panRef       = useRef({ x: 0, y: 0 });
-  const zoomRef      = useRef(1.0);
-  const [zoom, setZoom]     = useState(1.0);
+  const INITIAL_ZOOM = 1.4;
+  const MIN_ZOOM     = 1.1;   // ~2 scroll-outs from initial
+  const MAX_ZOOM     = 2.4;
+  const zoomRef      = useRef(INITIAL_ZOOM);
+  const [zoom, setZoom]     = useState(INITIAL_ZOOM);
   const [cursor, setCursor] = useState<'grab' | 'grabbing'>('grab');
   const dragStartRef = useRef<{ mx: number; my: number; px: number; py: number } | null>(null);
   const didDragRef   = useRef(false);
@@ -142,8 +145,8 @@ const GameInner = ({ profile }: { profile: PlayerProfile }) => {
     }
   }, []);
 
-  // Initial position: island visually centred on load
-  useEffect(() => { applyTransform(0, 0, 1.0); }, [applyTransform]);
+  // Initial position: island visually centred on load, zoomed in
+  useEffect(() => { applyTransform(0, 0, INITIAL_ZOOM); }, [applyTransform]); // eslint-disable-line react-hooks/exhaustive-deps
 
   /* Mouse-wheel zoom (non-passive, zooms at cursor point) */
   useEffect(() => {
@@ -157,7 +160,7 @@ const GameInner = ({ profile }: { profile: PlayerProfile }) => {
       const cx = e.clientX - rect.left  - rect.width  / 2;
       const cy = e.clientY - rect.top   - rect.height / 2;
       const oldZ = zoomRef.current;
-      const newZ = Math.max(0.4, Math.min(2.4, oldZ * (e.deltaY < 0 ? 1.1 : 0.9)));
+      const newZ = Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, oldZ * (e.deltaY < 0 ? 1.1 : 0.9)));
       // Transform: translate(panX-CX, panY-CY) scale(z), origin 0 0
       // screen_x = z*wx + (panX - WORLD_CX)  →  newPanX that keeps wx at cx:
       // newPanX = cx + WORLD_CX - wx*newZ  where  wx = (cx + WORLD_CX - panX) / oldZ
@@ -207,11 +210,11 @@ const GameInner = ({ profile }: { profile: PlayerProfile }) => {
 
   /** Zoom button helper — zooms centred on viewport */
   const zoomBy = useCallback((factor: number) => {
-    const newZ = Math.max(0.4, Math.min(2.4, zoomRef.current * factor));
+    const newZ = Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, zoomRef.current * factor));
     zoomRef.current = newZ;
     applyTransform(panRef.current.x, panRef.current.y, newZ);
     setZoom(newZ);
-  }, [applyTransform]);
+  }, [applyTransform]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <div className="w-full h-[100dvh] overflow-hidden relative" style={{ fontFamily: "'Fredoka', sans-serif" }}>
@@ -282,7 +285,7 @@ const GameInner = ({ profile }: { profile: PlayerProfile }) => {
           title="Zoom in"
         >+</button>
         <button
-          onClick={() => { panRef.current = { x: 0, y: 0 }; zoomRef.current = 1; applyTransform(0, 0, 1); setZoom(1); }}
+          onClick={() => { panRef.current = { x: 0, y: 0 }; zoomRef.current = INITIAL_ZOOM; applyTransform(0, 0, INITIAL_ZOOM); setZoom(INITIAL_ZOOM); }}
           className="w-9 h-9 rounded-full shadow-lg text-xs font-black flex items-center justify-center active:scale-95 transition-transform"
           style={{ background: 'rgba(255,255,255,0.92)', border: '2px solid #c8a56a', color: '#5c3a21' }}
           title="Reset view"

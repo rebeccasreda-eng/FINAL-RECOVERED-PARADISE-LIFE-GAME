@@ -4,25 +4,24 @@ import { IslandTile } from './IslandTile';
 import { CharacterOnIsland } from './CharacterOnIsland';
 
 /* ── Isometric projection ──────────────────────────────────────────────── */
-const TW = 64;   // tile width
-const TH = 32;   // tile diamond height
+const TW = 80;   // tile width  (wider → more horizontal look)
+const TH = 28;   // tile diamond height (flatter → more horizontal look)
 
 export const GRID_COLS = 21;
 export const GRID_ROWS = 21;
 
 // World container size (px) — sized to contain the 21×21 elliptical island
-// Center tile (10,10) is at (OX, 320+OY) = (440, 320) = (WORLD_W/2, WORLD_H/2)
-// so island is visually centred on load.
-export const WORLD_W = 880;
-export const WORLD_H = 640;
+// Center tile (10,10): screenY = (10+10)*(TH/2) = 20*14 = 280 = WORLD_H/2 ✓
+export const WORLD_W = 1200;
+export const WORLD_H = 560;
 
 // Iso origin — tile (tx,ty) maps to:
 //   screenX = (tx-ty)*(TW/2) + OX
 //   screenY = (tx+ty)*(TH/2) + OY
-// Center tile (10,10): screenX = 0+440 = 440, screenY = 320+0 = 320
+// Center tile (10,10): screenX = 0+600 = 600, screenY = 280+0 = 280
 // → equals (WORLD_W/2, WORLD_H/2) ✓
-const OX = WORLD_W / 2;   // 440
-const OY = 0;              // tile (10,10) lands at screenY=320 = WORLD_H/2
+const OX = WORLD_W / 2;   // 600
+const OY = 0;              // tile (10,10) lands at screenY=280 = WORLD_H/2
 
 /** Screen X of tile (tx, ty) within the world div */
 export function isoScreenX(tx: number, ty: number): number {
