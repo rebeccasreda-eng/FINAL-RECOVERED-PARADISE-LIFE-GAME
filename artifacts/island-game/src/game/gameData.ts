@@ -290,26 +290,30 @@ export function generateIsland(): Record<string, TileData> {
           }
 
         } else if (isMidBack) {
-          // ── Mid zone: scattered trees with clear gaps ──────────────────
-          const treePct = 0.16 + ff * 0.10;
+          // ── Mid zone: more trees to fill the transition band ──────────
+          const treePct = 0.30 + ff * 0.14;
           if (r < treePct) {
             const tr = rand();
-            const type = tr < 0.40 ? 'TREE_MANGO_UNRIPE' : 'TREE_COCONUT_UNRIPE';
-            const ripenOffset2 = type === 'TREE_COCONUT_UNRIPE' ? COCONUT_RIPEN_TIME : MANGO_RIPEN_TIME;
-            placeTree(tile, type, 2, { ripensAt: Date.now() + Math.floor(rand() * ripenOffset2) }); // minDist=2
-          } else if (r < treePct + 0.04) {
+            const type = tr < 0.35 ? 'TREE_MANGO_UNRIPE'
+                       : tr < 0.65 ? 'TREE_COCONUT_UNRIPE'
+                       :             'TREE_APPLE';
+            const ripenOffset2 = type === 'TREE_COCONUT_UNRIPE' ? COCONUT_RIPEN_TIME
+                               : type === 'TREE_MANGO_UNRIPE'   ? MANGO_RIPEN_TIME : 0;
+            const extras2 = ripenOffset2 > 0 ? { ripensAt: Date.now() + Math.floor(rand() * ripenOffset2) } : undefined;
+            placeTree(tile, type, 2, extras2); // minDist=2
+          } else if (r < treePct + 0.03) {
             tile.object = 'FLOWER_BUSH';
           }
 
         } else {
-          // ── Front / open: only waterside coconuts + rare mango ────────
-          const palmChance  = adjToWater ? 0.10 : 0;
-          const mangoChance = 0.03;
+          // ── Front / open: scattered palms, not just waterside ─────────
+          const palmChance  = adjToWater ? 0.14 : 0.06;
+          const mangoChance = 0.05;
           if (r < palmChance) {
             placeTree(tile, 'TREE_COCONUT_UNRIPE', 3, { ripensAt: Date.now() + Math.floor(rand() * COCONUT_RIPEN_TIME) }); // minDist=3
           } else if (r < palmChance + mangoChance) {
             placeTree(tile, 'TREE_MANGO_UNRIPE', 3, { ripensAt: Date.now() + Math.floor(rand() * MANGO_RIPEN_TIME) });
-          } else if (r < palmChance + mangoChance + 0.04) {
+          } else if (r < palmChance + mangoChance + 0.03) {
             tile.object = 'FLOWER_BUSH';
           }
         }
@@ -332,9 +336,9 @@ export function generateIsland(): Record<string, TileData> {
   for (let i = 0; i < 3 && inner.length; i++) pick(inner).object = 'GARDEN_PATCH';
   for (let i = 0; i < 3 && inner.length; i++) pick(inner).object = 'CROP_PLOT';
   for (let i = 0; i < 5  && outer.length; i++) pick(outer).object = 'GRASS_PATCH';
-  // Overgrown weed clumps — scattered across both inner and outer grass areas
-  for (let i = 0; i < 8  && inner.length; i++) pick(inner).object = 'WEEDS';
-  for (let i = 0; i < 6  && outer.length; i++) pick(outer).object = 'WEEDS';
+  // Overgrown weed clumps — kept sparse so the island feels tidier
+  for (let i = 0; i < 3  && inner.length; i++) pick(inner).object = 'WEEDS';
+  for (let i = 0; i < 2  && outer.length; i++) pick(outer).object = 'WEEDS';
   for (let i = 0; i < 7  && inner.length; i++) pick(inner).object = 'THORNS';
   for (let i = 0; i < 8  && outer.length; i++) pick(outer).object = 'THORNS';
   for (let i = 0; i < 5  && inner.length; i++) pick(inner).object = 'BLUEBELL';
@@ -412,7 +416,7 @@ export function generateIsland(): Record<string, TileData> {
   for (const rock of rockTiles) {
     for (const [dx, dy] of ROCK_NEIGHBORS) {
       const nb = tiles[`${rock.x + dx},${rock.y + dy}`];
-      if (nb && nb.type === 'GRASS' && !nb.object && rand() < 0.55) {
+      if (nb && nb.type === 'GRASS' && !nb.object && rand() < 0.15) {
         nb.object = 'WEEDS';
       }
     }
