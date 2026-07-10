@@ -293,17 +293,17 @@ export const CustomizableCharSVG: React.FC<{
   const legColor  = gender === 'female' ? sk : darkenHex(outfitColor, 20);
 
   const mouthPaths: Record<string, string> = {
-    smile: 'M43 49 Q50 55 57 49',
-    grin:  'M40 49 Q50 58 60 49',
+    smile: 'M44 49 Q50 53 56 49',   // gentle relaxed curve (was wider + taller arc)
+    grin:  'M40 49 Q50 57 60 49',
     pout:  'M44 50 Q50 47 56 50',
     smirk: 'M43 49 Q47 53 50 52 Q53 51 57 49',
   };
   const mouthD = mouthPaths[mouthStyle] ?? mouthPaths.smile;
 
   const browPaths: Record<string, [string, string]> = {
-    natural:  ['M34 29 Q40 25 46 28', 'M54 28 Q60 25 66 29'],
-    thin:     ['M35 28 Q40 25 45 27', 'M55 27 Q60 25 65 28'],
-    thick:    ['M33 30 Q40 24 47 29', 'M53 29 Q60 24 67 30'],
+    natural:  ['M34 31 Q40 28 46 30', 'M54 30 Q60 28 66 31'],  // lowered, flatter → relaxed
+    thin:     ['M35 30 Q40 27 45 29', 'M55 29 Q60 27 65 30'],
+    thick:    ['M33 32 Q40 27 47 31', 'M53 31 Q60 27 67 32'],
     arched:   ['M34 30 Q40 22 46 28', 'M54 28 Q60 22 66 30'],
   };
   const [lb, rb] = browPaths[eyebrowStyle] ?? browPaths.natural;
@@ -378,20 +378,19 @@ export const CustomizableCharSVG: React.FC<{
       {/* Left rim highlight */}
       <path d="M33 68 Q28 86 32 107" stroke="rgba(255,255,255,0.18)" strokeWidth="5" fill="none" strokeLinecap="round"/>
 
-      {/* ── Arms ── */}
-      {/* Back arm — catches more light */}
+      {/* ── Arms — relaxed, hanging straight down beside the body ── */}
+      {/* Back arm — lit from left */}
       <g className={isWalking ? 'char-arm-b' : undefined} style={{ transformOrigin: '28px 68px' }}>
-        <path d="M28 68 Q16 76 18 88" stroke={`url(#cal${gp})`} strokeWidth="11" fill="none" strokeLinecap="round"/>
-        {/* Arm specular streak */}
-        <path d="M27.5 68 Q16.5 75.5 18.5 86.5" stroke="rgba(255,255,255,0.28)" strokeWidth="3.5" fill="none" strokeLinecap="round"/>
-        <circle cx="17" cy="89" r="6.5" fill={`url(#cal${gp})`}/>
-        <circle cx="15.5" cy="87.5" r="2.2" fill="rgba(255,255,255,0.34)"/>
+        <path d="M28 68 Q24 82 25 100" stroke={`url(#cal${gp})`} strokeWidth="11" fill="none" strokeLinecap="round"/>
+        <path d="M27.5 68 Q23.5 81.5 24.5 98.5" stroke="rgba(255,255,255,0.28)" strokeWidth="3.5" fill="none" strokeLinecap="round"/>
+        <circle cx="25" cy="101" r="6.5" fill={`url(#cal${gp})`}/>
+        <circle cx="23.5" cy="99" r="2.2" fill="rgba(255,255,255,0.34)"/>
       </g>
       {/* Front arm — in shadow relative to light */}
       <g className={isWalking ? 'char-arm-a' : undefined} style={{ transformOrigin: '72px 68px' }}>
-        <path d="M72 68 Q84 76 82 88" stroke={darkenHex(sk, 12)} strokeWidth="11" fill="none" strokeLinecap="round"/>
-        <path d="M72 68 Q84 76 82 88" stroke="rgba(0,0,0,0.10)" strokeWidth="4" fill="none" strokeLinecap="round"/>
-        <circle cx="83" cy="89" r="6.5" fill={darkenHex(sk, 12)}/>
+        <path d="M72 68 Q76 82 75 100" stroke={darkenHex(sk, 12)} strokeWidth="11" fill="none" strokeLinecap="round"/>
+        <path d="M72 68 Q76 82 75 100" stroke="rgba(0,0,0,0.10)" strokeWidth="4" fill="none" strokeLinecap="round"/>
+        <circle cx="75" cy="101" r="6.5" fill={darkenHex(sk, 12)}/>
       </g>
 
       {/* ── Neck ── */}
@@ -421,6 +420,9 @@ export const CustomizableCharSVG: React.FC<{
       {/* Eyelid shadow (skin colour, above eye socket) */}
       <ellipse cx="40" cy="32.5" rx="8" ry="4.5" fill={darkenHex(sk, 16)} opacity="0.36"/>
       <ellipse cx="60" cy="32.5" rx="8" ry="4.5" fill={darkenHex(sk, 16)} opacity="0.36"/>
+      {/* Relaxed upper eyelid droop — soft half-lid overlay */}
+      <ellipse cx="40" cy="29.5" rx="7.2" ry="4.8" fill={sk} opacity="0.58"/>
+      <ellipse cx="60" cy="29.5" rx="7.2" ry="4.8" fill={sk} opacity="0.58"/>
       {/* Whites */}
       <ellipse cx="40" cy="36" rx="7" ry="8" fill="white"/>
       <ellipse cx="60" cy="36" rx="7" ry="8" fill="white"/>
