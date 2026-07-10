@@ -150,8 +150,9 @@ export const OBJECT_CONFIG: Record<string, any> = {
   CROP_READY: { action: 'Harvest', energy: 1, coins: 10, xp: 20 },
   CROP_WILTED: { action: 'Clear', energy: 1, coins: 0, xp: 2 },
   FISH_SPOT: { action: 'Fish', energy: 1, coins: 12, xp: 15, respawn: SCALED(120000) },
-  CRAB: { action: 'Attack', energy: 1, coins: 5, xp: 10 },
-  BOAR: { action: 'Shoo', energy: 1, coins: 8, xp: 12 }
+  CRAB:        { action: 'Attack', energy: 1, coins: 5, xp: 10 },
+  BOAR:        { action: 'Shoo',  energy: 1, coins: 8, xp: 12 },
+  BABY_PARROT: { action: 'Feed',  energy: 0, coins: 2, xp: 5  },
 };
 
 export const EMOJI_MAP: Record<string, string> = {
@@ -160,7 +161,7 @@ export const EMOJI_MAP: Record<string, string> = {
   TREE_COCONUT: '🌴', TREE_MANGO: '🥭', GARDEN_PATCH: '🍍',
   CROP_PLOT: '🟫', CROP_GROWING: '🌱', CROP_READY: '🌽', CROP_WILTED: '🥀',
   FISH_SPOT: '', HUT: '🏚️', DOCK: '⛵', WELL: '💧', 
-  FLOWER_POT: '🪴', FENCE: '🚧', LANTERN: '🏮', CRAB: '🦀', BOAR: '🐗'
+  FLOWER_POT: '🪴', FENCE: '🚧', LANTERN: '🏮', CRAB: '🦀', BOAR: '🐗', BABY_PARROT: '🦜'
 };
 
 export const INITIAL_NEIGHBORS = [
@@ -334,6 +335,7 @@ export function generateIsland(): Record<string, TileData> {
   for (let i = 0; i < 4  && outer.length; i++) pick(outer).object = 'PINEAPPLE_PLANT';
   for (let i = 0; i < 6  && inner.length; i++) pick(inner).object = 'BLUEBERRY_BUSH';
   for (let i = 0; i < 5  && outer.length; i++) pick(outer).object = 'BLUEBERRY_BUSH';
+  for (let i = 0; i < 4  && inner.length; i++) pick(inner).object = 'BABY_PARROT';
 
   const waterTiles = Object.values(tiles).filter(t => t.type === 'WATER');
   for (let i = 0; i < 6 && waterTiles.length; i++) pick(waterTiles).object = 'FISH_SPOT';

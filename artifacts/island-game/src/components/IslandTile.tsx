@@ -1142,6 +1142,78 @@ const ObjectSVG: React.FC<{ object: string; tileX: number; tileY: number }> = ({
       );
     }
 
+    /* ── BABY PARROT ─────────────────────────────────────────────────────── */
+    case 'BABY_PARROT': {
+      // Alternate facing direction per tile so parrots look varied
+      const facingRight = (tx + ty) % 2 === 0;
+      const bkX = facingRight ? 30 : 18;   // beak base X
+      const eyX = facingRight ? 29 : 19;   // eye X
+      const bkPath = facingRight
+        ? 'M30,26 L37,23.5 L36,27.5Z'
+        : 'M18,26 L11,23.5 L12,27.5Z';
+      return (
+        <svg viewBox="0 0 48 62" width="44" height="57" style={{ display:'block' }}>
+          {/* Ground shadow */}
+          <ellipse cx="24" cy="60" rx="12" ry="3.2" fill="rgba(0,0,0,0.22)"/>
+
+          {/* Legs */}
+          <line x1="20" y1="52" x2="17" y2="58" stroke="#d07810" strokeWidth="2.2" strokeLinecap="round"/>
+          <line x1="17" y1="58" x2="14" y2="59.5" stroke="#d07810" strokeWidth="1.8" strokeLinecap="round"/>
+          <line x1="17" y1="58" x2="18" y2="60.5" stroke="#d07810" strokeWidth="1.8" strokeLinecap="round"/>
+          <line x1="28" y1="52" x2="31" y2="58" stroke="#d07810" strokeWidth="2.2" strokeLinecap="round"/>
+          <line x1="31" y1="58" x2="34" y2="59.5" stroke="#d07810" strokeWidth="1.8" strokeLinecap="round"/>
+          <line x1="31" y1="58" x2="30" y2="60.5" stroke="#d07810" strokeWidth="1.8" strokeLinecap="round"/>
+
+          {/* Body — compact green egg */}
+          <ellipse cx="24" cy="44" rx="13" ry="12" fill="#1e8010"/>
+          <ellipse cx="24" cy="43" rx="10" ry="10" fill="#2ca018"/>
+          <ellipse cx="24" cy="43" rx="6"  ry="7"  fill="#38b420" opacity="0.75"/>
+          {/* Wing curves */}
+          <path d={facingRight ? 'M12,41 Q6,47 12,53'  : 'M36,41 Q42,47 36,53'} stroke="#16700c" strokeWidth="4.5" fill="none" strokeLinecap="round"/>
+          {/* Belly highlight */}
+          <ellipse cx="24" cy="46" rx="4.5" ry="5.5" fill="rgba(255,255,255,0.16)"/>
+
+          {/* ── Head: fluffy orange-red ball with radiating feather spike tufts ── */}
+          {/* Feather tufts behind head — 12 at 30° intervals */}
+          {Array.from({ length: 12 }, (_, i) => {
+            const ang = (i * 30 - 90) * (Math.PI / 180);
+            const fx  = 24 + 17 * Math.cos(ang);
+            const fy  = 24 + 17 * Math.sin(ang);
+            return (
+              <ellipse key={i}
+                cx={fx} cy={fy} rx="3.2" ry="5.8"
+                fill={i % 2 === 0 ? '#c82010' : '#e03820'}
+                transform={`rotate(${i * 30} ${fx} ${fy})`}
+              />
+            );
+          })}
+
+          {/* Main head sphere */}
+          <circle cx="24" cy="24" r="13.5" fill="#e04a1c"/>
+          {/* Warm lit zone upper-left */}
+          <circle cx="20" cy="19" r="8" fill="#f07030" opacity="0.55"/>
+          {/* Specular */}
+          <ellipse cx="18.5" cy="17" rx="4.5" ry="2.8" fill="rgba(255,255,255,0.34)" transform="rotate(-22 18.5 17)"/>
+          {/* Chin shadow */}
+          <ellipse cx="24" cy="34.5" rx="8" ry="3" fill="rgba(0,0,0,0.14)"/>
+
+          {/* Eye */}
+          <circle cx={eyX} cy="24" r="5" fill="white"/>
+          <circle cx={eyX} cy="24" r="3.4" fill="#160800"/>
+          <circle cx={eyX + (facingRight ? 0.8 : -0.8)} cy="22.5" r="1.3" fill="white"/>
+
+          {/* Beak */}
+          <path d={bkPath} fill="#e8c01a"/>
+          <line x1={bkX} y1="26" x2={facingRight ? 37 : 11} y2="26" stroke="#c09c10" strokeWidth="1.3"/>
+
+          {/* Top crest — small curved tuft */}
+          <path d="M21,11 Q24,4 27,11" stroke="#b01808" strokeWidth="4" fill="none" strokeLinecap="round"/>
+          <circle cx="24" cy="5" r="3" fill="#d02014"/>
+          <circle cx="24" cy="5" r="1.2" fill="rgba(255,255,255,0.45)"/>
+        </svg>
+      );
+    }
+
     /* ── PINEAPPLE PLANT ─────────────────────────────────────────────────── */
     case 'PINEAPPLE_PLANT': {
       return (
@@ -1225,7 +1297,7 @@ const CHOP_TREES = new Set(['TREE_PALM', 'TREE_APPLE', 'TREE_COCONUT', 'TREE_MAN
 /** Objects that use SVG art instead of emoji */
 const SVG_OBJECTS = new Set(['TREE_PALM', 'TREE_APPLE', 'ROCK', 'FLOWER_BUSH', 'DRIFTWOOD',
   'TREE_COCONUT', 'TREE_MANGO', 'GARDEN_PATCH', 'WEEDS', 'SUNFLOWER', 'PUDDLE', 'THORNS',
-  'BLUEBELL', 'PANSY', 'TULIP', 'PINEAPPLE_PLANT', 'BLUEBERRY_BUSH']);
+  'BLUEBELL', 'PANSY', 'TULIP', 'PINEAPPLE_PLANT', 'BLUEBERRY_BUSH', 'BABY_PARROT']);
 /** Objects that sway in the breeze */
 const SWAY_OBJECTS = new Set(['TREE_PALM', 'TREE_APPLE', 'TREE_COCONUT', 'TREE_MANGO']);
 
@@ -1608,7 +1680,8 @@ export const IslandTile: React.FC<IslandTileProps> = ({
 
         {/* ── Fluffy 3-D grass tufts — rise above the tile surface ── */}
         {!isWater && !isCleared && tile.type === 'GRASS' && (() => {
-          const h = (tx * 13 + ty * 7 + tx * ty * 3) | 0;
+          const gx = tile.x, gy = tile.y;
+          const h = (gx * 13 + gy * 7 + gx * gy * 3) | 0;
           // 9 candidate positions inside diamond top half (clipped naturally by overflow:visible)
           const slots: [number, number][] = [
             [22, 4], [36, 1], [50, 1], [59, 4],
