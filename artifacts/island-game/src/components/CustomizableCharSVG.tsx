@@ -16,13 +16,13 @@ export interface CharAppearance {
   noseStyle: string;  // 'button' | 'dot' | 'round' | 'snub'
 }
 
-// Default boy: short reddish-auburn shaggy hair, warm brown striped sweater — matches reference chibi
+// Default boy: short reddish-auburn shaggy hair, warm cocoa-brown plain top — matches reference chibi
 export const DEFAULT_MALE: CharAppearance = {
   skinTone: '#fde8d0',
   hairStyle: 'shaggy',
   hairColor: '#c85a28',
-  outfitStyle: 'stripes',
-  outfitColor: '#5c3a20',
+  outfitStyle: 'plain',
+  outfitColor: '#7a3820',
   hatStyle: 'none',
   eyeColor: '#3388ee',
   mouthStyle: 'smile',
@@ -269,6 +269,18 @@ function OutfitLayer({ style, color }: { style: string; color: string }) {
         <rect x="28" y="65" width="44" height="43" rx="6" fill={color}/>
         <path d="M28 65 L50 79 L72 65 L64 65 L50 73 L36 65Z" fill={d} opacity="0.7"/>
         <path d="M50 73 L50 91" stroke="#cc2222" strokeWidth="2.5" fill="none"/>
+      </>
+    );
+    case 'plain': return (
+      <>
+        {/* Main body */}
+        <rect x="28" y="65" width="44" height="43" rx="6" fill={color}/>
+        {/* Crew-neck arc — small dark opening at top */}
+        <path d="M43 65 Q50 71 57 65" fill={d} opacity="0.55"/>
+        {/* Subtle centre seam */}
+        <line x1="50" y1="71" x2="50" y2="108" stroke={d} strokeWidth="1.2" opacity="0.22"/>
+        {/* Sleeve cuff hints at shoulders */}
+        <rect x="28" y="65" width="44" height="5" rx="3" fill={d} opacity="0.25"/>
       </>
     );
     default: return <rect x="28" y="65" width="44" height="43" rx="6" fill={color}/>;
