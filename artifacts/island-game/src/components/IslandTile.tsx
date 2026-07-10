@@ -792,13 +792,81 @@ const ObjectSVG: React.FC<{ object: string; tileX: number; tileY: number }> = ({
       );
     }
 
+    /* ── THORNS ─────────────────────────────────────────────────────────── */
+    case 'THORNS': {
+      const tv = (tx * 9 + ty * 17) % 3;
+      // slight rotation variant so clusters don't all align
+      const trot = tv === 0 ? 0 : tv === 1 ? 15 : -12;
+      // thorn color variants: warm brown, grey-brown, olive-brown
+      const [thorn, thornDk, leafC] = ([
+        ['#9a7838', '#604a18', '#3a6e14'],
+        ['#8a8060', '#544e30', '#2e6410'],
+        ['#7a8040', '#4c5020', '#3a7018'],
+      ] as const)[tv];
+      return (
+        <svg viewBox="0 0 46 36" width="44" height="34" style={{ display:'block' }}>
+          {/* Ground shadow */}
+          <ellipse cx="23" cy="35" rx="19" ry="3.5" fill="rgba(0,0,0,0.20)"/>
+
+          {/* ── Leaf base — low oval mound ── */}
+          <ellipse cx="23" cy="28" rx="18" ry="7"  fill={leafC} opacity="0.85"/>
+          <ellipse cx="23" cy="26" rx="14" ry="5.5" fill={leafC}/>
+          {/* leaf sheen */}
+          <ellipse cx="19" cy="24" rx="5" ry="2.5" fill="rgba(255,255,255,0.18)" transform="rotate(-15 19 24)"/>
+
+          {/* ── Thorn spikes — radiating outward ── */}
+          <g transform={`rotate(${trot} 23 26)`}>
+            {/* 8 main spikes at 45° intervals */}
+            {([0,45,90,135,180,225,270,315] as const).map((a, i) => {
+              const rad  = (a * Math.PI) / 180;
+              const len  = i % 2 === 0 ? 13 : 10;   // alternate long/short
+              const x2   = 23 + Math.sin(rad) * len;
+              const y2   = 26 - Math.cos(rad) * len;
+              const xm   = 23 + Math.sin(rad) * (len * 0.6);
+              const ym   = 26 - Math.cos(rad) * (len * 0.6);
+              // barb offsets perpendicular to spine
+              const px   =  Math.cos(rad) * 2.2;
+              const py   =  Math.sin(rad) * 2.2;
+              return (
+                <g key={a}>
+                  {/* Thorn spine */}
+                  <line x1="23" y1="26" x2={x2} y2={y2}
+                    stroke={thorn} strokeWidth={i % 2 === 0 ? 2.4 : 1.9} strokeLinecap="round"/>
+                  {/* Barb / side hook */}
+                  <line x1={xm} y1={ym} x2={xm + px} y2={ym - py}
+                    stroke={thornDk} strokeWidth="1.4" strokeLinecap="round"/>
+                  {/* Sharp tip dot */}
+                  <circle cx={x2} cy={y2} r="1.2" fill={thornDk}/>
+                </g>
+              );
+            })}
+            {/* 4 inner shorter spikes at 22.5° offset */}
+            {([22,112,202,292] as const).map(a => {
+              const rad = (a * Math.PI) / 180;
+              const x2  = 23 + Math.sin(rad) * 7;
+              const y2  = 26 - Math.cos(rad) * 7;
+              return (
+                <line key={a} x1="23" y1="26" x2={x2} y2={y2}
+                  stroke={thorn} strokeWidth="1.5" strokeLinecap="round" opacity="0.75"/>
+              );
+            })}
+          </g>
+
+          {/* ── Centre knot ── */}
+          <circle cx="23" cy="26" r="4.5" fill={leafC}/>
+          <circle cx="23" cy="26" r="3"   fill={thorn} opacity="0.70"/>
+          <circle cx="21.8" cy="24.8" r="1.2" fill="rgba(255,255,255,0.30)"/>
+        </svg>
+      );
+    }
+
     default: return null;
   }
 };
 
 /** Objects that use SVG art instead of emoji */
 const SVG_OBJECTS = new Set(['TREE_PALM', 'TREE_APPLE', 'ROCK', 'FLOWER_BUSH', 'DRIFTWOOD',
-  'TREE_COCONUT', 'TREE_MANGO', 'GARDEN_PATCH', 'WEEDS', 'SUNFLOWER', 'PUDDLE']);
+  'TREE_COCONUT', 'TREE_MANGO', 'GARDEN_PATCH', 'WEEDS', 'SUNFLOWER', 'PUDDLE', 'THORNS']);
 /** Objects that sway in the breeze */
 const SWAY_OBJECTS = new Set(['TREE_PALM', 'TREE_APPLE', 'TREE_COCONUT', 'TREE_MANGO']);
 
