@@ -34,8 +34,8 @@ function darkenHex(hex: string, amount = 22): string {
 }
 
 /* ── SVG art for natural objects — 3-D chibi style ──────────────────────── */
-const PETAL_COLORS  = ['#e8628a', '#f5a020', '#8a5ad4'] as const;
-const PETAL_DARKS   = ['#b03460', '#c07010', '#5a2aa4'] as const;
+const PETAL_COLORS  = ['#e8628a', '#f5a020', '#8a5ad4', '#f5e018', '#f02828'] as const;
+const PETAL_DARKS   = ['#b03460', '#c07010', '#5a2aa4', '#c8a800', '#b01010'] as const;
 
 const ObjectSVG: React.FC<{ object: string; tileX: number; tileY: number }> = ({ object, tileX: tx, tileY: ty }) => {
   // Build a unique gradient-ID prefix per tile to avoid SVG id collisions
@@ -331,7 +331,7 @@ const ObjectSVG: React.FC<{ object: string; tileX: number; tileY: number }> = ({
 
     /* ── FLOWER BUSH ───────────────────────────────────────────────────── */
     case 'FLOWER_BUSH': {
-      const pi   = (tx * 7 + ty * 13) % 3;
+      const pi   = (tx * 7 + ty * 13) % 5;
       const petal = PETAL_COLORS[pi];
       const dark  = PETAL_DARKS[pi];
       const pid   = g('flp');
