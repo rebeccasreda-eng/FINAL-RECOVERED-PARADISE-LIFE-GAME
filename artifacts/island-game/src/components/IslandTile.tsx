@@ -181,34 +181,37 @@ const ObjectSVG: React.FC<{ object: string; tileX: number; tileY: number }> = ({
 
     /* ── ROCK ───────────────────────────────────────────────────────────── */
     case 'ROCK': return (
-      <svg viewBox="0 0 54 44" width="52" height="42" style={{ display:'block' }}>
+      <svg viewBox="0 0 56 36" width="54" height="34" style={{ display:'block' }}>
         <defs>
-          <radialGradient id={g('rkg')} cx="34%" cy="28%" r="70%">
-            <stop offset="0%"   stopColor="#d6d6ce"/>
-            <stop offset="55%"  stopColor="#9e9e96"/>
+          <radialGradient id={g('rkg')} cx="30%" cy="28%" r="75%">
+            <stop offset="0%"   stopColor="#d8d8d0"/>
+            <stop offset="50%"  stopColor="#a0a098"/>
             <stop offset="100%" stopColor="#606058"/>
           </radialGradient>
-          <radialGradient id={g('rks')} cx="36%" cy="30%" r="68%">
-            <stop offset="0%"   stopColor="#c8c8be"/>
-            <stop offset="60%"  stopColor="#888880"/>
+          <radialGradient id={g('rks')} cx="35%" cy="30%" r="70%">
+            <stop offset="0%"   stopColor="#c6c6be"/>
+            <stop offset="55%"  stopColor="#888882"/>
             <stop offset="100%" stopColor="#525248"/>
           </radialGradient>
         </defs>
-        {/* Ground shadow */}
-        <ellipse cx="24" cy="42" rx="21" ry="5" fill="rgba(0,0,0,0.25)"/>
-        {/* Small back rock */}
-        <ellipse cx="42" cy="27" rx="11" ry="9"   fill={`url(#${g('rks')})`}/>
-        <ellipse cx="38" cy="23" rx="4"  ry="2.5" fill="rgba(255,255,255,0.28)" transform="rotate(-15 38 23)"/>
-        {/* Main boulder */}
-        <ellipse cx="22" cy="23" rx="21" ry="17"  fill={`url(#${g('rkg')})`}/>
+        {/* Ground shadow — wide, low */}
+        <ellipse cx="26" cy="34" rx="26" ry="4.5" fill="rgba(0,0,0,0.22)"/>
+        {/* Small back rock — flat */}
+        <ellipse cx="44" cy="22" rx="11" ry="6"   fill={`url(#${g('rks')})`}/>
+        <ellipse cx="40" cy="19" rx="4"  ry="1.8" fill="rgba(255,255,255,0.26)" transform="rotate(-10 40 19)"/>
+        {/* Main boulder — wide and flat */}
+        <ellipse cx="22" cy="26" rx="23" ry="10"  fill={`url(#${g('rkg')})`}/>
         {/* Rim */}
-        <ellipse cx="22" cy="23" rx="21" ry="17"  fill="none" stroke="rgba(0,0,0,0.14)" strokeWidth="1.5"/>
+        <ellipse cx="22" cy="26" rx="23" ry="10"  fill="none" stroke="rgba(0,0,0,0.12)" strokeWidth="1.4"/>
         {/* Specular highlight */}
-        <ellipse cx="13" cy="14" rx="9" ry="5.5"  fill="rgba(255,255,255,0.44)" transform="rotate(-22 13 14)"/>
+        <ellipse cx="11" cy="21" rx="10" ry="3.5" fill="rgba(255,255,255,0.42)" transform="rotate(-12 11 21)"/>
         {/* Secondary highlight */}
-        <ellipse cx="9"  cy="19" rx="3" ry="2"    fill="rgba(255,255,255,0.22)" transform="rotate(-14 9 19)"/>
+        <ellipse cx="7"  cy="26" rx="3.5" ry="1.5" fill="rgba(255,255,255,0.20)" transform="rotate(-6 7 26)"/>
         {/* Subtle crack */}
-        <path d="M18,17 Q20,23 19,29" stroke="rgba(0,0,0,0.12)" strokeWidth="1.3" fill="none"/>
+        <path d="M20,22 Q22,26 21,31" stroke="rgba(0,0,0,0.10)" strokeWidth="1.2" fill="none"/>
+        {/* Mossy patch */}
+        <ellipse cx="30" cy="29" rx="6" ry="2.5" fill="#5a8820" opacity="0.28"/>
+        <ellipse cx="14" cy="30" rx="4" ry="2"   fill="#4a7818" opacity="0.22"/>
       </svg>
     );
 
