@@ -92,23 +92,23 @@ export const INITIAL_NEIGHBORS = [
 ];
 
 export function generateIsland(): Record<string, TileData> {
-  const GRID = 21;
+  const GRID = 31;
   const TW = 64, TH = 32;
-  // Center tile is (10,10); all iso coords are relative to it
-  const originX = 0;  // (cx-cy)*(TW/2) = 0 since cx=cy=10
-  const originY = 320; // (cx+cy)*(TH/2) = 20*16
+  // Center tile is (15,15); all iso coords are relative to it
+  const originX = 0;   // (cx-cy)*(TW/2) = 0 since cx=cy=15
+  const originY = 480; // (cx+cy)*(TH/2) = 30*16
 
   // Iso coords of tile (x,y) relative to center
   const isoX = (x: number, y: number) => (x - y) * (TW / 2) - originX;
   const isoY = (x: number, y: number) => (x + y) * (TH / 2) - originY;
 
-  // Build type map for all 21×21 tiles (for PRNG parity even on outer water)
+  // Build type map for all 31×31 tiles
   const tmap: number[][] = [];
   for (let y = 0; y < GRID; y++) {
     tmap[y] = [];
     for (let x = 0; x < GRID; x++) {
       const sx = isoX(x, y), sy = isoY(x, y);
-      const e = (sx * sx) / (255 * 255) + (sy * sy) / (85 * 85);
+      const e = (sx * sx) / (500 * 500) + (sy * sy) / (160 * 160);
       tmap[y][x] = e < 1 ? 2 : (e < 1.35 ? 1 : 0);
     }
   }
@@ -118,7 +118,7 @@ export function generateIsland(): Record<string, TileData> {
   for (let y = 0; y < GRID; y++) {
     for (let x = 0; x < GRID; x++) {
       const sx = isoX(x, y), sy = isoY(x, y);
-      const e = (sx * sx) / (255 * 255) + (sy * sy) / (85 * 85);
+      const e = (sx * sx) / (500 * 500) + (sy * sy) / (160 * 160);
       if (e > 1.8) continue;
       let type: TileType = 'WATER';
       if (e < 1) type = 'GRASS';
@@ -131,8 +131,7 @@ export function generateIsland(): Record<string, TileData> {
   let seed = 7;
   const rand = () => { seed = (seed * 9301 + 49297) % 233280; return seed / 233280; };
 
-  // Place natural decorations — same iteration order and probability chain as HTML
-  // Water tiles (tmap=0) call rand() 0 times; grass calls 1-2 times; sand calls 1-2 times
+  // Place natural decorations
   for (let y = 0; y < GRID; y++) {
     for (let x = 0; x < GRID; x++) {
       const tile = tiles[`${x},${y}`];
@@ -158,12 +157,12 @@ export function generateIsland(): Record<string, TileData> {
   const emptyGrass = Object.values(tiles).filter(t => t.type === 'GRASS' && !t.object);
   const pick = (arr: TileData[]) => arr.splice(Math.floor(rand() * arr.length), 1)[0];
 
-  for (let i = 0; i < 3 && emptyGrass.length; i++) pick(emptyGrass).object = 'TREE_APPLE';
-  for (let i = 0; i < 4 && emptyGrass.length; i++) pick(emptyGrass).object = 'TREE_COCONUT';
-  for (let i = 0; i < 3 && emptyGrass.length; i++) pick(emptyGrass).object = 'TREE_MANGO';
-  for (let i = 0; i < 2 && emptyGrass.length; i++) pick(emptyGrass).object = 'GARDEN_PATCH';
-  for (let i = 0; i < 6 && emptyGrass.length; i++) pick(emptyGrass).object = 'GRASS_PATCH';
-  for (let i = 0; i < 1 && emptyGrass.length; i++) pick(emptyGrass).object = 'CROP_PLOT';
+  for (let i = 0; i < 6  && emptyGrass.length; i++) pick(emptyGrass).object = 'TREE_APPLE';
+  for (let i = 0; i < 8  && emptyGrass.length; i++) pick(emptyGrass).object = 'TREE_COCONUT';
+  for (let i = 0; i < 6  && emptyGrass.length; i++) pick(emptyGrass).object = 'TREE_MANGO';
+  for (let i = 0; i < 4  && emptyGrass.length; i++) pick(emptyGrass).object = 'GARDEN_PATCH';
+  for (let i = 0; i < 12 && emptyGrass.length; i++) pick(emptyGrass).object = 'GRASS_PATCH';
+  for (let i = 0; i < 3  && emptyGrass.length; i++) pick(emptyGrass).object = 'CROP_PLOT';
 
   const waterTiles = Object.values(tiles).filter(t => t.type === 'WATER');
   for (let i = 0; i < 4 && waterTiles.length; i++) pick(waterTiles).object = 'FISH_SPOT';

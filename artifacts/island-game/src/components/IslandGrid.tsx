@@ -7,21 +7,21 @@ import { CharacterOnIsland } from './CharacterOnIsland';
 const TW = 80;   // tile width  (wider → more horizontal look)
 const TH = 28;   // tile diamond height (flatter → more horizontal look)
 
-export const GRID_COLS = 21;
-export const GRID_ROWS = 21;
+export const GRID_COLS = 31;
+export const GRID_ROWS = 31;
 
-// World container size (px) — sized to contain the 21×21 elliptical island
-// Center tile (10,10): screenY = (10+10)*(TH/2) = 20*14 = 280 = WORLD_H/2 ✓
-export const WORLD_W = 1200;
-export const WORLD_H = 560;
+// World container size (px) — sized to contain the 31×31 elliptical island
+// Center tile (15,15): screenY = (15+15)*(TH/2) = 30*14 = 420; OY=80 → 500 = WORLD_H/2 ✓
+export const WORLD_W = 2200;
+export const WORLD_H = 1000;
 
 // Iso origin — tile (tx,ty) maps to:
 //   screenX = (tx-ty)*(TW/2) + OX
 //   screenY = (tx+ty)*(TH/2) + OY
-// Center tile (10,10): screenX = 0+600 = 600, screenY = 280+0 = 280
-// → equals (WORLD_W/2, WORLD_H/2) ✓
-const OX = WORLD_W / 2;   // 600
-const OY = 0;              // tile (10,10) lands at screenY=280 = WORLD_H/2
+// Center tile (15,15): screenX = 0+1100 = 1100 = WORLD_W/2 ✓
+//                      screenY = 420+80 = 500 = WORLD_H/2 ✓
+const OX = WORLD_W / 2;   // 1100
+const OY = 80;             // tile (15,15) lands at screenY=500 = WORLD_H/2
 
 /** Screen X of tile (tx, ty) within the world div */
 export function isoScreenX(tx: number, ty: number): number {
@@ -78,6 +78,15 @@ export const IslandGrid: React.FC<IslandGridProps> = ({
         userSelect: 'none',
       }}
     >
+      {/* Ocean fill — covers the world canvas so "outside tiles" = open sea */}
+      <div
+        style={{
+          position: 'absolute',
+          inset: 0,
+          background: 'radial-gradient(ellipse 70% 55% at 50% 52%, #5ecff5 0%, #2aa8e0 30%, #1270b8 60%, #0a4a8a 100%)',
+          zIndex: 0,
+        }}
+      />
       {tiles.map(tile => (
         <IslandTile
           key={tile.id}

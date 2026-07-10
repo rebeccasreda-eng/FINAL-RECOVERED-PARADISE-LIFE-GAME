@@ -33,8 +33,8 @@ function saveProfile(p: PlayerProfile) {
 const TOP_H = 88;
 const BOT_H = 96;
 
-// Player start tile — centre of the 21×21 elliptical island
-const PLAYER_START = { x: 10, y: 10 };
+// Player start tile — centre of the 31×31 elliptical island
+const PLAYER_START = { x: 15, y: 15 };
 const MOVE_SPEED = 6.0; // tiles per second (free movement)
 
 // World centre (used to offset the world container so island is centred on load)
@@ -194,9 +194,30 @@ const GameInner = ({ profile }: { profile: PlayerProfile }) => {
   const viewportRef  = useRef<HTMLDivElement>(null);
   const worldRef     = useRef<HTMLDivElement>(null);
   const panRef       = useRef({ x: 0, y: 0 });
-  const INITIAL_ZOOM = 2.2;   // start close — tiles fill the screen nicely
-  const MIN_ZOOM     = 0.5;   // zoom out to see the whole island at once
+  const INITIAL_ZOOM = 2.0;   // start close — tiles fill the screen nicely
+  const MIN_ZOOM     = 0.4;   // zoom out to see the whole island at once
   const MAX_ZOOM     = 3.2;   // a bit extra for inspecting objects up close
+
+  /** Clamp pan so the world div always covers the full viewport (no void showing). */
+  const clampPan = useCallback((px: number, py: number, z: number) => {
+    const vp = viewportRef.current;
+    if (!vp) return { x: px, y: py };
+    const VW = vp.clientWidth;
+    const VH = vp.clientHeight;
+    // world div: translate(px-WORLD_CX, py-WORLD_CY) scale(z), origin 0,0
+    // left screen edge of world  = px - WORLD_CX
+    // right screen edge of world = px - WORLD_CX + WORLD_W*z
+    const scaledW = WORLD_W * z;
+    const scaledH = WORLD_H * z;
+    let cx = px, cy = py;
+    if (scaledW >= VW) {
+      cx = Math.min(WORLD_CX, Math.max(px, VW - scaledW + WORLD_CX));
+    }
+    if (scaledH >= VH) {
+      cy = Math.min(WORLD_CY, Math.max(py, VH - scaledH + WORLD_CY));
+    }
+    return { x: cx, y: cy };
+  }, []);
   const zoomRef      = useRef(INITIAL_ZOOM);
   const [zoom, setZoom]     = useState(INITIAL_ZOOM);
   const [cursor, setCursor] = useState<'grab' | 'grabbing'>('grab');
@@ -231,8 +252,9 @@ const GameInner = ({ profile }: { profile: PlayerProfile }) => {
       // screen_x = z*wx + (panX - WORLD_CX)  →  newPanX that keeps wx at cx:
       // newPanX = cx + WORLD_CX - wx*newZ  where  wx = (cx + WORLD_CX - panX) / oldZ
       const ratio = newZ / oldZ;
-      const newPX = panRef.current.x + (cx + WORLD_CX) * (1 - ratio);
-      const newPY = panRef.current.y + (cy + WORLD_CY) * (1 - ratio);
+      const rawPX = panRef.current.x + (cx + WORLD_CX) * (1 - ratio);
+      const rawPY = panRef.current.y + (cy + WORLD_CY) * (1 - ratio);
+      const { x: newPX, y: newPY } = clampPan(rawPX, rawPY, newZ);
       panRef.current = { x: newPX, y: newPY };
       zoomRef.current = newZ;
       applyTransform(newPX, newPY, newZ);
@@ -259,8 +281,8 @@ const GameInner = ({ profile }: { profile: PlayerProfile }) => {
     const dy = e.clientY - dragStartRef.current.my;
     if (!didDragRef.current && Math.abs(dx) + Math.abs(dy) > 3) didDragRef.current = true;
     if (didDragRef.current) {
-      const nx = dragStartRef.current.px + dx;
-      const ny = dragStartRef.current.py + dy;
+      const raw = { x: dragStartRef.current.px + dx, y: dragStartRef.current.py + dy };
+      const { x: nx, y: ny } = clampPan(raw.x, raw.y, zoomRef.current);
       panRef.current = { x: nx, y: ny };
       applyTransform(nx, ny, zoomRef.current);
     }
@@ -277,10 +299,12 @@ const GameInner = ({ profile }: { profile: PlayerProfile }) => {
   /** Zoom button helper — zooms centred on viewport */
   const zoomBy = useCallback((factor: number) => {
     const newZ = Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, zoomRef.current * factor));
+    const { x, y } = clampPan(panRef.current.x, panRef.current.y, newZ);
+    panRef.current = { x, y };
     zoomRef.current = newZ;
-    applyTransform(panRef.current.x, panRef.current.y, newZ);
+    applyTransform(x, y, newZ);
     setZoom(newZ);
-  }, [applyTransform]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [applyTransform, clampPan]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <div className="w-full h-[100dvh] overflow-hidden relative" style={{ fontFamily: "'Fredoka', sans-serif" }}>
@@ -294,6 +318,7 @@ const GameInner = ({ profile }: { profile: PlayerProfile }) => {
           top: TOP_H, bottom: BOT_H, left: 0, right: 0,
           overflow: 'hidden',
           cursor,
+          background: 'radial-gradient(ellipse 80% 80% at 50% 50%, #1270b8 0%, #0a4a8a 50%, #062040 100%)',
         }}
         onMouseDown={onMouseDown}
         onMouseMove={onMouseMove}

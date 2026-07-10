@@ -1,42 +1,40 @@
 ---
 name: Island game world layout
-description: Grid size, ellipse formula, PRNG, world dimensions, and localStorage version for the 21×21 island.
+description: Tile grid dimensions, world container size, iso projection constants — all must change together.
 ---
 
-## Island shape — ellipse formula
-Grid is 21×21, center tile (10,10). Terrain uses iso-space ellipse:
-```
-sx = (x - y) * 32,  sy = (x + y) * 16 - 320
-e  = sx²/255² + sy²/85²
-e < 1     → GRASS
-e < 1.35  → SAND
-e < 1.8   → WATER (rendered)
-e ≥ 1.8   → skipped (not in tiles map)
-```
+## Current values (as of grid expansion)
 
-**Why:** Matches the HTML reference design that uses a wide/short elliptical island.
+| Constant | Value | Where |
+|---|---|---|
+| GRID | 31 | gameData.ts `generateIsland` |
+| Center tile | (15, 15) | gameData.ts |
+| Ellipse radii | 500 (x), 160 (y) | gameData.ts |
+| originX | 0 | gameData.ts (cx=cy so always 0) |
+| originY | 480 | gameData.ts = (15+15)*16 |
+| TW (gameData) | 64 | gameData.ts (used for island gen only) |
+| TH (gameData) | 32 | gameData.ts (used for island gen only) |
+| TW (IslandGrid) | 80 | IslandGrid.tsx (rendering) |
+| TH (IslandGrid) | 28 | IslandGrid.tsx (rendering) |
+| WORLD_W | 2200 | IslandGrid.tsx |
+| WORLD_H | 1000 | IslandGrid.tsx |
+| OX | 1100 (= WORLD_W/2) | IslandGrid.tsx |
+| OY | 80 | IslandGrid.tsx; tile (15,15) → screenY=420+80=500=WORLD_H/2 |
+| PLAYER_START | { x:15, y:15 } | Game.tsx |
+| localStorage key | island-game-state-v8 | GameContext.tsx |
+| INITIAL_ZOOM | 2.0 | Game.tsx |
+| MIN_ZOOM | 0.4 | Game.tsx |
+| MAX_ZOOM | 3.2 | Game.tsx |
 
-## Seeded PRNG decoration placement
-LCG constants (matching HTML reference): `seed = (seed * 9301 + 49297) % 233280`.
-Iteration: y outer, x inner over all 21×21.
-- Water tiles (t=0): 0 rand() calls (critical for parity)
-- Grass tiles: 1-2 rand() calls (tree 10%, then flower 8%)
-- Sand tiles: 1-2 rand() calls (rock 8%, then driftwood 5%)
+**Why:** All four groups (gameData GRID/origin, IslandGrid WORLD/TW/TH/OY, Game PLAYER_START, GameContext localStorage key) must change together whenever the island is resized, or tiles will be misaligned and saved state will use stale coordinates.
 
-**Why:** Matches HTML reference's deterministic decoration layout.
+**How to apply:** When changing grid size, recalculate:
+- originY = (cx+cy) * (TH_gamedata/2)
+- OY = WORLD_H/2 - (cx+cy) * (TH_IslandGrid/2)
+- Bump localStorage key version
+- Update PLAYER_START to new center
 
-## World dimensions & centering (current)
-- `TW = 80, TH = 28` (tile width/height); `TH_HALF = 14` in CharacterOnIsland
-- `WORLD_W = 1200, WORLD_H = 560`; `OX = 600, OY = 0`
-- IslandTile SVG: `viewBox="0 0 80 44"`, diamond points `"40,0 80,14 40,28 0,14"`, sides depth 10px
-- Container: `width:80, height:38`; objects positioned at `top:14` (= TH/2)
-- **All three (TW, TH, IslandTile SVG, CharacterOnIsland TH_HALF) must change together when resizing tiles.**
-
-## Player start
-`PLAYER_START = { x: 10, y: 10 }` — guaranteed GRASS (e=0 at center).
-
-## localStorage
-State key is `island-game-state-v6`. Bump version to force fresh island generation when terrain changes.
-
-## New object type: DRIFTWOOD
-Sand-tile decoration (5% probability). Interactive: clearable, drops 1 wood, respawns. Renders as SVG planks (not emoji). Fully wired in types.ts, gameData.ts (OBJECT_CONFIG + EMOJI_MAP), and IslandTile (ObjectSVG).
+## Ocean immersion (added with grid expansion)
+- Viewport div has a deep-blue radial gradient background (fallback ocean)
+- IslandGrid world div has a `zIndex:0` ocean radial gradient fill covering the full world canvas
+- `clampPan(px, py, z)` in Game.tsx prevents panning past world bounds when scaled dimension ≥ viewport dimension, so no void/white is ever visible when zoomed in
