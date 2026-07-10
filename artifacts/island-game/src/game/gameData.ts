@@ -185,12 +185,12 @@ export function generateIsland(): Record<string, TileData> {
     const distSq = (dx * dx) / (13.5 * 13.5) + (dy * dy) / (11.5 * 11.5);
     const radial  = 1.0 - distSq;
 
-    // Horizontal channel — centred at dy = -2, sigma 1.35 → ~3 tile gap
-    const hRiver = G(dy + 2, 1.35) * 2.8;
+    // Horizontal channel — reduced depth so centre tiles become sand (connected)
+    // while channel mouths at island edges remain water
+    const hRiver = G(dy + 2, 1.35) * 0.68;
 
-    // Vertical channel — centred at dx = +3, sigma 1.15 → ~2.5 tile gap
-    // Only carved below the horizontal channel (dy > -5) to keep the top-left intact
-    const vRiver = dy > -5 ? G(dx - 3, 1.15) * 2.5 : 0;
+    // Vertical channel — likewise shallower so middle is sandy
+    const vRiver = dy > -5 ? G(dx - 3, 1.15) * 0.60 : 0;
 
     return radial - Math.max(hRiver, vRiver);
   };
