@@ -157,8 +157,8 @@ export function generateIsland(): Record<string, TileData> {
 
       if (tile.type === 'GRASS') {
         const r = rand();
-        const treePct   = 0.05 + ff * 0.26; // 5% at centre → 31% at edge
-        const floralPct = treePct + 0.09;    // additional 9% flowers / ground cover
+        const treePct   = 0.03 + ff * 0.14; // 3% at centre → 17% at edge (spaced out)
+        const floralPct = treePct + 0.07;    // additional 7% flowers / ground cover
 
         if (r < treePct) {
           const tr = rand();

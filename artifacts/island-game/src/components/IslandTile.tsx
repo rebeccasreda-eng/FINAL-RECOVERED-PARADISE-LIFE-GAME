@@ -745,12 +745,31 @@ export const IslandTile: React.FC<IslandTileProps> = ({
         <polygon
           points="40,-1 81,14 40,29 -1,14"
           fill={isWater
-            ? '#4ec4de'
+            ? '#0b3d5c'
             : hovered ? topFill : `url(#lg-${tile.x}-${tile.y})`}
           stroke="none"
         />
 
-
+        {/* ── Deep pond depth layers ── */}
+        {isWater && (
+          <>
+            {/* Abyssal darkness — centre-lower area, simulates depth */}
+            <ellipse cx="40" cy="18" rx="20" ry="7"
+              fill="rgba(0,12,28,0.48)"/>
+            {/* Mid depth tint */}
+            <ellipse cx="40" cy="14" rx="30" ry="10"
+              fill="rgba(0,18,38,0.28)"/>
+            {/* Sky reflection — upper-centre, lighter patch */}
+            <ellipse cx="38" cy="9" rx="22" ry="6"
+              fill="rgba(60,160,240,0.13)"/>
+            {/* Glint highlight — small bright spot, like sunlight on still water */}
+            <ellipse cx="28" cy="8" rx="7" ry="2.5"
+              fill="rgba(200,238,255,0.22)" transform="rotate(-18 28 8)"/>
+            {/* Secondary micro-glint */}
+            <ellipse cx="50" cy="11" rx="4" ry="1.5"
+              fill="rgba(200,238,255,0.15)" transform="rotate(10 50 11)"/>
+          </>
+        )}
 
         {/* Danger zone red pulse — same expanded points as base diamond */}
         {isDangerZone && (
