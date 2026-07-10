@@ -246,9 +246,7 @@ const GameInner = ({ profile }: { profile: PlayerProfile }) => {
   // Initial position: island visually centred on load, zoomed in
   useEffect(() => { applyTransform(0, 0, INITIAL_ZOOM); }, [applyTransform]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  /* Mouse-wheel zoom (non-passive).
-     Zoom-IN  → cursor-anchored, continuous up to MAX_ZOOM.
-     Zoom-OUT → always centred, snaps through ZOOM_OUT_LEVELS (max 3 steps out). */
+  /* Mouse-wheel zoom (non-passive) — cursor-anchored in both directions. */
   useEffect(() => {
     const el = viewportRef.current;
     if (!el) return;
@@ -256,32 +254,27 @@ const GameInner = ({ profile }: { profile: PlayerProfile }) => {
       if (e.ctrlKey || e.metaKey) return;
       e.preventDefault();
 
-      if (e.deltaY > 0) {
-        // ── Zoom OUT: snap to next lower level, locked to centre ──────────
-        const nextZ = [...ZOOM_OUT_LEVELS].sort((a, b) => b - a)
-          .find(l => l < zoomRef.current - 0.02);
-        if (nextZ == null) return; // already at minimum level
-        const { x, y } = clampPan(0, 0, nextZ);
-        panRef.current  = { x, y };
-        zoomRef.current = nextZ;
-        applyTransform(x, y, nextZ);
-        setZoom(nextZ);
-      } else {
-        // ── Zoom IN: continuous, cursor-anchored ──────────────────────────
-        const rect  = el.getBoundingClientRect();
-        const cx    = e.clientX - rect.left - rect.width  / 2;
-        const cy    = e.clientY - rect.top  - rect.height / 2;
-        const oldZ  = zoomRef.current;
-        const newZ  = Math.min(MAX_ZOOM, oldZ * 1.1);
-        const ratio = newZ / oldZ;
-        const rawPX = panRef.current.x + (cx + WORLD_CX) * (1 - ratio);
-        const rawPY = panRef.current.y + (cy + WORLD_CY) * (1 - ratio);
-        const { x: newPX, y: newPY } = clampPan(rawPX, rawPY, newZ);
-        panRef.current  = { x: newPX, y: newPY };
-        zoomRef.current = newZ;
-        applyTransform(newPX, newPY, newZ);
-        setZoom(newZ);
-      }
+      const rect  = el.getBoundingClientRect();
+      // cursor offset from viewport centre (matching the transform origin math)
+      const cx    = e.clientX - rect.left - rect.width  / 2;
+      const cy    = e.clientY - rect.top  - rect.height / 2;
+
+      const oldZ  = zoomRef.current;
+      const factor = e.deltaY > 0 ? 1 / 1.12 : 1.12;   // out / in
+      const newZ  = Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, oldZ * factor));
+      if (newZ === oldZ) return;
+
+      // Anchor the point under the cursor: world-point = (cursor - pan + WORLD_CX) / oldZ
+      // After zoom the same world-point should stay under cursor:
+      // newPan = cursor + WORLD_CX - worldPoint * newZ
+      const ratio = newZ / oldZ;
+      const rawPX = panRef.current.x + (cx + WORLD_CX) * (1 - ratio);
+      const rawPY = panRef.current.y + (cy + WORLD_CY) * (1 - ratio);
+      const { x: newPX, y: newPY } = clampPan(rawPX, rawPY, newZ);
+      panRef.current  = { x: newPX, y: newPY };
+      zoomRef.current = newZ;
+      applyTransform(newPX, newPY, newZ);
+      setZoom(newZ);
     };
     el.addEventListener('wheel', handler, { passive: false });
     return () => el.removeEventListener('wheel', handler);
