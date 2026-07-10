@@ -4,7 +4,7 @@ import { ResourceType } from '../game/types';
 import { EMOJI_MAP, SCALED } from '../game/gameData';
 import { useToast } from '@/hooks/use-toast';
 
-export const HUD = ({ onOpenCollections, onOpenWeather }: { onOpenCollections: () => void, onOpenWeather: () => void }) => {
+export const HUD = ({ onOpenCollections, onOpenWeather, playerName = 'Player' }: { onOpenCollections: () => void, onOpenWeather: () => void, playerName?: string }) => {
   const { state, dispatch, setShopOpen, activeTool, setActiveTool, activeBuildItem, setActiveBuildItem } = useGame();
   const { level, xp, inventory, energy, maxEnergy } = state;
   const nextLevelXp = Math.floor(100 * Math.pow(level, 1.5));
