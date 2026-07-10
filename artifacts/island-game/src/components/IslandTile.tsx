@@ -1340,6 +1340,15 @@ const ObjectSVG: React.FC<{ object: string; tileX: number; tileY: number; tileTy
               <stop offset="50%"  stopColor="#3a50d8"/>
               <stop offset="100%" stopColor="#162898"/>
             </radialGradient>
+            <linearGradient id={g('bbfw')} x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%"   stopColor="#d8c08a"/>
+              <stop offset="55%"  stopColor="#b09858"/>
+              <stop offset="100%" stopColor="#7a6030"/>
+            </linearGradient>
+            <linearGradient id={g('bbfr')} x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%"   stopColor="#ccb07a"/>
+              <stop offset="100%" stopColor="#8a6c3c"/>
+            </linearGradient>
           </defs>
           {/* Leaf mass — back */}
           <ellipse cx="26" cy="34" rx="21" ry="19" fill="#1e8012"/>
@@ -1368,6 +1377,42 @@ const ObjectSVG: React.FC<{ object: string; tileX: number; tileY: number; tileTy
           {/* Front leaf overhang */}
           <path d="M5,50  Q12,40 19,50  Q12,60 5,50Z"  fill="#1e8412" opacity="0.75"/>
           <path d="M28,49 Q35,39 42,49  Q35,59 28,49Z"  fill="#22901a" opacity="0.70"/>
+
+          {/* ══ CROOKED RAIL FENCE (front) ══ */}
+          {/* Left post — leans left */}
+          <g transform="rotate(-3 4 54)">
+            <rect x="1"  y="12" width="6" height="42" rx="2" fill={`url(#${g('bbfw')})`}/>
+            <rect x="1"  y="12" width="2" height="42" rx="1" fill="rgba(255,255,255,0.26)"/>
+            <rect x="5"  y="12" width="1.8" height="42" rx="1" fill="rgba(0,0,0,0.24)"/>
+            <ellipse cx="4" cy="12" rx="3.5" ry="2.2" fill="#e4cb90"/>
+            <ellipse cx="4" cy="54" rx="3.5" ry="1.6" fill="rgba(0,0,0,0.18)"/>
+          </g>
+          {/* Center post — leans right */}
+          <g transform="rotate(2.5 26 54)">
+            <rect x="23" y="14" width="6" height="40" rx="2" fill={`url(#${g('bbfw')})`}/>
+            <rect x="23" y="14" width="2" height="40" rx="1" fill="rgba(255,255,255,0.26)"/>
+            <rect x="27" y="14" width="1.8" height="40" rx="1" fill="rgba(0,0,0,0.24)"/>
+            <ellipse cx="26" cy="14" rx="3.5" ry="2.2" fill="#e4cb90"/>
+            <ellipse cx="26" cy="54" rx="3.5" ry="1.6" fill="rgba(0,0,0,0.18)"/>
+          </g>
+          {/* Right post — leans left */}
+          <g transform="rotate(-2 49 54)">
+            <rect x="46" y="13" width="6" height="41" rx="2" fill={`url(#${g('bbfw')})`}/>
+            <rect x="46" y="13" width="2" height="41" rx="1" fill="rgba(255,255,255,0.26)"/>
+            <rect x="50" y="13" width="1.8" height="41" rx="1" fill="rgba(0,0,0,0.24)"/>
+            <ellipse cx="49" cy="13" rx="3.5" ry="2.2" fill="#e4cb90"/>
+            <ellipse cx="49" cy="54" rx="3.5" ry="1.6" fill="rgba(0,0,0,0.18)"/>
+          </g>
+          {/* Rails — left span */}
+          <path d="M7,19 L23,22 L23,27 L7,24 Z"    fill={`url(#${g('bbfr')})`}/>
+          <path d="M7,19 L23,22 L23,23.5 L7,20.5 Z" fill="rgba(255,255,255,0.28)"/>
+          <path d="M7,40 L23,37 L23,42 L7,45 Z"    fill={`url(#${g('bbfr')})`}/>
+          <path d="M7,40 L23,37 L23,38.5 L7,41.5 Z" fill="rgba(255,255,255,0.20)"/>
+          {/* Rails — right span */}
+          <path d="M29,22 L46,19 L46,24 L29,27 Z"   fill={`url(#${g('bbfr')})`}/>
+          <path d="M29,22 L46,19 L46,20.5 L29,23.5 Z" fill="rgba(255,255,255,0.28)"/>
+          <path d="M29,37 L46,40 L46,45 L29,42 Z"   fill={`url(#${g('bbfr')})`}/>
+          <path d="M29,37 L46,40 L46,41.5 L29,38.5 Z" fill="rgba(255,255,255,0.20)"/>
         </svg>
       );
     }
@@ -1655,6 +1700,15 @@ const ObjectSVG: React.FC<{ object: string; tileX: number; tileY: number; tileTy
             </radialGradient>
             <clipPath id={g('pc1')}><ellipse cx="22" cy="46" rx="9"   ry="12"/></clipPath>
             <clipPath id={g('pc2')}><ellipse cx="41" cy="42" rx="9.5" ry="13"/></clipPath>
+            <linearGradient id={g('ppfw')} x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%"   stopColor="#d8c08a"/>
+              <stop offset="55%"  stopColor="#b09858"/>
+              <stop offset="100%" stopColor="#7a6030"/>
+            </linearGradient>
+            <linearGradient id={g('ppfr')} x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%"   stopColor="#ccb07a"/>
+              <stop offset="100%" stopColor="#8a6c3c"/>
+            </linearGradient>
           </defs>
           {/* Base leaf mass */}
           <ellipse cx="30" cy="48" rx="26" ry="16" fill="#1a7a0e"/>
@@ -1710,6 +1764,42 @@ const ObjectSVG: React.FC<{ object: string; tileX: number; tileY: number; tileTy
           <path d="M34,12 L32,9"  stroke="#4ab830" strokeWidth="1.9" fill="none" strokeLinecap="round"/>
           <path d="M41,8  L41,5"  stroke="#4ab830" strokeWidth="2.0" fill="none" strokeLinecap="round"/>
           <path d="M48,12 L50,9"  stroke="#4ab830" strokeWidth="1.9" fill="none" strokeLinecap="round"/>
+
+          {/* ══ CROOKED RAIL FENCE (front) ══ */}
+          {/* Left post — leans left */}
+          <g transform="rotate(-3 4 60)">
+            <rect x="1"  y="14" width="6" height="46" rx="2" fill={`url(#${g('ppfw')})`}/>
+            <rect x="1"  y="14" width="2" height="46" rx="1" fill="rgba(255,255,255,0.26)"/>
+            <rect x="5"  y="14" width="1.8" height="46" rx="1" fill="rgba(0,0,0,0.24)"/>
+            <ellipse cx="4" cy="14" rx="3.5" ry="2.2" fill="#e4cb90"/>
+            <ellipse cx="4" cy="60" rx="3.5" ry="1.6" fill="rgba(0,0,0,0.18)"/>
+          </g>
+          {/* Center post — leans right */}
+          <g transform="rotate(2.5 30 60)">
+            <rect x="27" y="15" width="6" height="45" rx="2" fill={`url(#${g('ppfw')})`}/>
+            <rect x="27" y="15" width="2" height="45" rx="1" fill="rgba(255,255,255,0.26)"/>
+            <rect x="31" y="15" width="1.8" height="45" rx="1" fill="rgba(0,0,0,0.24)"/>
+            <ellipse cx="30" cy="15" rx="3.5" ry="2.2" fill="#e4cb90"/>
+            <ellipse cx="30" cy="60" rx="3.5" ry="1.6" fill="rgba(0,0,0,0.18)"/>
+          </g>
+          {/* Right post — leans left */}
+          <g transform="rotate(-2 57 60)">
+            <rect x="54" y="14" width="6" height="46" rx="2" fill={`url(#${g('ppfw')})`}/>
+            <rect x="54" y="14" width="2" height="46" rx="1" fill="rgba(255,255,255,0.26)"/>
+            <rect x="58" y="14" width="1.8" height="46" rx="1" fill="rgba(0,0,0,0.24)"/>
+            <ellipse cx="57" cy="14" rx="3.5" ry="2.2" fill="#e4cb90"/>
+            <ellipse cx="57" cy="60" rx="3.5" ry="1.6" fill="rgba(0,0,0,0.18)"/>
+          </g>
+          {/* Rails — left span */}
+          <path d="M7,21 L27,24 L27,29 L7,26 Z"    fill={`url(#${g('ppfr')})`}/>
+          <path d="M7,21 L27,24 L27,25.5 L7,22.5 Z" fill="rgba(255,255,255,0.28)"/>
+          <path d="M7,43 L27,40 L27,45 L7,48 Z"    fill={`url(#${g('ppfr')})`}/>
+          <path d="M7,43 L27,40 L27,41.5 L7,44.5 Z" fill="rgba(255,255,255,0.20)"/>
+          {/* Rails — right span */}
+          <path d="M33,24 L54,21 L54,26 L33,29 Z"   fill={`url(#${g('ppfr')})`}/>
+          <path d="M33,24 L54,21 L54,22.5 L33,25.5 Z" fill="rgba(255,255,255,0.28)"/>
+          <path d="M33,40 L54,43 L54,48 L33,45 Z"   fill={`url(#${g('ppfr')})`}/>
+          <path d="M33,40 L54,43 L54,44.5 L33,41.5 Z" fill="rgba(255,255,255,0.20)"/>
         </svg>
       );
     }
