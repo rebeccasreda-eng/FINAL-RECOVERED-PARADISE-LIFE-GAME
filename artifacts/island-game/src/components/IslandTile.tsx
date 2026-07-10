@@ -620,11 +620,7 @@ export const IslandTile: React.FC<IslandTileProps> = ({
   const isWater   = tile.type === 'WATER';
   const isCleared = tile.object === 'CLEARED_LAND' || tile.object === 'CROP_PLOT';
 
-  // Detect outer ocean vs inner pond/channel using the same radial formula as terrain gen
-  const _dx2 = tile.x - 15, _dy2 = tile.y - 15;
-  const _radial = 1 - (_dx2 * _dx2) / (13.5 * 13.5) - (_dy2 * _dy2) / (11.5 * 11.5);
-  const isOuterWater = isWater && _radial <= 0;
-  const isInnerWater = isWater && !isOuterWater;
+  // All water tiles render as bright ocean blue (#1fa8e8), matching the outer ocean background.
 
   /* ── Diamond colours ── */
   const palette = isCleared ? COLORS.CLEARED : (COLORS[tile.type] ?? COLORS.GRASS);
@@ -679,23 +675,6 @@ export const IslandTile: React.FC<IslandTileProps> = ({
 
   const myTexts = floatingTexts.filter(t => t.tileId === tile.id);
 
-  /* ── Outer ocean tiles: invisible — let the background gradient show through ── */
-  if (isOuterWater) {
-    return (
-      <div
-        style={{
-          position: 'absolute',
-          left: screenX,
-          top: screenY,
-          width: 80,
-          height: 38,
-          transform: 'translate(-50%, 0)',
-          zIndex: tileZIndex,
-          pointerEvents: 'none',
-        }}
-      />
-    );
-  }
 
   /* ── Render ── */
   return (
@@ -779,11 +758,7 @@ export const IslandTile: React.FC<IslandTileProps> = ({
         {/* Top face — expanded 1 px beyond nominal edges to seal sub-pixel seams */}
         <polygon
           points="40,-1 81,14 40,29 -1,14"
-          fill={
-            isOuterWater ? '#0d4a88'
-            : isInnerWater ? '#0b3d5c'
-            : hovered ? topFill : `url(#lg-${tile.x}-${tile.y})`
-          }
+          fill={isWater ? '#1fa8e8' : hovered ? topFill : `url(#lg-${tile.x}-${tile.y})`}
           stroke="none"
         />
 
@@ -795,29 +770,6 @@ export const IslandTile: React.FC<IslandTileProps> = ({
           />
         )}
 
-        {/* ── Deep pond depth layers (inner water only) ── */}
-        {isInnerWater && (
-          <>
-            {/* Abyssal darkness — centre-lower area */}
-            <ellipse cx="40" cy="18" rx="20" ry="7"
-              fill="rgba(0,12,28,0.48)"/>
-            {/* Mid depth tint */}
-            <ellipse cx="40" cy="14" rx="30" ry="10"
-              fill="rgba(0,18,38,0.28)"/>
-            {/* Sky reflection */}
-            <ellipse cx="38" cy="9" rx="22" ry="6"
-              fill="rgba(60,160,240,0.13)"/>
-            {/* Glint highlight */}
-            <ellipse cx="28" cy="8" rx="7" ry="2.5"
-              fill="rgba(200,238,255,0.22)" transform="rotate(-18 28 8)"/>
-            {/* Secondary micro-glint */}
-            <ellipse cx="50" cy="11" rx="4" ry="1.5"
-              fill="rgba(200,238,255,0.15)" transform="rotate(10 50 11)"/>
-            {/* Pond outline rim — visible at shoreline, subtle inside */}
-            <polygon points="40,1 77,14 40,27 3,14"
-              fill="none" stroke="#3ac8e8" strokeWidth="1.2" opacity="0.38"/>
-          </>
-        )}
 
         {/* Danger zone red pulse — same expanded points as base diamond */}
         {isDangerZone && (

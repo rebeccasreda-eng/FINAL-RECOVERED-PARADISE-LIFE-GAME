@@ -324,7 +324,7 @@ const GameInner = ({ profile }: { profile: PlayerProfile }) => {
           top: TOP_H, bottom: BOT_H, left: 0, right: 0,
           overflow: 'hidden',
           cursor,
-          background: 'radial-gradient(ellipse 80% 80% at 50% 50%, #1270b8 0%, #0a4a8a 50%, #062040 100%)',
+          background: '#1fa8e8',
         }}
         onMouseDown={onMouseDown}
         onMouseMove={onMouseMove}

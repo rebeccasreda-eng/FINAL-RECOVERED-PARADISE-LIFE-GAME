@@ -64,17 +64,7 @@ export const IslandGrid: React.FC<IslandGridProps> = ({
     return danger;
   }, [state.tiles]);
 
-  // Filter out outer ocean tiles — their slot is filled by the ocean-fill div behind everything.
-  // Outer ocean = water tiles outside the island base ellipse (radial ≤ 0).
-  const tiles = useMemo(() => {
-    const CX = 15, CY = 15;
-    return Object.values(state.tiles).filter(t => {
-      if (t.type !== 'WATER') return true;
-      const dx = t.x - CX, dy = t.y - CY;
-      const radial = 1 - (dx * dx) / (13.5 * 13.5) - (dy * dy) / (11.5 * 11.5);
-      return radial > 0; // keep only inner water (channels/pond)
-    });
-  }, [state.tiles]);
+  const tiles = useMemo(() => Object.values(state.tiles), [state.tiles]);
 
   const showChar = playerX >= 0 && playerX < GRID_COLS && playerY >= 0 && playerY < GRID_ROWS;
   const charZ   = Math.round(playerX + playerY) * 2 + 1;
@@ -93,7 +83,7 @@ export const IslandGrid: React.FC<IslandGridProps> = ({
         style={{
           position: 'absolute',
           inset: 0,
-          background: 'radial-gradient(ellipse 70% 55% at 50% 52%, #5ecff5 0%, #2aa8e0 30%, #1270b8 60%, #0a4a8a 100%)',
+          background: '#1fa8e8',
           zIndex: 0,
         }}
       />
