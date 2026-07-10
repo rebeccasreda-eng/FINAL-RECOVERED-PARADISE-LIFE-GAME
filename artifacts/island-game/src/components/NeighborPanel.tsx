@@ -533,6 +533,94 @@ const PlayerCard = ({ name, level }: { name: string; level: number }) => (
   </div>
 );
 
+/* ─── Marina card — always shown next to PlayerCard ─────────────────────── */
+const MarinaCard = () => (
+  <div
+    style={{
+      width: 76, flexShrink: 0, height: '100%',
+      border: '2px solid #1870b8',
+      borderBottom: '3px solid #0e4880',
+      borderRadius: 8,
+      background: 'linear-gradient(180deg, #a0d8f8 0%, #5090d0 100%)',
+      display: 'flex', flexDirection: 'column', overflow: 'hidden',
+      boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.40), 0 2px 6px rgba(0,0,0,0.35)',
+    }}
+  >
+    <div style={{
+      background: 'linear-gradient(180deg, #0e3870 0%, #082450 100%)',
+      padding: '2px 4px', textAlign: 'center',
+      fontSize: 8, fontWeight: 900, color: '#a0d8ff', letterSpacing: '0.06em',
+      flexShrink: 0, lineHeight: '13px',
+    }}>MARINA</div>
+    <div style={{ flex: 1, position: 'relative', overflow: 'hidden' }}>
+      <MarinaIllus />
+    </div>
+  </div>
+);
+
+/* ─── Inline market grid — 6 icons shown permanently next to Marina ──────── */
+const InlineMarketGrid = ({ onOpenShop, onOpenQuests, onOpenCollections }: {
+  onOpenShop: () => void;
+  onOpenQuests?: () => void;
+  onOpenCollections?: () => void;
+}) => {
+  const cell: React.CSSProperties = {
+    width: 34, height: 28,
+    borderRadius: 6,
+    background: 'linear-gradient(180deg, #5a6838 0%, #3e4a24 100%)',
+    border: '1.5px solid #2a3010',
+    borderBottom: '2.5px solid #1a2008',
+    display: 'flex', flexDirection: 'column',
+    alignItems: 'center', justifyContent: 'center',
+    gap: 1, cursor: 'pointer',
+    boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.15)',
+    position: 'relative', overflow: 'hidden',
+    transition: 'transform 0.08s',
+  };
+  const lbl: React.CSSProperties = {
+    fontSize: 6, fontWeight: 900, color: '#d8e8a0',
+    letterSpacing: '0.03em', lineHeight: 1,
+  };
+  const tiles = [
+    { icon: <IcoCursor />,     label: 'SELECT', cb: () => {} },
+    { icon: <IcoMarketSign />, label: 'MARKET', cb: onOpenShop },
+    { icon: <IcoCharacter />,  label: 'PROFILE', cb: () => {} },
+    { icon: <IcoFish />,       label: 'FISH',   cb: () => {} },
+    { icon: <IcoGift />,       label: 'GIFTS',  cb: () => {} },
+    { icon: <IcoScreen />,     label: 'DISPLAY', cb: () => {} },
+  ];
+  return (
+    <div style={{
+      flexShrink: 0,
+      background: 'linear-gradient(180deg, #3a4220 0%, #262e14 100%)',
+      border: '2px solid #1a2008',
+      borderRadius: 8,
+      padding: '3px 4px',
+      display: 'grid',
+      gridTemplateColumns: 'repeat(3, 34px)',
+      gridTemplateRows: 'repeat(2, 28px)',
+      gap: 3,
+      alignSelf: 'center',
+      boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.08)',
+    }}>
+      {tiles.map(({ icon, label, cb }) => (
+        <button
+          key={label}
+          onClick={cb}
+          style={cell}
+          onMouseEnter={e => (e.currentTarget.style.transform = 'scale(0.93)')}
+          onMouseLeave={e => (e.currentTarget.style.transform = 'scale(1)')}
+          title={label}
+        >
+          <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '40%', background: 'linear-gradient(180deg, rgba(255,255,255,0.13), transparent)', borderRadius: '4px 4px 0 0', pointerEvents: 'none' }}/>
+          <div style={{ transform: 'scale(0.7)', transformOrigin: 'center' }}>{icon}</div>
+          <span style={lbl}>{label}</span>
+        </button>
+      ))}
+    </div>
+  );
+};
+
 /* ─── Market card — shop shortcut in the neighbor strip ─────────────────── */
 const MarketCard = ({ onClick }: { onClick: () => void }) => (
   <button
@@ -650,16 +738,20 @@ export const NeighborPanel = ({
             </span>
           </div>
 
-          {/* Card row: Player | gap | Market | divider | 5×AddNeighbor */}
+          {/* Card row: Player | Marina | InlineMarketGrid | divider | 5×AddNeighbor */}
           <div className="flex flex-1 min-h-0" style={{ padding: '4px', gap: 4, alignItems: 'stretch' }}>
             {/* Player's own island card */}
             <PlayerCard name={playerName} level={playerLevel} />
 
-            {/* Gap spacer */}
-            <div style={{ width: 10, flexShrink: 0 }} />
+            {/* Marina card */}
+            <MarinaCard />
 
-            {/* Market shortcut card */}
-            <MarketCard onClick={() => setShopOpen(true)} />
+            {/* Inline market 6-icon grid */}
+            <InlineMarketGrid
+              onOpenShop={() => setShopOpen(true)}
+              onOpenQuests={onOpenQuests}
+              onOpenCollections={onOpenCollections}
+            />
 
             {/* Thin divider */}
             <div style={{ width: 2, background: 'rgba(0,0,0,0.28)', borderRadius: 1, flexShrink: 0, margin: '2px 4px' }} />
