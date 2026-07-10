@@ -121,7 +121,7 @@ export const QUESTS: QuestDef[] = [
     targetType: 'none', targetCount: 1,
     objectives: [
       { description: 'Chop down 1 tree on your island',       targetType: 'chop_tree',       targetCount: 1, icon: '🌴' },
-      { description: 'Clear 1 tree stump on your island',     targetType: 'clear_driftwood', targetCount: 1, icon: '🪵' },
+      { description: 'Clear 1 tree stump on your island',     targetType: 'clear_driftwood', targetCount: 1, icon: '🪏' },
     ],
     rewardCoins: 150, rewardXP: 10,
     rewardItems: [{ type: 'wood', count: 3 }],
