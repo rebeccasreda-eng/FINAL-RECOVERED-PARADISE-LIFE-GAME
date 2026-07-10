@@ -85,6 +85,8 @@ export const IslandTile = ({ tile, isDangerZone }: { tile: TileData, isDangerZon
     titleText += ` - Expected Yield: ${CROP_TYPES[tile.cropType].yield * 5} 🪙`;
   }
 
+  const isTree = /PALM|TREE|COCO|MANGO|BAMBOO|BUSH|FLOWER/.test(tile.object || '');
+
   let badgeText = '';
   let progressWidth = 0;
 
@@ -122,31 +124,31 @@ export const IslandTile = ({ tile, isDangerZone }: { tile: TileData, isDangerZon
       )}
 
       {tile.object && tile.object !== 'CLEARED_LAND' && tile.object !== 'CROP_PLOT' && (
-        <div className={`isometric-object text-5xl select-none group-hover:scale-110 transition-transform`}>
-          {tile.object === 'CROP_READY' && tile.cropType && CROP_TYPES[tile.cropType] 
-            ? CROP_TYPES[tile.cropType].emoji 
+        <div className={`isometric-object text-5xl select-none group-hover:scale-110 transition-transform ${isTree ? 'tree-sway' : ''}`}>
+          {tile.object === 'CROP_READY' && tile.cropType && CROP_TYPES[tile.cropType]
+            ? CROP_TYPES[tile.cropType].emoji
             : EMOJI_MAP[tile.object] || '?'}
 
           {tile.object === 'CROP_GROWING' && (
             <div className="absolute -top-6 left-1/2 transform -translate-x-1/2 text-[10px] bg-black/60 text-white px-2 py-0.5 rounded-full border border-white/30 whitespace-nowrap flex flex-col items-center gap-0.5 z-20">
-               <span>{badgeText || 'Growing'}</span>
-               {progressWidth > 0 && (
-                 <div className="w-12 h-1 bg-gray-500 rounded-full overflow-hidden">
-                   <div className="h-full bg-green-400" style={{ width: `${progressWidth}%` }} />
-                 </div>
-               )}
+              <span>{badgeText || 'Growing'}</span>
+              {progressWidth > 0 && (
+                <div className="w-12 h-1 bg-gray-500 rounded-full overflow-hidden">
+                  <div className="h-full bg-green-400" style={{ width: `${progressWidth}%` }} />
+                </div>
+              )}
             </div>
           )}
 
           {tile.object === 'CROP_READY' && badgeText && (
             <div className="absolute -top-6 left-1/2 transform -translate-x-1/2 text-[10px] bg-black/60 text-white px-2 py-0.5 rounded-full border border-white/30 whitespace-nowrap z-20">
-               {badgeText}
+              {badgeText}
             </div>
           )}
 
           {(tile.object === 'CRAB' || tile.object === 'BOAR') && (
             <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 w-12 h-3 bg-red-900 rounded-full overflow-hidden border-2 border-white shadow-sm">
-              <div className="bg-red-500 h-full transition-all" style={{ width: `${((tile.crabHp || (tile.object === 'CRAB' ? 3 : 2)) / (tile.object === 'CRAB' ? 3 : 2)) * 100}%` }}></div>
+              <div className="bg-red-500 h-full transition-all" style={{ width: `${((tile.crabHp || (tile.object === 'CRAB' ? 3 : 2)) / (tile.object === 'CRAB' ? 3 : 2)) * 100}%` }} />
             </div>
           )}
         </div>

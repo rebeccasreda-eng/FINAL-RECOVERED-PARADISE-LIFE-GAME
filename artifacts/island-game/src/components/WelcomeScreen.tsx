@@ -209,7 +209,80 @@ const ChAva = ({ size = 120 }: { size?: number }) => (
   </svg>
 );
 
-/** Character 4 – Nora: dark bob hair, sailor navy dress */
+/** Character 4 – Kai: dark spiky hair, tropical orange shirt, board shorts */
+const ChKai = ({ size = 120 }: { size?: number }) => (
+  <svg viewBox="0 0 100 148" width={size} height={size * 1.48} xmlns="http://www.w3.org/2000/svg">
+    <ellipse cx="50" cy="145" rx="24" ry="4" fill="#00000025"/>
+    {/* legs */}
+    <rect x="34" y="108" width="12" height="30" rx="5" fill="#e8c898"/>
+    <rect x="54" y="108" width="12" height="30" rx="5" fill="#e8c898"/>
+    {/* board shorts – bright teal/green */}
+    <path d="M28 88 Q28 112 40 114 L60 114 Q72 112 72 88Z" fill="#20a898"/>
+    <path d="M28 88 L50 100 L72 88" fill="#18907e" opacity="0.6"/>
+    {/* shorts pattern lines */}
+    <path d="M34 92 L34 108" stroke="#18907e" strokeWidth="1.2" opacity="0.5"/>
+    <path d="M66 92 L66 108" stroke="#18907e" strokeWidth="1.2" opacity="0.5"/>
+    {/* shoes / sandals */}
+    <ellipse cx="40" cy="138" rx="11" ry="6" fill="#8b5a2b"/>
+    <ellipse cx="60" cy="138" rx="11" ry="6" fill="#8b5a2b"/>
+    <path d="M34 134 L46 134" stroke="#5c3a1e" strokeWidth="2.5" strokeLinecap="round"/>
+    <path d="M54 134 L66 134" stroke="#5c3a1e" strokeWidth="2.5" strokeLinecap="round"/>
+    {/* tropical shirt body – orange with white pattern */}
+    <rect x="26" y="62" width="48" height="28" rx="9" fill="#f07020"/>
+    {/* shirt collar open */}
+    <path d="M26 62 L50 76 L74 62 L64 62 L50 70 L36 62Z" fill="#cc5010"/>
+    {/* leaf patterns on shirt */}
+    <path d="M34 68 Q38 64 42 68 Q38 72 34 68Z" fill="#60c820" opacity="0.7"/>
+    <path d="M56 72 Q60 68 64 72 Q60 76 56 72Z" fill="#60c820" opacity="0.7"/>
+    <path d="M44 78 Q48 74 52 78 Q48 82 44 78Z" fill="#60c820" opacity="0.6"/>
+    {/* arms */}
+    <path d="M26 66 Q13 72 15 84" stroke="#f07020" strokeWidth="12" fill="none" strokeLinecap="round"/>
+    <path d="M74 66 Q87 72 85 84" stroke="#f07020" strokeWidth="12" fill="none" strokeLinecap="round"/>
+    {/* tan hands */}
+    <circle cx="15" cy="86" r="6.5" fill="#e8c898"/>
+    <circle cx="85" cy="86" r="6.5" fill="#e8c898"/>
+    {/* neck */}
+    <rect x="42" y="52" width="16" height="12" rx="3" fill="#e8c898"/>
+    {/* head – tan skin */}
+    <circle cx="50" cy="33" r="30" fill="#e8c898"/>
+    {/* hair – dark/black spiky */}
+    <ellipse cx="50" cy="20" rx="29" ry="18" fill="#1a1008"/>
+    {/* spiky hair front */}
+    <path d="M22 30 Q21 8 30 4 Q32 18 37 22" fill="#28180c"/>
+    <path d="M36 14 Q40 0 50 2 Q48 16 50 20" fill="#1a1008"/>
+    <path d="M50 10 Q56 -2 64 4 Q60 16 58 20" fill="#28180c"/>
+    <path d="M60 14 Q68 2 76 8 Q70 18 66 22" fill="#1a1008"/>
+    {/* side hair */}
+    <path d="M21 30 Q18 46 22 55" stroke="#1a1008" strokeWidth="10" fill="none" strokeLinecap="round"/>
+    <path d="M79 30 Q82 46 78 55" stroke="#1a1008" strokeWidth="10" fill="none" strokeLinecap="round"/>
+    {/* fringe sweep */}
+    <path d="M22 30 Q30 38 40 32" fill="#1a1008"/>
+    {/* eyes – warm brown */}
+    <ellipse cx="38" cy="35" rx="7.5" ry="8.5" fill="white"/>
+    <ellipse cx="62" cy="35" rx="7.5" ry="8.5" fill="white"/>
+    <ellipse cx="38" cy="37" rx="5.5" ry="6.5" fill="#7a4818"/>
+    <ellipse cx="62" cy="37" rx="5.5" ry="6.5" fill="#7a4818"/>
+    <circle cx="39" cy="38" r="3.2" fill="#1a0a00"/>
+    <circle cx="63" cy="38" r="3.2" fill="#1a0a00"/>
+    <circle cx="40.8" cy="35.5" r="1.6" fill="white"/>
+    <circle cx="64.8" cy="35.5" r="1.6" fill="white"/>
+    {/* brows */}
+    <path d="M31 28 Q38 23 45 27" stroke="#1a1008" strokeWidth="2.4" fill="none" strokeLinecap="round"/>
+    <path d="M55 27 Q62 23 69 28" stroke="#1a1008" strokeWidth="2.4" fill="none" strokeLinecap="round"/>
+    {/* blush – warm */}
+    <ellipse cx="27" cy="42" rx="7" ry="4" fill="#e08060" opacity="0.35"/>
+    <ellipse cx="73" cy="42" rx="7" ry="4" fill="#e08060" opacity="0.35"/>
+    {/* nose */}
+    <ellipse cx="50" cy="43" rx="2.3" ry="1.5" fill="#c8906a" opacity="0.55"/>
+    {/* wide confident grin */}
+    <path d="M40 51 Q50 59 60 51" stroke="#cc3344" strokeWidth="2.4" fill="none" strokeLinecap="round"/>
+    <path d="M43 52 Q50 57 57 52" fill="#ff7799" opacity="0.3"/>
+    {/* teeth hint */}
+    <path d="M44 52 Q50 55 56 52" stroke="white" strokeWidth="1.2" fill="none" opacity="0.5"/>
+  </svg>
+);
+
+/** Character 5 – Nora: dark bob hair, sailor navy dress */
 const ChNora = ({ size = 120 }: { size?: number }) => (
   <svg viewBox="0 0 100 140" width={size} height={size * 1.4} xmlns="http://www.w3.org/2000/svg">
     <ellipse cx="50" cy="137" rx="22" ry="4" fill="#00000025"/>
@@ -281,10 +354,11 @@ const ChNora = ({ size = 120 }: { size?: number }) => (
 
 /* ── Character data ──────────────────────────────────────────────────────── */
 const CHARACTERS = [
-  { id: 'mia',   name: 'Mia',  gender: 'female' as const, Component: ChMia,  desc: 'Cheerful sailor girl' },
-  { id: 'leo',   name: 'Leo',  gender: 'male'   as const, Component: ChLeo,  desc: 'Cool island adventurer' },
-  { id: 'ava',   name: 'Ava',  gender: 'female' as const, Component: ChAva,  desc: 'Bright & fashionable' },
-  { id: 'nora',  name: 'Nora', gender: 'female' as const, Component: ChNora, desc: 'Elegant sailor' },
+  { id: 'mia',  name: 'Mia',  gender: 'female' as const, Component: ChMia,  desc: 'Cheerful sailor girl' },
+  { id: 'leo',  name: 'Leo',  gender: 'male'   as const, Component: ChLeo,  desc: 'Cool island adventurer' },
+  { id: 'ava',  name: 'Ava',  gender: 'female' as const, Component: ChAva,  desc: 'Bright & fashionable' },
+  { id: 'kai',  name: 'Kai',  gender: 'male'   as const, Component: ChKai,  desc: 'Tropical surfer dude' },
+  { id: 'nora', name: 'Nora', gender: 'female' as const, Component: ChNora, desc: 'Elegant sailor' },
 ];
 
 interface Props {
@@ -363,9 +437,9 @@ export const WelcomeScreen: React.FC<Props> = ({ onPlay }) => {
           {/* Character selection label */}
           <p className="text-[#5c3a21] font-bold text-sm">Choose Your Character</p>
 
-          {/* 4 character cards */}
-          <div className="grid grid-cols-4 gap-3 w-full">
-            {CHARACTERS.map(ch => {
+          {/* 5 character cards */}
+          <div className="grid grid-cols-5 gap-2 w-full">
+            {CHARACTERS.map((ch, idx) => {
               const isSelected = ch.id === charId;
               return (
                 <button
@@ -397,9 +471,12 @@ export const WelcomeScreen: React.FC<Props> = ({ onPlay }) => {
                     )}
                     {/* Ground strip */}
                     <div className="absolute bottom-0 left-0 right-0 h-6" style={{ background: 'linear-gradient(180deg, #b8e870, #90cc50)' }}/>
-                    {/* Character */}
-                    <div className="relative z-10" style={{ marginBottom: 4 }}>
-                      <ch.Component size={88} />
+                    {/* Character with idle-bob animation, offset per card so they're not all in sync */}
+                    <div
+                      className="idle-bob relative z-10"
+                      style={{ marginBottom: 4, animationDelay: `${idx * 0.28}s` }}
+                    >
+                      <ch.Component size={80} />
                     </div>
                   </div>
                   {/* Name + desc */}
