@@ -116,7 +116,102 @@ const TreeNPC = () => (
   </svg>
 );
 
-const NPC_MAP: Record<string, React.FC> = { parrot: ParrotNPC, crab: CrabNPC, tree: TreeNPC };
+/* ── Fish NPC ──────────────────────────────────────────────────────────── */
+const FishNPC = () => (
+  <svg viewBox="0 0 84 84" xmlns="http://www.w3.org/2000/svg" width="80" height="80">
+    <ellipse cx="42" cy="80" rx="28" ry="5" fill="rgba(0,0,0,0.18)"/>
+    {/* Water base */}
+    <ellipse cx="42" cy="72" rx="36" ry="12" fill="#1a90d8" opacity="0.65"/>
+    <ellipse cx="42" cy="70" rx="32" ry="9" fill="#28a8e8" opacity="0.8"/>
+    {/* Waves */}
+    <path d="M6,66 Q16,62 26,66 Q36,70 46,66 Q56,62 66,66 Q74,70 80,66" stroke="#48c8f8" strokeWidth="2.5" fill="none" opacity="0.9"/>
+    <path d="M10,72 Q20,68 30,72 Q40,76 50,72 Q60,68 70,72" stroke="#38b8e8" strokeWidth="2" fill="none" opacity="0.6"/>
+    {/* Coral left */}
+    <path d="M16,70 Q12,60 14,50 Q16,42 18,50 Q20,56 18,62" stroke="#e04040" strokeWidth="3.5" fill="none" strokeLinecap="round"/>
+    <circle cx="13" cy="49" r="4.5" fill="#e84848"/>
+    <circle cx="17" cy="45" r="4" fill="#f05050"/>
+    <circle cx="19" cy="50" r="3.5" fill="#e03838"/>
+    {/* Seaweed right */}
+    <path d="M66,70 Q64,57 67,46" stroke="#28a030" strokeWidth="3.5" fill="none" strokeLinecap="round"/>
+    <ellipse cx="67" cy="45" rx="6" ry="3.5" fill="#38b838" transform="rotate(-20 67 45)"/>
+    <ellipse cx="64" cy="54" rx="5" ry="3" fill="#30ac30" transform="rotate(15 64 54)"/>
+    {/* Fish body */}
+    <ellipse cx="43" cy="38" rx="23" ry="15" fill="#ff6820"/>
+    {/* White stripes */}
+    <path d="M36,24 Q34,38 36,52" stroke="white" strokeWidth="4.5" fill="none" opacity="0.72"/>
+    <path d="M47,24 Q45,38 47,52" stroke="white" strokeWidth="4" fill="none" opacity="0.60"/>
+    {/* Outline */}
+    <ellipse cx="43" cy="38" rx="23" ry="15" fill="none" stroke="#c84808" strokeWidth="1.5" opacity="0.6"/>
+    {/* Tail fin */}
+    <path d="M66,32 Q80,28 82,38 Q80,50 66,46 Q70,38 66,32Z" fill="#ff7830"/>
+    <path d="M66,32 Q70,38 66,46" stroke="white" strokeWidth="1.5" fill="none" opacity="0.45"/>
+    {/* Dorsal fin */}
+    <path d="M30,24 Q38,12 52,23 Q47,25 40,25 Q35,25 30,24Z" fill="#ff8030" stroke="#c84808" strokeWidth="1" opacity="0.9"/>
+    {/* Pectoral fin */}
+    <path d="M48,47 Q54,56 52,62 Q45,55 45,49Z" fill="#ff9840" opacity="0.75"/>
+    {/* Eye */}
+    <circle cx="24" cy="36" r="6" fill="white"/>
+    <circle cx="24" cy="36" r="4" fill="#1a1a1a"/>
+    <circle cx="22.5" cy="34.5" r="1.8" fill="white"/>
+    {/* Mouth */}
+    <path d="M16,41 Q18,44 21,42" stroke="#b83808" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
+    {/* Bubbles */}
+    <circle cx="12" cy="32" r="3" fill="none" stroke="#88d8f8" strokeWidth="1.5" opacity="0.75"/>
+    <circle cx="8"  cy="23" r="2.3" fill="none" stroke="#88d8f8" strokeWidth="1.2" opacity="0.55"/>
+    <circle cx="13" cy="16" r="1.7" fill="none" stroke="#88d8f8" strokeWidth="1" opacity="0.45"/>
+  </svg>
+);
+
+/* ── Axe-stump NPC ─────────────────────────────────────────────────────── */
+const AxeNPC = () => (
+  <svg viewBox="0 0 84 84" xmlns="http://www.w3.org/2000/svg" width="80" height="80">
+    <ellipse cx="42" cy="80" rx="30" ry="5" fill="rgba(0,0,0,0.18)"/>
+    {/* Grass */}
+    <ellipse cx="42" cy="74" rx="34" ry="11" fill="#3ab028"/>
+    <ellipse cx="28" cy="72" rx="20" ry="8" fill="#44c030"/>
+    <ellipse cx="56" cy="72" rx="18" ry="7" fill="#40bc2c"/>
+    {/* Small grass blades */}
+    <path d="M18,68 Q14,60 16,54" stroke="#4ccc34" strokeWidth="3" fill="none" strokeLinecap="round"/>
+    <path d="M64,68 Q68,58 66,52" stroke="#4ccc34" strokeWidth="3" fill="none" strokeLinecap="round"/>
+    {/* Stump body */}
+    <rect x="18" y="40" width="48" height="32" rx="5" fill="#8a5020"/>
+    {/* Stump top ring face */}
+    <ellipse cx="42" cy="40" rx="24" ry="9" fill="#9a5a22"/>
+    <ellipse cx="42" cy="40" rx="18" ry="6.5" fill="#a86428" opacity="0.85"/>
+    <ellipse cx="42" cy="40" rx="11" ry="4" fill="#b87030" opacity="0.7"/>
+    <ellipse cx="42" cy="40" rx="5.5" ry="2" fill="#c87838" opacity="0.6"/>
+    {/* Stump side wood grain lines */}
+    <path d="M26,44 Q25,56 26,64" stroke="#6a3a18" strokeWidth="1.5" fill="none" opacity="0.5"/>
+    <path d="M56,44 Q57,56 56,64" stroke="#6a3a18" strokeWidth="1.5" fill="none" opacity="0.5"/>
+    <path d="M35,43 Q34,57 35,66" stroke="#7a4820" strokeWidth="1" fill="none" opacity="0.35"/>
+    {/* Flying wood chip left */}
+    <path d="M18,42 Q12,36 14,28" stroke="#a06028" strokeWidth="3" fill="none" strokeLinecap="round"/>
+    <ellipse cx="14" cy="27" rx="5" ry="3" fill="#b87030" transform="rotate(-35 14 27)"/>
+    {/* Flying wood chip right */}
+    <path d="M64,40 Q72,34 70,26" stroke="#8a5020" strokeWidth="2.5" fill="none" strokeLinecap="round"/>
+    <ellipse cx="70" cy="25" rx="4" ry="2.5" fill="#a06028" transform="rotate(25 70 25)"/>
+    {/* Axe handle — diagonal, embedded in stump */}
+    <path d="M60,4 Q58,14 54,26 Q51,34 48,42" stroke="#7a4e1c" strokeWidth="7" fill="none" strokeLinecap="round"/>
+    <path d="M60,4 Q58,14 54,26 Q51,34 48,42" stroke="#c08840" strokeWidth="4" fill="none" strokeLinecap="round" opacity="0.55"/>
+    {/* Axe head — steel blue-grey */}
+    <path d="M36,4 Q30,6 28,13 Q26,21 30,27 Q34,33 40,29 Q46,31 50,23 Q54,15 48,9 Q44,5 36,4Z" fill="#8898B4"/>
+    <path d="M36,4 Q30,6 28,13 Q26,21 30,27" stroke="#6070A0" strokeWidth="1.2" fill="none" opacity="0.7"/>
+    {/* Blade shine */}
+    <path d="M34,6 Q30,11 30,18" stroke="rgba(210,225,255,0.55)" strokeWidth="2.5" fill="none" strokeLinecap="round"/>
+    {/* Grape cluster on blade */}
+    <circle cx="40" cy="20" r="3"   fill="#5535A8"/>
+    <circle cx="44" cy="19" r="3"   fill="#5535A8"/>
+    <circle cx="42" cy="16" r="3"   fill="#6848BB"/>
+    <circle cx="38.5" cy="16.5" r="2.5" fill="#4828A0"/>
+    <circle cx="39.5" cy="19.3" r="1.2" fill="rgba(255,255,255,0.55)"/>
+    <circle cx="43.2" cy="18.3" r="1.2" fill="rgba(255,255,255,0.55)"/>
+    {/* Grape stem + leaf */}
+    <path d="M42,13.5 Q43,11 46,10" stroke="#3a7018" strokeWidth="1.4" fill="none" strokeLinecap="round"/>
+    <ellipse cx="47" cy="9" rx="4.5" ry="2.8" fill="#4aA028" transform="rotate(-25 47 9)"/>
+  </svg>
+);
+
+const NPC_MAP: Record<string, React.FC> = { parrot: ParrotNPC, crab: CrabNPC, tree: TreeNPC, fish: FishNPC, axe: AxeNPC };
 
 /* ── Wooden arrow sign with quest icon ─────────────────────────────────── */
 const QuestSign = ({ icon, onClick }: { icon: string; onClick: () => void }) => (

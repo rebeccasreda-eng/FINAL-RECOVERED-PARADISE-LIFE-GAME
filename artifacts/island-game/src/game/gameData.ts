@@ -31,13 +31,14 @@ export const PREMIUM_ITEMS = [
 
 export interface QuestGroup {
   id: string;
-  npcType: 'parrot' | 'crab' | 'tree';
+  npcType: 'parrot' | 'crab' | 'tree' | 'fish' | 'axe';
   quests: string[];   // quest IDs offered by this NPC
   prereqs: string[];  // quest IDs that must all be completed first
 }
 
 export const QUEST_GROUPS: QuestGroup[] = [
-  { id: 'grp_parrot', npcType: 'parrot', quests: ['q_fishing', 'q_clear'],  prereqs: [] },
+  { id: 'grp_fish',   npcType: 'fish',   quests: ['q_fishing'],             prereqs: [] },
+  { id: 'grp_axe',    npcType: 'axe',    quests: ['q_clear'],               prereqs: [] },
   { id: 'grp_crab',   npcType: 'crab',   quests: ['q_crab'],                prereqs: ['q_fishing', 'q_clear'] },
   { id: 'grp_tree',   npcType: 'tree',   quests: ['q_chop'],                prereqs: ['q_fishing', 'q_clear'] },
 ];
