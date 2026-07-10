@@ -3,6 +3,8 @@ import { useGame } from '../game/GameContext';
 import { EMOJI_MAP } from '../game/gameData';
 import { ResourceType } from '../game/types';
 
+type QuickTab = 'player' | 'market' | null;
+
 /* ─── Tiny SVG icons ──────────────────────────────────────────────────────── */
 const IcoAxe = () => (
   <svg viewBox="0 0 30 30" width="20" height="20">
@@ -63,6 +65,244 @@ const IcoWeather = () => (
     <ellipse cx="20" cy="20" rx="5" ry="3.5" fill="white"/>
     <ellipse cx="14" cy="21" rx="9" ry="4" fill="#e8e8e8"/>
   </svg>
+);
+
+/* ─── Quick-panel SVG icons ─────────────────────────────────────────────── */
+const IcoCursor = () => (
+  <svg viewBox="0 0 28 28" width="22" height="22">
+    <polygon points="5,3 5,22 10,17 14,25 17,24 13,16 20,16" fill="white" stroke="#333" strokeWidth="1.2" strokeLinejoin="round"/>
+    <polygon points="5,3 5,22 10,17 14,25 17,24 13,16 20,16" fill="none" stroke="rgba(255,255,255,0.5)" strokeWidth="0.5"/>
+  </svg>
+);
+const IcoMarketSign = () => (
+  <svg viewBox="0 0 36 28" width="32" height="24">
+    <rect x="2" y="6" width="32" height="18" rx="3" fill="#e84020" stroke="#901010" strokeWidth="1.5"/>
+    <rect x="2" y="6" width="32" height="6" rx="3" fill="#c83010"/>
+    <text x="18" y="19" textAnchor="middle" fontSize="7.5" fontWeight="900" fill="white" fontFamily="'Fredoka', sans-serif" letterSpacing="0.5">MARKET</text>
+    <rect x="15" y="2" width="6" height="6" rx="1" fill="#8a6020"/>
+    <rect x="16.5" y="1" width="3" height="4" rx="1" fill="#6a4010"/>
+  </svg>
+);
+const IcoCharacter = () => (
+  <svg viewBox="0 0 28 28" width="22" height="22">
+    <circle cx="14" cy="9" r="6" fill="#f5c890" stroke="#c08840" strokeWidth="1"/>
+    <ellipse cx="14" cy="26" rx="9" ry="6" fill="#5080d8" stroke="#3060b0" strokeWidth="1"/>
+    <circle cx="12" cy="8" r="1.2" fill="#3a2a10"/>
+    <circle cx="16" cy="8" r="1.2" fill="#3a2a10"/>
+    <path d="M12,12 Q14,14 16,12" stroke="#c08840" strokeWidth="1" fill="none" strokeLinecap="round"/>
+  </svg>
+);
+const IcoFish = () => (
+  <svg viewBox="0 0 32 24" width="28" height="20">
+    <path d="M6,12 Q2,7 2,12 Q2,17 6,12Z" fill="#f0a020"/>
+    <ellipse cx="17" cy="12" rx="13" ry="7" fill="#f0a020" stroke="#c07010" strokeWidth="1"/>
+    <ellipse cx="17" cy="12" rx="11" ry="5.5" fill="#f8c040" opacity="0.5"/>
+    <circle cx="25" cy="10" r="2" fill="white" stroke="#c07010" strokeWidth="0.7"/>
+    <circle cx="25.5" cy="9.5" r="1" fill="#1a1a1a"/>
+    <path d="M10,8 Q12,10 10,12 Q8,10 10,8Z" fill="#c07010" opacity="0.5"/>
+  </svg>
+);
+const IcoGift = () => (
+  <svg viewBox="0 0 28 28" width="22" height="22">
+    <rect x="3" y="12" width="22" height="13" rx="2" fill="#e83050" stroke="#a01030" strokeWidth="1"/>
+    <rect x="3" y="9" width="22" height="5" rx="1.5" fill="#f04060" stroke="#a01030" strokeWidth="1"/>
+    <rect x="12" y="9" width="4" height="16" fill="#f0d000"/>
+    <path d="M14,9 Q14,5 10,5 Q8,5 8,7 Q8,9 14,9Z" fill="#f04060" stroke="#a01030" strokeWidth="0.8"/>
+    <path d="M14,9 Q14,5 18,5 Q20,5 20,7 Q20,9 14,9Z" fill="#f04060" stroke="#a01030" strokeWidth="0.8"/>
+    <path d="M14,9 Q11,7 10,5" stroke="#f0d000" strokeWidth="1.5" fill="none"/>
+    <path d="M14,9 Q17,7 18,5" stroke="#f0d000" strokeWidth="1.5" fill="none"/>
+  </svg>
+);
+const IcoScreen = () => (
+  <svg viewBox="0 0 28 24" width="22" height="18">
+    <rect x="2" y="2" width="24" height="16" rx="2" fill="#1a2a3a" stroke="#4888c8" strokeWidth="1.5"/>
+    <rect x="4" y="4" width="20" height="12" rx="1" fill="#0a4888"/>
+    <rect x="4" y="4" width="20" height="12" rx="1" fill="url(#scrGrad)"/>
+    <defs><linearGradient id="scrGrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stopColor="#60b0ff" stopOpacity="0.3"/><stop offset="100%" stopColor="transparent"/></linearGradient></defs>
+    <rect x="11" y="18" width="6" height="3" fill="#2a3a4a"/>
+    <rect x="8" y="21" width="12" height="2" rx="1" fill="#3a4a5a"/>
+  </svg>
+);
+const IcoQuestion = () => (
+  <svg viewBox="0 0 22 22" width="18" height="18">
+    <circle cx="11" cy="11" r="10" fill="#1a4a18" stroke="#2a7a20" strokeWidth="1.5"/>
+    <text x="11" y="16" textAnchor="middle" fontSize="13" fontWeight="900" fill="white" fontFamily="'Fredoka', sans-serif">?</text>
+  </svg>
+);
+const IcoGear = () => (
+  <svg viewBox="0 0 22 22" width="18" height="18">
+    <circle cx="11" cy="11" r="10" fill="#1a4a18" stroke="#2a7a20" strokeWidth="1.5"/>
+    {[0,45,90,135,180,225,270,315].map(a=>(
+      <rect key={a} x="10" y="2" width="2" height="4" rx="1" fill="white" opacity="0.85"
+        transform={`rotate(${a} 11 11)`}/>
+    ))}
+    <circle cx="11" cy="11" r="3.5" fill="#1a4a18" stroke="white" strokeWidth="1.2"/>
+  </svg>
+);
+
+/* ─── Quick-actions floating panel ─────────────────────────────────────── */
+const QuickPanel = ({
+  tab,
+  onClose,
+  onOpenShop,
+  onOpenQuests,
+  onOpenCollections,
+}: {
+  tab: QuickTab;
+  onClose: () => void;
+  onOpenShop: () => void;
+  onOpenQuests?: () => void;
+  onOpenCollections?: () => void;
+}) => {
+  if (!tab) return null;
+
+  // Tile background — dark olive like the reference
+  const tileBg = 'linear-gradient(180deg, #5a6838 0%, #3e4a24 100%)';
+  const tileStyle: React.CSSProperties = {
+    width: 52, height: 48,
+    borderRadius: 8,
+    background: tileBg,
+    border: '2px solid #2a3010',
+    borderBottom: '3px solid #1a2008',
+    display: 'flex', flexDirection: 'column',
+    alignItems: 'center', justifyContent: 'center',
+    gap: 2, cursor: 'pointer',
+    boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.18), 0 2px 4px rgba(0,0,0,0.4)',
+    position: 'relative', overflow: 'hidden',
+    transition: 'transform 0.08s',
+  };
+  const tileLabel: React.CSSProperties = {
+    fontSize: 8, fontWeight: 900, color: '#d8e8a0', letterSpacing: '0.04em',
+    textShadow: '0 1px 2px rgba(0,0,0,0.7)', lineHeight: 1,
+  };
+
+  const actions = tab === 'market'
+    ? [
+        { icon: <IcoCursor />,      label: 'SELECT',    cb: onClose },
+        { icon: <IcoMarketSign />,  label: 'MARKET',    cb: () => { onOpenShop(); onClose(); } },
+        { icon: <IcoCharacter />,   label: 'PROFILE',   cb: onClose },
+        { icon: <IcoFish />,        label: 'FISHING',   cb: onClose },
+        { icon: <IcoGift />,        label: 'GIFTS',     cb: onClose },
+        { icon: <IcoScreen />,      label: 'DISPLAY',   cb: onClose },
+      ]
+    : [
+        { icon: <IcoCursor />,      label: 'SELECT',    cb: onClose },
+        { icon: <IcoCharacter />,   label: 'PROFILE',   cb: onClose },
+        { icon: <IcoMarketSign />,  label: 'SHOP',      cb: () => { onOpenShop(); onClose(); } },
+        { icon: <IcoGift />,        label: 'GIFTS',     cb: onClose },
+        { icon: <IcoFish />,        label: 'FISHING',   cb: onClose },
+        { icon: <IcoScreen />,      label: 'DISPLAY',   cb: onClose },
+      ];
+
+  return (
+    <div
+      style={{
+        position: 'absolute',
+        bottom: 112, right: 10,
+        width: 174, 
+        background: 'linear-gradient(180deg, #3a4220 0%, #262e14 100%)',
+        border: '3px solid #1a2008',
+        borderRadius: 12,
+        boxShadow: '0 -4px 20px rgba(0,0,0,0.65), inset 0 1px 0 rgba(255,255,255,0.10)',
+        zIndex: 60,
+        overflow: 'hidden',
+        fontFamily: "'Fredoka', sans-serif",
+      }}
+    >
+      {/* ── Header: Cancel + ? + Screen ── */}
+      <div style={{ display: 'flex', gap: 4, padding: '6px 6px 4px', alignItems: 'center' }}>
+        {/* Cancel */}
+        <button
+          onClick={onClose}
+          style={{
+            flex: 1, height: 26,
+            background: 'linear-gradient(180deg, #e83020 0%, #a01808 100%)',
+            border: '2px solid #700810', borderBottom: '3px solid #500408',
+            borderRadius: 7, color: 'white', fontSize: 9, fontWeight: 900,
+            letterSpacing: '0.08em', cursor: 'pointer',
+            textShadow: '0 1px 2px rgba(0,0,0,0.5)',
+            boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.22)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 3,
+          }}
+        >
+          ✕ CANCEL
+        </button>
+        {/* ? */}
+        <button
+          style={{
+            width: 28, height: 26,
+            background: 'linear-gradient(180deg, #2a6020 0%, #184010 100%)',
+            border: '2px solid #0e2808', borderBottom: '3px solid #0a1c04',
+            borderRadius: 7, cursor: 'pointer',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.18)',
+          }}
+        ><IcoQuestion /></button>
+        {/* Screen */}
+        <button
+          style={{
+            width: 28, height: 26,
+            background: 'linear-gradient(180deg, #2a6020 0%, #184010 100%)',
+            border: '2px solid #0e2808', borderBottom: '3px solid #0a1c04',
+            borderRadius: 7, cursor: 'pointer',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.18)',
+          }}
+        ><IcoScreen /></button>
+      </div>
+
+      {/* ── 3×2 Icon grid ── */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 4, padding: '0 6px 6px' }}>
+        {actions.map(({ icon, label, cb }) => (
+          <button
+            key={label}
+            onClick={cb}
+            style={tileStyle}
+            onMouseEnter={e => (e.currentTarget.style.transform = 'scale(0.94)')}
+            onMouseLeave={e => (e.currentTarget.style.transform = 'scale(1)')}
+          >
+            {/* Sheen */}
+            <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '40%', background: 'linear-gradient(180deg, rgba(255,255,255,0.15), transparent)', borderRadius: '6px 6px 0 0', pointerEvents: 'none' }}/>
+            {icon}
+            <span style={tileLabel}>{label}</span>
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+/* ─── Quick-tab button (PLAYER / MARKET) ───────────────────────────────── */
+const QuickTabBtn = ({
+  label, emoji, active, onClick,
+}: {
+  label: string; emoji: string; active: boolean; onClick: () => void;
+}) => (
+  <button
+    onClick={onClick}
+    style={{
+      width: 62, flexShrink: 0, height: '100%',
+      border: active ? '2px solid #d8e060' : '2px solid #3a4820',
+      borderBottom: active ? '3px solid #a0a830' : '3px solid #242e10',
+      borderRadius: 8,
+      background: active
+        ? 'linear-gradient(180deg, #8aaa40 0%, #506820 100%)'
+        : 'linear-gradient(180deg, #5a6838 0%, #3a4820 100%)',
+      display: 'flex', flexDirection: 'column',
+      alignItems: 'center', justifyContent: 'center',
+      gap: 3, cursor: 'pointer',
+      boxShadow: active
+        ? 'inset 0 0 8px rgba(220,240,60,0.35), 0 2px 6px rgba(0,0,0,0.4)'
+        : 'inset 0 1px 0 rgba(255,255,255,0.15), 0 2px 4px rgba(0,0,0,0.4)',
+      transition: 'all 0.12s',
+      position: 'relative', overflow: 'hidden',
+    }}
+  >
+    {/* Sheen */}
+    <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '40%', background: 'linear-gradient(180deg, rgba(255,255,255,0.18), transparent)', borderRadius: '6px 6px 0 0', pointerEvents: 'none' }}/>
+    <span style={{ fontSize: 18, lineHeight: 1 }}>{emoji}</span>
+    <span style={{ fontSize: 8, fontWeight: 900, color: active ? '#e8f880' : '#b8c880', letterSpacing: '0.06em', textShadow: '0 1px 2px rgba(0,0,0,0.6)' }}>{label}</span>
+  </button>
 );
 
 /* ─── Marina destination illustration ──────────────────────────────────────── */
@@ -365,6 +605,10 @@ export const NeighborPanel = ({
     setShopOpen,
   } = useGame();
 
+  const [quickTab, setQuickTab] = useState<QuickTab>(null);
+  const toggleTab = (tab: 'player' | 'market') =>
+    setQuickTab(prev => (prev === tab ? null : tab));
+
   const BUILDABLES: ResourceType[] = ['HUT','DOCK','WELL','FLOWER_POT','FENCE','LANTERN'];
   const ownedStructures = BUILDABLES.filter(s => (state.inventory[s] ?? 0) > 0);
 
@@ -422,6 +666,25 @@ export const NeighborPanel = ({
 
             {/* 5 Add-Neighbor cards — flex-fill so they share remaining width equally */}
             {Array.from({ length: 5 }, (_, i) => <AddNeighborCard key={i} />)}
+
+            {/* Thin divider before the quick tabs */}
+            <div style={{ width: 2, background: 'rgba(0,0,0,0.28)', borderRadius: 1, flexShrink: 0, margin: '2px 4px' }} />
+
+            {/* PLAYER quick-tab */}
+            <QuickTabBtn
+              label="PLAYER"
+              emoji="🧑"
+              active={quickTab === 'player'}
+              onClick={() => toggleTab('player')}
+            />
+
+            {/* MARKET quick-tab */}
+            <QuickTabBtn
+              label="MARKET"
+              emoji="🛒"
+              active={quickTab === 'market'}
+              onClick={() => toggleTab('market')}
+            />
           </div>
         </div>
 
@@ -478,6 +741,15 @@ export const NeighborPanel = ({
           </div>
         </div>
       </div>
+
+      {/* ── Quick-actions floating panel ────────────────────────────────── */}
+      <QuickPanel
+        tab={quickTab}
+        onClose={() => setQuickTab(null)}
+        onOpenShop={() => setShopOpen(true)}
+        onOpenQuests={onOpenQuests}
+        onOpenCollections={onOpenCollections}
+      />
 
       {/* ── Build tray popup ─────────────────────────────────────────────── */}
       {activeTool === 'build' && (
