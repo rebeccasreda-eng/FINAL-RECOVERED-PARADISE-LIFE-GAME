@@ -279,8 +279,8 @@ const NavArrowBtn = ({ symbol, title, onClick }: { symbol: React.ReactNode; titl
     title={title}
     className="active:scale-90 transition-transform"
     style={{
-      width: 44, height: 26,
-      borderRadius: 14,
+      width: 44, height: 34,
+      borderRadius: 17,
       background: 'linear-gradient(180deg, #d8cdb4 0%, #b0a488 100%)',
       border: '2px solid #8a7a5a',
       borderBottom: '3px solid #6a5a3a',
@@ -519,13 +519,13 @@ const NeighborCard = ({
   <div
     className="active:scale-95 transition-transform"
     style={{
-      width: 116, flexShrink: 0, height: '100%',
-      border: '2.5px solid #c8880a',
-      borderBottom: '4px solid #8a5004',
-      borderRadius: 10,
+      width: 80, flexShrink: 0, height: '100%',
+      border: '2px solid #c8880a',
+      borderBottom: '3px solid #8a5004',
+      borderRadius: 8,
       background: 'linear-gradient(180deg, #f5dea0 0%, #d4b060 100%)',
       display: 'flex', flexDirection: 'column', overflow: 'hidden', cursor: 'pointer',
-      boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.40), 0 3px 8px rgba(0,0,0,0.40)',
+      boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.35), 0 2px 6px rgba(0,0,0,0.35)',
     }}
   >
     {/* Name tab */}
@@ -787,7 +787,7 @@ export const NeighborPanel = ({
     <div
       className="absolute bottom-0 left-0 right-0 z-30 flex flex-col select-none"
       style={{
-        height: 108,
+        height: 148,
         fontFamily: "'Fredoka', sans-serif",
         boxShadow: '0 -4px 18px rgba(0,0,0,0.60)',
       }}
