@@ -481,39 +481,54 @@ const ObjectSVG: React.FC<{ object: string; tileX: number; tileY: number; tileTy
         ))}
         <ellipse cx="29" cy="82" rx="3.2" ry="1.8" fill="rgba(0,0,0,0.16)" transform="rotate(-8 29 82)"/>
         <ellipse cx="41" cy="94" rx="2.8" ry="1.6" fill="rgba(0,0,0,0.13)" transform="rotate(7 41 94)"/>
-        <path d="M35,58 Q13,65 1,72"  stroke="#186416" strokeWidth="13" fill="none" strokeLinecap="round" opacity="0.88"/>
-        <path d="M35,58 Q57,65 69,72" stroke="#186416" strokeWidth="13" fill="none" strokeLinecap="round" opacity="0.88"/>
-        <path d="M35,58 Q13,65 1,72"  stroke="#58d83c" strokeWidth="3.5" fill="none" strokeLinecap="round" opacity="0.40"/>
-        <path d="M35,58 Q57,65 69,72" stroke="#58d83c" strokeWidth="3.5" fill="none" strokeLinecap="round" opacity="0.40"/>
-        <path d="M35,56 Q10,48 1,35"   stroke="#228a20" strokeWidth="13" fill="none" strokeLinecap="round"/>
-        <path d="M35,56 Q60,48 69,35"  stroke="#228a20" strokeWidth="13" fill="none" strokeLinecap="round"/>
-        <path d="M35,56 Q10,48 1,35"   stroke="#6ae44a" strokeWidth="4"   fill="none" strokeLinecap="round" opacity="0.45"/>
-        <path d="M35,56 Q60,48 69,35"  stroke="#6ae44a" strokeWidth="4"   fill="none" strokeLinecap="round" opacity="0.45"/>
-        <path d="M35,54 Q16,38 9,17"   stroke="#2eaa2c" strokeWidth="12"  fill="none" strokeLinecap="round"/>
-        <path d="M35,54 Q54,38 61,17"  stroke="#2eaa2c" strokeWidth="12"  fill="none" strokeLinecap="round"/>
-        <path d="M35,54 Q16,38 9,17"   stroke="#74ee54" strokeWidth="3.8" fill="none" strokeLinecap="round" opacity="0.50"/>
-        <path d="M35,54 Q54,38 61,17"  stroke="#74ee54" strokeWidth="3.8" fill="none" strokeLinecap="round" opacity="0.50"/>
-        <path d="M35,52 Q23,30 17,7"   stroke="#3ec03a" strokeWidth="11"  fill="none" strokeLinecap="round"/>
-        <path d="M35,52 Q47,30 53,7"   stroke="#3ec03a" strokeWidth="11"  fill="none" strokeLinecap="round"/>
-        <path d="M35,50 Q35,27 34,5"   stroke="#52d448" strokeWidth="10.5" fill="none" strokeLinecap="round"/>
-        <path d="M35,52 Q23,30 17,7"   stroke="#8af86a" strokeWidth="3.5" fill="none" strokeLinecap="round" opacity="0.55"/>
-        <path d="M35,52 Q47,30 53,7"   stroke="#8af86a" strokeWidth="3.5" fill="none" strokeLinecap="round" opacity="0.55"/>
-        <path d="M35,50 Q35,27 34,5"   stroke="#8af86a" strokeWidth="3"   fill="none" strokeLinecap="round" opacity="0.55"/>
-        <path d="M22,62 L16,56" stroke="#38b028" strokeWidth="2.5" fill="none" strokeLinecap="round"/>
-        <path d="M22,62 L17,68" stroke="#226e12" strokeWidth="2.5" fill="none" strokeLinecap="round"/>
-        <path d="M9,68  L3,62"  stroke="#38b028" strokeWidth="2.2" fill="none" strokeLinecap="round"/>
-        <path d="M9,68  L4,74"  stroke="#226e12" strokeWidth="2.2" fill="none" strokeLinecap="round"/>
-        <path d="M48,62 L54,56" stroke="#38b028" strokeWidth="2.5" fill="none" strokeLinecap="round"/>
-        <path d="M48,62 L53,68" stroke="#226e12" strokeWidth="2.5" fill="none" strokeLinecap="round"/>
-        <path d="M61,68 L67,62" stroke="#38b028" strokeWidth="2.2" fill="none" strokeLinecap="round"/>
-        <path d="M61,68 L66,74" stroke="#226e12" strokeWidth="2.2" fill="none" strokeLinecap="round"/>
-        <path d="M21,44 L15,38" stroke="#4ccc38" strokeWidth="2.2" fill="none" strokeLinecap="round"/>
-        <path d="M49,44 L55,38" stroke="#4ccc38" strokeWidth="2.2" fill="none" strokeLinecap="round"/>
-        <circle cx="35" cy="56" r="19" fill="#0b4808" opacity="0.62"/>
-        <circle cx="35" cy="54" r="16" fill={`url(#${g('coc')})`}/>
-        <circle cx="35" cy="54" r="16" fill="none" stroke="rgba(140,250,90,0.24)" strokeWidth="3.5"/>
-        <ellipse cx="27" cy="44" rx="8.5" ry="5.2" fill="rgba(255,255,255,0.48)" transform="rotate(-18 27 44)"/>
-        <ellipse cx="29" cy="46" rx="4.2" ry="2.6" fill="rgba(255,255,255,0.30)" transform="rotate(-18 29 46)"/>
+        {/* ── CANOPY SHADOW BASE ── */}
+        <ellipse cx="36" cy="58" rx="33" ry="22" fill="#061a03" opacity="0.55"/>
+
+        {/* ── BACK LAYER — darkest, drooping wide fronds ── */}
+        <path d="M36,52 Q12,58 0,80 Q24,74 36,52Z" fill="#0a3506"/>
+        <path d="M36,52 Q60,74 72,80 Q48,58 36,52Z" fill="#0a3506"/>
+        <path d="M36,52 Q18,43 0,52 Q18,61 36,52Z"  fill="#0a3506"/>
+        <path d="M36,52 Q54,61 72,52 Q54,43 36,52Z"  fill="#0a3506"/>
+
+        {/* ── MID LAYER — lower and upper diagonal fronds ── */}
+        <path d="M36,52 Q15,54 4,72  Q25,71 36,52Z"  fill="#134610"/>
+        <path d="M36,52 Q57,71 68,72 Q57,54 36,52Z"  fill="#134610"/>
+        <path d="M36,52 Q26,30 4,20  Q14,42 36,52Z"  fill="#134610"/>
+        <path d="M36,52 Q58,42 68,20 Q46,30 36,52Z"  fill="#134610"/>
+
+        {/* ── UPPER LAYER — top-left / top / top-right fronds ── */}
+        <path d="M36,52 Q33,27 16,8  Q19,33 36,52Z"  fill="#1c620e"/>
+        <path d="M36,52 Q44,29 36,5  Q28,29 36,52Z"  fill="#1c620e"/>
+        <path d="M36,52 Q53,33 56,8  Q39,27 36,52Z"  fill="#1c620e"/>
+
+        {/* ── FRONT LAYER — bright upper-angled fronds ── */}
+        <path d="M36,52 Q27,33 8,26  Q17,45 36,52Z"  fill="#267814"/>
+        <path d="M36,52 Q55,45 64,26 Q45,33 36,52Z"  fill="#267814"/>
+
+        {/* ── MIDRIB HIGHLIGHTS ── */}
+        <path d="M36,52 Q26,30 16,8"  stroke="#34921a" strokeWidth="1.8" fill="none" opacity="0.85"/>
+        <path d="M36,52 Q36,28 36,5"  stroke="#36961c" strokeWidth="1.8" fill="none" opacity="0.85"/>
+        <path d="M36,52 Q46,30 56,8"  stroke="#34921a" strokeWidth="1.8" fill="none" opacity="0.85"/>
+        <path d="M36,52 Q22,39 8,26"  stroke="#2e8618" strokeWidth="1.5" fill="none" opacity="0.8"/>
+        <path d="M36,52 Q50,39 64,26" stroke="#2e8618" strokeWidth="1.5" fill="none" opacity="0.8"/>
+        <path d="M36,52 Q18,66 1,80"  stroke="#175212" strokeWidth="1.2" fill="none" opacity="0.6"/>
+        <path d="M36,52 Q54,66 71,80" stroke="#175212" strokeWidth="1.2" fill="none" opacity="0.6"/>
+
+        {/* ── LEAFLET ACCENTS — small barb strokes along top frond rachis ── */}
+        <path d="M29,37 L23,32" stroke="#3aaa20" strokeWidth="1.4" fill="none" strokeLinecap="round" opacity="0.7"/>
+        <path d="M29,37 L26,43" stroke="#1e6812" strokeWidth="1.4" fill="none" strokeLinecap="round" opacity="0.7"/>
+        <path d="M22,22 L15,18" stroke="#3aaa20" strokeWidth="1.2" fill="none" strokeLinecap="round" opacity="0.65"/>
+        <path d="M36,30 L30,27" stroke="#3aaa20" strokeWidth="1.4" fill="none" strokeLinecap="round" opacity="0.7"/>
+        <path d="M36,30 L42,27" stroke="#3aaa20" strokeWidth="1.4" fill="none" strokeLinecap="round" opacity="0.7"/>
+        <path d="M36,18 L30,15" stroke="#3aaa20" strokeWidth="1.2" fill="none" strokeLinecap="round" opacity="0.65"/>
+        <path d="M36,18 L42,15" stroke="#3aaa20" strokeWidth="1.2" fill="none" strokeLinecap="round" opacity="0.65"/>
+        <path d="M43,37 L49,32" stroke="#3aaa20" strokeWidth="1.4" fill="none" strokeLinecap="round" opacity="0.7"/>
+        <path d="M43,37 L46,43" stroke="#1e6812" strokeWidth="1.4" fill="none" strokeLinecap="round" opacity="0.7"/>
+        <path d="M50,22 L57,18" stroke="#3aaa20" strokeWidth="1.2" fill="none" strokeLinecap="round" opacity="0.65"/>
+
+        {/* ── CROWN CENTRE dark core ── */}
+        <circle cx="36" cy="54" r="11" fill="#040f02" opacity="0.65"/>
+        <circle cx="36" cy="52" r="7"  fill="#0a2a06" opacity="0.8"/>
         {/* ── Unripe coconuts — small green spheres ── */}
         <circle cx="25" cy="62" r="5.5" fill={`url(#${g('conut')})`}/>
         <circle cx="42" cy="63" r="5"   fill={`url(#${g('conut')})`}/>
@@ -566,53 +581,54 @@ const ObjectSVG: React.FC<{ object: string; tileX: number; tileY: number; tileTy
         <ellipse cx="29" cy="82" rx="3.2" ry="1.8" fill="rgba(0,0,0,0.16)" transform="rotate(-8 29 82)"/>
         <ellipse cx="41" cy="94" rx="2.8" ry="1.6" fill="rgba(0,0,0,0.13)" transform="rotate(7 41 94)"/>
 
-        {/* ── Fronds: back drooping (darkest, farthest) ── */}
-        <path d="M35,58 Q13,65 1,72"  stroke="#186416" strokeWidth="13" fill="none" strokeLinecap="round" opacity="0.88"/>
-        <path d="M35,58 Q57,65 69,72" stroke="#186416" strokeWidth="13" fill="none" strokeLinecap="round" opacity="0.88"/>
-        <path d="M35,58 Q13,65 1,72"  stroke="#58d83c" strokeWidth="3.5" fill="none" strokeLinecap="round" opacity="0.40"/>
-        <path d="M35,58 Q57,65 69,72" stroke="#58d83c" strokeWidth="3.5" fill="none" strokeLinecap="round" opacity="0.40"/>
+        {/* ── CANOPY SHADOW BASE ── */}
+        <ellipse cx="36" cy="58" rx="33" ry="22" fill="#061a03" opacity="0.55"/>
 
-        {/* ── Fronds: mid layer ── */}
-        <path d="M35,56 Q10,48 1,35"   stroke="#228a20" strokeWidth="13" fill="none" strokeLinecap="round"/>
-        <path d="M35,56 Q60,48 69,35"  stroke="#228a20" strokeWidth="13" fill="none" strokeLinecap="round"/>
-        <path d="M35,56 Q10,48 1,35"   stroke="#6ae44a" strokeWidth="4"   fill="none" strokeLinecap="round" opacity="0.45"/>
-        <path d="M35,56 Q60,48 69,35"  stroke="#6ae44a" strokeWidth="4"   fill="none" strokeLinecap="round" opacity="0.45"/>
+        {/* ── BACK LAYER — darkest, drooping wide fronds ── */}
+        <path d="M36,52 Q12,58 0,80 Q24,74 36,52Z" fill="#0a3506"/>
+        <path d="M36,52 Q60,74 72,80 Q48,58 36,52Z" fill="#0a3506"/>
+        <path d="M36,52 Q18,43 0,52 Q18,61 36,52Z"  fill="#0a3506"/>
+        <path d="M36,52 Q54,61 72,52 Q54,43 36,52Z"  fill="#0a3506"/>
 
-        {/* ── Fronds: upper ── */}
-        <path d="M35,54 Q16,38 9,17"   stroke="#2eaa2c" strokeWidth="12"  fill="none" strokeLinecap="round"/>
-        <path d="M35,54 Q54,38 61,17"  stroke="#2eaa2c" strokeWidth="12"  fill="none" strokeLinecap="round"/>
-        <path d="M35,54 Q16,38 9,17"   stroke="#74ee54" strokeWidth="3.8" fill="none" strokeLinecap="round" opacity="0.50"/>
-        <path d="M35,54 Q54,38 61,17"  stroke="#74ee54" strokeWidth="3.8" fill="none" strokeLinecap="round" opacity="0.50"/>
+        {/* ── MID LAYER — lower and upper diagonal fronds ── */}
+        <path d="M36,52 Q15,54 4,72  Q25,71 36,52Z"  fill="#134610"/>
+        <path d="M36,52 Q57,71 68,72 Q57,54 36,52Z"  fill="#134610"/>
+        <path d="M36,52 Q26,30 4,20  Q14,42 36,52Z"  fill="#134610"/>
+        <path d="M36,52 Q58,42 68,20 Q46,30 36,52Z"  fill="#134610"/>
 
-        {/* ── Fronds: top (brightest, thinnest) ── */}
-        <path d="M35,52 Q23,30 17,7"   stroke="#3ec03a" strokeWidth="11"  fill="none" strokeLinecap="round"/>
-        <path d="M35,52 Q47,30 53,7"   stroke="#3ec03a" strokeWidth="11"  fill="none" strokeLinecap="round"/>
-        <path d="M35,50 Q35,27 34,5"   stroke="#52d448" strokeWidth="10.5" fill="none" strokeLinecap="round"/>
-        <path d="M35,52 Q23,30 17,7"   stroke="#8af86a" strokeWidth="3.5" fill="none" strokeLinecap="round" opacity="0.55"/>
-        <path d="M35,52 Q47,30 53,7"   stroke="#8af86a" strokeWidth="3.5" fill="none" strokeLinecap="round" opacity="0.55"/>
-        <path d="M35,50 Q35,27 34,5"   stroke="#8af86a" strokeWidth="3"   fill="none" strokeLinecap="round" opacity="0.55"/>
+        {/* ── UPPER LAYER — top-left / top / top-right fronds ── */}
+        <path d="M36,52 Q33,27 16,8  Q19,33 36,52Z"  fill="#1c620e"/>
+        <path d="M36,52 Q44,29 36,5  Q28,29 36,52Z"  fill="#1c620e"/>
+        <path d="M36,52 Q53,33 56,8  Q39,27 36,52Z"  fill="#1c620e"/>
 
-        {/* Leaflet pairs — left drooping */}
-        <path d="M22,62 L16,56" stroke="#38b028" strokeWidth="2.5" fill="none" strokeLinecap="round"/>
-        <path d="M22,62 L17,68" stroke="#226e12" strokeWidth="2.5" fill="none" strokeLinecap="round"/>
-        <path d="M9,68  L3,62"  stroke="#38b028" strokeWidth="2.2" fill="none" strokeLinecap="round"/>
-        <path d="M9,68  L4,74"  stroke="#226e12" strokeWidth="2.2" fill="none" strokeLinecap="round"/>
-        {/* Leaflet pairs — right drooping */}
-        <path d="M48,62 L54,56" stroke="#38b028" strokeWidth="2.5" fill="none" strokeLinecap="round"/>
-        <path d="M48,62 L53,68" stroke="#226e12" strokeWidth="2.5" fill="none" strokeLinecap="round"/>
-        <path d="M61,68 L67,62" stroke="#38b028" strokeWidth="2.2" fill="none" strokeLinecap="round"/>
-        <path d="M61,68 L66,74" stroke="#226e12" strokeWidth="2.2" fill="none" strokeLinecap="round"/>
-        {/* Leaflet pairs — upper fronds */}
-        <path d="M21,44 L15,38" stroke="#4ccc38" strokeWidth="2.2" fill="none" strokeLinecap="round"/>
-        <path d="M49,44 L55,38" stroke="#4ccc38" strokeWidth="2.2" fill="none" strokeLinecap="round"/>
+        {/* ── FRONT LAYER — bright upper-angled fronds ── */}
+        <path d="M36,52 Q27,33 8,26  Q17,45 36,52Z"  fill="#267814"/>
+        <path d="M36,52 Q55,45 64,26 Q45,33 36,52Z"  fill="#267814"/>
 
-        {/* ── Crown — multi-layer sphere ── */}
-        <circle cx="35" cy="56" r="19" fill="#0b4808" opacity="0.62"/>
-        <circle cx="35" cy="54" r="16" fill={`url(#${g('coc')})`}/>
-        <circle cx="35" cy="54" r="16" fill="none" stroke="rgba(140,250,90,0.24)" strokeWidth="3.5"/>
-        {/* Specular — upper-left */}
-        <ellipse cx="27" cy="44" rx="8.5" ry="5.2" fill="rgba(255,255,255,0.48)" transform="rotate(-18 27 44)"/>
-        <ellipse cx="29" cy="46" rx="4.2" ry="2.6" fill="rgba(255,255,255,0.30)" transform="rotate(-18 29 46)"/>
+        {/* ── MIDRIB HIGHLIGHTS ── */}
+        <path d="M36,52 Q26,30 16,8"  stroke="#34921a" strokeWidth="1.8" fill="none" opacity="0.85"/>
+        <path d="M36,52 Q36,28 36,5"  stroke="#36961c" strokeWidth="1.8" fill="none" opacity="0.85"/>
+        <path d="M36,52 Q46,30 56,8"  stroke="#34921a" strokeWidth="1.8" fill="none" opacity="0.85"/>
+        <path d="M36,52 Q22,39 8,26"  stroke="#2e8618" strokeWidth="1.5" fill="none" opacity="0.8"/>
+        <path d="M36,52 Q50,39 64,26" stroke="#2e8618" strokeWidth="1.5" fill="none" opacity="0.8"/>
+        <path d="M36,52 Q18,66 1,80"  stroke="#175212" strokeWidth="1.2" fill="none" opacity="0.6"/>
+        <path d="M36,52 Q54,66 71,80" stroke="#175212" strokeWidth="1.2" fill="none" opacity="0.6"/>
+
+        {/* ── LEAFLET ACCENTS — small barb strokes along top frond rachis ── */}
+        <path d="M29,37 L23,32" stroke="#3aaa20" strokeWidth="1.4" fill="none" strokeLinecap="round" opacity="0.7"/>
+        <path d="M29,37 L26,43" stroke="#1e6812" strokeWidth="1.4" fill="none" strokeLinecap="round" opacity="0.7"/>
+        <path d="M22,22 L15,18" stroke="#3aaa20" strokeWidth="1.2" fill="none" strokeLinecap="round" opacity="0.65"/>
+        <path d="M36,30 L30,27" stroke="#3aaa20" strokeWidth="1.4" fill="none" strokeLinecap="round" opacity="0.7"/>
+        <path d="M36,30 L42,27" stroke="#3aaa20" strokeWidth="1.4" fill="none" strokeLinecap="round" opacity="0.7"/>
+        <path d="M36,18 L30,15" stroke="#3aaa20" strokeWidth="1.2" fill="none" strokeLinecap="round" opacity="0.65"/>
+        <path d="M36,18 L42,15" stroke="#3aaa20" strokeWidth="1.2" fill="none" strokeLinecap="round" opacity="0.65"/>
+        <path d="M43,37 L49,32" stroke="#3aaa20" strokeWidth="1.4" fill="none" strokeLinecap="round" opacity="0.7"/>
+        <path d="M43,37 L46,43" stroke="#1e6812" strokeWidth="1.4" fill="none" strokeLinecap="round" opacity="0.7"/>
+        <path d="M50,22 L57,18" stroke="#3aaa20" strokeWidth="1.2" fill="none" strokeLinecap="round" opacity="0.65"/>
+
+        {/* ── CROWN CENTRE dark core ── */}
+        <circle cx="36" cy="54" r="11" fill="#040f02" opacity="0.65"/>
+        <circle cx="36" cy="52" r="7"  fill="#0a2a06" opacity="0.8"/>
 
         {/* ── Coconuts — proper 3D spheres ── */}
         <circle cx="25" cy="62" r="7"   fill={`url(#${g('conut')})`}/>
