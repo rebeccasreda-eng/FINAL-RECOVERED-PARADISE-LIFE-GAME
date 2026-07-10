@@ -86,7 +86,7 @@ export const CharacterOnIsland: React.FC<Props> = ({
 
       {/* Character sprite — bob wrapper provides squish-stretch */}
       <div
-        className={isWalking ? 'char-walk-bob' : 'char-idle-bob'}
+        className={isWalking ? undefined : 'char-idle-bob'}
         style={{ transformOrigin: 'bottom center' }}
       >
         <div style={{ filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.40))' }}>
