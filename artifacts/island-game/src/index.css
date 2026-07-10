@@ -244,3 +244,9 @@
   0%,100% { opacity: 0.8; transform: scale(1); }
   50%     { opacity: 0.3; transform: scale(1.4); }
 }
+
+/* ── Player arrow bounce ────────────────────────────────── */
+@keyframes charArrowBounce {
+  0%, 100% { transform: translateX(-50%) translateY(0px);   }
+  50%       { transform: translateX(-50%) translateY(-7px);  }
+}
