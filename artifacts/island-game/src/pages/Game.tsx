@@ -407,14 +407,6 @@ const GameInner = ({ profile }: { profile: PlayerProfile }) => {
       {weatherOpen      && <WeatherModal    onClose={() => setWeatherOpen(false)} />}
 
       {/* Tutorial banner */}
-      {tutorial && (
-        <div
-          className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 px-8 py-4 rounded-3xl shadow-2xl border-4 font-black text-2xl animate-pulse z-40 pointer-events-none text-center"
-          style={{ background: '#fde047', color: '#713f12', borderColor: '#ca8a04' }}
-        >
-          👆 WASD / arrows to move · click tiles to interact
-        </div>
-      )}
 
     </div>
   );
