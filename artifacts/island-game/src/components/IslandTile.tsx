@@ -403,17 +403,45 @@ const ObjectSVG: React.FC<{ object: string; tileX: number; tileY: number }> = ({
         {/* Ground bed */}
         <rect x="2" y="26" width="68" height="32" rx="5" fill={`url(#${g('gpf')})`}/>
         <rect x="2" y="26" width="68" height="7"  rx="3" fill="rgba(255,255,255,0.14)"/>
-        {/* Fence posts */}
-        {[4,23,43,63].map(x => (
-          <rect key={x} x={x} y="20" width="5" height="38" rx="1.5" fill={`url(#${g('gpw')})`}/>
+
+        {/* ── Picket fence enclosing BLUEBERRY + PINEAPPLE cells (x=2..47) ── */}
+        {/* Corner posts */}
+        <rect x="2"  y="16" width="6" height="44" rx="2" fill={`url(#${g('gpw')})`}/>
+        <rect x="43" y="16" width="6" height="44" rx="2" fill={`url(#${g('gpw')})`}/>
+        {/* Mid post between berry and pineapple cells */}
+        <rect x="22" y="16" width="5" height="44" rx="1.5" fill={`url(#${g('gpw')})`}/>
+        {/* Top rails */}
+        <rect x="2" y="20" width="47" height="4.5" rx="1.5" fill="#d4aa60"/>
+        <rect x="2" y="20" width="47" height="1.5" rx="1"   fill="rgba(255,255,255,0.38)"/>
+        <rect x="2" y="28" width="47" height="3.5" rx="1.5" fill="#b89050"/>
+        {/* Bottom rails */}
+        <rect x="2" y="43" width="47" height="4"   rx="1.5" fill="#d4aa60"/>
+        <rect x="2" y="43" width="47" height="1.5" rx="1"   fill="rgba(255,255,255,0.25)"/>
+        <rect x="2" y="50" width="47" height="3.5" rx="1.5" fill="#b89050"/>
+        {/* Picket boards — left of left post */}
+        {/* Left cell pickets (between x=8 and x=22) */}
+        {[9,13,17].map(x => (
+          <g key={x}>
+            <polygon points={`${x},14 ${x+3},14 ${x+3},13 ${x+1.5},11 ${x},13`} fill="#ddb862"/>
+            <rect x={x} y="14" width="3" height="34" rx="1" fill="#c89a48"/>
+            <rect x={x} y="14" width="1.2" height="34" rx="0.6" fill="rgba(255,255,255,0.22)"/>
+          </g>
         ))}
-        {/* Rails */}
-        <rect x="4" y="22" width="64" height="4"   rx="1.5" fill="#c8a464"/>
-        <rect x="4" y="22" width="64" height="1.5" rx="1"   fill="rgba(255,255,255,0.30)"/>
-        <rect x="4" y="29" width="64" height="3.5" rx="1.5" fill="#b89050"/>
-        <rect x="4" y="38" width="64" height="4"   rx="1.5" fill="#c8a464"/>
-        <rect x="4" y="38" width="64" height="1.5" rx="1"   fill="rgba(255,255,255,0.25)"/>
-        <rect x="4" y="46" width="64" height="3.5" rx="1.5" fill="#b89050"/>
+        {/* Right cell pickets (between x=27 and x=43) */}
+        {[28,32,36,40].map(x => (
+          <g key={x}>
+            <polygon points={`${x},14 ${x+3},14 ${x+3},13 ${x+1.5},11 ${x},13`} fill="#ddb862"/>
+            <rect x={x} y="14" width="3" height="34" rx="1" fill="#c89a48"/>
+            <rect x={x} y="14" width="1.2" height="34" rx="0.6" fill="rgba(255,255,255,0.22)"/>
+          </g>
+        ))}
+
+        {/* ── Flower section — simple low border only ── */}
+        <rect x="49" y="20" width="5"  height="38" rx="1.5" fill={`url(#${g('gpw')})`}/>
+        <rect x="63" y="20" width="5"  height="38" rx="1.5" fill={`url(#${g('gpw')})`}/>
+        <rect x="49" y="23" width="19" height="3.5" rx="1.5" fill="#c8a464"/>
+        <rect x="49" y="23" width="19" height="1.2" rx="1"   fill="rgba(255,255,255,0.25)"/>
+        <rect x="49" y="43" width="19" height="3.5" rx="1.5" fill="#b89050"/>
         {/* Blueberries */}
         {([{cx:10,cy:31,r:5},{cx:17,cy:33,r:4.5},{cx:9,cy:38,r:4.5},{cx:16,cy:28,r:4},{cx:10,cy:44,r:4.5},{cx:17,cy:42,r:4}] as const).map((b,i) => (
           <g key={i}>
