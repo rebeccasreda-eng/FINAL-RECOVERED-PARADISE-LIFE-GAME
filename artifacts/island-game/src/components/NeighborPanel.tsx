@@ -272,6 +272,25 @@ const QuickPanel = ({
   );
 };
 
+/* ─── Nav arrow button — stone/beige pill like the reference ────────────── */
+const NavArrowBtn = ({ symbol, title, onClick }: { symbol: React.ReactNode; title: string; onClick?: () => void }) => (
+  <button
+    onClick={onClick}
+    title={title}
+    className="active:scale-90 transition-transform"
+    style={{
+      width: 44, height: 26,
+      borderRadius: 14,
+      background: 'linear-gradient(180deg, #d8cdb4 0%, #b0a488 100%)',
+      border: '2px solid #8a7a5a',
+      borderBottom: '3px solid #6a5a3a',
+      boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.55), 0 2px 4px rgba(0,0,0,0.35)',
+      display: 'flex', alignItems: 'center', justifyContent: 'center',
+      cursor: 'pointer', color: '#5a4a2a', fontSize: 13, fontWeight: 900,
+    }}
+  >{symbol}</button>
+);
+
 /* ─── Quick-tab button (PLAYER / MARKET) ───────────────────────────────── */
 const QuickTabBtn = ({
   label, emoji, active, onClick,
@@ -759,24 +778,18 @@ export const NeighborPanel = ({
             {/* 5 Add-Neighbor cards — flex-fill so they share remaining width equally */}
             {Array.from({ length: 5 }, (_, i) => <AddNeighborCard key={i} />)}
 
-            {/* Thin divider before the quick tabs */}
+            {/* Thin divider before nav arrows */}
             <div style={{ width: 2, background: 'rgba(0,0,0,0.28)', borderRadius: 1, flexShrink: 0, margin: '2px 4px' }} />
 
-            {/* PLAYER quick-tab */}
-            <QuickTabBtn
-              label="PLAYER"
-              emoji="🧑"
-              active={quickTab === 'player'}
-              onClick={() => toggleTab('player')}
-            />
+            {/* 3 nav arrow buttons + one AddNeighbor card */}
+            <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 3, flexShrink: 0 }}>
+              <NavArrowBtn symbol="◀" title="Previous" />
+              <NavArrowBtn symbol="●" title="Home" />
+              <NavArrowBtn symbol="▶" title="Next" />
+            </div>
 
-            {/* MARKET quick-tab */}
-            <QuickTabBtn
-              label="MARKET"
-              emoji="🛒"
-              active={quickTab === 'market'}
-              onClick={() => toggleTab('market')}
-            />
+            {/* AddNeighbor card next to the arrows */}
+            <AddNeighborCard />
           </div>
         </div>
 
