@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useId } from 'react';
 
 export interface CharAppearance {
   skinTone: string;
@@ -55,6 +55,13 @@ function darkenHex(hex: string, amt = 35): string {
   const r = Math.max(0, (n >> 16) - amt);
   const g = Math.max(0, ((n >> 8) & 0xff) - amt);
   const b = Math.max(0, (n & 0xff) - amt);
+  return '#' + [r, g, b].map(x => x.toString(16).padStart(2, '0')).join('');
+}
+function lightenHex(hex: string, amt = 25): string {
+  const n = parseInt(hex.replace('#', ''), 16);
+  const r = Math.min(255, (n >> 16) + amt);
+  const g = Math.min(255, ((n >> 8) & 0xff) + amt);
+  const b = Math.min(255, (n & 0xff) + amt);
   return '#' + [r, g, b].map(x => x.toString(16).padStart(2, '0')).join('');
 }
 
@@ -305,66 +312,145 @@ export const CustomizableCharSVG: React.FC<{
   const mouthColor = makeupStyle === 'red_lips' ? '#cc1133' : makeupStyle === 'pink_glow' ? '#dd44aa' : '#cc4466';
   const blushOp = makeupStyle === 'pink_glow' ? 0.6 : makeupStyle === 'smoky' ? 0.18 : 0.35;
 
+  // Per-instance unique prefix for gradient IDs — prevents cross-character style bleed
+  const uid = useId().replace(/:/g, '');
+  const gp  = uid;
+
   return (
     <svg viewBox="0 0 100 140" width={size} height={size * 1.4} xmlns="http://www.w3.org/2000/svg">
-      {/* Shadow */}
+      <defs>
+        {/* Head / face — radial sphere, lit from upper-left */}
+        <radialGradient id={`cfs${gp}`} cx="36%" cy="30%" r="72%">
+          <stop offset="0%"   stopColor={lightenHex(sk, 22)}/>
+          <stop offset="55%"  stopColor={sk}/>
+          <stop offset="100%" stopColor={darkenHex(sk, 26)}/>
+        </radialGradient>
+        {/* Arms / hands / neck — cylindrical, lit from left */}
+        <linearGradient id={`cal${gp}`} x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%"   stopColor={lightenHex(sk, 16)}/>
+          <stop offset="38%"  stopColor={sk}/>
+          <stop offset="100%" stopColor={darkenHex(sk, 28)}/>
+        </linearGradient>
+        {/* Legs — cylindrical, same scheme */}
+        <linearGradient id={`clg${gp}`} x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%"   stopColor={lightenHex(legColor, 18)}/>
+          <stop offset="40%"  stopColor={legColor}/>
+          <stop offset="100%" stopColor={darkenHex(legColor, 30)}/>
+        </linearGradient>
+        {/* Outfit shading overlay — adds cylinder depth without hiding patterns */}
+        <linearGradient id={`cou${gp}`} x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%"   stopColor="rgba(255,255,255,0.24)"/>
+          <stop offset="40%"  stopColor="rgba(255,255,255,0.04)"/>
+          <stop offset="72%"  stopColor="rgba(0,0,0,0.05)"/>
+          <stop offset="100%" stopColor="rgba(0,0,0,0.24)"/>
+        </linearGradient>
+        {/* Shoes — top-lit */}
+        <linearGradient id={`csh${gp}`} x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%"   stopColor={lightenHex(shoeColor, 22)}/>
+          <stop offset="100%" stopColor={darkenHex(shoeColor, 18)}/>
+        </linearGradient>
+      </defs>
+
+      {/* Ground shadow */}
       <ellipse cx="50" cy="137" rx="22" ry="4" fill="#00000025"/>
 
-      {/* Legs */}
+      {/* ── Legs ── */}
       <g className={isWalking ? 'char-leg-a' : undefined} style={{ transformOrigin: '40px 108px' }}>
-        <rect x="34" y="108" width="12" height="25" rx="5" fill={legColor}/>
-        <ellipse cx="40" cy="133" rx="10" ry="5.5" fill={shoeColor}/>
+        <rect x="34" y="108" width="12" height="25" rx="5" fill={`url(#clg${gp})`}/>
+        {/* Knee gloss */}
+        <ellipse cx="38" cy="116" rx="3.2" ry="2" fill="rgba(255,255,255,0.28)"/>
+        <ellipse cx="40" cy="133" rx="10" ry="5.5" fill={`url(#csh${gp})`}/>
+        <ellipse cx="37" cy="130" rx="5.5" ry="2" fill="rgba(255,255,255,0.26)"/>
       </g>
       <g className={isWalking ? 'char-leg-b' : undefined} style={{ transformOrigin: '60px 108px' }}>
-        <rect x="54" y="108" width="12" height="25" rx="5" fill={legColor}/>
-        <ellipse cx="60" cy="133" rx="10" ry="5.5" fill={shoeColor}/>
+        <rect x="54" y="108" width="12" height="25" rx="5" fill={`url(#clg${gp})`}/>
+        <ellipse cx="58" cy="116" rx="3.2" ry="2" fill="rgba(255,255,255,0.22)"/>
+        <ellipse cx="60" cy="133" rx="10" ry="5.5" fill={darkenHex(shoeColor, 10)}/>
+        <ellipse cx="57" cy="130" rx="5.5" ry="2" fill="rgba(255,255,255,0.18)"/>
       </g>
 
-      {/* Outfit body */}
+      {/* ── Outfit body ── */}
       <OutfitLayer style={outfitStyle} color={outfitColor}/>
+      {/* Cylindrical depth overlay — sits above patterns at low opacity */}
+      <rect x="28" y="65" width="44" height="43" rx="6" fill={`url(#cou${gp})`}/>
+      {/* Right rim shadow crescent */}
+      <path d="M66 68 Q71 86 67 107" stroke="rgba(0,0,0,0.16)" strokeWidth="7" fill="none" strokeLinecap="round"/>
+      {/* Left rim highlight */}
+      <path d="M33 68 Q28 86 32 107" stroke="rgba(255,255,255,0.18)" strokeWidth="5" fill="none" strokeLinecap="round"/>
 
-      {/* Arms (skin) — opposite phase to same-side leg = natural gait */}
+      {/* ── Arms ── */}
+      {/* Back arm — catches more light */}
       <g className={isWalking ? 'char-arm-b' : undefined} style={{ transformOrigin: '28px 68px' }}>
-        <path d="M28 68 Q16 76 18 88" stroke={sk} strokeWidth="11" fill="none" strokeLinecap="round"/>
-        <circle cx="17" cy="89" r="6.5" fill={sk}/>
+        <path d="M28 68 Q16 76 18 88" stroke={`url(#cal${gp})`} strokeWidth="11" fill="none" strokeLinecap="round"/>
+        {/* Arm specular streak */}
+        <path d="M27.5 68 Q16.5 75.5 18.5 86.5" stroke="rgba(255,255,255,0.28)" strokeWidth="3.5" fill="none" strokeLinecap="round"/>
+        <circle cx="17" cy="89" r="6.5" fill={`url(#cal${gp})`}/>
+        <circle cx="15.5" cy="87.5" r="2.2" fill="rgba(255,255,255,0.34)"/>
       </g>
+      {/* Front arm — in shadow relative to light */}
       <g className={isWalking ? 'char-arm-a' : undefined} style={{ transformOrigin: '72px 68px' }}>
-        <path d="M72 68 Q84 76 82 88" stroke={sk} strokeWidth="11" fill="none" strokeLinecap="round"/>
-        <circle cx="83" cy="89" r="6.5" fill={sk}/>
+        <path d="M72 68 Q84 76 82 88" stroke={darkenHex(sk, 12)} strokeWidth="11" fill="none" strokeLinecap="round"/>
+        <path d="M72 68 Q84 76 82 88" stroke="rgba(0,0,0,0.10)" strokeWidth="4" fill="none" strokeLinecap="round"/>
+        <circle cx="83" cy="89" r="6.5" fill={darkenHex(sk, 12)}/>
       </g>
 
-      {/* Neck */}
+      {/* ── Neck ── */}
       <rect x="43" y="56" width="14" height="11" rx="3" fill={sk}/>
+      {/* Neck right-side shadow */}
+      <path d="M51 56 Q58 59 57 65" stroke="rgba(0,0,0,0.14)" strokeWidth="6" fill="none" strokeLinecap="round"/>
 
-      {/* Fro hair — rendered BEFORE head so it appears behind */}
+      {/* ── Fro (behind head) ── */}
       {hairStyle === 'fro' && <HairLayer style="fro" color={hairColor}/>}
 
-      {/* Head — shape driven by faceShape */}
-      {faceShape === 'oval'   ? <ellipse cx="50" cy="37" rx="24" ry="30" fill={sk}/> :
-       faceShape === 'wide'   ? <ellipse cx="50" cy="36" rx="32" ry="24" fill={sk}/> :
-       faceShape === 'narrow' ? <ellipse cx="50" cy="37" rx="20" ry="30" fill={sk}/> :
-       faceShape === 'heart'  ? <path d="M50 64 Q26 50 24 30 Q22 12 36 8 Q50 4 50 20 Q50 4 64 8 Q78 12 76 30 Q74 50 50 64Z" fill={sk}/> :
-       faceShape === 'soft'   ? <ellipse cx="50" cy="37" rx="26" ry="28" fill={sk}/> :
-       <circle cx="50" cy="36" r="28" fill={sk}/>}
+      {/* ── Head — spherical skin gradient ── */}
+      {faceShape === 'oval'   ? <ellipse cx="50" cy="37" rx="24" ry="30" fill={`url(#cfs${gp})`}/> :
+       faceShape === 'wide'   ? <ellipse cx="50" cy="36" rx="32" ry="24" fill={`url(#cfs${gp})`}/> :
+       faceShape === 'narrow' ? <ellipse cx="50" cy="37" rx="20" ry="30" fill={`url(#cfs${gp})`}/> :
+       faceShape === 'heart'  ? <path d="M50 64 Q26 50 24 30 Q22 12 36 8 Q50 4 50 20 Q50 4 64 8 Q78 12 76 30 Q74 50 50 64Z" fill={`url(#cfs${gp})`}/> :
+       faceShape === 'soft'   ? <ellipse cx="50" cy="37" rx="26" ry="28" fill={`url(#cfs${gp})`}/> :
+       <circle cx="50" cy="36" r="28" fill={`url(#cfs${gp})`}/>}
+      {/* Chin shadow — reinforces sphere volume */}
+      <ellipse cx="50" cy="59" rx="20" ry="7" fill="rgba(0,0,0,0.09)"/>
+      {/* Cheek specular — lit from upper-left */}
+      <ellipse cx="33" cy="33" rx="5.5" ry="3.5" fill="rgba(255,255,255,0.18)" transform="rotate(-16 33 33)"/>
 
-      {/* Hair on top of head (non-fro) */}
+      {/* ── Hair (on top of head) ── */}
       {hairStyle !== 'fro' && <HairLayer style={hairStyle} color={hairColor}/>}
 
-      {/* Eyes */}
+      {/* ── Eyes — layered for 3D depth ── */}
+      {/* Eyelid shadow (skin colour, above eye socket) */}
+      <ellipse cx="40" cy="32.5" rx="8" ry="4.5" fill={darkenHex(sk, 16)} opacity="0.36"/>
+      <ellipse cx="60" cy="32.5" rx="8" ry="4.5" fill={darkenHex(sk, 16)} opacity="0.36"/>
+      {/* Whites */}
       <ellipse cx="40" cy="36" rx="7" ry="8" fill="white"/>
       <ellipse cx="60" cy="36" rx="7" ry="8" fill="white"/>
+      {/* Upper-lid inner shadow on white */}
+      <ellipse cx="40" cy="30" rx="7" ry="3.5" fill="rgba(0,0,0,0.11)"/>
+      <ellipse cx="60" cy="30" rx="7" ry="3.5" fill="rgba(0,0,0,0.11)"/>
+      {/* Iris */}
       <ellipse cx="40" cy="38" rx="5" ry="6" fill={eyeColor || '#88551a'}/>
       <ellipse cx="60" cy="38" rx="5" ry="6" fill={eyeColor || '#88551a'}/>
+      {/* Iris rim darkening */}
+      <ellipse cx="40" cy="38" rx="5" ry="6" fill="none" stroke={darkenHex(eyeColor || '#88551a', 35)} strokeWidth="1.0" opacity="0.55"/>
+      <ellipse cx="60" cy="38" rx="5" ry="6" fill="none" stroke={darkenHex(eyeColor || '#88551a', 35)} strokeWidth="1.0" opacity="0.55"/>
+      {/* Pupils */}
       <circle cx="40.8" cy="39" r="3" fill="#1a0a00"/>
       <circle cx="60.8" cy="39" r="3" fill="#1a0a00"/>
-      <circle cx="42.5" cy="36.5" r="1.5" fill="white"/>
-      <circle cx="62.5" cy="36.5" r="1.5" fill="white"/>
+      {/* Primary specular (large) */}
+      <circle cx="42.5" cy="36.5" r="1.8" fill="white"/>
+      <circle cx="62.5" cy="36.5" r="1.8" fill="white"/>
+      {/* Secondary micro-highlight */}
+      <circle cx="39.2" cy="41" r="0.9" fill="rgba(255,255,255,0.62)"/>
+      <circle cx="59.2" cy="41" r="0.9" fill="rgba(255,255,255,0.62)"/>
+      {/* Lash line */}
+      <path d="M33 30.5 Q40 27.5 47 30.5" stroke={darkenHex(hairColor, 8)} strokeWidth="2.0" fill="none" strokeLinecap="round" opacity="0.88"/>
+      <path d="M53 30.5 Q60 27.5 67 30.5" stroke={darkenHex(hairColor, 8)} strokeWidth="2.0" fill="none" strokeLinecap="round" opacity="0.88"/>
 
-      {/* Eyebrows */}
+      {/* ── Eyebrows ── */}
       <path d={lb} stroke={browColor} strokeWidth={browW} fill="none" strokeLinecap="round"/>
       <path d={rb} stroke={browColor} strokeWidth={browW} fill="none" strokeLinecap="round"/>
 
-      {/* Blush */}
+      {/* ── Blush ── */}
       <ellipse cx="30" cy="42" rx="7" ry="4" fill="#ff8888" opacity={blushOp}/>
       <ellipse cx="70" cy="42" rx="7" ry="4" fill="#ff8888" opacity={blushOp}/>
       {makeupStyle === 'shimmer' && <>
@@ -376,16 +462,16 @@ export const CustomizableCharSVG: React.FC<{
         <ellipse cx="70" cy="42" rx="9" ry="5" fill="#ff88cc" opacity="0.3"/>
       </>}
 
-      {/* Nose — style driven by noseStyle */}
+      {/* ── Nose ── */}
       {noseStyle === 'dot'   ? <circle cx="50" cy="43" r="1.5" fill="#e0a880" opacity="0.7"/> :
        noseStyle === 'round' ? <ellipse cx="50" cy="43" rx="3.5" ry="2.2" fill="#e0a880" opacity="0.6"/> :
        noseStyle === 'snub'  ? <path d="M47 42 Q50 44 53 42 Q51 46 50 46 Q49 46 47 42Z" fill="#e0a880" opacity="0.55"/> :
        <ellipse cx="50" cy="43" rx="2" ry="1.2" fill="#e0a880" opacity="0.6"/>}
 
-      {/* Mouth */}
+      {/* ── Mouth ── */}
       <path d={mouthD} stroke={mouthColor} strokeWidth="2" fill="none" strokeLinecap="round"/>
 
-      {/* Facial hair (male) */}
+      {/* ── Facial hair ── */}
       {facialHairStyle === 'stubble' && (
         <>{([[36,50],[40,52],[46,53],[54,53],[60,52],[64,50]] as [number,number][]).map(([x,y]) => (
           <circle key={`${x}${y}`} cx={x} cy={y} r="1.5" fill={browColor} opacity="0.45"/>
@@ -408,7 +494,7 @@ export const CustomizableCharSVG: React.FC<{
         </>
       )}
 
-      {/* Hat (last — on top of everything) */}
+      {/* ── Hat ── */}
       <HatLayer style={hatStyle}/>
     </svg>
   );
