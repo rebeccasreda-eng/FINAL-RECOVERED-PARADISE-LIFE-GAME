@@ -194,9 +194,9 @@ const GameInner = ({ profile }: { profile: PlayerProfile }) => {
   const viewportRef  = useRef<HTMLDivElement>(null);
   const worldRef     = useRef<HTMLDivElement>(null);
   const panRef       = useRef({ x: 0, y: 0 });
-  const INITIAL_ZOOM = 1.4;
-  const MIN_ZOOM     = 1.1;   // ~2 scroll-outs from initial
-  const MAX_ZOOM     = 2.4;
+  const INITIAL_ZOOM = 2.2;   // start close — tiles fill the screen nicely
+  const MIN_ZOOM     = 0.5;   // zoom out to see the whole island at once
+  const MAX_ZOOM     = 3.2;   // a bit extra for inspecting objects up close
   const zoomRef      = useRef(INITIAL_ZOOM);
   const [zoom, setZoom]     = useState(INITIAL_ZOOM);
   const [cursor, setCursor] = useState<'grab' | 'grabbing'>('grab');
