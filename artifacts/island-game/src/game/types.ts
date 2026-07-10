@@ -24,12 +24,21 @@ export interface TileData {
   unwitherRequestedAt?: number;
 }
 
+export interface QuestObjective {
+  description: string;
+  targetType: string;
+  targetCount: number;
+  icon: string;
+}
+
 export interface QuestDef {
   id: string; 
-  title: string; 
+  title: string;
+  subtitle?: string;
   description: string;
   targetType: string; 
   targetCount: number;
+  objectives?: QuestObjective[];
   rewardCoins: number; 
   rewardXP: number;
   rewardItem?: { type: ResourceType; count: number };
@@ -55,7 +64,7 @@ export interface GameState {
   lastEnergyTick: number;
   xp: number;
   level: number;
-  quests: Record<string, { progress: number; completed: boolean }>;
+  quests: Record<string, { progress: number; completed: boolean; objectiveProgress?: number[] }>;
   respawns: { tileId: string; object: ObjectType; respawnAt: number }[];
   weather: WeatherType;
   nextWeatherAt: number;

@@ -30,6 +30,23 @@ export const PREMIUM_ITEMS = [
 ];
 
 export const QUESTS: QuestDef[] = [
+  {
+    id: 'q_welcome',
+    title: 'Welcome To Paradise!',
+    subtitle: "It's time to build the island of your dreams!",
+    description: 'Complete your first island tasks',
+    targetType: 'none',
+    targetCount: 1,
+    objectives: [
+      { description: 'Harvest 1 mango tree',   targetType: 'harvest_mango',     targetCount: 1, icon: '🥭' },
+      { description: 'Feed 1 parrot',           targetType: 'feed_parrot',       targetCount: 1, icon: '🦜' },
+      { description: 'Harvest 3 pineapples',    targetType: 'harvest_pineapple', targetCount: 3, icon: '🍍' },
+    ],
+    rewardCoins: 50,
+    rewardXP: 5,
+    icon: '🌴',
+    unlockLevel: 1,
+  },
   { id: 'q1', title: 'First Steps', description: 'Clear 3 grass patches', targetType: 'clear_grass', targetCount: 3, rewardCoins: 20, rewardXP: 10, icon: '🌿', unlockLevel: 1 },
   { id: 'q2', title: 'Lumberjack', description: 'Chop 5 trees', targetType: 'chop_tree', targetCount: 5, rewardCoins: 50, rewardXP: 20, rewardItem: { type: 'wood', count: 2 }, icon: '🌴', unlockLevel: 1 },
   { id: 'q3', title: 'Green Thumb', description: 'Plant 3 crops', targetType: 'plant_crop', targetCount: 3, rewardCoins: 30, rewardXP: 15, icon: '🌱', unlockLevel: 2, prereqs: ['q1'] },

@@ -47,6 +47,14 @@ function checkQuestCompletions(state: GameState): GameState {
     const p = nextQuests[q.id] || { progress: 0, completed: false };
     if (p.completed) continue;
 
+    // Multi-objective quests: completion is driven by track(); just re-verify on load
+    if (q.objectives && q.objectives.length > 0) {
+      const objProg = p.objectiveProgress ?? q.objectives.map(() => 0);
+      const allDone = q.objectives.every((o, i) => objProg[i] >= o.targetCount);
+      if (allDone) { nextQuests[q.id] = { ...p, completed: true }; changed = true; }
+      continue;
+    }
+
     let currentProgress = p.progress;
     if (q.targetType === 'reach_level') currentProgress = state.level;
     if (q.targetType === 'accumulate_coins') currentProgress = state.inventory.coins;
@@ -268,9 +276,25 @@ function gameReducer(state: GameState, action: GameAction): GameState {
 
       const track = (type: string) => {
         for (const q of QUESTS) {
-          if (q.targetType === type && nextState.level >= q.unlockLevel) {
-            const p = nextState.quests[q.id] || { progress: 0, completed: false };
-            if (!p.completed) nextState.quests[q.id] = { ...p, progress: p.progress + 1 };
+          if (nextState.level < q.unlockLevel) continue;
+          if (q.prereqs && q.prereqs.some(pid => !nextState.quests[pid]?.completed)) continue;
+
+          if (q.objectives && q.objectives.length > 0) {
+            // Multi-objective quest: update each matching objective's progress
+            q.objectives.forEach((obj, i) => {
+              if (obj.targetType !== type) return;
+              const p = nextState.quests[q.id] || { progress: 0, completed: false, objectiveProgress: q.objectives!.map(() => 0) };
+              if (p.completed) return;
+              const objProg = [...(p.objectiveProgress ?? q.objectives!.map(() => 0))];
+              if (objProg[i] < obj.targetCount) objProg[i] += 1;
+              const allDone = q.objectives!.every((o, j) => objProg[j] >= o.targetCount);
+              nextState.quests[q.id] = { ...p, completed: allDone, progress: allDone ? 1 : 0, objectiveProgress: objProg };
+            });
+          } else {
+            if (q.targetType === type) {
+              const p = nextState.quests[q.id] || { progress: 0, completed: false };
+              if (!p.completed) nextState.quests[q.id] = { ...p, progress: p.progress + 1 };
+            }
           }
         }
       };
@@ -340,7 +364,9 @@ function gameReducer(state: GameState, action: GameAction): GameState {
       }
 
       if (obj === 'GRASS_PATCH') track('clear_grass');
-      if (obj === 'TREE_PALM' || obj === 'TREE_APPLE') track('chop_tree');
+      if (obj === 'TREE_PALM' || obj === 'TREE_APPLE' || obj === 'TREE_COCONUT') track('chop_tree');
+      if (obj === 'TREE_MANGO') track('harvest_mango');
+      if (obj === 'GARDEN_PATCH') track('harvest_pineapple');
       if (obj === 'ROCK') track('mine_rock');
       if (obj === 'CROP_READY') track('harvest_crop');
       if (obj === 'FISH_SPOT') track('fish');

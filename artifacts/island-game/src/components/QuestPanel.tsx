@@ -4,75 +4,195 @@ import { QUESTS } from '../game/gameData';
 
 export const QuestPanel = ({ onClose }: { onClose: () => void }) => {
   const { state } = useGame();
-  
+
+  // Active quest = first uncompleted, unlocked, prereqs met
+  const activeQuest = QUESTS.find(q =>
+    state.level >= q.unlockLevel &&
+    !state.quests[q.id]?.completed &&
+    (!q.prereqs?.length || q.prereqs.every(pid => state.quests[pid]?.completed))
+  );
+
   return (
-    <div className="absolute right-6 top-24 bottom-32 w-80 bg-[#fff5d7] border-8 border-[#8b5a2b] rounded-3xl shadow-2xl flex flex-col overflow-hidden z-30 select-none">
-      <div className="bg-[#8b5a2b] text-white p-4 text-center font-black text-2xl uppercase tracking-widest border-b-4 border-[#5c3a21] shadow-md relative">
-        📋 Quests
+    /* ── Full-screen backdrop ── */
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center"
+      style={{ background: 'rgba(0,0,0,0.55)', fontFamily: "'Fredoka', sans-serif" }}
+      onClick={onClose}
+    >
+      {/* ── Modal card ── */}
+      <div
+        className="relative overflow-hidden rounded-2xl shadow-2xl"
+        style={{ width: 420, maxHeight: '90vh' }}
+        onClick={e => e.stopPropagation()}
+      >
+        {/* ── "Quest" badge top-left ── */}
+        <div
+          className="absolute top-2 left-3 z-20 px-3 py-1 rounded-lg font-black text-sm text-white"
+          style={{
+            background: '#5a7a28',
+            border: '2px solid #3a5010',
+            boxShadow: '1px 2px 6px rgba(0,0,0,0.45)',
+            letterSpacing: 1,
+          }}
+        >
+          〔Quest〕
+        </div>
+
+        {/* ── Red ✕ close button top-right ── */}
         <button
           onClick={onClose}
-          className="absolute right-3 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full flex items-center justify-center text-lg font-black leading-none active:scale-90 transition-transform"
-          style={{ background: 'rgba(0,0,0,0.3)', color: 'white' }}
-          aria-label="Close quests"
-        >✕</button>
-      </div>
-      <div className="flex-1 overflow-y-auto p-4 space-y-4 custom-scrollbar">
-        {QUESTS.map(q => {
-          if (state.level < q.unlockLevel) return null;
-          
-          let lockedByPrereq = false;
-          let prereqTitle = '';
-          if (q.prereqs && q.prereqs.length > 0) {
-            for (const pid of q.prereqs) {
-              if (!state.quests[pid]?.completed) {
-                lockedByPrereq = true;
-                prereqTitle = QUESTS.find(x => x.id === pid)?.title || 'Previous Quest';
-                break;
-              }
-            }
-          }
+          className="absolute top-2 right-2 z-20 w-9 h-9 rounded-lg flex items-center justify-center font-black text-xl text-white active:scale-90 transition-transform"
+          style={{
+            background: '#dd2222',
+            border: '2px solid #aa1111',
+            boxShadow: '1px 2px 5px rgba(0,0,0,0.45)',
+          }}
+          aria-label="Close"
+        >
+          ✕
+        </button>
 
-          if (lockedByPrereq) {
-            return (
-              <div key={q.id} className="p-4 rounded-2xl border-4 bg-gray-200 border-gray-300 shadow-sm opacity-60">
-                <div className="flex items-start gap-3">
-                   <div className="text-4xl drop-shadow-sm grayscale">🔒</div>
-                   <div className="flex-1">
-                     <h4 className="font-bold text-gray-500 text-lg leading-tight">{q.title}</h4>
-                     <p className="text-sm text-gray-400 leading-snug mt-1 font-medium">Complete [{prereqTitle}] first</p>
-                   </div>
-                </div>
-              </div>
-            );
-          }
-
-          const progress = state.quests[q.id]?.progress || 0;
-          const completed = state.quests[q.id]?.completed;
-          return (
-            <div key={q.id} className={`p-4 rounded-2xl border-4 transition-colors ${completed ? 'bg-green-100 border-green-400' : 'bg-white border-[#d2b48c] shadow-sm'}`}>
-              <div className="flex items-start gap-3">
-                 <div className="text-4xl drop-shadow-sm">{q.icon}</div>
-                 <div className="flex-1">
-                   <h4 className="font-bold text-[#5c3a21] text-lg leading-tight">{q.title}</h4>
-                   <p className="text-sm text-[#8b5a2b] leading-snug mt-1 font-medium">{q.description}</p>
-                 </div>
-                 {completed && <div className="text-green-500 text-3xl font-black shrink-0">✓</div>}
-              </div>
-              {!completed && (
-                <div className="mt-4 relative w-full bg-gray-200 h-4 rounded-full overflow-hidden border-2 border-gray-300">
-                   <div className="absolute top-0 left-0 h-full bg-blue-500 transition-all duration-500" style={{ width: `${Math.min(100, (progress/q.targetCount)*100)}%` }} />
-                   <div className="absolute inset-0 flex items-center justify-center text-[10px] text-black font-bold tracking-widest">{progress}/{q.targetCount}</div>
-                </div>
-              )}
-              {completed && q.rewardCoins > 0 && (
-                <div className="mt-2 text-right text-xs font-bold text-green-700 bg-green-200 inline-block float-right px-2 py-1 rounded-full">
-                  +{q.rewardCoins} 🪙 | +{q.rewardXP} ⭐
-                </div>
+        {/* ── Orange amber header ── */}
+        {activeQuest ? (
+          <>
+            <div
+              className="pt-10 pb-5 px-6 text-center"
+              style={{ background: 'linear-gradient(180deg, #f0a030 0%, #c87020 100%)' }}
+            >
+              <h1
+                className="font-black uppercase"
+                style={{
+                  color: '#3a1800',
+                  fontSize: 22,
+                  letterSpacing: 2,
+                  textShadow: '0 1px 2px rgba(255,255,255,0.25)',
+                }}
+              >
+                {activeQuest.title.toUpperCase()}
+              </h1>
+              {activeQuest.subtitle && (
+                <p className="mt-1 font-semibold" style={{ color: '#6a3010', fontSize: 13 }}>
+                  {activeQuest.subtitle}
+                </p>
               )}
             </div>
-          )
-        })}
+
+            {/* ── Body — parchment ── */}
+            <div style={{ background: '#d4b896' }} className="px-5 pb-5">
+
+              {/* OBJECTIVES */}
+              <h2
+                className="font-black uppercase text-center py-3"
+                style={{ color: '#4a2800', fontSize: 15, letterSpacing: 3 }}
+              >
+                OBJECTIVES:
+              </h2>
+
+              <div className="space-y-2">
+                {activeQuest.objectives && activeQuest.objectives.length > 0
+                  ? activeQuest.objectives.map((obj, i) => {
+                      const prog = state.quests[activeQuest.id]?.objectiveProgress?.[i] ?? 0;
+                      const done = prog >= obj.targetCount;
+                      return (
+                        <div
+                          key={i}
+                          className="flex items-center gap-3 rounded-xl px-3 py-2"
+                          style={{ background: done ? '#92b85a' : '#b89060' }}
+                        >
+                          {/* Icon box */}
+                          <div
+                            className="w-13 h-13 rounded-xl flex items-center justify-center text-3xl shrink-0 border-2"
+                            style={{
+                              width: 52, height: 52,
+                              background: '#987040',
+                              borderColor: '#705020',
+                            }}
+                          >
+                            {obj.icon}
+                          </div>
+                          {/* Label */}
+                          <div className="flex-1 font-bold" style={{ color: '#2a1000', fontSize: 14 }}>
+                            {obj.description}
+                          </div>
+                          {/* Counter */}
+                          <div
+                            className="rounded-lg px-3 py-1 font-black text-center"
+                            style={{
+                              minWidth: 50,
+                              background: done ? '#6a9830' : '#987040',
+                              color: done ? '#fff' : '#2a1000',
+                              fontSize: 14,
+                            }}
+                          >
+                            {done ? '✓' : `${prog}/${obj.targetCount}`}
+                          </div>
+                        </div>
+                      );
+                    })
+                  : /* single-objective fallback */ (
+                    <div className="flex items-center gap-3 rounded-xl px-3 py-2" style={{ background: '#b89060' }}>
+                      <div className="w-[52px] h-[52px] rounded-xl flex items-center justify-center text-3xl shrink-0 border-2"
+                        style={{ background: '#987040', borderColor: '#705020' }}>
+                        {activeQuest.icon}
+                      </div>
+                      <div className="flex-1 font-bold" style={{ color: '#2a1000', fontSize: 14 }}>
+                        {activeQuest.description}
+                      </div>
+                      <div className="rounded-lg px-3 py-1 font-black text-center"
+                        style={{ minWidth: 50, background: '#987040', color: '#2a1000', fontSize: 14 }}>
+                        {Math.min(state.quests[activeQuest.id]?.progress ?? 0, activeQuest.targetCount)}/{activeQuest.targetCount}
+                      </div>
+                    </div>
+                  )
+                }
+              </div>
+
+              {/* REWARDS */}
+              <h2
+                className="font-black uppercase text-center pt-4 pb-2"
+                style={{ color: '#4a2800', fontSize: 15, letterSpacing: 3 }}
+              >
+                REWARDS:
+              </h2>
+              <div
+                className="flex justify-center gap-10 rounded-xl py-4"
+                style={{ background: '#b89060' }}
+              >
+                <div className="flex flex-col items-center gap-1">
+                  <div className="text-4xl drop-shadow">🪙</div>
+                  <div className="font-bold" style={{ color: '#2a1000', fontSize: 13 }}>
+                    {activeQuest.rewardCoins} Coins
+                  </div>
+                </div>
+                <div className="flex flex-col items-center gap-1">
+                  <div className="text-4xl drop-shadow">⭐</div>
+                  <div className="font-bold" style={{ color: '#2a1000', fontSize: 13 }}>
+                    {activeQuest.rewardXP} EXP
+                  </div>
+                </div>
+              </div>
+            </div>
+          </>
+        ) : (
+          /* No active quest */
+          <>
+            <div className="pt-10 pb-5 px-6 text-center"
+              style={{ background: 'linear-gradient(180deg, #f0a030 0%, #c87020 100%)' }}>
+              <h1 className="font-black uppercase" style={{ color: '#3a1800', fontSize: 22, letterSpacing: 2 }}>
+                ALL DONE! 🎉
+              </h1>
+            </div>
+            <div style={{ background: '#d4b896' }} className="px-5 py-8 text-center">
+              <p className="font-bold text-lg" style={{ color: '#4a2800' }}>
+                You've completed all available quests!
+              </p>
+              <p className="mt-1 font-semibold text-sm" style={{ color: '#7a5030' }}>
+                Amazing work, island builder!
+              </p>
+            </div>
+          </>
+        )}
       </div>
     </div>
-  )
-}
+  );
+};
