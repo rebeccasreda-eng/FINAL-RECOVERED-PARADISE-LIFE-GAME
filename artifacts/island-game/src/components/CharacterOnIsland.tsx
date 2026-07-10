@@ -52,9 +52,7 @@ export const CharacterOnIsland: React.FC<Props> = ({
         willChange: 'left, top',
       }}
     >
-      {/* Bob animation on inner div so scaleX and translateY never conflict */}
       <div
-        className={isWalking ? 'char-walk-bob' : 'char-idle-bob'}
         style={{ filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.40))' }}
       >
         <Char size={SIZE} isWalking={isWalking} />
