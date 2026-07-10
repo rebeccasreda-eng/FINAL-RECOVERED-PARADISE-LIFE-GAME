@@ -397,7 +397,7 @@ export const QuestNotifier = ({
         userSelect: 'none',
       }}
     >
-      {groups}
+      {activeGroups.map(g => makeGroup(g, false))}
     </div>
   );
 };

@@ -7,10 +7,9 @@ interface HUDProps {
   onOpenCollections: () => void;
   onOpenWeather: () => void;
   playerName?: string;
-  questSlot?: React.ReactNode;
 }
 
-export const HUD: React.FC<HUDProps> = ({ onOpenCollections, onOpenWeather, playerName = 'Player', questSlot }) => {
+export const HUD: React.FC<HUDProps> = ({ onOpenCollections, onOpenWeather, playerName = 'Player' }) => {
   const { state, dispatch } = useGame();
   const { level, xp, inventory, energy, maxEnergy } = state;
   const nextLevelXp = Math.floor(100 * Math.pow(level, 1.5));
@@ -139,7 +138,6 @@ export const HUD: React.FC<HUDProps> = ({ onOpenCollections, onOpenWeather, play
           GET SHELLS
         </button>
         {/* Quest NPC icons — inline slot */}
-        {questSlot && <div className="flex items-center gap-1">{questSlot}</div>}
 
         {/* Space for collections / weather quick access */}
         <div className="ml-auto flex items-center gap-1">
