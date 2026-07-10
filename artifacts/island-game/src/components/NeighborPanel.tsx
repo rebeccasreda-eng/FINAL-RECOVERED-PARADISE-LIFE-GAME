@@ -646,7 +646,7 @@ export const NeighborPanel = ({
           >
             <span style={{ fontSize: 12 }}>🏝️</span>
             <span style={{ color: '#f5e0a0', fontSize: 11, fontWeight: 900, letterSpacing: '0.06em', textShadow: '0 1px 3px rgba(0,0,0,0.7)' }}>
-              NEIGHBORS
+              PLAYER'S ISLAND
             </span>
           </div>
 
