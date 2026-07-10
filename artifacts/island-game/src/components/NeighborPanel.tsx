@@ -1,321 +1,191 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useGame } from '../game/GameContext';
 import { EMOJI_MAP } from '../game/gameData';
 import { ResourceType } from '../game/types';
 import { useToast } from '@/hooks/use-toast';
 
-/* ─── Marina chibi portrait SVG ─────────────────────────────────────────── */
-const MarinaPortrait = () => (
-  <svg viewBox="0 0 56 68" width="56" height="68" xmlns="http://www.w3.org/2000/svg">
-    {/* Sky background */}
-    <rect x="0" y="0" width="56" height="68" fill="#c0e8ff"/>
-    <rect x="0" y="42" width="56" height="26" fill="#90c870"/>
-    {/* Back hair */}
-    <ellipse cx="28" cy="28" rx="21" ry="20" fill="#ff5baa"/>
-    {/* Long side hair left */}
-    <path d="M8,32 Q3,50 6,66" stroke="#ff5baa" strokeWidth="10" fill="none" strokeLinecap="round"/>
-    {/* Long side hair right */}
-    <path d="M48,32 Q53,50 50,66" stroke="#ff5baa" strokeWidth="10" fill="none" strokeLinecap="round"/>
-    {/* Neck + body */}
-    <rect x="22" y="44" width="12" height="12" rx="3" fill="#fde8d0"/>
-    <path d="M16,56 Q22,52 28,54 Q34,52 40,56 Q38,68 28,68 Q18,68 16,56Z" fill="#e86888"/>
-    {/* Head */}
-    <ellipse cx="28" cy="28" rx="17" ry="18" fill="#fde8d0"/>
-    {/* Fringe bangs */}
-    <path d="M11,26 Q14,10 28,10 Q42,10 45,26 Q38,16 28,17 Q18,16 11,26Z" fill="#ff5baa"/>
-    {/* Side fringe pieces */}
-    <path d="M11,26 Q8,30 10,36" stroke="#ff5baa" strokeWidth="5" fill="none" strokeLinecap="round"/>
-    <path d="M45,26 Q48,30 46,36" stroke="#ff5baa" strokeWidth="5" fill="none" strokeLinecap="round"/>
-    {/* Eyes — big sparkly */}
-    <ellipse cx="20" cy="29" rx="5" ry="6" fill="white"/>
-    <ellipse cx="36" cy="29" rx="5" ry="6" fill="white"/>
-    <ellipse cx="20" cy="30" rx="3.5" ry="4.5" fill="#2244cc"/>
-    <ellipse cx="36" cy="30" rx="3.5" ry="4.5" fill="#2244cc"/>
-    <circle cx="20" cy="29.5" r="2.2" fill="#111"/>
-    <circle cx="36" cy="29.5" r="2.2" fill="#111"/>
-    <circle cx="21.2" cy="28.2" r="1.1" fill="white"/>
-    <circle cx="37.2" cy="28.2" r="1.1" fill="white"/>
-    <circle cx="19.2" cy="30.8" r="0.6" fill="rgba(255,255,255,0.7)"/>
-    <circle cx="35.2" cy="30.8" r="0.6" fill="rgba(255,255,255,0.7)"/>
-    {/* Eyelashes */}
-    <path d="M15,24 Q17,22 20,23" stroke="#333" strokeWidth="1.1" fill="none"/>
-    <path d="M31,24 Q33,22 36,23" stroke="#333" strokeWidth="1.1" fill="none"/>
-    {/* Blush */}
-    <ellipse cx="13" cy="33" rx="4" ry="2.2" fill="#ff8888" opacity="0.5"/>
-    <ellipse cx="43" cy="33" rx="4" ry="2.2" fill="#ff8888" opacity="0.5"/>
-    {/* Nose */}
-    <circle cx="28" cy="35" r="1.2" fill="#e0b090" opacity="0.6"/>
-    {/* Smile */}
-    <path d="M22,40 Q28,45 34,40" stroke="#cc4466" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
-    {/* Hair accessories — star clips */}
-    <polygon points="38,15 39.4,18.2 42.8,18.2 40.1,20.2 41.1,23.5 38,21.5 34.9,23.5 35.9,20.2 33.2,18.2 36.6,18.2"
-             fill="#ffe040" stroke="#e0b000" strokeWidth="0.6"/>
-    <circle cx="38" cy="19.5" r="1.5" fill="white" opacity="0.5"/>
-  </svg>
-);
-
-/* ─── Blank player card portrait ─────────────────────────────────────────── */
-const PlayerPortrait = () => (
-  <svg viewBox="0 0 56 68" width="56" height="68" xmlns="http://www.w3.org/2000/svg">
-    {/* Background */}
-    <rect x="0" y="0" width="56" height="68" fill="#b0d8f0"/>
-    <rect x="0" y="44" width="56" height="24" fill="#88b858"/>
-    {/* Silhouette person */}
-    <circle cx="28" cy="24" r="12" fill="rgba(80,100,140,0.35)"/>
-    <path d="M10,68 Q14,44 28,42 Q42,44 46,68Z" fill="rgba(80,100,140,0.30)"/>
-    {/* Dashed border hint */}
-    <rect x="4" y="4" width="48" height="60" rx="3" fill="none"
-          stroke="rgba(255,255,255,0.55)" strokeWidth="1.5" strokeDasharray="4 3"/>
-    {/* Plus icon */}
-    <rect x="25" y="18" width="6" height="18" rx="2" fill="rgba(255,255,255,0.65)"/>
-    <rect x="19" y="24" width="18" height="6" rx="2" fill="rgba(255,255,255,0.65)"/>
-  </svg>
-);
-
-/* ─── Neighbour card (shared frame for Player and Marina) ────────────────── */
-interface NeighbourCardProps {
-  portrait: React.ReactNode;
-  name: string;
-  hearts: number;
-  stars: number;
-  onClick?: () => void;
-}
-const NeighbourCard = ({ portrait, name, hearts, stars, onClick }: NeighbourCardProps) => (
-  <div
-    className="flex flex-col items-center shrink-0 cursor-pointer"
-    style={{ width: 72 }}
-    onClick={onClick}
-  >
-    {/* Golden frame */}
-    <div
-      className="relative overflow-hidden"
-      style={{
-        width: 68,
-        height: 72,
-        borderRadius: '50% 50% 10px 10px',
-        border: '3px solid #8a5808',
-        background: 'linear-gradient(180deg, #d4a020 0%, #a07010 40%, #d4a020 100%)',
-        boxShadow: '0 4px 10px rgba(0,0,0,0.45), inset 0 1px 3px rgba(255,220,80,0.6)',
-      }}
-    >
-      {/* Portrait inset */}
-      <div
-        className="absolute overflow-hidden flex items-center justify-center"
-        style={{ inset: 3, borderRadius: '50% 50% 7px 7px' }}
-      >
-        {portrait}
-      </div>
-      {/* Top sheen */}
-      <div
-        className="absolute top-0 left-0 right-0 pointer-events-none"
-        style={{
-          height: '40%',
-          borderRadius: '50% 50% 0 0',
-          background: 'linear-gradient(180deg, rgba(255,255,255,0.28) 0%, transparent 100%)',
-        }}
-      />
-    </div>
-
-    {/* Name label */}
-    <span
-      className="mt-1 text-[10px] font-black text-center leading-none"
-      style={{ color: '#f5e8c0', textShadow: '0 1px 2px rgba(0,0,0,0.7)', maxWidth: 68 }}
-    >
-      {name}
-    </span>
-
-    {/* Heart + Star count badges — matching reference layout */}
-    <div className="flex items-center gap-1 mt-0.5">
-      {/* Heart badge */}
-      <div
-        className="flex items-center gap-0.5"
-        style={{
-          background: 'linear-gradient(180deg, #e84444, #a81818)',
-          borderRadius: 8,
-          border: '1.5px solid #7a1010',
-          padding: '1px 4px',
-          boxShadow: '0 2px 4px rgba(0,0,0,0.40)',
-        }}
-      >
-        <span style={{ fontSize: 7, lineHeight: 1 }}>❤️</span>
-        <span style={{ fontSize: 8, color: 'white', fontWeight: 900, lineHeight: 1 }}>{hearts}</span>
-      </div>
-      {/* Star badge */}
-      <div
-        className="flex items-center gap-0.5"
-        style={{
-          background: 'linear-gradient(180deg, #ffe860, #c89000)',
-          borderRadius: 8,
-          border: '1.5px solid #9a6800',
-          padding: '1px 4px',
-          boxShadow: '0 2px 4px rgba(0,0,0,0.35)',
-        }}
-      >
-        <span style={{ fontSize: 7, lineHeight: 1 }}>⭐</span>
-        <span style={{ fontSize: 8, color: '#4a2800', fontWeight: 900, lineHeight: 1 }}>{stars}</span>
-      </div>
-    </div>
-  </div>
-);
-
-/* ─── Add Neighbor empty slot ─────────────────────────────────────────────── */
-const AddNeighborCard = () => (
-  <div className="flex flex-col items-center shrink-0" style={{ width: 68 }}>
-    <button
-      aria-label="Add Neighbor"
-      style={{
-        width: 64,
-        height: 72,
-        borderRadius: 10,
-        background: 'linear-gradient(180deg, #e2d9c8 0%, #cec4b0 100%)',
-        border: '2.5px solid #a08868',
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        gap: 4,
-        boxShadow: '0 2px 6px rgba(0,0,0,0.28), inset 0 1px 3px rgba(255,255,255,0.55)',
-        cursor: 'pointer',
-        padding: 0,
-      }}
-    >
-      {/* Big "?" */}
-      <span
-        style={{
-          fontSize: 28,
-          fontWeight: 900,
-          color: '#b0a090',
-          lineHeight: 1,
-          textShadow: '0 1px 2px rgba(0,0,0,0.18)',
-        }}
-      >?</span>
-      {/* Label */}
-      <span
-        style={{
-          fontSize: 8,
-          fontWeight: 900,
-          color: '#6a5030',
-          textAlign: 'center',
-          lineHeight: 1.2,
-        }}
-      >Add<br/>Neighbor</span>
-    </button>
-  </div>
-);
-
-/* ─── Nav arrow button ───────────────────────────────────────────────────── */
-const NavArrow = ({ label }: { label: string }) => (
-  <div
-    className="flex items-center justify-center cursor-pointer active:scale-95 transition-transform select-none"
-    style={{
-      width: 22,
-      height: 19,
-      background: 'linear-gradient(180deg, #8090a8, #506070)',
-      border: '1.5px solid #304050',
-      borderBottomWidth: 3,
-      borderRadius: 4,
-      color: 'white',
-      fontSize: 11,
-      fontWeight: 900,
-    }}
-  >
-    {label}
-  </div>
-);
-
-/* ─── Market item cell ───────────────────────────────────────────────────── */
-const MarketCell = ({ emoji, bg }: { emoji: string; bg: string }) => (
-  <div
-    className="flex items-center justify-center cursor-pointer active:scale-95 transition-transform"
-    style={{
-      width: 36, height: 34,
-      background: bg,
-      border: '2px solid #7a5010',
-      borderBottomWidth: 3,
-      borderRadius: 6,
-    }}
-  >
-    <span style={{ fontSize: 18 }}>{emoji}</span>
-  </div>
-);
-
-/* ─── Quick-action button (big 3×2 grid) ────────────────────────────────── */
-const QuickBtn = ({
-  onClick, active, bg, children,
-}: {
-  onClick: () => void; active?: boolean; bg: string; children: React.ReactNode;
-}) => (
-  <button
-    onClick={onClick}
-    className="flex items-center justify-center rounded-lg overflow-hidden active:scale-95 transition-transform"
-    style={{
-      width: 50, height: 40,
-      background: active ? 'linear-gradient(180deg,#ffe860,#d4a020)' : bg,
-      border: `2px solid ${active ? '#a07010' : '#8a5808'}`,
-      borderBottom: `3px solid ${active ? '#7a5000' : '#5a3a10'}`,
-      boxShadow: active
-        ? '0 0 8px rgba(255,200,0,0.55), inset 0 1px 0 rgba(255,255,255,0.25)'
-        : 'inset 0 1px 0 rgba(255,255,255,0.18), 0 2px 4px rgba(0,0,0,0.4)',
-    }}
-  >
-    {children}
-  </button>
-);
-
-/* SVG micro-icons */
+/* ─── SVG micro-icons (unchanged from previous impl) ──────────────────── */
 const IcoSelect = () => (
-  <svg viewBox="0 0 28 28" width="28" height="28">
-    <polygon points="6,4 6,22 11,18 14,26 17,25 14,17 20,17" fill="white" stroke="#aac" strokeWidth="1.2"/>
+  <svg viewBox="0 0 28 28" width="26" height="26">
+    <polygon points="6,4 6,22 11,18 14,26 17,25 14,17 20,17"
+             fill="white" stroke="rgba(0,0,0,0.3)" strokeWidth="1"/>
   </svg>
 );
 const IcoMarket = () => (
-  <svg viewBox="0 0 32 28" width="32" height="28">
-    <rect x="2" y="14" width="28" height="12" rx="2" fill="#c89a48"/>
-    <rect x="4" y="16" width="24" height="8"  rx="1" fill="#f5e0a0"/>
-    {[8,14,20].map(x => <rect key={x} x={x} y="16" width="2" height="8" fill="#c89048" opacity="0.5"/>)}
+  <svg viewBox="0 0 32 28" width="30" height="26">
+    <rect x="2" y="14" width="28" height="12" rx="2" fill="#d4a848"/>
+    <rect x="4" y="16" width="24" height="8" rx="1" fill="#f8e8b0"/>
+    {[8,14,20].map(x => <rect key={x} x={x} y="16" width="2" height="8" fill="#b88830" opacity="0.5"/>)}
     <path d="M2,14 Q8,4 16,6 Q24,4 30,14Z" fill="#e84040"/>
-    <path d="M2,14 Q8,8 16,10 Q24,8 30,14" stroke="white" strokeWidth="2" fill="none" opacity="0.5"/>
+    <path d="M2,14 Q8,8 16,10 Q24,8 30,14" stroke="white" strokeWidth="1.5" fill="none" opacity="0.5"/>
     <text x="16" y="13" textAnchor="middle" fontSize="5" fontWeight="900" fill="white" opacity="0.9">MARKET</text>
   </svg>
 );
 const IcoCollect = () => (
-  <svg viewBox="0 0 28 28" width="28" height="28">
-    <polygon points="14,3 17,11 26,11 19,17 22,25 14,20 6,25 9,17 2,11 11,11" fill="#f0c820" stroke="#c09010" strokeWidth="1"/>
-    <polygon points="14,6 16.5,11.5 22.5,11.5 17.5,15.5 19.5,21 14,17.5 8.5,21 10.5,15.5 5.5,11.5 11.5,11.5" fill="#ffe860" opacity="0.6"/>
+  <svg viewBox="0 0 28 28" width="26" height="26">
+    <polygon points="14,3 17,11 26,11 19,17 22,25 14,20 6,25 9,17 2,11 11,11"
+             fill="#f0c820" stroke="#b08010" strokeWidth="1"/>
+    <polygon points="14,6 16.5,11.5 22.5,11.5 17.5,15.5 19.5,21 14,17.5 8.5,21 10.5,15.5 5.5,11.5 11.5,11.5"
+             fill="#ffe860" opacity="0.55"/>
   </svg>
 );
 const IcoQuest = () => (
-  <svg viewBox="0 0 28 28" width="28" height="28">
+  <svg viewBox="0 0 28 28" width="26" height="26">
     <rect x="6" y="4" width="16" height="20" rx="2" fill="#f5e8c0" stroke="#a07830" strokeWidth="1.5"/>
-    <rect x="6" y="4" width="16" height="5"  rx="2" fill="#d4a840"/>
+    <rect x="6" y="4" width="16" height="5" rx="2" fill="#d4a840"/>
     {[12,16,20].map(y => <rect key={y} x="9" y={y} width="10" height="1.5" rx="0.7" fill="#c09040" opacity="0.7"/>)}
     <circle cx="21" cy="21" r="6" fill="#e84040"/>
     <text x="21" y="25" textAnchor="middle" fontSize="9" fontWeight="900" fill="white">!</text>
   </svg>
 );
 const IcoPlant = () => (
-  <svg viewBox="0 0 28 28" width="28" height="28">
+  <svg viewBox="0 0 28 28" width="26" height="26">
     <rect x="11" y="16" width="6" height="10" rx="2" fill="#8a6030"/>
     <ellipse cx="14" cy="18" rx="8" ry="10" fill="#40b820"/>
-    <ellipse cx="7"  cy="20" rx="6" ry="7"  fill="#32a010"/>
-    <ellipse cx="21" cy="20" rx="6" ry="7"  fill="#36a814"/>
-    <ellipse cx="14" cy="10" rx="7" ry="8"  fill="#4cc428"/>
-    <ellipse cx="11" cy="13" rx="3" ry="4"  fill="rgba(255,255,255,0.18)"/>
+    <ellipse cx="14" cy="14" rx="6" ry="8" fill="#58d030"/>
+    <ellipse cx="10" cy="17" rx="5" ry="6" fill="#48c028" transform="rotate(-30 10 17)"/>
+    <ellipse cx="18" cy="17" rx="5" ry="6" fill="#48c028" transform="rotate(30 18 17)"/>
+    <ellipse cx="14" cy="12" rx="4" ry="5" fill="#70e040"/>
   </svg>
 );
 const IcoBuild = () => (
-  <svg viewBox="0 0 28 28" width="28" height="28">
-    <rect x="3" y="12" width="22" height="14" rx="3" fill="#508048"/>
-    <rect x="3" y="12" width="22" height="5"  rx="2" fill="#60a058"/>
-    <rect x="3" y="14" width="22" height="1.5"    fill="rgba(255,255,255,0.2)"/>
-    {[7,12,17].map(x => <rect key={x} x={x} y="19" width="4" height="6" rx="1" fill="#304028"/>)}
-    <rect x="8" y="4" width="12" height="10" rx="2" fill="#d4a020"/>
-    <rect x="8" y="4" width="12" height="4"  rx="2" fill="#e8c030"/>
-    <rect x="11" y="6" width="6" height="1.5"     fill="rgba(255,255,255,0.35)"/>
+  <svg viewBox="0 0 28 28" width="26" height="26">
+    <rect x="4" y="14" width="20" height="12" rx="1" fill="#a0a8b8"/>
+    <rect x="4" y="14" width="20" height="3" fill="#b8c0d0"/>
+    <polygon points="3,14 14,5 25,14" fill="#9098a8"/>
+    <rect x="11" y="18" width="6" height="8" fill="#708098"/>
+    <rect x="6"  y="16" width="4" height="4" rx="1" fill="#d0d8e8"/>
+    <rect x="18" y="16" width="4" height="4" rx="1" fill="#d0d8e8"/>
   </svg>
 );
 
-/* ─── Main bottom bar ────────────────────────────────────────────────────── */
+/* ─── Single toolbar tile ──────────────────────────────────────────────── */
+const Tile = ({
+  onClick, active, gradient, children,
+}: {
+  onClick: () => void; active?: boolean; gradient: string; children: React.ReactNode;
+}) => (
+  <button
+    onClick={onClick}
+    className="relative overflow-hidden active:scale-95 transition-transform shrink-0"
+    style={{
+      width: 50, height: 40,
+      borderRadius: 10,
+      background: active
+        ? 'linear-gradient(180deg, #ffe870 0%, #c89020 100%)'
+        : gradient,
+      border: '2px solid rgba(0,0,0,0.35)',
+      borderBottom: '4px solid rgba(0,0,0,0.55)',
+      boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.22), 0 2px 4px rgba(0,0,0,0.35)',
+      display: 'flex', alignItems: 'center', justifyContent: 'center',
+      cursor: 'pointer', padding: 0,
+    }}
+  >
+    {/* Top-sheen */}
+    <div style={{
+      position: 'absolute', top: 0, left: 0, right: 0, height: '40%',
+      background: 'linear-gradient(180deg, rgba(255,255,255,0.22), transparent)',
+      borderRadius: '8px 8px 0 0', pointerEvents: 'none',
+    }}/>
+    {/* Active glow ring */}
+    {active && (
+      <div style={{
+        position: 'absolute', inset: 0, borderRadius: 8,
+        boxShadow: 'inset 0 0 8px rgba(255,220,0,0.7)', pointerEvents: 'none',
+      }}/>
+    )}
+    {children}
+  </button>
+);
+
+/* ─── Mini island SVG scene ────────────────────────────────────────────── */
+const IslandScene = () => (
+  <svg viewBox="0 0 260 68" preserveAspectRatio="xMidYMid slice"
+       style={{ position: 'absolute', inset: 0, width: '100%', height: '100%' }}>
+    {/* Sky gradient */}
+    <defs>
+      <linearGradient id="skyG" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%"   stopColor="#60c8f0"/>
+        <stop offset="100%" stopColor="#98dff8"/>
+      </linearGradient>
+      <linearGradient id="waterG" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%"   stopColor="#1898d8"/>
+        <stop offset="100%" stopColor="#0e78b0"/>
+      </linearGradient>
+    </defs>
+    <rect x="0"   y="0"  width="260" height="68" fill="url(#skyG)"/>
+    {/* Distant clouds */}
+    <ellipse cx="30"  cy="14" rx="18" ry="7"  fill="white" opacity="0.80"/>
+    <ellipse cx="22"  cy="16" rx="10" ry="5"  fill="white" opacity="0.75"/>
+    <ellipse cx="40"  cy="16" rx="10" ry="5"  fill="white" opacity="0.75"/>
+    <ellipse cx="200" cy="12" rx="22" ry="8"  fill="white" opacity="0.75"/>
+    <ellipse cx="191" cy="14" rx="12" ry="6"  fill="white" opacity="0.70"/>
+    <ellipse cx="213" cy="14" rx="12" ry="6"  fill="white" opacity="0.70"/>
+    {/* Water */}
+    <rect x="0" y="38" width="260" height="30" fill="url(#waterG)"/>
+    <rect x="0" y="38" width="260" height="5"  fill="#40b8e8" opacity="0.45"/>
+    {/* Water shimmer lines */}
+    <line x1="20"  y1="48" x2="50"  y2="48" stroke="rgba(255,255,255,0.30)" strokeWidth="1.5" strokeLinecap="round"/>
+    <line x1="80"  y1="52" x2="115" y2="52" stroke="rgba(255,255,255,0.25)" strokeWidth="1.5" strokeLinecap="round"/>
+    <line x1="160" y1="46" x2="195" y2="46" stroke="rgba(255,255,255,0.28)" strokeWidth="1.5" strokeLinecap="round"/>
+    <line x1="220" y1="54" x2="248" y2="54" stroke="rgba(255,255,255,0.22)" strokeWidth="1.5" strokeLinecap="round"/>
+    {/* Island sand base */}
+    <ellipse cx="130" cy="46" rx="90" ry="16" fill="#c8a040"/>
+    <ellipse cx="130" cy="43" rx="82" ry="12" fill="#e0c060"/>
+    {/* Island grass */}
+    <ellipse cx="130" cy="40" rx="58" ry="9"  fill="#68cc30"/>
+    <ellipse cx="130" cy="38" rx="48" ry="6"  fill="#80e040"/>
+    {/* Sand texture dots */}
+    <circle cx="90"  cy="46" r="1.5" fill="rgba(160,120,40,0.35)"/>
+    <circle cx="110" cy="48" r="1.5" fill="rgba(160,120,40,0.30)"/>
+    <circle cx="152" cy="47" r="1.5" fill="rgba(160,120,40,0.30)"/>
+    <circle cx="170" cy="45" r="1.5" fill="rgba(160,120,40,0.32)"/>
+    {/* Palm tree 1 (left) */}
+    <path d="M90 38 Q88 26 86 14" stroke="#7a5020" strokeWidth="3.5" fill="none" strokeLinecap="round"/>
+    <ellipse cx="86" cy="14" rx="14" ry="6"  fill="#28a818" transform="rotate(-20 86 14)"/>
+    <ellipse cx="86" cy="14" rx="14" ry="6"  fill="#38c020" transform="rotate( 15 86 14)" opacity="0.8"/>
+    <ellipse cx="86" cy="14" rx="10" ry="5"  fill="#48d828" transform="rotate(-50 86 14)" opacity="0.7"/>
+    <circle  cx="86" cy="14" r="2"            fill="#f0a818" opacity="0.85"/>
+    {/* Palm tree 2 (right) */}
+    <path d="M172 37 Q174 25 177 12" stroke="#7a5020" strokeWidth="3.5" fill="none" strokeLinecap="round"/>
+    <ellipse cx="177" cy="12" rx="14" ry="6"  fill="#28a818" transform="rotate( 18 177 12)"/>
+    <ellipse cx="177" cy="12" rx="14" ry="6"  fill="#38c020" transform="rotate(-15 177 12)" opacity="0.8"/>
+    <ellipse cx="177" cy="12" rx="10" ry="5"  fill="#48d828" transform="rotate( 48 177 12)" opacity="0.7"/>
+    <circle  cx="177" cy="12" r="2"            fill="#f0a818" opacity="0.85"/>
+    {/* Palm tree 3 (center, shorter) */}
+    <path d="M130 38 Q129 30 128 22" stroke="#7a5020" strokeWidth="3"   fill="none" strokeLinecap="round"/>
+    <ellipse cx="128" cy="22" rx="11" ry="5"  fill="#38b820" transform="rotate(-10 128 22)"/>
+    <ellipse cx="128" cy="22" rx="11" ry="5"  fill="#50cc28" transform="rotate( 25 128 22)" opacity="0.8"/>
+    <circle  cx="128" cy="22" r="1.8"          fill="#f0a818" opacity="0.8"/>
+    {/* Small accent flowers */}
+    <circle cx="106" cy="37" r="2.5" fill="#ff4488" opacity="0.9"/>
+    <circle cx="155" cy="37" r="2.5" fill="#ffcc00" opacity="0.9"/>
+    <circle cx="117" cy="36" r="2"   fill="#ff8022" opacity="0.85"/>
+    <circle cx="143" cy="36" r="2"   fill="#ff4488" opacity="0.80"/>
+  </svg>
+);
+
+/* ─── Nav arrow button ──────────────────────────────────────────────────── */
+const NavArrow = ({ label }: { label: string }) => (
+  <button
+    className="active:scale-95 transition-transform"
+    style={{
+      width: 30,
+      background: 'rgba(0,0,0,0.38)',
+      border: 'none',
+      borderRight: label === '‹' ? '1px solid rgba(255,255,255,0.12)' : 'none',
+      borderLeft:  label === '›' ? '1px solid rgba(255,255,255,0.12)' : 'none',
+      color: 'rgba(255,255,255,0.90)',
+      fontSize: 22, fontWeight: 900,
+      cursor: 'pointer', flexShrink: 0,
+      display: 'flex', alignItems: 'center', justifyContent: 'center',
+    }}
+  >
+    {label}
+  </button>
+);
+
+/* ─── NeighborPanel props ───────────────────────────────────────────────── */
 interface NeighborPanelProps {
   playerName?: string;
   playerLevel?: number;
@@ -323,36 +193,24 @@ interface NeighborPanelProps {
   onOpenQuests?: () => void;
 }
 
-export const NeighborPanel = ({ playerName = 'Player', playerLevel = 1, onOpenCollections, onOpenQuests }: NeighborPanelProps) => {
-  const { state, dispatch, activeTool, setActiveTool, activeBuildItem, setActiveBuildItem, setShopOpen } = useGame();
+export const NeighborPanel = ({
+  playerName = 'Player',
+  playerLevel = 1,
+  onOpenCollections,
+  onOpenQuests,
+}: NeighborPanelProps) => {
+  const {
+    state, dispatch,
+    activeTool, setActiveTool,
+    activeBuildItem, setActiveBuildItem,
+    setShopOpen,
+  } = useGame();
+
   const { toast } = useToast();
 
-  const ownedStructures = ['HUT','DOCK','WELL','FLOWER_POT','FENCE','LANTERN'].filter(
-    (i) => (state.inventory[i as ResourceType] || 0) > 0
-  );
-
-  const handleVisit = (n: any) => {
-    dispatch({ type: 'VISIT_NEIGHBOR', neighborId: n.id });
-    toast({ title: `Visited ${n.name}!`, description: '+10 favor, +5 coins, +5 XP', duration: 2000 });
-  };
-
-  const handleHire = (n: any) => {
-    const isNewDay = Date.now() - state.lastNeighborHire > 86400000;
-    const hiredToday = isNewDay ? 0 : state.neighborsHiredToday;
-    if (hiredToday >= 2) {
-      toast({ title: 'Daily limit reached', description: 'Max 2 hires/day.', variant: 'destructive' });
-      return;
-    }
-    if (state.inventory.coins < 50) {
-      toast({ title: 'Need 50 coins!', variant: 'destructive' });
-      return;
-    }
-    dispatch({ type: 'HIRE_NEIGHBOR', neighborId: n.id });
-    toast({ title: `${n.name} is helping! +3 ⚡`, duration: 2000 });
-  };
-
-  // Marina is always the first (and only) neighbour
-  const marina = state.neighbors?.find(n => n.id === 'n1');
+  // Structures the player owns ≥1 of (must match ResourceType + ObjectType intersection)
+  const BUILDABLES: ResourceType[] = ['HUT','DOCK','WELL','FLOWER_POT','FENCE','LANTERN'];
+  const ownedStructures = BUILDABLES.filter(s => (state.inventory[s] ?? 0) > 0);
 
   return (
     <div
@@ -365,226 +223,177 @@ export const NeighborPanel = ({ playerName = 'Player', playerLevel = 1, onOpenCo
         fontFamily: "'Fredoka', sans-serif",
       }}
     >
-      {/* ── LEFT: 3×2 quick-action grid ── */}
+      {/* ══ LEFT: 3 × 2 icon-tile toolbar ══════════════════════════════════ */}
       <div
         className="flex items-center justify-center shrink-0"
         style={{
-          width: 168,
-          padding: '5px 5px',
-          borderRight: '2px solid #5a3a10',
+          width: 172,
+          padding: '6px 8px',
+          borderRight: '2px solid #4a2e08',
           background: 'linear-gradient(180deg, #7a6040 0%, #5a4020 100%)',
         }}
       >
-        <div className="grid gap-1" style={{ gridTemplateColumns: 'repeat(3,50px)' }}>
-          <QuickBtn
+        <div className="grid gap-1.5" style={{ gridTemplateColumns: 'repeat(3, 50px)' }}>
+
+          {/* Row 1 */}
+          <Tile
             onClick={() => setActiveTool('clear')}
             active={activeTool === 'clear'}
-            bg="linear-gradient(180deg,#7090b8,#405878)"
-          ><IcoSelect /></QuickBtn>
+            gradient="linear-gradient(180deg, #7090b8 0%, #405878 100%)"
+          >
+            <IcoSelect />
+          </Tile>
 
-          <QuickBtn
+          <Tile
             onClick={() => setShopOpen(true)}
-            bg="linear-gradient(180deg,#88c840,#50881c)"
-          ><IcoMarket /></QuickBtn>
+            gradient="linear-gradient(180deg, #70b030 0%, #408010 100%)"
+          >
+            <IcoMarket />
+          </Tile>
 
-          <QuickBtn
+          <Tile
             onClick={() => onOpenCollections?.()}
-            bg="linear-gradient(180deg,#9060c8,#603898)"
-          ><IcoCollect /></QuickBtn>
+            gradient="linear-gradient(180deg, #9060c8 0%, #603898 100%)"
+          >
+            <IcoCollect />
+          </Tile>
 
-          <QuickBtn
+          {/* Row 2 */}
+          <Tile
             onClick={() => onOpenQuests?.()}
-            bg="linear-gradient(180deg,#c07830,#885020)"
-          ><IcoQuest /></QuickBtn>
+            gradient="linear-gradient(180deg, #c07830 0%, #885020 100%)"
+          >
+            <IcoQuest />
+          </Tile>
 
-          <QuickBtn
+          <Tile
             onClick={() => setActiveTool('plant')}
             active={activeTool === 'plant'}
-            bg="linear-gradient(180deg,#60c040,#308820)"
-          ><IcoPlant /></QuickBtn>
+            gradient="linear-gradient(180deg, #60c038 0%, #308818 100%)"
+          >
+            <IcoPlant />
+          </Tile>
 
-          <QuickBtn
+          <Tile
             onClick={() => {
               setActiveTool('build');
-              if (!activeBuildItem && ownedStructures.length > 0) setActiveBuildItem(ownedStructures[0] as any);
+              if (!activeBuildItem && ownedStructures.length > 0)
+                setActiveBuildItem(ownedStructures[0] as any);
             }}
             active={activeTool === 'build'}
-            bg="linear-gradient(180deg,#508850,#306030)"
-          ><IcoBuild /></QuickBtn>
+            gradient="linear-gradient(180deg, #608858 0%, #385038 100%)"
+          >
+            <IcoBuild />
+          </Tile>
         </div>
       </div>
 
-      {/* ── NEIGHBOUR CARDS: Player + Marina + 5 empty slots ── */}
+      {/* ══ RIGHT: Player's Island panel ════════════════════════════════════ */}
       <div
-        className="flex items-center justify-evenly px-2"
-        style={{
-          flex: 1,
-          minWidth: 0,
-          borderRight: '2px solid #5a3a10',
-          overflow: 'hidden',
-        }}
+        className="flex flex-col flex-1 min-w-0"
+        style={{ background: 'linear-gradient(180deg, #6a5030 0%, #3a2808 100%)' }}
       >
-        {/* 5 empty Add Neighbor slots — come first */}
-        {Array.from({ length: 5 }).map((_, i) => (
-          <AddNeighborCard key={i} />
-        ))}
+        {/* Header strip */}
+        <div
+          className="flex items-center justify-between px-3"
+          style={{
+            height: 20,
+            background: 'linear-gradient(180deg, #2e1c08 0%, #3e2c18 100%)',
+            borderBottom: '2px solid #5a3a10',
+            flexShrink: 0,
+          }}
+        >
+          <span
+            style={{
+              color: '#f5e8c0', fontSize: 11, fontWeight: 900,
+              letterSpacing: '0.06em',
+              textShadow: '0 1px 3px rgba(0,0,0,0.7)',
+            }}
+          >
+            Player's Island
+          </span>
+          <span
+            style={{
+              color: '#c8a860', fontSize: 9, fontWeight: 700,
+              letterSpacing: '0.04em',
+              textShadow: '0 1px 2px rgba(0,0,0,0.5)',
+            }}
+          >
+            {playerName} · Lv {playerLevel}
+          </span>
+        </div>
 
-        {/* Player card */}
-        <NeighbourCard
-          portrait={<PlayerPortrait />}
-          name={playerName}
-          hearts={2}
-          stars={1}
-        />
+        {/* Scene row: ‹  island scene  ADD NEIGHBOR  › */}
+        <div className="flex flex-1 items-stretch overflow-hidden">
 
-        {/* Marina card — ❤️1 ⭐5 */}
-        {marina && (
-          <div className="flex flex-col items-center gap-1">
-            <NeighbourCard
-              portrait={<MarinaPortrait />}
-              name="Marina"
-              hearts={1}
-              stars={5}
-              onClick={() => handleVisit(marina)}
-            />
+          <NavArrow label="‹" />
+
+          {/* Island scene with ADD NEIGHBOR overlay */}
+          <div className="flex-1 relative overflow-hidden flex items-center justify-center">
+            <IslandScene />
+
+            {/* ADD NEIGHBOR button */}
             <button
-              onClick={() => handleHire(marina)}
-              className="text-[9px] font-black px-2 py-0.5 rounded border active:scale-95 transition-transform"
+              className="relative active:scale-95 transition-transform"
               style={{
-                background: 'linear-gradient(180deg, #50cc30, #289010)',
-                borderColor: '#186808',
-                borderBottomWidth: 2,
+                zIndex: 2,
+                background: 'linear-gradient(180deg, #60d040 0%, #30a010 100%)',
+                border: '2px solid #186808',
+                borderBottom: '3px solid #105008',
                 color: 'white',
-                marginTop: -4,
+                fontWeight: 900, fontSize: 10,
+                padding: '4px 14px',
+                borderRadius: 8,
+                boxShadow: '0 2px 8px rgba(0,0,0,0.40)',
+                textShadow: '0 1px 2px rgba(0,0,0,0.45)',
+                cursor: 'pointer',
+                letterSpacing: '0.05em',
               }}
             >
-              Hire
-            </button>
-          </div>
-        )}
-      </div>
-
-      {/* ── NAV ARROWS (4 stacked) ── */}
-      <div
-        className="flex flex-col items-center justify-center gap-1 px-2 shrink-0"
-        style={{ borderRight: '2px solid #5a3a10' }}
-      >
-        <NavArrow label="◄"/>
-        <NavArrow label="◄"/>
-        <NavArrow label="◄"/>
-        <NavArrow label="◄"/>
-      </div>
-
-      {/* ── TOOLS column ── */}
-      <div className="flex flex-col items-center justify-center gap-1 px-2 shrink-0"
-        style={{ borderRight: '2px solid #5a3a10' }}
-      >
-        {/* Build tray popup */}
-        {activeTool === 'build' && (
-          <div
-            className="absolute bottom-[100px] right-[168px] bg-[#5a3a10] p-2 rounded-xl flex gap-2 border-4 border-[#3a1a00] shadow-2xl z-50"
-          >
-            {ownedStructures.length === 0 ? (
-              <span className="text-yellow-200 text-xs font-bold px-2 py-1">Buy in Shop!</span>
-            ) : (
-              ownedStructures.map((item) => (
-                <button
-                  key={item}
-                  onClick={() => setActiveBuildItem(item as any)}
-                  className="w-12 h-12 rounded-lg border-3 flex items-center justify-center relative active:scale-95"
-                  style={{
-                    background: activeBuildItem === item ? '#f5c842' : '#fff5d7',
-                    border: `3px solid ${activeBuildItem === item ? '#d4a020' : '#c0a070'}`,
-                  }}
-                >
-                  <span className="text-2xl">{EMOJI_MAP[item]}</span>
-                  <span className="absolute -top-2 -right-2 bg-red-500 text-white text-[9px] font-black px-1 rounded-full border border-white">
-                    {state.inventory[item as ResourceType]}
-                  </span>
-                </button>
-              ))
-            )}
-          </div>
-        )}
-
-        {[
-          { tool: 'clear' as const,  label: '👆', title: 'Pointer' },
-          { tool: 'plant' as const,  label: '🌱', title: 'Plant'   },
-          { tool: 'build' as const,  label: '🔨', title: 'Build'   },
-        ].map(({ tool, label, title }) => (
-          <button
-            key={tool}
-            title={title}
-            onClick={() => {
-              setActiveTool(tool);
-              if (tool === 'build' && !activeBuildItem && ownedStructures.length > 0) {
-                setActiveBuildItem(ownedStructures[0] as any);
-              }
-            }}
-            className="w-10 h-10 rounded-lg flex items-center justify-center text-xl active:scale-95 transition-transform border-b-2"
-            style={{
-              background: activeTool === tool
-                ? 'linear-gradient(180deg, #ffe860, #d4a020)'
-                : 'linear-gradient(180deg, #b09060, #806040)',
-              borderColor: activeTool === tool ? '#a07010' : '#3a2000',
-              boxShadow: activeTool === tool ? '0 0 8px rgba(255,200,0,0.6)' : 'none',
-            }}
-          >
-            {label}
-          </button>
-        ))}
-      </div>
-
-      {/* ── RIGHT: MARKET label + grid ── */}
-      <div
-        className="flex flex-col shrink-0"
-        style={{
-          background: 'linear-gradient(180deg, #7a6040 0%, #5a4020 100%)',
-          borderLeft: '2px solid #5a3a10',
-        }}
-      >
-        {/* Top row: MARKET label + big button */}
-        <div className="flex items-stretch flex-1">
-          {/* Market big button */}
-          <div className="flex flex-col items-center justify-start pt-1 px-1.5" style={{ width: 90 }}>
-            <span
-              className="text-[10px] font-black text-yellow-200 tracking-widest mb-0.5"
-              style={{ textShadow: '0 1px 2px rgba(0,0,0,0.6)' }}
-            >
-              MARKET
-            </span>
-            <button
-              onClick={() => setShopOpen(true)}
-              className="w-[78px] h-[56px] rounded-lg overflow-hidden border-2 active:scale-95 transition-transform relative"
-              style={{ borderColor: '#c0901a', background: '#8b6020' }}
-              title="Open Market"
-            >
-              <div className="absolute inset-0" style={{ background: 'linear-gradient(180deg, #a8d868 0%, #70a028 50%, #c8a050 100%)' }}/>
-              <div className="absolute top-0 left-0 right-0 h-4 flex items-center justify-center"
-                style={{ background: 'linear-gradient(180deg, #d4a020, #a07010)', borderBottom: '1px solid #604000' }}>
-                <span className="text-[8px] font-black text-yellow-100">🏪 SHOP</span>
-              </div>
-              <div className="absolute bottom-1 left-0 right-0 flex flex-wrap justify-center gap-0.5 px-1">
-                {['🍎','🌽','🥥','🍅','🥚','🫐'].map((e, i) => (
-                  <span key={i} style={{ fontSize: 10 }}>{e}</span>
-                ))}
-              </div>
+              ADD NEIGHBOR
             </button>
           </div>
 
-          {/* Item grid: 2 columns × 2 rows */}
-          <div className="flex flex-col justify-center gap-1 px-1.5 py-1">
-            <div className="flex gap-1">
-              <MarketCell emoji="🎁" bg="linear-gradient(180deg, #e8c060, #c09030)"/>
-              <MarketCell emoji="🐰" bg="linear-gradient(180deg, #f0e8e0, #d8c8b8)"/>
-            </div>
-            <div className="flex gap-1">
-              <MarketCell emoji="💎" bg="linear-gradient(180deg, #a0d8f8, #5090d0)"/>
-              <MarketCell emoji="🌺" bg="linear-gradient(180deg, #f8a0b8, #d06080)"/>
-            </div>
-          </div>
+          <NavArrow label="›" />
         </div>
       </div>
+
+      {/* ══ Build tray popup ════════════════════════════════════════════════ */}
+      {activeTool === 'build' && (
+        <div
+          data-nodrag
+          className="absolute flex gap-2 p-2 rounded-xl border-4 shadow-2xl z-50"
+          style={{
+            bottom: 100, left: 6,
+            background: '#3a2008',
+            borderColor: '#1e1000',
+          }}
+        >
+          {ownedStructures.length === 0 ? (
+            <span className="text-yellow-200 text-xs font-bold px-2 py-1">Buy in Shop!</span>
+          ) : (
+            ownedStructures.map(item => (
+              <button
+                key={item}
+                onClick={() => setActiveBuildItem(item as any)}
+                className="w-12 h-12 rounded-lg flex items-center justify-center relative active:scale-95"
+                style={{
+                  background: activeBuildItem === item ? '#f5c842' : '#fff5d7',
+                  border: `3px solid ${activeBuildItem === item ? '#d4a020' : '#c0a070'}`,
+                }}
+              >
+                <span style={{ fontSize: 22 }}>{EMOJI_MAP[item]}</span>
+                <span
+                  className="absolute -top-2 -right-2 text-white text-[9px] font-black px-1 rounded-full border border-white"
+                  style={{ background: '#e84040' }}
+                >
+                  {state.inventory[item as ResourceType]}
+                </span>
+              </button>
+            ))
+          )}
+        </div>
+      )}
     </div>
   );
 };
