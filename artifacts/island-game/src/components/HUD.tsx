@@ -61,12 +61,6 @@ export const HUD: React.FC<HUDProps> = ({ onOpenCollections, onOpenWeather, play
           <span className="tabular-nums min-w-[36px]">{inventory.coins}</span>
         </div>
 
-        {/* Wood */}
-        <div className={statBox}>
-          <div className={iconBox} style={{ background: 'radial-gradient(circle at 35% 35%, #c8904a, #8b5a2b)' }}>🥥</div>
-          <span className="tabular-nums min-w-[28px]">{inventory.wood}</span>
-        </div>
-
         {/* Food */}
         <div className={statBox}>
           <div className={iconBox} style={{ background: 'radial-gradient(circle at 35% 35%, #f4a040, #c87020)' }}>🍔</div>

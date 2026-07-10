@@ -38,7 +38,7 @@ const PETAL_COLORS  = ['#e03818', '#e8628a', '#f59420', '#f0e018', '#c040d0'] as
 const PETAL_DARKS   = ['#981408', '#b03060', '#c06810', '#c8a400', '#8020a0'] as const;
 const FLOWER_ANGS   = [0, 72, 144, 216, 288] as const;
 
-const ObjectSVG: React.FC<{ object: string; tileX: number; tileY: number }> = ({ object, tileX: tx, tileY: ty }) => {
+const ObjectSVG: React.FC<{ object: string; tileX: number; tileY: number; tileType?: string }> = ({ object, tileX: tx, tileY: ty, tileType }) => {
   // Build a unique gradient-ID prefix per tile to avoid SVG id collisions
   const g = (s: string) => `${s}${tx}x${ty}`;
 
@@ -842,8 +842,14 @@ const ObjectSVG: React.FC<{ object: string; tileX: number; tileY: number }> = ({
     /* ── WEEDS (tall reed/cattail cluster — clearable) ──────────────────── */
     case 'WEEDS': {
       const wv = (tx * 5 + ty * 11) % 3;
-      // Three green palette variants matching the reference (no yellowing — all live green)
-      const [cDark, cMid, cFront, cHi] = ([
+      const onSand = tileType === 'SAND';
+      // Sand: muted olive/sage tones that blend with sandy ground
+      // Grass: natural greens that blend with the turf
+      const [cDark, cMid, cFront, cHi] = onSand ? ([
+        ['#7a8428','#909a38','#a8b248','#c2cc5e'],  // dusty sage
+        ['#7e8830','#96a040','#aeba50','#c8d468'],  // warm olive
+        ['#788030','#8e9a3c','#a4b24c','#bece62'],  // deep olive
+      ] as const)[wv] : ([
         ['#266c10','#3a9018','#52b020','#78d038'],  // pure cool green
         ['#2a7012','#40981a','#56b422','#7acc3a'],  // slightly warmer
         ['#246810','#368c18','#4eac1e','#72c836'],  // deep forest
@@ -1913,7 +1919,7 @@ export const IslandTile: React.FC<IslandTileProps> = ({
               transformOrigin: 'bottom center',
             }}
           >
-            <ObjectSVG object={tile.object} tileX={tile.x} tileY={tile.y}/>
+            <ObjectSVG object={tile.object} tileX={tile.x} tileY={tile.y} tileType={tile.type}/>
           </div>
         </div>
       )}
