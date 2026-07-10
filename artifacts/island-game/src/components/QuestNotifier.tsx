@@ -190,6 +190,19 @@ const AxeNPC = () => (
     {/* Small grass blades */}
     <path d="M18,68 Q14,60 16,54" stroke="#4ccc34" strokeWidth="3" fill="none" strokeLinecap="round"/>
     <path d="M64,68 Q68,58 66,52" stroke="#4ccc34" strokeWidth="3" fill="none" strokeLinecap="round"/>
+    {/* Coconut tree trunk — behind stump, left side */}
+    <path d="M10,74 Q8,58 12,42 Q16,26 20,10" stroke="#7a5020" strokeWidth="6" fill="none" strokeLinecap="round"/>
+    <path d="M10,74 Q8,58 12,42 Q16,26 20,10" stroke="#b88040" strokeWidth="3.5" fill="none" strokeLinecap="round" opacity="0.55"/>
+    {/* Palm fronds */}
+    <ellipse cx="20" cy="10" rx="16" ry="5"  fill="#28a818" transform="rotate(10 20 10)"/>
+    <ellipse cx="20" cy="10" rx="16" ry="5"  fill="#38c020" transform="rotate(-30 20 10)" opacity="0.9"/>
+    <ellipse cx="20" cy="10" rx="14" ry="4.5" fill="#48d028" transform="rotate(50 20 10)"  opacity="0.85"/>
+    <ellipse cx="20" cy="10" rx="13" ry="4"  fill="#30b818" transform="rotate(-65 20 10)" opacity="0.8"/>
+    <ellipse cx="20" cy="10" rx="12" ry="4"  fill="#40c424" transform="rotate(85 20 10)"  opacity="0.75"/>
+    {/* Coconuts */}
+    <circle cx="20" cy="13" r="3.5" fill="#c88820"/>
+    <circle cx="24" cy="11" r="3"   fill="#b87818"/>
+    <circle cx="17" cy="12" r="2.8" fill="#d09028"/>
     {/* Stump body */}
     <rect x="18" y="40" width="48" height="32" rx="5" fill="#8a5020"/>
     {/* Stump top ring face */}
