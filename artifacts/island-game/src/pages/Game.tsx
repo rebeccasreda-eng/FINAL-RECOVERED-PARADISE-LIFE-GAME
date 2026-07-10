@@ -54,7 +54,7 @@ const GameInner = ({ profile }: { profile: PlayerProfile }) => {
   const [selectedQuestId,  setSelectedQuestId]  = useState<string | null>(null);
   const { muted: bgmMuted, toggle: toggleBgm } = useBgm('/bgm.mp3');
 
-  /* ── Player movement — free analog movement (WASD / arrows + click-to-glide) ── */
+  /* ── Player movement — click-to-glide ── */
 
   // Float tile-space position (supports sub-tile interpolation)
   const playerPosRef = useRef<{ x: number; y: number }>({ x: PLAYER_START.x, y: PLAYER_START.y });
@@ -64,9 +64,6 @@ const GameInner = ({ profile }: { profile: PlayerProfile }) => {
 
   // Click-to-glide destination; null = no pending target
   const targetRef = useRef<{ x: number; y: number } | null>(null);
-
-  // Currently held direction keys
-  const keysRef = useRef({ up: false, down: false, left: false, right: false });
 
   // rAF bookkeeping
   const rafRef       = useRef<number | null>(null);
@@ -96,29 +93,10 @@ const GameInner = ({ profile }: { profile: PlayerProfile }) => {
     const dt = Math.min((now - lastTimeRef.current) / 1000, 0.05); // cap at 50 ms
     lastTimeRef.current = now;
 
-    const keys = keysRef.current;
     const pos  = playerPosRef.current;
-
-    // ── Build velocity in tile-space ──────────────────────────────────────
-    // Iso projection: screenX = (tx−ty)*TW/2, screenY = (tx+ty)*TH/2
-    //   W/↑ → tile (−1,−1) → pure screen-up
-    //   S/↓ → tile (+1,+1) → pure screen-down
-    //   D/→ → tile (+1,−1) → pure screen-right
-    //   A/← → tile (−1,+1) → pure screen-left
     let vx = 0, vy = 0;
-    if (keys.up)    { vx -= 1; vy -= 1; }
-    if (keys.down)  { vx += 1; vy += 1; }
-    if (keys.right) { vx += 1; vy -= 1; }
-    if (keys.left)  { vx -= 1; vy += 1; }
 
-    const hasKeys = vx !== 0 || vy !== 0;
-
-    if (hasKeys) {
-      targetRef.current = null;           // keyboard overrides click target
-      pendingInteractTileRef.current = null; // cancel queued action
-      const len = Math.hypot(vx, vy);
-      vx /= len; vy /= len;
-    } else if (targetRef.current) {
+    if (targetRef.current) {
       const ddx = targetRef.current.x - pos.x;
       const ddy = targetRef.current.y - pos.y;
       const dist = Math.hypot(ddx, ddy);
@@ -180,29 +158,6 @@ const GameInner = ({ profile }: { profile: PlayerProfile }) => {
     return () => { if (rafRef.current !== null) cancelAnimationFrame(rafRef.current); };
   }, [tick]);
 
-  // WASD / arrow key listeners
-  useEffect(() => {
-    const down = (e: KeyboardEvent) => {
-      if ((e.target as HTMLElement)?.closest('input,textarea')) return;
-      switch (e.code) {
-        case 'KeyW': case 'ArrowUp':    keysRef.current.up    = true; e.preventDefault(); break;
-        case 'KeyS': case 'ArrowDown':  keysRef.current.down  = true; e.preventDefault(); break;
-        case 'KeyD': case 'ArrowRight': keysRef.current.right = true; e.preventDefault(); break;
-        case 'KeyA': case 'ArrowLeft':  keysRef.current.left  = true; e.preventDefault(); break;
-      }
-    };
-    const up = (e: KeyboardEvent) => {
-      switch (e.code) {
-        case 'KeyW': case 'ArrowUp':    keysRef.current.up    = false; break;
-        case 'KeyS': case 'ArrowDown':  keysRef.current.down  = false; break;
-        case 'KeyD': case 'ArrowRight': keysRef.current.right = false; break;
-        case 'KeyA': case 'ArrowLeft':  keysRef.current.left  = false; break;
-      }
-    };
-    window.addEventListener('keydown', down);
-    window.addEventListener('keyup',   up);
-    return () => { window.removeEventListener('keydown', down); window.removeEventListener('keyup', up); };
-  }, []);
 
   // Click-to-glide: set target; optionally queue an interact on arrival
   const moveTo = useCallback((tx: number, ty: number, interactTileId?: string) => {
@@ -220,11 +175,10 @@ const GameInner = ({ profile }: { profile: PlayerProfile }) => {
   const viewportRef  = useRef<HTMLDivElement>(null);
   const worldRef     = useRef<HTMLDivElement>(null);
   const panRef       = useRef({ x: 0, y: 0 });
-  const INITIAL_ZOOM = 2.0;   // start close — tiles fill the screen nicely
-  const MAX_ZOOM     = 3.2;   // a bit extra for inspecting objects up close
-  // Zoom-out is limited to exactly 3 snap levels (descending), always centred.
-  // Zooming in is continuous up to MAX_ZOOM.
-  const ZOOM_OUT_LEVELS = [INITIAL_ZOOM, 1.3, 0.82, 0.55]; // 3 steps out
+  const INITIAL_ZOOM = 2.0;
+  const MAX_ZOOM     = 3.2;
+  // Exactly 3 scroll-steps out from the initial zoom, always island-centred.
+  const ZOOM_OUT_LEVELS = [INITIAL_ZOOM, 1.35, 0.85, 0.55];
   const MIN_ZOOM = ZOOM_OUT_LEVELS[ZOOM_OUT_LEVELS.length - 1];
 
   /** Clamp pan so the world div always covers the full viewport (no void showing). */
@@ -264,7 +218,7 @@ const GameInner = ({ profile }: { profile: PlayerProfile }) => {
   // Initial position: island visually centred on load, zoomed in
   useEffect(() => { applyTransform(0, 0, INITIAL_ZOOM); }, [applyTransform]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  /* Mouse-wheel zoom (non-passive) — cursor-anchored in both directions. */
+  /* Mouse-wheel zoom — centre-anchored; scroll-out snaps discrete levels, scroll-in is smooth. */
   useEffect(() => {
     const el = viewportRef.current;
     if (!el) return;
@@ -272,27 +226,32 @@ const GameInner = ({ profile }: { profile: PlayerProfile }) => {
       if (e.ctrlKey || e.metaKey) return;
       e.preventDefault();
 
-      const rect  = el.getBoundingClientRect();
-      // cursor offset from viewport centre (matching the transform origin math)
-      const cx    = e.clientX - rect.left - rect.width  / 2;
-      const cy    = e.clientY - rect.top  - rect.height / 2;
+      const oldZ = zoomRef.current;
 
-      const oldZ  = zoomRef.current;
-      const factor = e.deltaY > 0 ? 1 / 1.12 : 1.12;   // out / in
-      const newZ  = Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, oldZ * factor));
-      if (newZ === oldZ) return;
-
-      // Anchor the point under the cursor: world-point = (cursor - pan + WORLD_CX) / oldZ
-      // After zoom the same world-point should stay under cursor:
-      // newPan = cursor + WORLD_CX - worldPoint * newZ
-      const ratio = newZ / oldZ;
-      const rawPX = panRef.current.x + (cx + WORLD_CX) * (1 - ratio);
-      const rawPY = panRef.current.y + (cy + WORLD_CY) * (1 - ratio);
-      const { x: newPX, y: newPY } = clampPan(rawPX, rawPY, newZ);
-      panRef.current  = { x: newPX, y: newPY };
-      zoomRef.current = newZ;
-      applyTransform(newPX, newPY, newZ);
-      setZoom(newZ);
+      if (e.deltaY > 0) {
+        // ── ZOOM OUT — discrete snap, always re-centred on island ──────────
+        const nextZ = [...ZOOM_OUT_LEVELS].sort((a, b) => b - a)
+          .find(l => l < oldZ - 0.02);
+        if (nextZ == null) return;
+        const { x, y } = clampPan(0, 0, nextZ);
+        panRef.current  = { x, y };
+        zoomRef.current = nextZ;
+        applyTransform(x, y, nextZ);
+        setZoom(nextZ);
+      } else {
+        // ── ZOOM IN — smooth, anchored on viewport centre (not cursor) ─────
+        const newZ = Math.min(MAX_ZOOM, oldZ * 1.18);
+        if (newZ === oldZ) return;
+        const ratio = newZ / oldZ;
+        // cx = 0, cy = 0  →  viewport centre anchor
+        const rawPX = panRef.current.x + WORLD_CX * (1 - ratio);
+        const rawPY = panRef.current.y + WORLD_CY * (1 - ratio);
+        const { x, y } = clampPan(rawPX, rawPY, newZ);
+        panRef.current  = { x, y };
+        zoomRef.current = newZ;
+        applyTransform(x, y, newZ);
+        setZoom(newZ);
+      }
     };
     el.addEventListener('wheel', handler, { passive: false });
     return () => el.removeEventListener('wheel', handler);
