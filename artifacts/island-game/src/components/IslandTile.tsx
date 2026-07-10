@@ -2321,6 +2321,38 @@ export const IslandTile: React.FC<IslandTileProps> = ({
           />
         )}
 
+        {/* ── Curvy grass outline — 2 bezier bumps per edge, per-tile variation ── */}
+        {!isWater && !isCleared && tile.type === 'GRASS' && (() => {
+          // 8 independent bump amplitudes — each 1.8–4 px outward from edge midpoint
+          const bh = (n: number) => 1.8 + tileRng(tile.x, tile.y, 50 + n) * 2.2;
+          // Outward normals per edge (perpendicular, pointing away from diamond centre)
+          // NE (top→right):  (0.343, -0.939)
+          // SE (right→bot):  (0.343,  0.939)
+          // SW (bot→left):  (-0.343,  0.939)
+          // NW (left→top):  (-0.343, -0.939)
+          const h = [bh(0),bh(1),bh(2),bh(3),bh(4),bh(5),bh(6),bh(7)];
+          // Segment midpoints (half-edge midpoints) and their control offsets
+          const cp = [
+            [50.25 + 0.343*h[0],  2.75 - 0.939*h[0]],  // NE seg1
+            [70.75 + 0.343*h[1], 10.25 - 0.939*h[1]],  // NE seg2
+            [70.75 + 0.343*h[2], 17.75 + 0.939*h[2]],  // SE seg1
+            [50.25 + 0.343*h[3], 25.25 + 0.939*h[3]],  // SE seg2
+            [29.75 - 0.343*h[4], 25.25 + 0.939*h[4]],  // SW seg1
+            [ 9.25 - 0.343*h[5], 17.75 + 0.939*h[5]],  // SW seg2
+            [ 9.25 - 0.343*h[6], 10.25 - 0.939*h[6]],  // NW seg1
+            [29.75 - 0.343*h[7],  2.75 - 0.939*h[7]],  // NW seg2
+          ].map(([x,y]) => `${x.toFixed(1)},${y.toFixed(1)}`);
+          return (
+            <path
+              d={`M40,-1 Q${cp[0]} 60.5,6.5 Q${cp[1]} 81,14 Q${cp[2]} 60.5,21.5 Q${cp[3]} 40,29 Q${cp[4]} 19.5,21.5 Q${cp[5]} -1,14 Q${cp[6]} 19.5,6.5 Q${cp[7]} 40,-1 Z`}
+              fill="none"
+              stroke="rgba(28,95,8,0.52)"
+              strokeWidth="2.2"
+              strokeLinejoin="round"
+            />
+          );
+        })()}
+
         {/* ── Terrain edge blends ─────────────────────────────────────────────
             For each edge where the neighbour is a different terrain type, draw
             a gradient-filled triangle (one quarter of the diamond) that bleeds
