@@ -373,8 +373,6 @@ const ObjectSVG: React.FC<{ object: string; tileX: number; tileY: number; tileTy
               <stop offset="100%" stopColor="#8a6c3c"/>
             </linearGradient>
           </defs>
-          {/* Shadow */}
-          <ellipse cx="22" cy="51" rx="16" ry="4" fill="rgba(0,0,0,0.22)"/>
           {/* Leaf base */}
           <ellipse cx="22" cy="44" rx="16" ry="6.5" fill="#246a18"/>
           <ellipse cx="11" cy="41" rx="11" ry="5.5" fill="#2e8020" transform="rotate(-20 11 41)"/>
@@ -1001,9 +999,6 @@ const ObjectSVG: React.FC<{ object: string; tileX: number; tileY: number; tileTy
       const by = 55;
       return (
         <svg viewBox="0 0 56 56" width="54" height="52" style={{ display:'block' }}>
-          {/* Very faint contact shadow — no harsh dark ring */}
-          <ellipse cx="28" cy="55" rx="22" ry="3" fill="rgba(0,0,0,0.07)"/>
-
           {/* ── BACK ROW — tallest, darkest ── */}
           <path d={blade(9,  by, 52, -3, 2.8)} fill={cDark}/>
           <path d={blade(18, by, 55, -1, 3.2)} fill={cDark}/>
@@ -1058,9 +1053,6 @@ const ObjectSVG: React.FC<{ object: string; tileX: number; tileY: number; tileTy
       ] as const)[tv];
       return (
         <svg viewBox="0 0 46 36" width="44" height="34" style={{ display:'block' }}>
-          {/* Ground shadow */}
-          <ellipse cx="23" cy="35" rx="19" ry="3.5" fill="rgba(0,0,0,0.20)"/>
-
           {/* ── Leaf base — low oval mound ── */}
           <ellipse cx="23" cy="28" rx="18" ry="7"  fill={leafC} opacity="0.85"/>
           <ellipse cx="23" cy="26" rx="14" ry="5.5" fill={leafC}/>
@@ -1126,8 +1118,6 @@ const ObjectSVG: React.FC<{ object: string; tileX: number; tileY: number; tileTy
       const lean = bv === 0 ? -2 : bv === 1 ? 2 : 0;
       return (
         <svg viewBox="0 0 38 56" width="36" height="54" style={{ display:'block' }}>
-          {/* Shadow */}
-          <ellipse cx="19" cy="55" rx="14" ry="3.5" fill="rgba(0,0,0,0.20)"/>
           {/* Leaf base */}
           <path d="M11,54 Q9,42 11,30 Q13,20 12,10" stroke="#2a8018" strokeWidth="6" fill="none" strokeLinecap="round"/>
           <path d="M19,54 Q18,40 19,26 Q20,14 19,4"  stroke="#2e9020" strokeWidth="6" fill="none" strokeLinecap="round"/>
@@ -1180,8 +1170,6 @@ const ObjectSVG: React.FC<{ object: string; tileX: number; tileY: number; tileTy
               <stop offset="100%" stopColor="#d4a010"/>
             </radialGradient>
           </defs>
-          {/* Shadow */}
-          <ellipse cx="23" cy="41" rx="18" ry="3.5" fill="rgba(0,0,0,0.20)"/>
           {/* Leaf mound */}
           <ellipse cx="23" cy="33" rx="19" ry="7.5" fill="#1e6010"/>
           <ellipse cx="12" cy="30" rx="12" ry="6"   fill="#246814" transform="rotate(-15 12 30)"/>
@@ -1254,8 +1242,6 @@ const ObjectSVG: React.FC<{ object: string; tileX: number; tileY: number; tileTy
       );
       return (
         <svg viewBox="0 0 40 58" width="38" height="56" style={{ display:'block' }}>
-          {/* Shadow */}
-          <ellipse cx="20" cy="57" rx="14" ry="3.5" fill="rgba(0,0,0,0.20)"/>
           {/* Stems */}
           <path d="M12,56 Q11,44 12,32 Q13,22 12,14" stroke="#2e8820" strokeWidth="3.5" fill="none" strokeLinecap="round"/>
           <path d="M20,56 Q20,42 20,28 Q20,16 20,8"  stroke="#349424" strokeWidth="3.8" fill="none" strokeLinecap="round"/>
@@ -1287,8 +1273,6 @@ const ObjectSVG: React.FC<{ object: string; tileX: number; tileY: number; tileTy
               <stop offset="100%" stopColor="#162898"/>
             </radialGradient>
           </defs>
-          {/* Shadow */}
-          <ellipse cx="26" cy="55" rx="21" ry="4" fill="rgba(0,0,0,0.22)"/>
           {/* Leaf mass — back */}
           <ellipse cx="26" cy="34" rx="21" ry="19" fill="#1e8012"/>
           <ellipse cx="14" cy="38" rx="14" ry="12" fill="#187010"/>
@@ -1331,9 +1315,6 @@ const ObjectSVG: React.FC<{ object: string; tileX: number; tileY: number; tileTy
         : 'M18,26 L11,23.5 L12,27.5Z';
       return (
         <svg viewBox="0 0 48 62" width="44" height="57" style={{ display:'block' }}>
-          {/* Ground shadow */}
-          <ellipse cx="24" cy="60" rx="12" ry="3.2" fill="rgba(0,0,0,0.22)"/>
-
           {/* Legs */}
           <line x1="20" y1="52" x2="17" y2="58" stroke="#d07810" strokeWidth="2.2" strokeLinecap="round"/>
           <line x1="17" y1="58" x2="14" y2="59.5" stroke="#d07810" strokeWidth="1.8" strokeLinecap="round"/>
@@ -1607,8 +1588,6 @@ const ObjectSVG: React.FC<{ object: string; tileX: number; tileY: number; tileTy
             <clipPath id={g('pc1')}><ellipse cx="22" cy="46" rx="9"   ry="12"/></clipPath>
             <clipPath id={g('pc2')}><ellipse cx="41" cy="42" rx="9.5" ry="13"/></clipPath>
           </defs>
-          {/* Shadow */}
-          <ellipse cx="30" cy="61" rx="23" ry="4.5" fill="rgba(0,0,0,0.22)"/>
           {/* Base leaf mass */}
           <ellipse cx="30" cy="48" rx="26" ry="16" fill="#1a7a0e"/>
           <ellipse cx="20" cy="50" rx="14" ry="11" fill="#187010"/>
