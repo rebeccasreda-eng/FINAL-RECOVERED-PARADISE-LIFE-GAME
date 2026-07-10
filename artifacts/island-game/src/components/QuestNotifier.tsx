@@ -119,46 +119,63 @@ const TreeNPC = () => (
 /* ── Fish NPC ──────────────────────────────────────────────────────────── */
 const FishNPC = () => (
   <svg viewBox="0 0 84 84" xmlns="http://www.w3.org/2000/svg" width="80" height="80">
-    <ellipse cx="42" cy="80" rx="28" ry="5" fill="rgba(0,0,0,0.18)"/>
-    {/* Water base */}
-    <ellipse cx="42" cy="72" rx="36" ry="12" fill="#1a90d8" opacity="0.65"/>
-    <ellipse cx="42" cy="70" rx="32" ry="9" fill="#28a8e8" opacity="0.8"/>
-    {/* Waves */}
-    <path d="M6,66 Q16,62 26,66 Q36,70 46,66 Q56,62 66,66 Q74,70 80,66" stroke="#48c8f8" strokeWidth="2.5" fill="none" opacity="0.9"/>
-    <path d="M10,72 Q20,68 30,72 Q40,76 50,72 Q60,68 70,72" stroke="#38b8e8" strokeWidth="2" fill="none" opacity="0.6"/>
+    {/* Rounded water-filled "tank" background */}
+    <rect x="0" y="0" width="84" height="84" rx="12" fill="#1282c4"/>
+    {/* Deep water gradient layers */}
+    <rect x="0" y="42" width="84" height="42" rx="0" fill="#0e6eaa" opacity="0.6"/>
+    <rect x="0" y="60" width="84" height="24" rx="0" fill="#0a5890" opacity="0.5"/>
+    {/* Bottom sand */}
+    <ellipse cx="42" cy="82" rx="44" ry="10" fill="#c8a450"/>
+    <ellipse cx="42" cy="80" rx="38" ry="7" fill="#d8b460"/>
+    {/* Sandy bottom bumps */}
+    <ellipse cx="14" cy="80" rx="10" ry="5" fill="#caa850" opacity="0.8"/>
+    <ellipse cx="60" cy="80" rx="12" ry="5" fill="#c8a250" opacity="0.7"/>
     {/* Coral left */}
-    <path d="M16,70 Q12,60 14,50 Q16,42 18,50 Q20,56 18,62" stroke="#e04040" strokeWidth="3.5" fill="none" strokeLinecap="round"/>
-    <circle cx="13" cy="49" r="4.5" fill="#e84848"/>
-    <circle cx="17" cy="45" r="4" fill="#f05050"/>
-    <circle cx="19" cy="50" r="3.5" fill="#e03838"/>
+    <path d="M12,76 Q9,64 11,54 Q13,46 15,54 Q17,60 15,68" stroke="#e04040" strokeWidth="4" fill="none" strokeLinecap="round"/>
+    <circle cx="9"  cy="53" r="5"   fill="#e84848"/>
+    <circle cx="14" cy="49" r="4.5" fill="#f05050"/>
+    <circle cx="16" cy="54" r="4"   fill="#e03838"/>
     {/* Seaweed right */}
-    <path d="M66,70 Q64,57 67,46" stroke="#28a030" strokeWidth="3.5" fill="none" strokeLinecap="round"/>
-    <ellipse cx="67" cy="45" rx="6" ry="3.5" fill="#38b838" transform="rotate(-20 67 45)"/>
-    <ellipse cx="64" cy="54" rx="5" ry="3" fill="#30ac30" transform="rotate(15 64 54)"/>
-    {/* Fish body */}
-    <ellipse cx="43" cy="38" rx="23" ry="15" fill="#ff6820"/>
+    <path d="M68,76 Q66,62 70,50 Q72,44 70,50" stroke="#28a030" strokeWidth="4" fill="none" strokeLinecap="round"/>
+    <path d="M72,76 Q75,63 72,52" stroke="#22961e" strokeWidth="3" fill="none" strokeLinecap="round"/>
+    <ellipse cx="70" cy="49" rx="7" ry="4"   fill="#38b838" transform="rotate(-20 70 49)"/>
+    <ellipse cx="73" cy="51" rx="6" ry="3.5" fill="#30ac30" transform="rotate(20 73 51)"/>
+    {/* Surface shimmer waves */}
+    <path d="M4,8 Q14,4 24,8 Q34,12 44,8 Q54,4 64,8 Q74,12 82,8" stroke="rgba(140,220,255,0.55)" strokeWidth="2.5" fill="none"/>
+    <path d="M2,14 Q12,10 22,14 Q32,18 42,14 Q52,10 62,14 Q72,18 82,14" stroke="rgba(140,220,255,0.35)" strokeWidth="2" fill="none"/>
+    {/* Light rays from surface */}
+    <path d="M20,0 L18,30" stroke="rgba(255,255,255,0.12)" strokeWidth="6" strokeLinecap="round"/>
+    <path d="M38,0 L36,25" stroke="rgba(255,255,255,0.10)" strokeWidth="5" strokeLinecap="round"/>
+    <path d="M58,0 L60,28" stroke="rgba(255,255,255,0.09)" strokeWidth="4" strokeLinecap="round"/>
+    {/* Fish body — clownfish, fully inside water */}
+    <ellipse cx="44" cy="44" rx="22" ry="14" fill="#ff6820"/>
     {/* White stripes */}
-    <path d="M36,24 Q34,38 36,52" stroke="white" strokeWidth="4.5" fill="none" opacity="0.72"/>
-    <path d="M47,24 Q45,38 47,52" stroke="white" strokeWidth="4" fill="none" opacity="0.60"/>
+    <path d="M37,31 Q35,44 37,57" stroke="white" strokeWidth="4.5" fill="none" opacity="0.78"/>
+    <path d="M48,31 Q46,44 48,57" stroke="white" strokeWidth="4"   fill="none" opacity="0.65"/>
     {/* Outline */}
-    <ellipse cx="43" cy="38" rx="23" ry="15" fill="none" stroke="#c84808" strokeWidth="1.5" opacity="0.6"/>
+    <ellipse cx="44" cy="44" rx="22" ry="14" fill="none" stroke="#c84808" strokeWidth="1.5" opacity="0.55"/>
     {/* Tail fin */}
-    <path d="M66,32 Q80,28 82,38 Q80,50 66,46 Q70,38 66,32Z" fill="#ff7830"/>
-    <path d="M66,32 Q70,38 66,46" stroke="white" strokeWidth="1.5" fill="none" opacity="0.45"/>
+    <path d="M66,38 Q80,34 82,44 Q80,54 66,50 Q70,44 66,38Z" fill="#ff7830"/>
+    <path d="M66,38 Q70,44 66,50" stroke="white" strokeWidth="1.5" fill="none" opacity="0.4"/>
     {/* Dorsal fin */}
-    <path d="M30,24 Q38,12 52,23 Q47,25 40,25 Q35,25 30,24Z" fill="#ff8030" stroke="#c84808" strokeWidth="1" opacity="0.9"/>
+    <path d="M30,30 Q38,20 52,30 Q47,31 40,31 Q35,31 30,30Z" fill="#ff8030" stroke="#c84808" strokeWidth="1" opacity="0.9"/>
     {/* Pectoral fin */}
-    <path d="M48,47 Q54,56 52,62 Q45,55 45,49Z" fill="#ff9840" opacity="0.75"/>
+    <path d="M50,52 Q56,60 54,66 Q47,60 47,54Z" fill="#ff9840" opacity="0.7"/>
     {/* Eye */}
-    <circle cx="24" cy="36" r="6" fill="white"/>
-    <circle cx="24" cy="36" r="4" fill="#1a1a1a"/>
-    <circle cx="22.5" cy="34.5" r="1.8" fill="white"/>
+    <circle cx="26" cy="42" r="5.5" fill="white"/>
+    <circle cx="26" cy="42" r="3.5" fill="#1a1a1a"/>
+    <circle cx="24.5" cy="40.5" r="1.5" fill="white"/>
     {/* Mouth */}
-    <path d="M16,41 Q18,44 21,42" stroke="#b83808" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
-    {/* Bubbles */}
-    <circle cx="12" cy="32" r="3" fill="none" stroke="#88d8f8" strokeWidth="1.5" opacity="0.75"/>
-    <circle cx="8"  cy="23" r="2.3" fill="none" stroke="#88d8f8" strokeWidth="1.2" opacity="0.55"/>
-    <circle cx="13" cy="16" r="1.7" fill="none" stroke="#88d8f8" strokeWidth="1" opacity="0.45"/>
+    <path d="M18,47 Q20,50 23,48" stroke="#b83808" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
+    {/* Bubbles rising */}
+    <circle cx="14" cy="38" r="2.8" fill="none" stroke="rgba(180,230,255,0.80)" strokeWidth="1.5"/>
+    <circle cx="10" cy="28" r="2.2" fill="none" stroke="rgba(180,230,255,0.65)" strokeWidth="1.2"/>
+    <circle cx="14" cy="19" r="1.6" fill="none" stroke="rgba(180,230,255,0.50)" strokeWidth="1"/>
+    <circle cx="10" cy="11" r="1.2" fill="none" stroke="rgba(180,230,255,0.35)" strokeWidth="0.9"/>
+    {/* Small decorative fish (background) */}
+    <ellipse cx="62" cy="26" rx="8" ry="5" fill="#ff9c50" opacity="0.65"/>
+    <path d="M70,23 Q75,26 70,29Z" fill="#ffaa60" opacity="0.6"/>
+    <circle cx="57" cy="25" r="2" fill="#1a1a1a" opacity="0.55"/>
   </svg>
 );
 
