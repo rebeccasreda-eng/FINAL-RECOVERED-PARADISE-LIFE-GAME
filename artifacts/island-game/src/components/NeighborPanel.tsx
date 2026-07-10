@@ -757,39 +757,44 @@ export const NeighborPanel = ({
             </span>
           </div>
 
-          {/* Card row: Player | Marina | InlineMarketGrid | divider | 5×AddNeighbor */}
+          {/* Card row: [◀ left arrows] | divider | 5×AddNeighbor | divider | [nav arrows] | AddNeighbor | MarketGrid */}
           <div className="flex flex-1 min-h-0" style={{ padding: '4px', gap: 4, alignItems: 'stretch' }}>
-            {/* Player's own island card */}
-            <PlayerCard name={playerName} level={playerLevel} />
 
-            {/* Marina card */}
-            <MarinaCard />
-
-            {/* Inline market 6-icon grid */}
-            <InlineMarketGrid
-              onOpenShop={() => setShopOpen(true)}
-              onOpenQuests={onOpenQuests}
-              onOpenCollections={onOpenCollections}
-            />
+            {/* Left-pointing arrows replacing the island cards */}
+            <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 3, flexShrink: 0 }}>
+              <NavArrowBtn symbol="◀" title="Back" />
+              <NavArrowBtn symbol="◀" title="Back" />
+              <NavArrowBtn symbol="◀" title="Back" />
+            </div>
 
             {/* Thin divider */}
             <div style={{ width: 2, background: 'rgba(0,0,0,0.28)', borderRadius: 1, flexShrink: 0, margin: '2px 4px' }} />
 
-            {/* 5 Add-Neighbor cards — flex-fill so they share remaining width equally */}
+            {/* 5 Add-Neighbor cards — flex-fill */}
             {Array.from({ length: 5 }, (_, i) => <AddNeighborCard key={i} />)}
 
             {/* Thin divider before nav arrows */}
             <div style={{ width: 2, background: 'rgba(0,0,0,0.28)', borderRadius: 1, flexShrink: 0, margin: '2px 4px' }} />
 
-            {/* 3 nav arrow buttons + one AddNeighbor card */}
+            {/* 3 nav arrow buttons */}
             <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 3, flexShrink: 0 }}>
               <NavArrowBtn symbol="◀" title="Previous" />
               <NavArrowBtn symbol="●" title="Home" />
               <NavArrowBtn symbol="▶" title="Next" />
             </div>
 
-            {/* AddNeighbor card next to the arrows */}
+            {/* AddNeighbor card */}
             <AddNeighborCard />
+
+            {/* Thin divider before market */}
+            <div style={{ width: 2, background: 'rgba(0,0,0,0.28)', borderRadius: 1, flexShrink: 0, margin: '2px 4px' }} />
+
+            {/* Market grid — far right */}
+            <InlineMarketGrid
+              onOpenShop={() => setShopOpen(true)}
+              onOpenQuests={onOpenQuests}
+              onOpenCollections={onOpenCollections}
+            />
           </div>
         </div>
 
