@@ -21,6 +21,7 @@ export interface TileData {
   placedAt?: number;
   cropType?: string;
   crabHp?: number;
+  treeHp?: number;        // chops remaining before tree falls
   unwitherRequestedAt?: number;
 }
 

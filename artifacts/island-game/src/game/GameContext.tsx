@@ -3,6 +3,11 @@ import { GameState, GameAction, GameContextType, ResourceType, ObjectType } from
 import { generateIsland, QUESTS, OBJECT_CONFIG, SCALED, WEATHER_TYPES, CROP_TYPES, INITIAL_NEIGHBORS, COLLECTIONS, COLLECTION_SETS, PREMIUM_ITEMS } from './gameData';
 import { useToast } from '@/hooks/use-toast';
 
+// Chops required to fell each tree type (shared by reducer + UI)
+const TREE_CHOPS: Record<string, number> = {
+  TREE_PALM: 3, TREE_APPLE: 2, TREE_COCONUT: 2, TREE_MANGO: 2,
+};
+
 export const GameContext = createContext<(GameContextType & { plantingTile: string | null; setPlantingTile: (id: string | null) => void; }) | null>(null);
 
 export const useGame = () => {
@@ -249,87 +254,32 @@ function gameReducer(state: GameState, action: GameAction): GameState {
       if (!config) return state;
 
       const nextState = { ...state, tiles: { ...state.tiles }, inventory: { ...state.inventory }, quests: { ...state.quests }, respawns: [...state.respawns], collections: { ...state.collections }, stats: { ...state.stats } };
-      
+
       nextState.energy -= energyCost;
-      
-      let coinsDrop = config.coins || 0;
-      if (obj === 'FISH_SPOT' && nextState.weather === 'STORMY') {
-        coinsDrop *= 2;
-      }
-      nextState.inventory.coins += coinsDrop;
-      
-      if (config.drops) {
-        for (const [k, v] of Object.entries(config.drops)) {
-          let dropAmount = v as number;
-          if (k === 'food' && obj === 'TREE_APPLE' && nextState.weather === 'CLOUDY') {
-             dropAmount += 1;
-          }
-          nextState.inventory[k as ResourceType] = (nextState.inventory[k as ResourceType] || 0) + dropAmount;
+
+      // ── Multi-hit checks FIRST — early return if not yet done ─────────────
+      // Trees: require multiple chops; no rewards until the final hit
+      if (obj in TREE_CHOPS) {
+        const maxChops = TREE_CHOPS[obj];
+        const chopsLeft = Math.max(1, tile.treeHp ?? maxChops) - 1;
+        if (chopsLeft > 0) {
+          nextState.tiles[tileId] = { ...tile, treeHp: chopsLeft };
+          return nextState; // energy spent, no rewards yet
         }
-      }
-
-      if (obj === 'GRASS_PATCH' && nextState.weather === 'WINDY') {
-        if (Math.random() < 0.25) {
-          nextState.energy = Math.min(nextState.maxEnergy, nextState.energy + 1);
-        }
-      }
-
-      const track = (type: string) => {
-        for (const q of QUESTS) {
-          if (nextState.level < q.unlockLevel) continue;
-          if (q.prereqs && q.prereqs.some(pid => !nextState.quests[pid]?.completed)) continue;
-
-          if (q.objectives && q.objectives.length > 0) {
-            // Multi-objective quest: update each matching objective's progress
-            q.objectives.forEach((obj, i) => {
-              if (obj.targetType !== type) return;
-              const p = nextState.quests[q.id] || { progress: 0, completed: false, objectiveProgress: q.objectives!.map(() => 0) };
-              if (p.completed) return;
-              // Normalise array to full length to handle partial/stale saves
-              const base = p.objectiveProgress ?? [];
-              const objProg = q.objectives!.map((_, j) => base[j] ?? 0);
-              if (objProg[i] < obj.targetCount) objProg[i] += 1;
-              const allDone = q.objectives!.every((o, j) => objProg[j] >= o.targetCount);
-              nextState.quests[q.id] = { ...p, completed: allDone, progress: allDone ? 1 : 0, objectiveProgress: objProg };
-            });
-          } else {
-            if (q.targetType === type) {
-              const p = nextState.quests[q.id] || { progress: 0, completed: false };
-              if (!p.completed) nextState.quests[q.id] = { ...p, progress: p.progress + 1 };
-            }
-          }
-        }
-      };
-
-      // Collection drops
-      let dropChance = 1;
-      if (nextState.premiumBoosts.lucky_charm && nextState.premiumBoosts.lucky_charm > Date.now()) {
-        dropChance = 2;
-      }
-
-      const rand = Math.random();
-      if (rand < 0.05 * dropChance) { nextState.collections['starfish'] = true; track('collect_item'); }
-      else if (rand < 0.1 * dropChance) { nextState.collections['conch'] = true; track('collect_item'); }
-      
-      if (obj === 'FISH_SPOT' && Math.random() < 0.3 * dropChance) {
-         nextState.collections['pearl'] = true; track('collect_item');
-      }
-
-      if (obj === 'CRAB' || obj === 'BOAR') {
+        // Final chop — tree falls; rewards flow below
+        nextState.tiles[tileId] = { ...tile, object: undefined, treeHp: undefined };
+      } else if (obj === 'CRAB' || obj === 'BOAR') {
         const hp = (tile.crabHp || (obj === 'CRAB' ? 3 : 2)) - 1;
         if (hp > 0) {
           nextState.tiles[tileId] = { ...tile, crabHp: hp };
-          return nextState; // Don't do XP or respawn yet
+          return nextState; // no rewards yet
+        }
+        nextState.tiles[tileId] = { ...tile, object: undefined, crabHp: undefined };
+        if (obj === 'CRAB') {
+          nextState.stats.crabsKilled = (nextState.stats.crabsKilled || 0) + 1;
+          nextState.inventory.food = (nextState.inventory.food || 0) + 1;
         } else {
-          nextState.tiles[tileId] = { ...tile, object: undefined, crabHp: undefined };
-          if (obj === 'CRAB') {
-            nextState.stats.crabsKilled = (nextState.stats.crabsKilled || 0) + 1;
-            nextState.inventory.food = (nextState.inventory.food || 0) + 1;
-            nextState.collections['crab_claw'] = true; track('collect_item');
-            track('kill_crab');
-          } else {
-            nextState.stats.boarsShooD = (nextState.stats.boarsShooD || 0) + 1;
-          }
+          nextState.stats.boarsShooD = (nextState.stats.boarsShooD || 0) + 1;
         }
       } else if (obj === 'CROP_READY') {
         nextState.tiles[tileId] = { ...tile, object: 'CLEARED_LAND' };
@@ -351,6 +301,54 @@ function gameReducer(state: GameState, action: GameAction): GameState {
       } else {
         nextState.tiles[tileId] = { ...tile, object: undefined };
       }
+
+      // ── Rewards — only reached on final/single hit ────────────────────────
+      const track = (type: string) => {
+        for (const q of QUESTS) {
+          if (nextState.level < q.unlockLevel) continue;
+          if (q.prereqs && q.prereqs.some(pid => !nextState.quests[pid]?.completed)) continue;
+          if (q.objectives && q.objectives.length > 0) {
+            q.objectives.forEach((obj, i) => {
+              if (obj.targetType !== type) return;
+              const p = nextState.quests[q.id] || { progress: 0, completed: false, objectiveProgress: q.objectives!.map(() => 0) };
+              if (p.completed) return;
+              const base = p.objectiveProgress ?? [];
+              const objProg = q.objectives!.map((_, j) => base[j] ?? 0);
+              if (objProg[i] < obj.targetCount) objProg[i] += 1;
+              const allDone = q.objectives!.every((o, j) => objProg[j] >= o.targetCount);
+              nextState.quests[q.id] = { ...p, completed: allDone, progress: allDone ? 1 : 0, objectiveProgress: objProg };
+            });
+          } else {
+            if (q.targetType === type) {
+              const p = nextState.quests[q.id] || { progress: 0, completed: false };
+              if (!p.completed) nextState.quests[q.id] = { ...p, progress: p.progress + 1 };
+            }
+          }
+        }
+      };
+
+      let coinsDrop = config.coins || 0;
+      if (obj === 'FISH_SPOT' && nextState.weather === 'STORMY') coinsDrop *= 2;
+      nextState.inventory.coins += coinsDrop;
+
+      if (config.drops) {
+        for (const [k, v] of Object.entries(config.drops)) {
+          let dropAmount = v as number;
+          if (k === 'food' && obj === 'TREE_APPLE' && nextState.weather === 'CLOUDY') dropAmount += 1;
+          nextState.inventory[k as ResourceType] = (nextState.inventory[k as ResourceType] || 0) + dropAmount;
+        }
+      }
+
+      if (obj === 'GRASS_PATCH' && nextState.weather === 'WINDY') {
+        if (Math.random() < 0.25) nextState.energy = Math.min(nextState.maxEnergy, nextState.energy + 1);
+      }
+
+      const dropChance = (nextState.premiumBoosts.lucky_charm && nextState.premiumBoosts.lucky_charm > Date.now()) ? 2 : 1;
+      const rand = Math.random();
+      if (rand < 0.05 * dropChance) { nextState.collections['starfish'] = true; track('collect_item'); }
+      else if (rand < 0.1 * dropChance) { nextState.collections['conch'] = true; track('collect_item'); }
+      if (obj === 'FISH_SPOT' && Math.random() < 0.3 * dropChance) { nextState.collections['pearl'] = true; track('collect_item'); }
+      if (obj === 'CRAB') { nextState.collections['crab_claw'] = true; track('collect_item'); track('kill_crab'); }
 
       if (config.respawn) {
         nextState.respawns.push({ tileId, object: obj, respawnAt: Date.now() + config.respawn });
@@ -735,22 +733,39 @@ export const GameProvider: React.FC<{children: React.ReactNode}> = ({ children }
     }
 
     dispatch({ type: 'INTERACT', tileId, energyCost });
-    
+
+    const TREE_CHOPS: Record<string, number> = {
+      TREE_PALM: 3, TREE_APPLE: 2, TREE_COCONUT: 2, TREE_MANGO: 2,
+    };
+    const isTree = tile.object != null && tile.object in TREE_CHOPS;
+    const treeChopsLeft = isTree ? (tile.treeHp ?? TREE_CHOPS[tile.object!]) : 0;
+
+    // Intermediate tree chop or non-final enemy hit — no rewards yet
+    if (isTree && treeChopsLeft > 1) {
+      const id = Math.random().toString();
+      setFloatingTexts(prev => [...prev, { id, tileId, text: '🪓' }]);
+      setTimeout(() => setFloatingTexts(prev => prev.filter(t => t.id !== id)), 900);
+      return;
+    }
     if ((tile.object === 'CRAB' || tile.object === 'BOAR') && (tile.crabHp || (tile.object === 'CRAB' ? 3 : 2)) > 1) {
-       const id = Math.random().toString();
-       setFloatingTexts(prev => [...prev, { id, tileId, text: `-${energyCost}⚡` }]);
-       setTimeout(() => setFloatingTexts(prev => prev.filter(t => t.id !== id)), 1500);
-       return;
+      const id = Math.random().toString();
+      setFloatingTexts(prev => [...prev, { id, tileId, text: `-${energyCost}⚡` }]);
+      setTimeout(() => setFloatingTexts(prev => prev.filter(t => t.id !== id)), 1500);
+      return;
     }
 
+    // Final harvest — show rewards
     let coinDrop = config.coins || 0;
     if (tile.object === 'FISH_SPOT' && state.weather === 'STORMY') coinDrop *= 2;
 
-    const id = Math.random().toString();
-    setFloatingTexts(prev => [...prev, { id, tileId, text: `+${coinDrop}🪙 +${config.xp || 0}⭐` }]);
-    setTimeout(() => {
-      setFloatingTexts(prev => prev.filter(t => t.id !== id));
-    }, 1500);
+    const rewardParts: string[] = [];
+    if (coinDrop > 0) rewardParts.push(`+${coinDrop}🪙`);
+    if (config.xp) rewardParts.push(`+${config.xp}⭐`);
+    if (rewardParts.length > 0) {
+      const id = Math.random().toString();
+      setFloatingTexts(prev => [...prev, { id, tileId, text: rewardParts.join(' ') }]);
+      setTimeout(() => setFloatingTexts(prev => prev.filter(t => t.id !== id)), 1500);
+    }
   };
 
   const plant = (tileId: string, cropType?: string) => {
