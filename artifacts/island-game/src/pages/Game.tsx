@@ -407,6 +407,12 @@ const GameInner = ({ profile }: { profile: PlayerProfile }) => {
         onOpenCollections={() => setCollectionsOpen(true)}
         onOpenWeather={() => setWeatherOpen(true)}
         playerName={profile.name}
+        questSlot={
+          <QuestNotifier
+            inline
+            onOpenPanel={(qid) => { setSelectedQuestId(qid); setQuestPanelOpen(true); }}
+          />
+        }
       />
       <NeighborPanel
         playerName={profile.name}
@@ -414,7 +420,6 @@ const GameInner = ({ profile }: { profile: PlayerProfile }) => {
         onOpenCollections={() => setCollectionsOpen(true)}
         onOpenQuests={() => { setSelectedQuestId(null); setQuestPanelOpen(true); }}
       />
-      <QuestNotifier onOpenPanel={(qid) => { setSelectedQuestId(qid); setQuestPanelOpen(true); }} />
       {questPanelOpen && <QuestPanel onClose={() => { setQuestPanelOpen(false); setSelectedQuestId(null); }} questId={selectedQuestId} />}
       <CropPicker />
 

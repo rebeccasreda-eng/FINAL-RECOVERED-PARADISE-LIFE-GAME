@@ -311,16 +311,77 @@ const QuestSign = ({ onClick }: { onClick: () => void }) => (
 );
 
 /* ── Main component ─────────────────────────────────────────────────────── */
-export const QuestNotifier = ({ onOpenPanel }: { onOpenPanel: (questId: string) => void }) => {
+export const QuestNotifier = ({
+  onOpenPanel,
+  inline = false,
+}: {
+  onOpenPanel: (questId: string) => void;
+  inline?: boolean;
+}) => {
   const { state, dispatch } = useGame();
 
-  // Active groups: prereqs met AND at least one quest incomplete
   const activeGroups = QUEST_GROUPS.filter(group => {
     if (group.prereqs.some(pid => !state.quests[pid]?.completed)) return false;
     return group.quests.some(qid => !state.quests[qid]?.completed);
   });
 
   if (activeGroups.length === 0) return null;
+
+  const makeGroup = (group: typeof activeGroups[number], inlineMode: boolean) => {
+    const NpcIcon = NPC_MAP[group.npcType] || ParrotNPC;
+    const newSigns = group.quests
+      .map(qid => QUESTS.find(q => q.id === qid))
+      .filter((q): q is NonNullable<typeof q> => !!q && !state.quests[q.id]?.completed && !state.quests[q.id]?.accepted);
+    const hasNew = newSigns.length > 0;
+
+    const btn = (
+      <button
+        key={group.id}
+        data-nodrag
+        onClick={() => {
+          if (hasNew) {
+            dispatch({ type: 'ACCEPT_QUEST', questId: newSigns[0].id });
+            onOpenPanel(newSigns[0].id);
+          } else {
+            const activeId = group.quests
+              .slice()
+              .reverse()
+              .find(qid => state.quests[qid]?.accepted && !state.quests[qid]?.completed);
+            if (activeId) onOpenPanel(activeId);
+          }
+        }}
+        style={{
+          background: 'none', border: 'none', padding: 0, cursor: 'pointer', flexShrink: 0,
+          animation: hasNew ? 'questIconGlow 1.8s ease-in-out infinite' : 'none',
+          filter: hasNew ? undefined : 'drop-shadow(2px 4px 6px rgba(0,0,0,0.4))',
+          /* In inline mode: scale the 46×46 SVG down to fit inside the 24px HUD row */
+          ...(inlineMode ? { zoom: 0.48, lineHeight: 0 } : {}),
+        }}
+      >
+        <NpcIcon />
+      </button>
+    );
+
+    if (inlineMode) return btn; // sign hidden in compact mode; glow signals new quest
+
+    return (
+      <div key={group.id} style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+        {btn}
+        {hasNew && (
+          <div style={{ animation: 'questSignNudge 2.2s ease-in-out infinite', pointerEvents: 'none', userSelect: 'none' }}>
+            <QuestSign onClick={() => {}} />
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  /* Inline mode: compact icons only, no absolute wrapper */
+  if (inline) return (
+    <div style={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+      {activeGroups.map(g => makeGroup(g, true))}
+    </div>
+  );
 
   return (
     <div
@@ -336,58 +397,7 @@ export const QuestNotifier = ({ onOpenPanel }: { onOpenPanel: (questId: string) 
         userSelect: 'none',
       }}
     >
-      {activeGroups.map(group => {
-        const NpcIcon = NPC_MAP[group.npcType] || ParrotNPC;
-
-        const newSigns = group.quests
-          .map(qid => QUESTS.find(q => q.id === qid))
-          .filter((q): q is NonNullable<typeof q> => !!q && !state.quests[q.id]?.completed && !state.quests[q.id]?.accepted);
-
-        return (
-          <div
-            key={group.id}
-            style={{ display: 'flex', alignItems: 'center', gap: 6 }}
-          >
-            {/* NPC icon — the ONLY clickable element */}
-            <button
-              onClick={() => {
-                if (newSigns.length > 0) {
-                  dispatch({ type: 'ACCEPT_QUEST', questId: newSigns[0].id });
-                  onOpenPanel(newSigns[0].id);
-                } else {
-                  const activeId = group.quests
-                    .slice()
-                    .reverse()
-                    .find(qid => state.quests[qid]?.accepted && !state.quests[qid]?.completed);
-                  if (activeId) onOpenPanel(activeId);
-                }
-              }}
-              style={{
-                background: 'none',
-                border: 'none',
-                padding: 0,
-                cursor: 'pointer',
-                flexShrink: 0,
-                animation: newSigns.length > 0
-                  ? 'questIconGlow 1.8s ease-in-out infinite'
-                  : 'none',
-                filter: newSigns.length > 0
-                  ? undefined
-                  : 'drop-shadow(2px 4px 6px rgba(0,0,0,0.4))',
-              }}
-            >
-              <NpcIcon />
-            </button>
-
-            {/* NEW QUEST sign — decorative only, not clickable */}
-            {newSigns.length > 0 && (
-              <div style={{ animation: 'questSignNudge 2.2s ease-in-out infinite', pointerEvents: 'none', userSelect: 'none' }}>
-                <QuestSign onClick={() => {}} />
-              </div>
-            )}
-          </div>
-        );
-      })}
+      {groups}
     </div>
   );
 };
