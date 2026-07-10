@@ -577,28 +577,29 @@ const MarinaCard = () => (
   </div>
 );
 
-/* ─── Inline market grid — 6 icons shown permanently next to Marina ──────── */
+/* ─── Inline market grid — bigger tiles, warm tan background ─────────────── */
 const InlineMarketGrid = ({ onOpenShop, onOpenQuests, onOpenCollections }: {
   onOpenShop: () => void;
   onOpenQuests?: () => void;
   onOpenCollections?: () => void;
 }) => {
   const cell: React.CSSProperties = {
-    width: 34, height: 28,
-    borderRadius: 6,
-    background: 'linear-gradient(180deg, #5a6838 0%, #3e4a24 100%)',
-    border: '1.5px solid #2a3010',
-    borderBottom: '2.5px solid #1a2008',
+    width: 52, height: 44,
+    borderRadius: 8,
+    background: 'linear-gradient(180deg, #c8a870 0%, #9a7840 100%)',
+    border: '2px solid #7a5820',
+    borderBottom: '3px solid #5a3c10',
     display: 'flex', flexDirection: 'column',
     alignItems: 'center', justifyContent: 'center',
-    gap: 1, cursor: 'pointer',
-    boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.15)',
+    gap: 2, cursor: 'pointer',
+    boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.30), 0 2px 4px rgba(0,0,0,0.30)',
     position: 'relative', overflow: 'hidden',
     transition: 'transform 0.08s',
   };
   const lbl: React.CSSProperties = {
-    fontSize: 6, fontWeight: 900, color: '#d8e8a0',
+    fontSize: 7, fontWeight: 900, color: '#3a2008',
     letterSpacing: '0.03em', lineHeight: 1,
+    textShadow: '0 1px 0 rgba(255,255,255,0.4)',
   };
   const tiles = [
     { icon: <IcoCursor />,     label: 'SELECT', cb: () => {} },
@@ -611,28 +612,28 @@ const InlineMarketGrid = ({ onOpenShop, onOpenQuests, onOpenCollections }: {
   return (
     <div style={{
       flexShrink: 0,
-      background: 'linear-gradient(180deg, #3a4220 0%, #262e14 100%)',
-      border: '2px solid #1a2008',
-      borderRadius: 8,
-      padding: '3px 4px',
+      background: 'linear-gradient(180deg, #b89050 0%, #8a6830 100%)',
+      border: '2px solid #5a3c10',
+      borderRadius: 10,
+      padding: '4px 5px',
       display: 'grid',
-      gridTemplateColumns: 'repeat(3, 34px)',
-      gridTemplateRows: 'repeat(2, 28px)',
-      gap: 3,
+      gridTemplateColumns: 'repeat(3, 52px)',
+      gridTemplateRows: 'repeat(2, 44px)',
+      gap: 4,
       alignSelf: 'center',
-      boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.08)',
+      boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.15), 0 2px 8px rgba(0,0,0,0.4)',
     }}>
       {tiles.map(({ icon, label, cb }) => (
         <button
           key={label}
           onClick={cb}
           style={cell}
-          onMouseEnter={e => (e.currentTarget.style.transform = 'scale(0.93)')}
+          onMouseEnter={e => (e.currentTarget.style.transform = 'scale(0.94)')}
           onMouseLeave={e => (e.currentTarget.style.transform = 'scale(1)')}
           title={label}
         >
-          <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '40%', background: 'linear-gradient(180deg, rgba(255,255,255,0.13), transparent)', borderRadius: '4px 4px 0 0', pointerEvents: 'none' }}/>
-          <div style={{ transform: 'scale(0.7)', transformOrigin: 'center' }}>{icon}</div>
+          <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '40%', background: 'linear-gradient(180deg, rgba(255,255,255,0.28), transparent)', borderRadius: '6px 6px 0 0', pointerEvents: 'none' }}/>
+          {icon}
           <span style={lbl}>{label}</span>
         </button>
       ))}
@@ -779,6 +780,13 @@ export const NeighborPanel = ({
             {/* PLAYER / MARKET / MARINA tabs */}
             <QuickTabBtn label="PLAYER" emoji="🧑" active={quickTab === 'player'} onClick={() => toggleTab('player')} />
             <QuickTabBtn label="MARINA" emoji="⚓" active={quickTab === 'marina'} onClick={() => toggleTab('marina')} />
+
+            {/* Right-pointing arrows after MARINA */}
+            <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 3, flexShrink: 0 }}>
+              <NavArrowBtn symbol="▶" title="Next" />
+              <NavArrowBtn symbol="▶" title="Next" />
+              <NavArrowBtn symbol="▶" title="Next" />
+            </div>
           </div>
         </div>
 
