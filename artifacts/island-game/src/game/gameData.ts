@@ -1,4 +1,4 @@
- import { QuestDef, TileData, TileType, ObjectType, WeatherType } from './types';
+  import { QuestDef, TileData, TileType, ObjectType, WeatherType } from './types';
 
 export const DEV_SPEEDUP = 100;
 export const SCALED = (ms: number) => Math.max(1000, ms / DEV_SPEEDUP); // Don't go below 1 second to avoid missing ticks
@@ -333,7 +333,19 @@ export function generateIsland(): Record<string, TileData> {
   const inner = emptyGrass.filter(t => forestFactor(t.x, t.y) < 0.40);
   const outer = emptyGrass.filter(t => forestFactor(t.x, t.y) >= 0.40);
 
-  for (let i = 0; i < 3 && inner.length; i++) pick(inner).object = 'GARDEN_PATCH';
+  // GARDEN_PATCH only near mango (yellow fruit) trees
+  const mangoTiles = Object.values(tiles).filter(t =>
+    t.object === 'TREE_MANGO' || t.object === 'TREE_MANGO_UNRIPE'
+  );
+  const nearMango = inner.filter(t =>
+    mangoTiles.some(m => Math.abs(m.x - t.x) + Math.abs(m.y - t.y) <= 3)
+  );
+  for (let i = 0; i < 5 && nearMango.length; i++) {
+    const tile = pick(nearMango);
+    tile.object = 'GARDEN_PATCH';
+    const idx = inner.indexOf(tile);
+    if (idx >= 0) inner.splice(idx, 1);
+  }
   for (let i = 0; i < 3 && inner.length; i++) pick(inner).object = 'CROP_PLOT';
   for (let i = 0; i < 5  && outer.length; i++) pick(outer).object = 'GRASS_PATCH';
   // Overgrown weed clumps — kept sparse so the island feels tidier
