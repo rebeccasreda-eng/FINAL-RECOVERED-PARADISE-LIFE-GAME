@@ -232,12 +232,12 @@ const NeighborCard = ({
   </div>
 );
 
-/* ─── Add-neighbor card ─────────────────────────────────────────────────── */
+/* ─── Add-neighbor card — flex-fill so 5 cards span the available width ── */
 const AddNeighborCard = () => (
   <div
     className="active:scale-95 transition-transform"
     style={{
-      width: 76, flexShrink: 0, height: '100%',
+      flex: 1, minWidth: 0, height: '100%',
       border: '2px solid #3a8a0e',
       borderBottom: '3px solid #246004',
       borderRadius: 8,
@@ -247,18 +247,77 @@ const AddNeighborCard = () => (
       position: 'relative',
     }}
   >
-    {/* Top label */}
     <div style={{
       background: 'linear-gradient(180deg, #2a6008 0%, #1a4004 100%)',
       padding: '2px 2px', textAlign: 'center',
       fontSize: 8, fontWeight: 900, color: '#c8f060', letterSpacing: '0.07em',
       flexShrink: 0, lineHeight: '13px',
     }}>ADD NEIGHBOR</div>
-    {/* Illustration */}
     <div style={{ flex: 1, position: 'relative', overflow: 'hidden' }}>
       <AddNeighborIllus />
     </div>
   </div>
+);
+
+/* ─── Player card — player's own island ─────────────────────────────────── */
+const PlayerCard = ({ name, level }: { name: string; level: number }) => (
+  <div
+    className="active:scale-95 transition-transform"
+    style={{
+      width: 76, flexShrink: 0, height: '100%',
+      border: '2px solid #c8880a',
+      borderBottom: '3px solid #8a5004',
+      borderRadius: 8,
+      background: 'linear-gradient(180deg, #f5dea0 0%, #d4b060 100%)',
+      display: 'flex', flexDirection: 'column', overflow: 'hidden', cursor: 'pointer',
+      boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.35), 0 2px 6px rgba(0,0,0,0.35)',
+    }}
+  >
+    <div style={{
+      background: 'linear-gradient(180deg, #3e2008 0%, #2a1404 100%)',
+      padding: '2px 4px', textAlign: 'center',
+      fontSize: 8, fontWeight: 900, color: '#f5e0a0', letterSpacing: '0.06em',
+      flexShrink: 0, lineHeight: '13px',
+    }}>MY ISLAND</div>
+    <div style={{ flex: 1, position: 'relative', overflow: 'hidden' }}>
+      <MarinaIllus />
+    </div>
+    <div style={{
+      display: 'flex', justifyContent: 'center', alignItems: 'center',
+      padding: '2px 0', background: 'rgba(0,0,0,0.28)', flexShrink: 0,
+      fontSize: 8, color: '#f5e0a0', fontWeight: 900, gap: 3,
+    }}>
+      <span>{name}</span>
+      <span style={{ color: '#c8a060' }}>Lv{level}</span>
+    </div>
+  </div>
+);
+
+/* ─── Market card — shop shortcut in the neighbor strip ─────────────────── */
+const MarketCard = ({ onClick }: { onClick: () => void }) => (
+  <button
+    onClick={onClick}
+    className="active:scale-95 transition-transform"
+    style={{
+      width: 76, flexShrink: 0, height: '100%',
+      border: '2px solid #186010',
+      borderBottom: '3px solid #0e4008',
+      borderRadius: 8,
+      background: 'linear-gradient(180deg, #70d850 0%, #38a018 100%)',
+      display: 'flex', flexDirection: 'column', overflow: 'hidden', cursor: 'pointer',
+      boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.35), 0 2px 6px rgba(0,0,0,0.35)',
+    }}
+  >
+    <div style={{
+      background: 'linear-gradient(180deg, #0e4008 0%, #083004 100%)',
+      padding: '2px 4px', textAlign: 'center',
+      fontSize: 8, fontWeight: 900, color: '#80f040', letterSpacing: '0.07em',
+      flexShrink: 0, lineHeight: '13px',
+    }}>MARKET</div>
+    <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 26 }}>
+      🛒
+    </div>
+  </button>
 );
 
 /* ─── Market / shop button ──────────────────────────────────────────────── */
@@ -306,17 +365,8 @@ export const NeighborPanel = ({
     setShopOpen,
   } = useGame();
 
-  const [scrollIdx, setScrollIdx] = useState(0);
-
   const BUILDABLES: ResourceType[] = ['HUT','DOCK','WELL','FLOWER_POT','FENCE','LANTERN'];
   const ownedStructures = BUILDABLES.filter(s => (state.inventory[s] ?? 0) > 0);
-
-  const totalCards = EMPTY_SLOTS + 1; // 5 empty + Marina
-  const visibleCards = 4; // at most 4 visible before scrolling
-  const maxScroll = Math.max(0, totalCards - visibleCards);
-
-  const scroll = (dir: -1 | 1) =>
-    setScrollIdx(i => Math.max(0, Math.min(maxScroll, i + dir)));
 
   return (
     <div
@@ -338,9 +388,9 @@ export const NeighborPanel = ({
           borderTop: '2px solid #5a3a10',
         }}
       >
-        {/* ── Header + neighbor cards (flex column) ─────────────────────── */}
+        {/* ── Neighbor strip (flex-1) ────────────────────────────────────── */}
         <div className="flex flex-col flex-1 min-w-0">
-          {/* Header strip — "Player's Island" */}
+          {/* Header */}
           <div
             style={{
               height: 20, flexShrink: 0,
@@ -350,54 +400,45 @@ export const NeighborPanel = ({
               padding: '0 6px', gap: 5,
             }}
           >
-            <span style={{ fontSize: 12 }}>🏠</span>
+            <span style={{ fontSize: 12 }}>🏝️</span>
             <span style={{ color: '#f5e0a0', fontSize: 11, fontWeight: 900, letterSpacing: '0.06em', textShadow: '0 1px 3px rgba(0,0,0,0.7)' }}>
-              {playerName}&apos;s Island
-            </span>
-            <div style={{ flexGrow: 1 }}/>
-            <span style={{ color: '#c8a060', fontSize: 9, fontWeight: 700, letterSpacing: '0.04em', textShadow: '0 1px 2px rgba(0,0,0,0.5)' }}>
-              Lv {playerLevel}
+              NEIGHBORS
             </span>
           </div>
 
-          {/* Neighbor cards row */}
-          <div className="flex flex-1 min-h-0" style={{ padding: '4px 0 4px 4px', gap: 4, alignItems: 'stretch' }}>
-            <ArrowBtn dir="◀" onClick={() => scroll(-1)} />
+          {/* Card row: Player | gap | Market | divider | 5×AddNeighbor */}
+          <div className="flex flex-1 min-h-0" style={{ padding: '4px', gap: 4, alignItems: 'stretch' }}>
+            {/* Player's own island card */}
+            <PlayerCard name={playerName} level={playerLevel} />
 
-            {/* Scrollable card strip */}
-            <div className="flex flex-1 min-w-0" style={{ gap: 4, overflow: 'hidden', alignItems: 'stretch' }}>
-              {/* Render cards offset by scrollIdx */}
-              {Array.from({ length: EMPTY_SLOTS }, (_, i) => i)
-                .concat([-1]) // -1 = Marina slot
-                .slice(scrollIdx, scrollIdx + visibleCards)
-                .map((slot) =>
-                  slot === -1 ? (
-                    <NeighborCard key="marina" name="Marina" illus={<MarinaIllus />} hearts={1} stars={5} />
-                  ) : (
-                    <AddNeighborCard key={slot} />
-                  )
-                )}
-            </div>
+            {/* Gap spacer */}
+            <div style={{ width: 10, flexShrink: 0 }} />
 
-            <ArrowBtn dir="▶" onClick={() => scroll(1)} />
+            {/* Market shortcut card */}
+            <MarketCard onClick={() => setShopOpen(true)} />
+
+            {/* Thin divider */}
+            <div style={{ width: 2, background: 'rgba(0,0,0,0.28)', borderRadius: 1, flexShrink: 0, margin: '2px 4px' }} />
+
+            {/* 5 Add-Neighbor cards — flex-fill so they share remaining width equally */}
+            {Array.from({ length: 5 }, (_, i) => <AddNeighborCard key={i} />)}
           </div>
         </div>
 
         {/* ── Separator ──────────────────────────────────────────────────── */}
         <div style={{ width: 2, background: 'rgba(0,0,0,0.30)', alignSelf: 'stretch', margin: '4px 0' }}/>
 
-        {/* ── Right dock ─────────────────────────────────────────────────── */}
+        {/* ── Right dock — tool tiles only ───────────────────────────────── */}
         <div
           style={{
-            width: 176, flexShrink: 0,
+            width: 210, flexShrink: 0,
             background: 'linear-gradient(180deg, #7a5c30 0%, #4a3010 100%)',
             borderLeft: '2px solid #3a2008',
-            display: 'flex', flexDirection: 'column',
-            padding: '5px 6px', gap: 5,
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            padding: '0 8px',
           }}
         >
-          {/* Tool row */}
-          <div style={{ display: 'flex', gap: 4, justifyContent: 'center' }}>
+          <div style={{ display: 'flex', gap: 5 }}>
             <ToolTile
               onClick={() => setActiveTool('clear')}
               active={activeTool === 'clear'}
@@ -435,9 +476,6 @@ export const NeighborPanel = ({
               label="Collections"
             ><IcoCollect /></ToolTile>
           </div>
-
-          {/* Market button */}
-          <MarketBtn onClick={() => setShopOpen(true)} />
         </div>
       </div>
 
