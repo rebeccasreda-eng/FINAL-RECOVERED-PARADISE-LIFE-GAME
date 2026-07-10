@@ -585,9 +585,6 @@ const ObjectSVG: React.FC<{ object: string; tileX: number; tileY: number; tileTy
         <path d="M43,37 L46,43" stroke="#1e6812" strokeWidth="1.4" fill="none" strokeLinecap="round" opacity="0.7"/>
         <path d="M50,22 L57,18" stroke="#3aaa20" strokeWidth="1.2" fill="none" strokeLinecap="round" opacity="0.65"/>
 
-        {/* ── CROWN CENTRE dark core ── */}
-        <circle cx="36" cy="54" r="11" fill="#040f02" opacity="0.65"/>
-        <circle cx="36" cy="52" r="7"  fill="#0a2a06" opacity="0.8"/>
         {/* ── Unripe coconuts — small green spheres ── */}
         <circle cx="25" cy="62" r="5.5" fill={`url(#${g('conut')})`}/>
         <circle cx="42" cy="63" r="5"   fill={`url(#${g('conut')})`}/>
@@ -684,10 +681,6 @@ const ObjectSVG: React.FC<{ object: string; tileX: number; tileY: number; tileTy
         <path d="M43,37 L49,32" stroke="#3aaa20" strokeWidth="1.4" fill="none" strokeLinecap="round" opacity="0.7"/>
         <path d="M43,37 L46,43" stroke="#1e6812" strokeWidth="1.4" fill="none" strokeLinecap="round" opacity="0.7"/>
         <path d="M50,22 L57,18" stroke="#3aaa20" strokeWidth="1.2" fill="none" strokeLinecap="round" opacity="0.65"/>
-
-        {/* ── CROWN CENTRE dark core ── */}
-        <circle cx="36" cy="54" r="11" fill="#040f02" opacity="0.65"/>
-        <circle cx="36" cy="52" r="7"  fill="#0a2a06" opacity="0.8"/>
 
         {/* ── Coconuts — proper 3D spheres ── */}
         <circle cx="25" cy="62" r="7"   fill={`url(#${g('conut')})`}/>
