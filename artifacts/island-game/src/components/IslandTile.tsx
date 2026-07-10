@@ -59,8 +59,6 @@ const ObjectSVG: React.FC<{ object: string; tileX: number; tileY: number; tileTy
             <stop offset="100%" stopColor="#1e7414"/>
           </radialGradient>
         </defs>
-        {/* Soft ground blend — no hard shadow */}
-        <ellipse cx="30" cy="89" rx="13" ry="3.5" fill="rgba(120,90,40,0.28)"/>
         {/* Trunk — single clean path, no dark overlay */}
         <path d="M19,89 Q23,72 27,52 L33,52 Q37,72 41,89Z" fill={`url(#${g('plt')})`}/>
         {/* Left highlight stripe */}
@@ -143,8 +141,6 @@ const ObjectSVG: React.FC<{ object: string; tileX: number; tileY: number; tileTy
         {[63,72,81].map(y => (
           <path key={y} d={`M27,${y} Q31,${y-1} 35,${y}`} stroke="rgba(0,0,0,0.16)" strokeWidth="1.3" fill="none" strokeLinecap="round"/>
         ))}
-        {/* Soft ground blend */}
-        <ellipse cx="31" cy="87" rx="12" ry="3.5" fill="rgba(130,100,50,0.30)"/>
         {/* Canopy depth base */}
         <circle cx="31" cy="36" r="27" fill="#186010" opacity="0.65"/>
         {/* Lower side clusters — fluffy edge */}
@@ -195,8 +191,6 @@ const ObjectSVG: React.FC<{ object: string; tileX: number; tileY: number; tileTy
             <stop offset="100%" stopColor="#525248"/>
           </radialGradient>
         </defs>
-        {/* Ground shadow */}
-        <ellipse cx="26" cy="34" rx="26" ry="4.5" fill="rgba(0,0,0,0.22)"/>
         {/* Small back rock */}
         <ellipse cx="44" cy="22" rx="11" ry="6"   fill={`url(#${g('rks')})`}/>
         <ellipse cx="40" cy="19" rx="4"  ry="1.8" fill="rgba(255,255,255,0.26)" transform="rotate(-10 40 19)"/>
@@ -218,8 +212,6 @@ const ObjectSVG: React.FC<{ object: string; tileX: number; tileY: number; tileTy
       const lean = sv === 0 ? -1.5 : sv === 1 ? 1.5 : 0;
       return (
         <svg viewBox="0 0 34 60" width="32" height="56" style={{ display:'block' }}>
-          {/* Ground shadow */}
-          <ellipse cx="17" cy="59" rx="9" ry="2.5" fill="rgba(0,0,0,0.18)"/>
           {/* Stem — slightly leaning per variant */}
           <path d={`M17,58 Q${16+lean},44 ${17+lean},30 Q${18+lean},20 ${17+lean},10`}
             stroke="#4a9c1c" strokeWidth="3.5" fill="none" strokeLinecap="round"/>
@@ -281,8 +273,6 @@ const ObjectSVG: React.FC<{ object: string; tileX: number; tileY: number; tileTy
       const pdgId = g('pdg');
       return (
         <svg viewBox="0 0 52 26" width="50" height="24" style={{ display:'block' }}>
-          {/* Ground shadow — slightly offset below */}
-          <ellipse cx={cx} cy={cy + 2} rx={W + 2} ry={H + 1} fill="rgba(0,0,0,0.15)"/>
           {/* Water body */}
           <ellipse cx={cx} cy={cy} rx={W} ry={H} fill="#2ab0d8"/>
           {/* Depth gradient — darker edges */}
@@ -424,8 +414,6 @@ const ObjectSVG: React.FC<{ object: string; tileX: number; tileY: number; tileTy
             <stop offset="100%" stopColor="#6a4020"/>
           </radialGradient>
         </defs>
-        {/* Ground shadow */}
-        <ellipse cx="27" cy="29" rx="23" ry="4" fill="rgba(0,0,0,0.23)"/>
         {/* Left end-cap */}
         <ellipse cx="6.5" cy="15" rx="5.5" ry="10" fill="#8a6030"/>
         {/* Log body */}
@@ -540,8 +528,7 @@ const ObjectSVG: React.FC<{ object: string; tileX: number; tileY: number; tileTy
         ))}
         <ellipse cx="29" cy="82" rx="3.2" ry="1.8" fill="rgba(0,0,0,0.16)" transform="rotate(-8 29 82)"/>
         <ellipse cx="41" cy="94" rx="2.8" ry="1.6" fill="rgba(0,0,0,0.13)" transform="rotate(7 41 94)"/>
-        {/* ── CANOPY SHADOW BASE ── */}
-        <ellipse cx="36" cy="58" rx="33" ry="22" fill="#061a03" opacity="0.55"/>
+
 
         {/* ── BACK LAYER — darkest, drooping wide fronds ── */}
         <path d="M36,52 Q12,58 0,80 Q24,74 36,52Z" fill="#0a3506"/>
@@ -620,9 +607,6 @@ const ObjectSVG: React.FC<{ object: string; tileX: number; tileY: number; tileTy
           </radialGradient>
         </defs>
 
-        {/* Ground shadow */}
-        <ellipse cx="36" cy="110" rx="17" ry="4.5" fill="rgba(60,40,10,0.32)"/>
-
         {/* Trunk — tapered path with cylindrical shading */}
         <path d="M22,108 Q26,84 30,62 L40,62 Q44,84 48,108Z" fill={`url(#${g('cot')})`}/>
         {/* Left specular streak */}
@@ -637,8 +621,7 @@ const ObjectSVG: React.FC<{ object: string; tileX: number; tileY: number; tileTy
         <ellipse cx="29" cy="82" rx="3.2" ry="1.8" fill="rgba(0,0,0,0.16)" transform="rotate(-8 29 82)"/>
         <ellipse cx="41" cy="94" rx="2.8" ry="1.6" fill="rgba(0,0,0,0.13)" transform="rotate(7 41 94)"/>
 
-        {/* ── CANOPY SHADOW BASE ── */}
-        <ellipse cx="36" cy="58" rx="33" ry="22" fill="#061a03" opacity="0.55"/>
+
 
         {/* ── BACK LAYER — darkest, drooping wide fronds ── */}
         <path d="M36,52 Q12,58 0,80 Q24,74 36,52Z" fill="#0a3506"/>
@@ -790,9 +773,6 @@ const ObjectSVG: React.FC<{ object: string; tileX: number; tileY: number; tileTy
           </radialGradient>
         </defs>
 
-        {/* Ground shadow */}
-        <ellipse cx="38" cy="93" rx="18" ry="5" fill="rgba(80,50,10,0.32)"/>
-
         {/* Trunk — tapered, cylindrical */}
         <path d="M30,91 Q32,72 33,56 L41,56 Q42,72 44,91Z" fill={`url(#${g('mgt')})`}/>
         {/* Left specular */}
@@ -805,8 +785,6 @@ const ObjectSVG: React.FC<{ object: string; tileX: number; tileY: number; tileTy
         ))}
 
         {/* ── Canopy — layered for deep 3D volume ── */}
-        {/* AO shadow base — widest, darkest */}
-        <ellipse cx="38" cy="40" rx="36" ry="29" fill="#0c4006" opacity="0.70"/>
         {/* Lower side blobs */}
         <circle cx="6"  cy="50" r="22" fill="#164e0c"/>
         <circle cx="70" cy="50" r="22" fill="#1a560e"/>
@@ -1506,9 +1484,6 @@ const ObjectSVG: React.FC<{ object: string; tileX: number; tileY: number; tileTy
             </linearGradient>
           </defs>
 
-          {/* Ground shadow */}
-          <ellipse cx="49" cy="86" rx="44" ry="5" fill="rgba(0,0,0,0.20)"/>
-
           {/* ── Water ── */}
           <rect x="2" y="68" width="94" height="18" rx="3" fill="#1ab4e8"/>
           <path d="M4,73 Q14,70 26,73 Q38,76 50,73 Q62,70 74,73 Q86,76 94,73"
@@ -1635,9 +1610,6 @@ const ObjectSVG: React.FC<{ object: string; tileX: number; tileY: number; tileTy
               <stop offset="100%" stopColor="rgba(0,0,0,0.00)"/>
             </linearGradient>
           </defs>
-
-          {/* Ground shadow */}
-          <ellipse cx="28" cy="67" rx="18" ry="4" fill="rgba(0,0,0,0.24)"/>
 
           {/* Back grass blades */}
           <path d={trb(14, 64, 38, -3)} stroke={tgDark} strokeWidth="3.2" fill="none" strokeLinecap="round"/>
@@ -2140,6 +2112,32 @@ export const IslandTile: React.FC<IslandTileProps> = ({
           stroke="none"
         />
 
+        {/* ── Water wave curves — bezier ripples across the tile diamond ── */}
+        {isWater && (() => {
+          const wid = `wv-${tile.x}-${tile.y}`;
+          const yo  = (tile.x * 3 + tile.y * 7) % 3 - 1; // -1 | 0 | +1
+          return (
+            <>
+              <defs>
+                <clipPath id={wid}>
+                  <polygon points="40,-1 81,14 40,29 -1,14"/>
+                </clipPath>
+              </defs>
+              <g clipPath={`url(#${wid})`}>
+                <path
+                  d={`M-1,${6+yo} Q10,${3+yo} 20,${6+yo} Q30,${9+yo} 40,${6+yo} Q50,${3+yo} 61,${6+yo} Q71,${9+yo} 81,${6+yo}`}
+                  stroke="rgba(255,255,255,0.22)" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
+                <path
+                  d={`M-1,${13+yo} Q10,${10+yo} 20,${13+yo} Q31,${16+yo} 41,${13+yo} Q52,${10+yo} 62,${13+yo} Q71,${16+yo} 81,${13+yo}`}
+                  stroke="rgba(255,255,255,0.16)" strokeWidth="1.1" fill="none" strokeLinecap="round"/>
+                <path
+                  d={`M-1,${20+yo} Q11,${17+yo} 21,${20+yo} Q32,${23+yo} 41,${20+yo} Q51,${17+yo} 62,${20+yo} Q71,${23+yo} 81,${20+yo}`}
+                  stroke="rgba(255,255,255,0.11)" strokeWidth="0.9" fill="none" strokeLinecap="round"/>
+              </g>
+            </>
+          );
+        })()}
+
         {/* ── Shore scatter: sandy blobs on water tiles adjacent to land ── */}
         {isShore && shoreScatter(tile.x, tile.y, shN, shE, shS, shW)}
 
@@ -2307,7 +2305,6 @@ export const IslandTile: React.FC<IslandTileProps> = ({
           {/* Inner div: sway animation only — transformOrigin at the base of the tree */}
           <div
             style={{
-              filter: 'drop-shadow(0 3px 5px rgba(0,0,0,0.38))',
               animation: undefined,
               transformOrigin: 'bottom center',
             }}
@@ -2333,7 +2330,6 @@ export const IslandTile: React.FC<IslandTileProps> = ({
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            boxShadow: '0 2px 8px rgba(0,0,0,0.38)',
             border: '2.5px solid #c08840',
             animation: 'axe-pop 0.14s ease-out',
             zIndex: tileZIndex + 10,
@@ -2365,9 +2361,7 @@ export const IslandTile: React.FC<IslandTileProps> = ({
             style={{
               fontSize: 28,
               lineHeight: 1,
-              filter: tile.object === 'CROP_WILTED'
-                ? 'grayscale(80%) sepia(40%)'
-                : 'drop-shadow(0 3px 4px rgba(0,0,0,0.35))',
+              filter: tile.object === 'CROP_WILTED' ? 'grayscale(80%) sepia(40%)' : undefined,
             }}
           >
             {emoji}
