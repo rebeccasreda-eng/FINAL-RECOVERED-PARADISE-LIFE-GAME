@@ -481,6 +481,7 @@ export const IslandTile: React.FC<IslandTileProps> = ({
 
       {/* ── SVG art object (trees, rocks, flowers, driftwood) ── */}
       {hasSvg && tile.object && (
+        // Outer div: positioning only (translate must not be overridden by sway animation)
         <div
           style={{
             position: 'absolute',
@@ -489,12 +490,18 @@ export const IslandTile: React.FC<IslandTileProps> = ({
             transform: 'translate(-50%, -100%)',
             pointerEvents: 'none',
             userSelect: 'none',
-            filter: 'drop-shadow(0 3px 5px rgba(0,0,0,0.38))',
-            animation: doSway ? 'treeSway 2.8s ease-in-out infinite alternate' : undefined,
-            transformOrigin: 'bottom center',
           }}
         >
-          <ObjectSVG object={tile.object} tileX={tile.x} tileY={tile.y}/>
+          {/* Inner div: sway animation only — transformOrigin at the base of the tree */}
+          <div
+            style={{
+              filter: 'drop-shadow(0 3px 5px rgba(0,0,0,0.38))',
+              animation: doSway ? 'treeSway 2.8s ease-in-out infinite alternate' : undefined,
+              transformOrigin: 'bottom center',
+            }}
+          >
+            <ObjectSVG object={tile.object} tileX={tile.x} tileY={tile.y}/>
+          </div>
         </div>
       )}
 
