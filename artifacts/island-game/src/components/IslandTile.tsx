@@ -34,8 +34,9 @@ function darkenHex(hex: string, amount = 22): string {
 }
 
 /* ── SVG art for natural objects — 3-D chibi style ──────────────────────── */
-const PETAL_COLORS  = ['#e8628a', '#f5a020', '#8a5ad4', '#f5e018', '#f02828'] as const;
-const PETAL_DARKS   = ['#b03460', '#c07010', '#5a2aa4', '#c8a800', '#b01010'] as const;
+const PETAL_COLORS  = ['#e03818', '#e8628a', '#f59420', '#f0e018', '#c040d0'] as const;
+const PETAL_DARKS   = ['#981408', '#b03060', '#c06810', '#c8a400', '#8020a0'] as const;
+const FLOWER_ANGS   = [0, 72, 144, 216, 288] as const;
 
 const ObjectSVG: React.FC<{ object: string; tileX: number; tileY: number }> = ({ object, tileX: tx, tileY: ty }) => {
   // Build a unique gradient-ID prefix per tile to avoid SVG id collisions
@@ -332,46 +333,57 @@ const ObjectSVG: React.FC<{ object: string; tileX: number; tileY: number }> = ({
 
     /* ── FLOWER BUSH ───────────────────────────────────────────────────── */
     case 'FLOWER_BUSH': {
-      const pi   = (tx * 7 + ty * 13) % 5;
+      const pi    = (tx * 7 + ty * 13) % 5;
       const petal = PETAL_COLORS[pi];
       const dark  = PETAL_DARKS[pi];
       const pid   = g('flp');
+      // Render one bloom: 5 rounded petals fanning from (bx, by)
+      const Bloom = (bx: number, by: number, d: number, rw: number, rh: number, op: number, ctr: number) => (
+        <g opacity={op}>
+          {FLOWER_ANGS.map(a => (
+            <ellipse key={a} cx={bx} cy={by - d} rx={rw} ry={rh}
+              fill={`url(#${pid})`} transform={`rotate(${a} ${bx} ${by})`}/>
+          ))}
+          {/* Petal vein lines */}
+          {FLOWER_ANGS.map(a => {
+            const rad = (a * Math.PI) / 180;
+            const vx  = bx + Math.sin(rad) * (d + rh * 0.55);
+            const vy  = by - Math.cos(rad) * (d + rh * 0.55);
+            return <line key={a} x1={bx} y1={by} x2={vx} y2={vy}
+              stroke={dark} strokeWidth="0.7" opacity="0.45"/>;
+          })}
+          {/* Seed centre */}
+          <circle cx={bx} cy={by} r={ctr + 0.8} fill="#1e0a04"/>
+          <circle cx={bx} cy={by} r={ctr}        fill="#3a1408"/>
+          <circle cx={bx - ctr * 0.4} cy={by - ctr * 0.4} r={ctr * 0.45}
+            fill="rgba(255,140,60,0.60)"/>
+        </g>
+      );
       return (
-        <svg viewBox="0 0 38 38" width="36" height="36" style={{ display:'block' }}>
+        <svg viewBox="0 0 44 52" width="42" height="50" style={{ display:'block' }}>
           <defs>
-            <radialGradient id={pid} cx="36%" cy="30%" r="68%">
+            <radialGradient id={pid} cx="38%" cy="28%" r="70%">
               <stop offset="0%"   stopColor={petal}/>
+              <stop offset="65%"  stopColor={petal} stopOpacity="0.85"/>
               <stop offset="100%" stopColor={dark}/>
             </radialGradient>
           </defs>
           {/* Shadow */}
-          <ellipse cx="19" cy="36" rx="13" ry="4" fill="rgba(0,0,0,0.22)"/>
+          <ellipse cx="22" cy="51" rx="16" ry="4" fill="rgba(0,0,0,0.22)"/>
           {/* Leaf base */}
-          <ellipse cx="19" cy="30" rx="13" ry="5.5" fill="#246a18"/>
-          <ellipse cx="11" cy="27" rx="8"  ry="4.5" fill="#2e8020" transform="rotate(-18 11 27)"/>
-          <ellipse cx="27" cy="27" rx="8"  ry="4.5" fill="#2e8020" transform="rotate(18 27 27)"/>
-          {/* Leaf highlight */}
-          <ellipse cx="12" cy="25.5" rx="3.5" ry="1.5" fill="rgba(255,255,255,0.22)" transform="rotate(-18 12 25.5)"/>
-          {/* Back flowers */}
-          <circle cx="10" cy="19" r="5.2" fill={`url(#${pid})`} opacity="0.9"/>
-          <circle cx="28" cy="18" r="5.2" fill={`url(#${pid})`} opacity="0.9"/>
-          {/* Front flowers */}
-          <circle cx="19" cy="13" r="5.8" fill={`url(#${pid})`}/>
-          <circle cx="10" cy="11" r="4.8" fill={`url(#${pid})`}/>
-          <circle cx="28" cy="11" r="4.8" fill={`url(#${pid})`}/>
-          {/* Centers */}
-          <circle cx="10" cy="19" r="2.3" fill="#f8e030"/>
-          <circle cx="28" cy="18" r="2.3" fill="#f8e030"/>
-          <circle cx="19" cy="13" r="2.6" fill="#f8e838"/>
-          <circle cx="10" cy="11" r="2.1" fill="#f8e030"/>
-          <circle cx="28" cy="11" r="2.1" fill="#f8e030"/>
-          {/* Center shine */}
-          <circle cx="9.3"  cy="18.3" r="1"   fill="rgba(255,255,255,0.65)"/>
-          <circle cx="27.3" cy="17.3" r="1"   fill="rgba(255,255,255,0.65)"/>
-          <circle cx="18.3" cy="12.3" r="1.1" fill="rgba(255,255,255,0.65)"/>
-          {/* Petal highlights */}
-          <circle cx="8.5"  cy="17"   r="2"   fill="rgba(255,255,255,0.30)"/>
-          <circle cx="17.5" cy="11"   r="2.2" fill="rgba(255,255,255,0.30)"/>
+          <ellipse cx="22" cy="44" rx="16" ry="6.5" fill="#246a18"/>
+          <ellipse cx="11" cy="41" rx="11" ry="5.5" fill="#2e8020" transform="rotate(-20 11 41)"/>
+          <ellipse cx="33" cy="40" rx="11" ry="5.5" fill="#2e8020" transform="rotate(20 33 40)"/>
+          <ellipse cx="22" cy="40" rx="7"  ry="3"   fill="#38a028"/>
+          {/* Leaf veins */}
+          <path d="M11,45 Q8,40 10,35" stroke="#1e6012" strokeWidth="0.9" fill="none" opacity="0.6"/>
+          <path d="M33,44 Q36,39 34,34" stroke="#1e6012" strokeWidth="0.9" fill="none" opacity="0.6"/>
+          {/* ── Back-left bloom (smaller) ── */}
+          {Bloom(12, 33, 6, 4.2, 7.5, 0.90, 3.2)}
+          {/* ── Back-right bloom (smaller) ── */}
+          {Bloom(32, 30, 6, 4.2, 7.5, 0.90, 3.2)}
+          {/* ── Front-centre bloom (main, larger) ── */}
+          {Bloom(22, 18, 8.5, 5.8, 10, 1.0, 4.5)}
         </svg>
       );
     }
