@@ -137,6 +137,9 @@ export const OBJECT_CONFIG: Record<string, any> = {
   ROCK: { action: 'Mine', energy: 1, coins: 8, xp: 15, drops: { stone: 1 }, respawn: SCALED(90000) },
   FLOWER_BUSH: { action: 'Harvest', energy: 1, coins: 3, xp: 8, respawn: SCALED(45000) },
   SUNFLOWER:   { action: 'Harvest', energy: 1, coins: 6, xp: 12, respawn: SCALED(90000) },
+  BLUEBELL:    { action: 'Harvest', energy: 1, coins: 4, xp: 8,  respawn: SCALED(60000) },
+  PANSY:       { action: 'Harvest', energy: 1, coins: 4, xp: 8,  respawn: SCALED(60000) },
+  TULIP:       { action: 'Harvest', energy: 1, coins: 5, xp: 10, respawn: SCALED(70000) },
   DRIFTWOOD: { action: 'Clear', energy: 1, coins: 3, xp: 5, drops: { wood: 1 }, respawn: SCALED(80000) },
   TREE_COCONUT: { action: 'Harvest', energy: 1, coins: 6, xp: 12, drops: { food: 2 }, respawn: SCALED(70000) },
   TREE_MANGO: { action: 'Harvest', energy: 1, coins: 8, xp: 14, drops: { food: 3 }, respawn: SCALED(80000) },
@@ -150,6 +153,7 @@ export const OBJECT_CONFIG: Record<string, any> = {
 
 export const EMOJI_MAP: Record<string, string> = {
   TREE_PALM: '🌴', TREE_APPLE: '🍎', ROCK: '🪨', FLOWER_BUSH: '🌸', DRIFTWOOD: '🪵', SUNFLOWER: '🌻', PUDDLE: '💧', THORNS: '🌵',
+  BLUEBELL: '💜', PANSY: '🌼', TULIP: '🌷',
   TREE_COCONUT: '🌴', TREE_MANGO: '🥭', GARDEN_PATCH: '🍍',
   CROP_PLOT: '🟫', CROP_GROWING: '🌱', CROP_READY: '🌽', CROP_WILTED: '🥀',
   FISH_SPOT: '', HUT: '🏚️', DOCK: '⛵', WELL: '💧', 
@@ -299,6 +303,12 @@ export function generateIsland(): Record<string, TileData> {
   for (let i = 0; i < 6  && outer.length; i++) pick(outer).object = 'WEEDS';
   for (let i = 0; i < 7  && inner.length; i++) pick(inner).object = 'THORNS';
   for (let i = 0; i < 8  && outer.length; i++) pick(outer).object = 'THORNS';
+  for (let i = 0; i < 5  && inner.length; i++) pick(inner).object = 'BLUEBELL';
+  for (let i = 0; i < 5  && outer.length; i++) pick(outer).object = 'BLUEBELL';
+  for (let i = 0; i < 5  && inner.length; i++) pick(inner).object = 'PANSY';
+  for (let i = 0; i < 4  && outer.length; i++) pick(outer).object = 'PANSY';
+  for (let i = 0; i < 5  && inner.length; i++) pick(inner).object = 'TULIP';
+  for (let i = 0; i < 4  && outer.length; i++) pick(outer).object = 'TULIP';
 
   const waterTiles = Object.values(tiles).filter(t => t.type === 'WATER');
   for (let i = 0; i < 6 && waterTiles.length; i++) pick(waterTiles).object = 'FISH_SPOT';

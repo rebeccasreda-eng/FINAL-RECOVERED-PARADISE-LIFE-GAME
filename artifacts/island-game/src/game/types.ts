@@ -7,6 +7,7 @@ export type ObjectType =
   | 'TREE_COCONUT' | 'TREE_MANGO' | 'GARDEN_PATCH'
   | 'CROP_PLOT' | 'CROP_GROWING' | 'CROP_READY' | 'CROP_WILTED'
   | 'CLEARED_LAND' | 'FISH_SPOT' | 'SUNFLOWER' | 'PUDDLE' | 'THORNS'
+  | 'BLUEBELL' | 'PANSY' | 'TULIP'
   | 'HUT' | 'DOCK' | 'WELL' | 'FLOWER_POT' | 'FENCE' | 'LANTERN'
   | 'CRAB' | 'BOAR';
 

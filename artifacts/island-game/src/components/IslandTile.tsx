@@ -860,13 +860,177 @@ const ObjectSVG: React.FC<{ object: string; tileX: number; tileY: number }> = ({
       );
     }
 
+    /* ── BLUEBELL (tall purple-blue spike flowers) ──────────────────────── */
+    case 'BLUEBELL': {
+      const bv = (tx * 13 + ty * 7) % 3;
+      // colour variants: cool violet, warm purple, soft lavender
+      const [bellC, bellDk, bellHi] = ([
+        ['#7060c8','#4030a0','#a898f0'],
+        ['#8040c0','#5020a0','#c07ae0'],
+        ['#5070d0','#304090','#88aaee'],
+      ] as const)[bv];
+      // slight lean per tile
+      const lean = bv === 0 ? -2 : bv === 1 ? 2 : 0;
+      return (
+        <svg viewBox="0 0 38 56" width="36" height="54" style={{ display:'block' }}>
+          {/* Shadow */}
+          <ellipse cx="19" cy="55" rx="14" ry="3.5" fill="rgba(0,0,0,0.20)"/>
+          {/* Leaf base */}
+          <path d="M11,54 Q9,42 11,30 Q13,20 12,10" stroke="#2a8018" strokeWidth="6" fill="none" strokeLinecap="round"/>
+          <path d="M19,54 Q18,40 19,26 Q20,14 19,4"  stroke="#2e9020" strokeWidth="6" fill="none" strokeLinecap="round"/>
+          <path d="M27,54 Q29,42 27,30 Q25,20 26,10" stroke="#2a8018" strokeWidth="6" fill="none" strokeLinecap="round"/>
+          {/* Stem highlights */}
+          <path d="M12,54 Q10,42 12,30" stroke="rgba(255,255,255,0.22)" strokeWidth="2" fill="none" strokeLinecap="round"/>
+          <path d="M20,54 Q19,40 20,26" stroke="rgba(255,255,255,0.22)" strokeWidth="2" fill="none" strokeLinecap="round"/>
+          {/* ── Left spike — bells along stem ── */}
+          {([50,42,34,27,21,16] as const).map((y, i) => (
+            <ellipse key={y}
+              cx={11 + lean - i * 0.4} cy={y}
+              rx={3.2 - i * 0.25} ry={4.5 - i * 0.3}
+              fill={bellC} stroke={bellDk} strokeWidth="0.8"
+              transform={`rotate(${-10 + lean} ${11 + lean - i * 0.4} ${y})`}/>
+          ))}
+          {/* ── Centre spike ── */}
+          {([50,41,32,24,17,11,6] as const).map((y, i) => (
+            <ellipse key={y}
+              cx={19 + lean * 0.5} cy={y}
+              rx={3.5 - i * 0.28} ry={5 - i * 0.38}
+              fill={i < 3 ? bellC : bellDk} stroke={bellDk} strokeWidth="0.8"
+              transform={`rotate(${lean * 0.5} ${19 + lean * 0.5} ${y})`}/>
+          ))}
+          {/* ── Right spike ── */}
+          {([50,42,34,27,21,16] as const).map((y, i) => (
+            <ellipse key={y}
+              cx={27 + lean + i * 0.4} cy={y}
+              rx={3.2 - i * 0.25} ry={4.5 - i * 0.3}
+              fill={bellC} stroke={bellDk} strokeWidth="0.8"
+              transform={`rotate(${10 + lean} ${27 + lean + i * 0.4} ${y})`}/>
+          ))}
+          {/* Bell highlights */}
+          {([50,41,32] as const).map(y => (
+            <ellipse key={y} cx={18} cy={y - 1.2} rx="1.4" ry="1.0"
+              fill={bellHi} opacity="0.55"/>
+          ))}
+        </svg>
+      );
+    }
+
+    /* ── PANSY (yellow + blue low flower cluster) ───────────────────────── */
+    case 'PANSY': {
+      const pav = (tx * 11 + ty * 9) % 2;
+      const pid2 = g('pny');
+      return (
+        <svg viewBox="0 0 46 42" width="44" height="40" style={{ display:'block' }}>
+          <defs>
+            <radialGradient id={pid2} cx="35%" cy="30%" r="68%">
+              <stop offset="0%"   stopColor="#f8e840"/>
+              <stop offset="100%" stopColor="#d4a010"/>
+            </radialGradient>
+          </defs>
+          {/* Shadow */}
+          <ellipse cx="23" cy="41" rx="18" ry="3.5" fill="rgba(0,0,0,0.20)"/>
+          {/* Leaf mound */}
+          <ellipse cx="23" cy="33" rx="19" ry="7.5" fill="#1e6010"/>
+          <ellipse cx="12" cy="30" rx="12" ry="6"   fill="#246814" transform="rotate(-15 12 30)"/>
+          <ellipse cx="34" cy="29" rx="12" ry="6"   fill="#246814" transform="rotate(15 34 29)"/>
+          <ellipse cx="23" cy="28" rx="10" ry="5"   fill="#2e7a1a"/>
+          {/* Leaf sheen */}
+          <ellipse cx="14" cy="27" rx="4" ry="2" fill="rgba(255,255,255,0.16)" transform="rotate(-15 14 27)"/>
+          {/* ── Yellow flowers (5-petal) ── */}
+          {([
+            [23, 18, 7.5, 9.5, 1.0],
+            [10, 22, 6,   8,   0.92],
+            [36, 21, 6,   8,   0.92],
+          ] as const).map(([bx, by, d, rh, op], fi) => (
+            <g key={fi} opacity={op}>
+              {FLOWER_ANGS.map(a => (
+                <ellipse key={a} cx={bx} cy={by - d} rx={4.5} ry={rh}
+                  fill={`url(#${pid2})`}
+                  transform={`rotate(${a} ${bx} ${by})`}/>
+              ))}
+              <circle cx={bx} cy={by} r={fi === 0 ? 4 : 3.2} fill="#4a2800"/>
+              <circle cx={bx - 1} cy={by - 1} r={fi === 0 ? 1.6 : 1.2} fill="rgba(255,200,40,0.70)"/>
+            </g>
+          ))}
+          {/* ── Blue accent flowers ── */}
+          {(pav === 0
+            ? [[16, 14], [30, 17]] as const
+            : [[9,  20], [37, 18]] as const
+          ).map(([bx, by]) => (
+            <g key={`${bx}${by}`}>
+              {FLOWER_ANGS.map(a => (
+                <ellipse key={a} cx={bx} cy={by - 5} rx={3.2} ry={6.5}
+                  fill="#4868e0"
+                  transform={`rotate(${a} ${bx} ${by})`}/>
+              ))}
+              <circle cx={bx} cy={by} r="2.5" fill="#f0e030"/>
+              <circle cx={bx - 0.6} cy={by - 0.6} r="1" fill="rgba(255,255,255,0.60)"/>
+            </g>
+          ))}
+        </svg>
+      );
+    }
+
+    /* ── TULIP (tall yellow tulips) ─────────────────────────────────────── */
+    case 'TULIP': {
+      const tlv = (tx * 7 + ty * 11) % 3;
+      const [tulipC, tulipDk, tulipHi] = ([
+        ['#f0d018','#c09000','#fff280'],  // classic yellow
+        ['#f8c020','#b08000','#ffe060'],  // deep gold
+        ['#f4dc30','#c8a010','#ffee90'],  // pale yellow
+      ] as const)[tlv];
+      // helper: draw one tulip cup at (hx, hy)
+      const TulipHead = (hx: number, hy: number, sc: number) => (
+        <g>
+          {/* 3 back petals */}
+          <path d={`M${hx},${hy + 2 * sc} Q${hx - 6 * sc},${hy - 4 * sc} ${hx - 2 * sc},${hy - 10 * sc} Q${hx},${hy - 8 * sc} ${hx},${hy + 2 * sc}`}
+            fill={tulipDk}/>
+          <path d={`M${hx},${hy + 2 * sc} Q${hx + 6 * sc},${hy - 4 * sc} ${hx + 2 * sc},${hy - 10 * sc} Q${hx},${hy - 8 * sc} ${hx},${hy + 2 * sc}`}
+            fill={tulipDk}/>
+          {/* 3 front petals */}
+          <path d={`M${hx - 3 * sc},${hy + 1 * sc} Q${hx - 8 * sc},${hy - 6 * sc} ${hx - 3 * sc},${hy - 12 * sc} Q${hx},${hy - 10 * sc} ${hx - 3 * sc},${hy + 1 * sc}`}
+            fill={tulipC}/>
+          <path d={`M${hx},${hy + 2 * sc} Q${hx},${hy - 10 * sc} ${hx},${hy - 13 * sc} Q${hx},${hy - 10 * sc} ${hx},${hy + 2 * sc}`}
+            fill={tulipHi} opacity="0.70"/>
+          <path d={`M${hx + 3 * sc},${hy + 1 * sc} Q${hx + 8 * sc},${hy - 6 * sc} ${hx + 3 * sc},${hy - 12 * sc} Q${hx},${hy - 10 * sc} ${hx + 3 * sc},${hy + 1 * sc}`}
+            fill={tulipC}/>
+          {/* Petal highlight */}
+          <path d={`M${hx - 1 * sc},${hy + 1 * sc} Q${hx - 2 * sc},${hy - 6 * sc} ${hx - 1 * sc},${hy - 12 * sc}`}
+            stroke={tulipHi} strokeWidth={0.9 * sc} fill="none" opacity="0.70" strokeLinecap="round"/>
+        </g>
+      );
+      return (
+        <svg viewBox="0 0 40 58" width="38" height="56" style={{ display:'block' }}>
+          {/* Shadow */}
+          <ellipse cx="20" cy="57" rx="14" ry="3.5" fill="rgba(0,0,0,0.20)"/>
+          {/* Stems */}
+          <path d="M12,56 Q11,44 12,32 Q13,22 12,14" stroke="#2e8820" strokeWidth="3.5" fill="none" strokeLinecap="round"/>
+          <path d="M20,56 Q20,42 20,28 Q20,16 20,8"  stroke="#349424" strokeWidth="3.8" fill="none" strokeLinecap="round"/>
+          <path d="M29,56 Q30,44 29,32 Q28,22 29,14" stroke="#2e8820" strokeWidth="3.5" fill="none" strokeLinecap="round"/>
+          {/* Strap leaves */}
+          <path d="M13,46 Q5,40 4,30"  stroke="#3aaa28" strokeWidth="5" fill="none" strokeLinecap="round"/>
+          <path d="M20,42 Q28,36 30,24" stroke="#3aaa28" strokeWidth="5" fill="none" strokeLinecap="round"/>
+          <path d="M28,44 Q36,38 37,28" stroke="#3aaa28" strokeWidth="4.5" fill="none" strokeLinecap="round"/>
+          <path d="M13,46 Q5,40 4,30"  stroke="rgba(255,255,255,0.20)" strokeWidth="1.8" fill="none" strokeLinecap="round"/>
+          {/* Leaf vein lines */}
+          <path d="M13,46 Q7,41 5,32"  stroke="#1e6010" strokeWidth="0.8" fill="none" opacity="0.6"/>
+          <path d="M20,42 Q26,37 28,26" stroke="#1e6010" strokeWidth="0.8" fill="none" opacity="0.6"/>
+          {/* Tulip heads */}
+          {TulipHead(12, 22, 1.0)}
+          {TulipHead(20, 16, 1.1)}
+          {TulipHead(29, 22, 1.0)}
+        </svg>
+      );
+    }
+
     default: return null;
   }
 };
 
 /** Objects that use SVG art instead of emoji */
 const SVG_OBJECTS = new Set(['TREE_PALM', 'TREE_APPLE', 'ROCK', 'FLOWER_BUSH', 'DRIFTWOOD',
-  'TREE_COCONUT', 'TREE_MANGO', 'GARDEN_PATCH', 'WEEDS', 'SUNFLOWER', 'PUDDLE', 'THORNS']);
+  'TREE_COCONUT', 'TREE_MANGO', 'GARDEN_PATCH', 'WEEDS', 'SUNFLOWER', 'PUDDLE', 'THORNS',
+  'BLUEBELL', 'PANSY', 'TULIP']);
 /** Objects that sway in the breeze */
 const SWAY_OBJECTS = new Set(['TREE_PALM', 'TREE_APPLE', 'TREE_COCONUT', 'TREE_MANGO']);
 
