@@ -168,6 +168,21 @@
 .water-wave-a { animation: waterWaveA 3.2s ease-in-out infinite; }
 .water-wave-b { animation: waterWaveB 4.0s ease-in-out infinite 0.6s; }
 
+/* ── Fish jump + backflip ──────────────────────────────── */
+@keyframes fishJump {
+  0%    { transform: translateY(0px)   rotate(0deg);   opacity: 0; }
+  3%    { transform: translateY(-3px)  rotate(15deg);  opacity: 1; }
+  30%   { transform: translateY(-28px) rotate(195deg); opacity: 1; }
+  56%   { transform: translateY(1px)   rotate(360deg); opacity: 1; }
+  62%   { transform: translateY(0px)   rotate(360deg); opacity: 0; }
+  100%  { transform: translateY(0px)   rotate(0deg);   opacity: 0; }
+}
+.fish-jump {
+  animation: fishJump 13s ease-in-out infinite;
+  pointer-events: none;
+  transform-origin: center center;
+}
+
 /* ── Danger zone pulse ─────────────────────────────────── */
 @keyframes dangerPulse {
   0%,100% { opacity: 0.28; }

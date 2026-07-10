@@ -749,6 +749,59 @@ export const IslandTile: React.FC<IslandTileProps> = ({
         )}
       </svg>
 
+      {/* ── Fish jumping in water ── */}
+      {isWater && (() => {
+        const hash1 = (tile.x * 7 + tile.y * 11) % 5;
+        const hash2 = (tile.x * 3 + tile.y * 13) % 5;
+        const fish: React.ReactNode[] = [];
+
+        const makeFish = (key: string, delay: number, offsetX: number, orange: boolean) => {
+          const body  = orange ? '#f5a623' : '#7ddcf8';
+          const fin   = orange ? '#d4821a' : '#4ab8e0';
+          const belly = orange ? '#fdd280' : '#c0eeff';
+          return (
+            <div
+              key={key}
+              className="fish-jump"
+              style={{
+                position: 'absolute',
+                left: `calc(50% + ${offsetX}px)`,
+                top: 10,
+                animationDelay: `${delay}s`,
+                zIndex: tileZIndex + 4,
+              }}
+            >
+              <svg viewBox="0 0 22 11" width="20" height="10" style={{ display: 'block', transform: 'translate(-50%,-50%)' }}>
+                {/* tail */}
+                <polygon points="1,1 7,5.5 1,10" fill={fin}/>
+                {/* body */}
+                <ellipse cx="13" cy="5.5" rx="9.5" ry="4.5" fill={body}/>
+                {/* belly shimmer */}
+                <ellipse cx="13" cy="7.8" rx="6" ry="1.6" fill={belly} opacity="0.55"/>
+                {/* dorsal fin */}
+                <polygon points="8,1.5 11,5 14,1.5" fill={fin} opacity="0.8"/>
+                {/* eye */}
+                <circle cx="20" cy="4.2" r="1.4" fill="white"/>
+                <circle cx="20.4" cy="4.2" r="0.7" fill="#111"/>
+              </svg>
+            </div>
+          );
+        };
+
+        // Primary fish — 1 in 5 water tiles
+        if (hash1 === 0) {
+          const delay = (tile.x * 5 + tile.y * 7) % 13;
+          fish.push(makeFish('f1', delay, -4, (tile.x + tile.y) % 2 === 0));
+        }
+        // Secondary fish — different 1-in-5 subset, slightly offset & different timing
+        if (hash2 === 0 && hash1 !== 0) {
+          const delay = (tile.x * 11 + tile.y * 3) % 13 + 6;
+          fish.push(makeFish('f2', delay, 5, (tile.x + tile.y) % 2 !== 0));
+        }
+
+        return fish.length > 0 ? <>{fish}</> : null;
+      })()}
+
       {/* ── SVG art object (trees, rocks, flowers, driftwood) ── */}
       {hasSvg && tile.object && (
         // Outer div: positioning only (translate must not be overridden by sway animation)
