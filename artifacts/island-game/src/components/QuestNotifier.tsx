@@ -16,42 +16,75 @@ import { QUESTS, QUEST_GROUPS } from '../game/gameData';
 /* ── Parrot-bush NPC ──────────────────────────────────────────────────── */
 const ParrotNPC = () => (
   <svg viewBox="0 0 84 84" xmlns="http://www.w3.org/2000/svg" width="80" height="80">
-    <ellipse cx="42" cy="80" rx="30" ry="5" fill="rgba(0,0,0,0.18)"/>
-    <ellipse cx="42" cy="66" rx="36" ry="18" fill="#2a8018"/>
-    <ellipse cx="28" cy="56" rx="24" ry="20" fill="#309e1e"/>
-    <ellipse cx="56" cy="54" rx="22" ry="18" fill="#2e9a1c"/>
-    <ellipse cx="42" cy="50" rx="28" ry="22" fill="#3ab822"/>
-    <ellipse cx="30" cy="42" rx="20" ry="18" fill="#44cc2c"/>
-    <ellipse cx="54" cy="40" rx="18" ry="17" fill="#40c428"/>
-    <ellipse cx="42" cy="34" rx="22" ry="18" fill="#50d836"/>
-    <ellipse cx="34" cy="26" rx="14" ry="13" fill="#58e040"/>
-    <ellipse cx="50" cy="24" rx="13" ry="12" fill="#54dc3c"/>
-    <ellipse cx="42" cy="20" rx="11" ry="10" fill="#62ea4a"/>
-    <circle cx="22" cy="52" r="5"   fill="#e03020"/>
-    <circle cx="60" cy="50" r="4.5" fill="#d82818"/>
-    <circle cx="38" cy="62" r="4"   fill="#cc2010"/>
-    <circle cx="62" cy="60" r="3.5" fill="#e03828"/>
-    <circle cx="32" cy="44" r="3.5" fill="#f0d020"/>
-    <circle cx="52" cy="58" r="3"   fill="#e8c818"/>
-    <ellipse cx="68" cy="58" rx="6" ry="9" fill="#d4a020"/>
-    <path d="M63 50 Q66 42 68 46" stroke="#38a822" strokeWidth="3" fill="none" strokeLinecap="round"/>
-    <path d="M68 49 Q70 40 72 44" stroke="#30a018" strokeWidth="3" fill="none" strokeLinecap="round"/>
-    <path d="M72 51 Q76 43 74 48" stroke="#38a822" strokeWidth="2.5" fill="none" strokeLinecap="round"/>
-    <path d="M18 44 Q10 36 14 26" stroke="#f0d020" strokeWidth="5" fill="none" strokeLinecap="round"/>
-    <path d="M20 48 Q11 41 16 30" stroke="#e8c818" strokeWidth="4" fill="none" strokeLinecap="round"/>
-    {/* Parrot */}
-    <ellipse cx="46" cy="18" rx="9" ry="10" fill="#22aa22"/>
-    <path d="M37 16 Q28 20 32 30" stroke="#1a8a1a" strokeWidth="4" fill="none" strokeLinecap="round"/>
-    <path d="M46 27 Q40 34 38 42" stroke="#1e7a1e" strokeWidth="3" fill="none" strokeLinecap="round"/>
-    <path d="M48 28 Q52 36 50 44" stroke="#228822" strokeWidth="2.5" fill="none" strokeLinecap="round"/>
-    <circle cx="46" cy="9" r="8.5" fill="#dd2020"/>
-    <path d="M51 10 Q57 12 53 16" stroke="#c09000" strokeWidth="1.5" fill="#f0b800" strokeLinecap="round"/>
-    <circle cx="43" cy="8" r="2.8" fill="white"/>
-    <circle cx="43.5" cy="8.2" r="1.7" fill="#111"/>
-    <circle cx="43" cy="7.6" r="0.7" fill="white"/>
-    <path d="M44 2 Q42 -3 46 1"  stroke="#ff6622" strokeWidth="2.5" fill="none" strokeLinecap="round"/>
-    <path d="M47 1 Q46 -4 50 0"  stroke="#ff9900" strokeWidth="2"   fill="none" strokeLinecap="round"/>
-    <path d="M41 3 Q38 -2 43 2"  stroke="#ffcc00" strokeWidth="2"   fill="none" strokeLinecap="round"/>
+    {/* Shadow */}
+    <ellipse cx="42" cy="81" rx="20" ry="4" fill="rgba(0,0,0,0.18)"/>
+
+    {/* ── Branch / perch ── */}
+    <rect x="16" y="70" width="52" height="7" rx="3.5" fill="#7a4a18"/>
+    <rect x="16" y="70" width="52" height="3.5" rx="2" fill="#a06030"/>
+
+    {/* ── Feet ── */}
+    <line x1="34" y1="70" x2="28" y2="76" stroke="#c06020" strokeWidth="2.5" strokeLinecap="round"/>
+    <line x1="34" y1="70" x2="32" y2="77" stroke="#c06020" strokeWidth="2.5" strokeLinecap="round"/>
+    <line x1="34" y1="70" x2="36" y2="77" stroke="#c06020" strokeWidth="2.5" strokeLinecap="round"/>
+    <line x1="50" y1="70" x2="44" y2="76" stroke="#c06020" strokeWidth="2.5" strokeLinecap="round"/>
+    <line x1="50" y1="70" x2="48" y2="77" stroke="#c06020" strokeWidth="2.5" strokeLinecap="round"/>
+    <line x1="50" y1="70" x2="52" y2="77" stroke="#c06020" strokeWidth="2.5" strokeLinecap="round"/>
+
+    {/* ── Body ── */}
+    <ellipse cx="42" cy="56" rx="20" ry="18" fill="#c83010"/>
+    <ellipse cx="42" cy="53" rx="18" ry="16" fill="#e04020"/>
+    {/* Body highlight */}
+    <ellipse cx="38" cy="47" rx="8" ry="6" fill="rgba(255,120,60,0.38)" transform="rotate(-15 38 47)"/>
+
+    {/* ── Green wing patch ── */}
+    <ellipse cx="56" cy="57" rx="11" ry="9" fill="#2aaa18" transform="rotate(20 56 57)"/>
+    <ellipse cx="55" cy="55" rx="8"  ry="6" fill="#38c020" transform="rotate(20 55 55)"/>
+    <ellipse cx="54" cy="54" rx="5"  ry="3.5" fill="rgba(100,220,60,0.40)" transform="rotate(20 54 54)"/>
+
+    {/* ── Tail feathers ── */}
+    <path d="M30 70 Q22 76 20 82" stroke="#c02808" strokeWidth="5" fill="none" strokeLinecap="round"/>
+    <path d="M33 71 Q28 79 27 84" stroke="#d83818" strokeWidth="4" fill="none" strokeLinecap="round"/>
+
+    {/* ── Neck connector ── */}
+    <ellipse cx="42" cy="40" rx="12" ry="8" fill="#d83818"/>
+
+    {/* ── Head ── */}
+    <circle cx="42" cy="30" r="17" fill="#c83010"/>
+    <circle cx="42" cy="28" r="15" fill="#e04020"/>
+    {/* Head highlight */}
+    <ellipse cx="37" cy="22" rx="7" ry="5" fill="rgba(255,120,60,0.35)" transform="rotate(-20 37 22)"/>
+
+    {/* ── Facial mask (pale orange cheek patch) ── */}
+    <ellipse cx="42" cy="32" rx="10" ry="7" fill="#f06030" opacity="0.55"/>
+
+    {/* ── Beak ── */}
+    {/* Upper mandible */}
+    <path d="M49 28 Q56 28 54 33 Q51 36 48 33Z" fill="#e8b800"/>
+    <path d="M49 28 Q55 28 53 32" stroke="#c09000" strokeWidth="1" fill="none"/>
+    {/* Lower mandible */}
+    <path d="M49 32 Q53 34 51 36 Q48 36 48 33Z" fill="#d4a400"/>
+
+    {/* ── Eyes ── */}
+    <circle cx="38" cy="26" r="6.5" fill="white"/>
+    <circle cx="38" cy="26" r="4.2" fill="#111"/>
+    <circle cx="36.5" cy="24.5" r="1.8" fill="white"/>
+    {/* Eye ring */}
+    <circle cx="38" cy="26" r="6.5" fill="none" stroke="#b02808" strokeWidth="1.2"/>
+
+    {/* ── Crest feathers — two golden balloon-like tufts ── */}
+    {/* Left stem */}
+    <line x1="37" y1="14" x2="34" y2="6"  stroke="#c09000" strokeWidth="2.2" strokeLinecap="round"/>
+    {/* Right stem */}
+    <line x1="43" y1="13" x2="46" y2="4"  stroke="#c09000" strokeWidth="2.2" strokeLinecap="round"/>
+    {/* Left balloon */}
+    <circle cx="34" cy="4"  r="5.5" fill="#f0c818"/>
+    <circle cx="32.5" cy="2.5" r="2" fill="rgba(255,240,120,0.70)"/>
+    <circle cx="34" cy="4"  r="5.5" fill="none" stroke="#c89800" strokeWidth="1"/>
+    {/* Right balloon */}
+    <circle cx="46" cy="2"  r="5.5" fill="#f0c818"/>
+    <circle cx="44.5" cy="0.5" r="2" fill="rgba(255,240,120,0.70)"/>
+    <circle cx="46" cy="2"  r="5.5" fill="none" stroke="#c89800" strokeWidth="1"/>
   </svg>
 );
 

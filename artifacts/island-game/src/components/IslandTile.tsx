@@ -282,6 +282,7 @@ const ObjectSVG: React.FC<{ object: string; tileX: number; tileY: number }> = ({
       const pr = pv === 0 ? 1.0 : pv === 1 ? 0.88 : 1.12;
       const W = 26 * pr, H = 12 * pr;
       const cx = 26, cy = 16;
+      const pdgId = g('pdg');
       return (
         <svg viewBox="0 0 52 26" width="50" height="24" style={{ display:'block' }}>
           {/* Ground shadow — slightly offset below */}
@@ -289,9 +290,9 @@ const ObjectSVG: React.FC<{ object: string; tileX: number; tileY: number }> = ({
           {/* Water body */}
           <ellipse cx={cx} cy={cy} rx={W} ry={H} fill="#2ab0d8"/>
           {/* Depth gradient — darker edges */}
-          <ellipse cx={cx} cy={cy} rx={W} ry={H} fill="url(#pdg)"/>
+          <ellipse cx={cx} cy={cy} rx={W} ry={H} fill={`url(#${pdgId})`}/>
           <defs>
-            <radialGradient id={g('pdg')} cx="38%" cy="30%" r="75%">
+            <radialGradient id={pdgId} cx="38%" cy="30%" r="75%">
               <stop offset="0%"   stopColor="rgba(100,220,255,0.55)"/>
               <stop offset="60%"  stopColor="rgba(30,160,210,0.20)"/>
               <stop offset="100%" stopColor="rgba(10,80,140,0.45)"/>
