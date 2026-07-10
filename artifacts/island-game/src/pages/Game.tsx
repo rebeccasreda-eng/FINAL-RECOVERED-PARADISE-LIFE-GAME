@@ -202,8 +202,11 @@ const GameInner = ({ profile }: { profile: PlayerProfile }) => {
   const worldRef     = useRef<HTMLDivElement>(null);
   const panRef       = useRef({ x: 0, y: 0 });
   const INITIAL_ZOOM = 2.0;   // start close — tiles fill the screen nicely
-  const MIN_ZOOM     = 0.4;   // zoom out to see the whole island at once
   const MAX_ZOOM     = 3.2;   // a bit extra for inspecting objects up close
+  // Zoom-out is limited to exactly 3 snap levels (descending), always centred.
+  // Zooming in is continuous up to MAX_ZOOM.
+  const ZOOM_OUT_LEVELS = [INITIAL_ZOOM, 1.3, 0.82, 0.55]; // 3 steps out
+  const MIN_ZOOM = ZOOM_OUT_LEVELS[ZOOM_OUT_LEVELS.length - 1];
 
   /** Clamp pan so the world div always covers the full viewport (no void showing). */
   const clampPan = useCallback((px: number, py: number, z: number) => {
@@ -242,30 +245,42 @@ const GameInner = ({ profile }: { profile: PlayerProfile }) => {
   // Initial position: island visually centred on load, zoomed in
   useEffect(() => { applyTransform(0, 0, INITIAL_ZOOM); }, [applyTransform]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  /* Mouse-wheel zoom (non-passive, zooms at cursor point) */
+  /* Mouse-wheel zoom (non-passive).
+     Zoom-IN  → cursor-anchored, continuous up to MAX_ZOOM.
+     Zoom-OUT → always centred, snaps through ZOOM_OUT_LEVELS (max 3 steps out). */
   useEffect(() => {
     const el = viewportRef.current;
     if (!el) return;
     const handler = (e: WheelEvent) => {
       if (e.ctrlKey || e.metaKey) return;
       e.preventDefault();
-      const rect = el.getBoundingClientRect();
-      // Cursor offset from viewport centre (= world origin on screen)
-      const cx = e.clientX - rect.left  - rect.width  / 2;
-      const cy = e.clientY - rect.top   - rect.height / 2;
-      const oldZ = zoomRef.current;
-      const newZ = Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, oldZ * (e.deltaY < 0 ? 1.1 : 0.9)));
-      // Transform: translate(panX-CX, panY-CY) scale(z), origin 0 0
-      // screen_x = z*wx + (panX - WORLD_CX)  →  newPanX that keeps wx at cx:
-      // newPanX = cx + WORLD_CX - wx*newZ  where  wx = (cx + WORLD_CX - panX) / oldZ
-      const ratio = newZ / oldZ;
-      const rawPX = panRef.current.x + (cx + WORLD_CX) * (1 - ratio);
-      const rawPY = panRef.current.y + (cy + WORLD_CY) * (1 - ratio);
-      const { x: newPX, y: newPY } = clampPan(rawPX, rawPY, newZ);
-      panRef.current = { x: newPX, y: newPY };
-      zoomRef.current = newZ;
-      applyTransform(newPX, newPY, newZ);
-      setZoom(newZ);
+
+      if (e.deltaY > 0) {
+        // ── Zoom OUT: snap to next lower level, locked to centre ──────────
+        const nextZ = [...ZOOM_OUT_LEVELS].sort((a, b) => b - a)
+          .find(l => l < zoomRef.current - 0.02);
+        if (nextZ == null) return; // already at minimum level
+        const { x, y } = clampPan(0, 0, nextZ);
+        panRef.current  = { x, y };
+        zoomRef.current = nextZ;
+        applyTransform(x, y, nextZ);
+        setZoom(nextZ);
+      } else {
+        // ── Zoom IN: continuous, cursor-anchored ──────────────────────────
+        const rect  = el.getBoundingClientRect();
+        const cx    = e.clientX - rect.left - rect.width  / 2;
+        const cy    = e.clientY - rect.top  - rect.height / 2;
+        const oldZ  = zoomRef.current;
+        const newZ  = Math.min(MAX_ZOOM, oldZ * 1.1);
+        const ratio = newZ / oldZ;
+        const rawPX = panRef.current.x + (cx + WORLD_CX) * (1 - ratio);
+        const rawPY = panRef.current.y + (cy + WORLD_CY) * (1 - ratio);
+        const { x: newPX, y: newPY } = clampPan(rawPX, rawPY, newZ);
+        panRef.current  = { x: newPX, y: newPY };
+        zoomRef.current = newZ;
+        applyTransform(newPX, newPY, newZ);
+        setZoom(newZ);
+      }
     };
     el.addEventListener('wheel', handler, { passive: false });
     return () => el.removeEventListener('wheel', handler);
@@ -303,14 +318,27 @@ const GameInner = ({ profile }: { profile: PlayerProfile }) => {
     setTimeout(() => { didDragRef.current = false; }, 0);
   }, []);
 
-  /** Zoom button helper — zooms centred on viewport */
+  /** Zoom button helper.
+   *  Zoom-out (factor < 1): snaps to next ZOOM_OUT_LEVELS level, locked to centre.
+   *  Zoom-in  (factor > 1): continuous, centred on viewport. */
   const zoomBy = useCallback((factor: number) => {
-    const newZ = Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, zoomRef.current * factor));
-    const { x, y } = clampPan(panRef.current.x, panRef.current.y, newZ);
-    panRef.current = { x, y };
-    zoomRef.current = newZ;
-    applyTransform(x, y, newZ);
-    setZoom(newZ);
+    if (factor < 1) {
+      const nextZ = [...ZOOM_OUT_LEVELS].sort((a, b) => b - a)
+        .find(l => l < zoomRef.current - 0.02);
+      if (nextZ == null) return;
+      const { x, y } = clampPan(0, 0, nextZ);
+      panRef.current  = { x, y };
+      zoomRef.current = nextZ;
+      applyTransform(x, y, nextZ);
+      setZoom(nextZ);
+    } else {
+      const newZ = Math.min(MAX_ZOOM, zoomRef.current * factor);
+      const { x, y } = clampPan(panRef.current.x, panRef.current.y, newZ);
+      panRef.current  = { x, y };
+      zoomRef.current = newZ;
+      applyTransform(x, y, newZ);
+      setZoom(newZ);
+    }
   }, [applyTransform, clampPan]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
