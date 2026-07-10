@@ -1,6 +1,9 @@
 import React, { createContext, useContext, useEffect, useReducer, useRef, useState } from 'react';
 import { GameState, GameAction, GameContextType, ResourceType, ObjectType } from './types';
-import { generateIsland, QUESTS, OBJECT_CONFIG, SCALED, WEATHER_TYPES, CROP_TYPES, INITIAL_NEIGHBORS, COLLECTIONS, COLLECTION_SETS, PREMIUM_ITEMS } from './gameData';
+import { generateIsland, QUESTS, QUEST_GROUPS, OBJECT_CONFIG, SCALED, WEATHER_TYPES, CROP_TYPES, INITIAL_NEIGHBORS, COLLECTIONS, COLLECTION_SETS, PREMIUM_ITEMS } from './gameData';
+
+// Quest IDs that require explicit acceptance before progress is tracked
+const GROUPED_QUEST_IDS = new Set(QUEST_GROUPS.flatMap(g => g.quests));
 import { useToast } from '@/hooks/use-toast';
 
 // Chops required to fell each tree type (shared by reducer + UI)
@@ -49,6 +52,7 @@ function checkQuestCompletions(state: GameState): GameState {
   for (const q of QUESTS) {
     if (state.level < q.unlockLevel) continue;
     if (q.prereqs && q.prereqs.some(pid => !nextQuests[pid]?.completed)) continue;
+    if (GROUPED_QUEST_IDS.has(q.id) && !nextQuests[q.id]?.accepted) continue;
     const p = nextQuests[q.id] || { progress: 0, completed: false };
     if (p.completed) continue;
 
@@ -89,6 +93,11 @@ function checkQuestCompletions(state: GameState): GameState {
         rewardXP += q.rewardXP;
         if (q.rewardItem) {
           rewardItems[q.rewardItem.type] = (rewardItems[q.rewardItem.type] || 0) + q.rewardItem.count;
+        }
+        if (q.rewardItems) {
+          for (const ri of q.rewardItems) {
+            rewardItems[ri.type] = (rewardItems[ri.type] || 0) + ri.count;
+          }
         }
       }
     }
@@ -307,6 +316,7 @@ function gameReducer(state: GameState, action: GameAction): GameState {
         for (const q of QUESTS) {
           if (nextState.level < q.unlockLevel) continue;
           if (q.prereqs && q.prereqs.some(pid => !nextState.quests[pid]?.completed)) continue;
+          if (GROUPED_QUEST_IDS.has(q.id) && !nextState.quests[q.id]?.accepted) continue;
           if (q.objectives && q.objectives.length > 0) {
             q.objectives.forEach((obj, i) => {
               if (obj.targetType !== type) return;
@@ -364,6 +374,7 @@ function gameReducer(state: GameState, action: GameAction): GameState {
       }
 
       if (obj === 'GRASS_PATCH') track('clear_grass');
+      if (obj === 'DRIFTWOOD') track('clear_driftwood');
       if (obj === 'TREE_PALM' || obj === 'TREE_APPLE' || obj === 'TREE_COCONUT') track('chop_tree');
       if (obj === 'TREE_MANGO') track('harvest_mango');
       if (obj === 'GARDEN_PATCH') track('harvest_pineapple');
@@ -439,6 +450,7 @@ function gameReducer(state: GameState, action: GameAction): GameState {
       for (const q of QUESTS) {
         if (nextState.level < q.unlockLevel) continue;
         if (q.prereqs && q.prereqs.some(pid => !nextState.quests[pid]?.completed)) continue;
+        if (GROUPED_QUEST_IDS.has(q.id) && !nextState.quests[q.id]?.accepted) continue;
         if (q.objectives && q.objectives.length > 0) {
           q.objectives.forEach((obj, i) => {
             if (obj.targetType !== trackType) return;
@@ -456,6 +468,11 @@ function gameReducer(state: GameState, action: GameAction): GameState {
         }
       }
       return checkQuestCompletions(nextState);
+    }
+
+    case 'ACCEPT_QUEST': {
+      const existing = state.quests[action.questId] || { progress: 0, completed: false };
+      return { ...state, quests: { ...state.quests, [action.questId]: { ...existing, accepted: true } } };
     }
 
     case 'CHECK_WEATHER': {

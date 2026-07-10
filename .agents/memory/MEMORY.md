@@ -2,3 +2,4 @@
 - [Island game WelcomeScreen profile](welcome-profile.md) — PlayerProfile uses CharAppearance (not raw skinTone/hairColor strings); characterId derived via pickCharacterId(gender, hairStyle).
 - [Island game world layout](island-layout.md) — 31×31 grid; sinusoidal terrain channels; WORLD_W=2200,WORLD_H=1000; localStorage key v13.
 - [Island game crop-timer crash](crop-timer-crash.md) — IslandTile crop-timer path crashes if cropType from localStorage isn't in CROP_TYPES; always guard cc existence before accessing cc.growTime/wiltTime.
+- [Island game quest system](quest-system.md) — NPC quest groups (parrot/crab/tree) with QUEST_GROUPS; acceptance gates progress; ACCEPT_QUEST action + clear_driftwood tracking added.

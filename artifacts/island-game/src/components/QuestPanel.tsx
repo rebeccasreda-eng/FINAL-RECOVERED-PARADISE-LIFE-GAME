@@ -1,16 +1,44 @@
 import React from 'react';
 import { useGame } from '../game/GameContext';
-import { QUESTS } from '../game/gameData';
+import { QUESTS, QUEST_GROUPS } from '../game/gameData';
 
-export const QuestPanel = ({ onClose }: { onClose: () => void }) => {
+/* Emoji representation for reward item types */
+const RESOURCE_EMOJI: Record<string, string> = {
+  coins: '🪙', wood: '🪵', stone: '🪨', produce: '🌽', food: '🍎',
+  shells: '🐚', FENCE: '🚧', HUT: '🏚️', DOCK: '⛵', WELL: '💧',
+  FLOWER_POT: '🪴', LANTERN: '🏮',
+};
+
+interface QuestPanelProps {
+  onClose: () => void;
+  questId?: string | null;
+}
+
+export const QuestPanel = ({ onClose, questId }: QuestPanelProps) => {
   const { state } = useGame();
 
-  // Active quest = first uncompleted, unlocked, prereqs met
-  const activeQuest = QUESTS.find(q =>
-    state.level >= q.unlockLevel &&
-    !state.quests[q.id]?.completed &&
-    (!q.prereqs?.length || q.prereqs.every(pid => state.quests[pid]?.completed))
-  );
+  // Find the quest to display:
+  // 1. If questId provided, show that quest
+  // 2. Otherwise find first active (uncompleted, unlocked, prereqs met) quest in QUEST_GROUPS order
+  // 3. Fall back to any active quest
+  const activeQuest = questId
+    ? QUESTS.find(q => q.id === questId)
+    : (() => {
+        // Check QUEST_GROUPS order first
+        for (const grp of QUEST_GROUPS) {
+          if (grp.prereqs.some(pid => !state.quests[pid]?.completed)) continue;
+          for (const qid of grp.quests) {
+            const q = QUESTS.find(x => x.id === qid);
+            if (q && !state.quests[q.id]?.completed) return q;
+          }
+        }
+        // Fallback: any unlocked, uncompleted quest
+        return QUESTS.find(q =>
+          state.level >= q.unlockLevel &&
+          !state.quests[q.id]?.completed &&
+          (!q.prereqs?.length || q.prereqs.every(pid => state.quests[pid]?.completed))
+        );
+      })();
 
   return (
     /* ── Full-screen backdrop ── */
@@ -52,9 +80,10 @@ export const QuestPanel = ({ onClose }: { onClose: () => void }) => {
           ✕
         </button>
 
-        {/* ── Orange amber header ── */}
+        {/* ── Content ── */}
         {activeQuest ? (
           <>
+            {/* ── Orange amber header ── */}
             <div
               className="pt-10 pb-5 px-6 text-center"
               style={{ background: 'linear-gradient(180deg, #f0a030 0%, #c87020 100%)' }}
@@ -99,22 +128,15 @@ export const QuestPanel = ({ onClose }: { onClose: () => void }) => {
                           className="flex items-center gap-3 rounded-xl px-3 py-2"
                           style={{ background: done ? '#92b85a' : '#b89060' }}
                         >
-                          {/* Icon box */}
                           <div
-                            className="w-13 h-13 rounded-xl flex items-center justify-center text-3xl shrink-0 border-2"
-                            style={{
-                              width: 52, height: 52,
-                              background: '#987040',
-                              borderColor: '#705020',
-                            }}
+                            className="flex items-center justify-center shrink-0 rounded-xl border-2"
+                            style={{ width: 52, height: 52, background: '#987040', borderColor: '#705020', fontSize: 26 }}
                           >
                             {obj.icon}
                           </div>
-                          {/* Label */}
-                          <div className="flex-1 font-bold" style={{ color: '#2a1000', fontSize: 14 }}>
+                          <div className="flex-1 font-bold" style={{ color: '#2a1000', fontSize: 13 }}>
                             {obj.description}
                           </div>
-                          {/* Counter */}
                           <div
                             className="rounded-lg px-3 py-1 font-black text-center"
                             style={{
@@ -129,13 +151,13 @@ export const QuestPanel = ({ onClose }: { onClose: () => void }) => {
                         </div>
                       );
                     })
-                  : /* single-objective fallback */ (
+                  : (
                     <div className="flex items-center gap-3 rounded-xl px-3 py-2" style={{ background: '#b89060' }}>
-                      <div className="w-[52px] h-[52px] rounded-xl flex items-center justify-center text-3xl shrink-0 border-2"
-                        style={{ background: '#987040', borderColor: '#705020' }}>
+                      <div className="flex items-center justify-center shrink-0 rounded-xl border-2"
+                        style={{ width: 52, height: 52, background: '#987040', borderColor: '#705020', fontSize: 26 }}>
                         {activeQuest.icon}
                       </div>
-                      <div className="flex-1 font-bold" style={{ color: '#2a1000', fontSize: 14 }}>
+                      <div className="flex-1 font-bold" style={{ color: '#2a1000', fontSize: 13 }}>
                         {activeQuest.description}
                       </div>
                       <div className="rounded-lg px-3 py-1 font-black text-center"
@@ -155,21 +177,45 @@ export const QuestPanel = ({ onClose }: { onClose: () => void }) => {
                 REWARDS:
               </h2>
               <div
-                className="flex justify-center gap-10 rounded-xl py-4"
+                className="flex justify-center gap-8 rounded-xl py-4"
                 style={{ background: '#b89060' }}
               >
+                {/* Coins */}
                 <div className="flex flex-col items-center gap-1">
                   <div className="text-4xl drop-shadow">🪙</div>
                   <div className="font-bold" style={{ color: '#2a1000', fontSize: 13 }}>
                     {activeQuest.rewardCoins} Coins
                   </div>
                 </div>
+                {/* XP */}
                 <div className="flex flex-col items-center gap-1">
                   <div className="text-4xl drop-shadow">⭐</div>
                   <div className="font-bold" style={{ color: '#2a1000', fontSize: 13 }}>
                     {activeQuest.rewardXP} EXP
                   </div>
                 </div>
+                {/* Extra reward items */}
+                {activeQuest.rewardItems?.map((ri, i) => (
+                  <div key={i} className="flex flex-col items-center gap-1">
+                    <div className="text-4xl drop-shadow">
+                      {RESOURCE_EMOJI[ri.type] ?? '📦'}
+                    </div>
+                    <div className="font-bold" style={{ color: '#2a1000', fontSize: 13 }}>
+                      {ri.count} {ri.type === 'FENCE' ? 'Fence' : ri.type === 'wood' ? 'Wood' : ri.type}
+                    </div>
+                  </div>
+                ))}
+                {/* Legacy single rewardItem */}
+                {activeQuest.rewardItem && !activeQuest.rewardItems && (
+                  <div className="flex flex-col items-center gap-1">
+                    <div className="text-4xl drop-shadow">
+                      {RESOURCE_EMOJI[activeQuest.rewardItem.type] ?? '📦'}
+                    </div>
+                    <div className="font-bold" style={{ color: '#2a1000', fontSize: 13 }}>
+                      {activeQuest.rewardItem.count}× {activeQuest.rewardItem.type}
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           </>

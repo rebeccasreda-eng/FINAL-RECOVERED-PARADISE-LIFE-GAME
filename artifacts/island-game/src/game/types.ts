@@ -43,6 +43,7 @@ export interface QuestDef {
   rewardCoins: number; 
   rewardXP: number;
   rewardItem?: { type: ResourceType; count: number };
+  rewardItems?: { type: ResourceType; count: number }[];
   icon: string; 
   unlockLevel: number;
   prereqs?: string[];
@@ -65,7 +66,7 @@ export interface GameState {
   lastEnergyTick: number;
   xp: number;
   level: number;
-  quests: Record<string, { progress: number; completed: boolean; objectiveProgress?: number[] }>;
+  quests: Record<string, { progress: number; completed: boolean; objectiveProgress?: number[]; accepted?: boolean }>;
   respawns: { tileId: string; object: ObjectType; respawnAt: number }[];
   weather: WeatherType;
   nextWeatherAt: number;
@@ -101,7 +102,8 @@ export type GameAction =
   | { type: 'GIFT_ITEM', itemId: string, neighborId: string }
   | { type: 'REQUEST_UNWITHER', tileId: string }
   | { type: 'REQUEST_RESOURCE', resource: ResourceType, amount: number }
-  | { type: 'BUY_PREMIUM', itemId: string, shellCost: number };
+  | { type: 'BUY_PREMIUM', itemId: string, shellCost: number }
+  | { type: 'ACCEPT_QUEST', questId: string };
 
 export interface GameContextType {
   state: GameState;

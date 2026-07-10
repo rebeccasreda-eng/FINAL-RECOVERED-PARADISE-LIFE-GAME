@@ -49,6 +49,7 @@ const GameInner = ({ profile }: { profile: PlayerProfile }) => {
   const [collectionsOpen,  setCollectionsOpen]  = useState(false);
   const [weatherOpen,      setWeatherOpen]      = useState(false);
   const [questPanelOpen,   setQuestPanelOpen]   = useState(false);
+  const [selectedQuestId,  setSelectedQuestId]  = useState<string | null>(null);
   const { muted: bgmMuted, toggle: toggleBgm } = useBgm('/bgm.mp3');
 
   /* ── Player movement — free analog movement (WASD / arrows + click-to-glide) ── */
@@ -401,10 +402,10 @@ const GameInner = ({ profile }: { profile: PlayerProfile }) => {
         playerName={profile.name}
         playerLevel={state.level}
         onOpenCollections={() => setCollectionsOpen(true)}
-        onOpenQuests={() => setQuestPanelOpen(true)}
+        onOpenQuests={() => { setSelectedQuestId(null); setQuestPanelOpen(true); }}
       />
-      <QuestNotifier onOpenPanel={() => setQuestPanelOpen(true)} />
-      {questPanelOpen && <QuestPanel onClose={() => setQuestPanelOpen(false)} />}
+      <QuestNotifier onOpenPanel={(qid) => { setSelectedQuestId(qid); setQuestPanelOpen(true); }} />
+      {questPanelOpen && <QuestPanel onClose={() => { setQuestPanelOpen(false); setSelectedQuestId(null); }} questId={selectedQuestId} />}
       <CropPicker />
 
       {shopOpen         && <ShopModal />}

@@ -29,6 +29,19 @@ export const PREMIUM_ITEMS = [
   { id: 'golden_crop', name: 'Golden Crop', emoji: '🌟', desc: 'Next harvest gives 3x yield', shellCost: 5 }
 ];
 
+export interface QuestGroup {
+  id: string;
+  npcType: 'parrot' | 'crab' | 'tree';
+  quests: string[];   // quest IDs offered by this NPC
+  prereqs: string[];  // quest IDs that must all be completed first
+}
+
+export const QUEST_GROUPS: QuestGroup[] = [
+  { id: 'grp_parrot', npcType: 'parrot', quests: ['q_fishing', 'q_clear'],  prereqs: [] },
+  { id: 'grp_crab',   npcType: 'crab',   quests: ['q_crab'],                prereqs: ['q_fishing', 'q_clear'] },
+  { id: 'grp_tree',   npcType: 'tree',   quests: ['q_chop'],                prereqs: ['q_fishing', 'q_clear'] },
+];
+
 export const QUESTS: QuestDef[] = [
   {
     id: 'q_welcome',
@@ -60,6 +73,58 @@ export const QUESTS: QuestDef[] = [
   { id: 'q11', title: 'Crab Slayer', description: 'Defeat 3 crabs', targetType: 'kill_crab', targetCount: 3, rewardCoins: 100, rewardXP: 50, icon: '🦀', unlockLevel: 2, prereqs: ['q1'] },
   { id: 'q12', title: 'Collector', description: 'Find a collection item', targetType: 'collect_item', targetCount: 1, rewardCoins: 200, rewardXP: 100, icon: '🐚', unlockLevel: 3, prereqs: ['q11'] },
   { id: 'q13', title: 'Forecast Fan', description: 'Check the weather', targetType: 'check_weather', targetCount: 1, rewardCoins: 20, rewardXP: 10, icon: '🌤️', unlockLevel: 2 },
+
+  // ── NPC quest pairs ─────────────────────────────────────────────────────
+  {
+    id: 'q_fishing',
+    title: 'Gone Fishing',
+    subtitle: 'There are fish swimming all around your island. Go catch some!',
+    description: 'Catch 3 fish on your island',
+    targetType: 'none', targetCount: 1,
+    objectives: [
+      { description: 'Catch 3 fish on your island', targetType: 'fish', targetCount: 3, icon: '🎣' },
+    ],
+    rewardCoins: 80, rewardXP: 7, icon: '🎣', unlockLevel: 1,
+  },
+  {
+    id: 'q_clear',
+    title: 'Clear The Island',
+    subtitle: 'Before you plant crops, clear grass on the island to create some space.',
+    description: 'Clear grass and debris',
+    targetType: 'none', targetCount: 1,
+    objectives: [
+      { description: 'Clear 3 patches of grass on your island', targetType: 'clear_grass',     targetCount: 3, icon: '🌿' },
+      { description: 'Clear 1 fishbone on your island',          targetType: 'clear_driftwood', targetCount: 1, icon: '🦴' },
+    ],
+    rewardCoins: 100, rewardXP: 10, icon: '🪓', unlockLevel: 1,
+  },
+  {
+    id: 'q_crab',
+    title: 'Crab Attack',
+    subtitle: "You will encounter some pesky crabs on your island. Scare 'em off or beat 'em up!",
+    description: 'Defeat a crab',
+    targetType: 'none', targetCount: 1,
+    objectives: [
+      { description: 'Find 1 crab by clearing debris and fishbones...then click to beat them with a stick!', targetType: 'kill_crab', targetCount: 1, icon: '🦀' },
+    ],
+    rewardCoins: 300, rewardXP: 15,
+    rewardItems: [{ type: 'FENCE', count: 2 }],
+    icon: '🦀', unlockLevel: 1, prereqs: ['q_fishing', 'q_clear'],
+  },
+  {
+    id: 'q_chop',
+    title: 'Chopping Time',
+    subtitle: "You'll need some wood to build your home.",
+    description: 'Chop a tree and clear the stump',
+    targetType: 'none', targetCount: 1,
+    objectives: [
+      { description: 'Chop down 1 tree on your island',       targetType: 'chop_tree',       targetCount: 1, icon: '🌴' },
+      { description: 'Clear 1 tree stump on your island',     targetType: 'clear_driftwood', targetCount: 1, icon: '🪵' },
+    ],
+    rewardCoins: 150, rewardXP: 10,
+    rewardItems: [{ type: 'wood', count: 3 }],
+    icon: '🌴', unlockLevel: 1, prereqs: ['q_fishing', 'q_clear'],
+  },
 ];
 
 export const OBJECT_CONFIG: Record<string, any> = {
