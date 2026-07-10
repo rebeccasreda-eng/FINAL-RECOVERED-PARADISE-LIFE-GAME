@@ -501,10 +501,10 @@ const ObjectSVG: React.FC<{ object: string; tileX: number; tileY: number; tileTy
       <svg viewBox="0 0 72 112" width="88" height="138" style={{ display:'block' }}>
         <defs>
           <linearGradient id={g('cot')} x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%"   stopColor="#f2ca72"/>
-            <stop offset="28%"  stopColor="#c89038"/>
-            <stop offset="70%"  stopColor="#8a5820"/>
-            <stop offset="100%" stopColor="#503408"/>
+            <stop offset="0%"   stopColor="#c05030"/>
+            <stop offset="24%"  stopColor="#8a2c10"/>
+            <stop offset="65%"  stopColor="#5a1806"/>
+            <stop offset="100%" stopColor="#300802"/>
           </linearGradient>
           <radialGradient id={g('coc')} cx="34%" cy="26%" r="70%">
             <stop offset="0%"   stopColor="#bcf874"/>
@@ -519,16 +519,31 @@ const ObjectSVG: React.FC<{ object: string; tileX: number; tileY: number; tileTy
             <stop offset="100%" stopColor="#1e5808"/>
           </radialGradient>
         </defs>
-        <ellipse cx="36" cy="110" rx="17" ry="4.5" fill="rgba(60,40,10,0.32)"/>
+        {/* ── Grass blades at base ── */}
+        <path d="M14,112 Q12,105 16,98"  stroke="#38901a" strokeWidth="2.4" fill="none" strokeLinecap="round"/>
+        <path d="M19,112 Q17,104 22,96"  stroke="#2e8012" strokeWidth="2.0" fill="none" strokeLinecap="round"/>
+        <path d="M25,112 Q23,104 27,95"  stroke="#3a9820" strokeWidth="2.2" fill="none" strokeLinecap="round"/>
+        <path d="M48,112 Q50,104 46,95"  stroke="#3a9820" strokeWidth="2.2" fill="none" strokeLinecap="round"/>
+        <path d="M54,112 Q56,104 51,96"  stroke="#2e8012" strokeWidth="2.0" fill="none" strokeLinecap="round"/>
+        <path d="M59,112 Q61,105 57,98"  stroke="#38901a" strokeWidth="2.4" fill="none" strokeLinecap="round"/>
+        {/* ── Trunk — dark reddish-brown with vertical stripe texture ── */}
         <path d="M22,108 Q26,84 30,62 L40,62 Q44,84 48,108Z" fill={`url(#${g('cot')})`}/>
-        <path d="M24.5,106 Q28,82 32,64" stroke="rgba(255,255,255,0.46)" strokeWidth="3.5" fill="none" strokeLinecap="round"/>
-        <path d="M44,106 Q45.5,82 43.5,64" stroke="rgba(0,0,0,0.24)" strokeWidth="3" fill="none" strokeLinecap="round"/>
-        {[70,78,87,96,104].map(y => (
-          <path key={y} d={`M24,${y} Q36,${y-3} 47,${y}`} stroke="rgba(0,0,0,0.20)" strokeWidth="2.0" fill="none" strokeLinecap="round"/>
-        ))}
-        <ellipse cx="29" cy="82" rx="3.2" ry="1.8" fill="rgba(0,0,0,0.16)" transform="rotate(-8 29 82)"/>
-        <ellipse cx="41" cy="94" rx="2.8" ry="1.6" fill="rgba(0,0,0,0.13)" transform="rotate(7 41 94)"/>
-
+        {/* Left lit edge */}
+        <path d="M24.5,106 Q28,82 32,64" stroke="rgba(255,255,255,0.26)" strokeWidth="2.0" fill="none" strokeLinecap="round"/>
+        {/* Dark vertical stripe lines */}
+        {([0.12,0.28,0.44,0.60,0.76,0.91] as const).map((t, i) => {
+          const tx = (30 + t * 10).toFixed(1);
+          const bx = (22 + t * 26).toFixed(1);
+          const mx = ((30 + t * 10) * 0.4 + (22 + t * 26) * 0.6).toFixed(1);
+          return <path key={i} d={`M${tx},62 Q${mx},84 ${bx},108`} stroke="rgba(0,0,0,0.30)" strokeWidth="1.2" fill="none"/>;
+        })}
+        {/* Light highlight stripes between dark ones */}
+        {([0.05,0.20,0.36,0.52,0.68,0.84] as const).map((t, i) => {
+          const tx = (30 + t * 10).toFixed(1);
+          const bx = (22 + t * 26).toFixed(1);
+          const mx = ((30 + t * 10) * 0.4 + (22 + t * 26) * 0.6).toFixed(1);
+          return <path key={i} d={`M${tx},62 Q${mx},84 ${bx},108`} stroke="rgba(255,255,255,0.13)" strokeWidth="0.8" fill="none"/>;
+        })}
 
         {/* ── BACK LAYER — darkest, drooping wide fronds ── */}
         <path d="M36,52 Q12,58 0,80 Q24,74 36,52Z" fill="#0a3506"/>
@@ -585,12 +600,12 @@ const ObjectSVG: React.FC<{ object: string; tileX: number; tileY: number; tileTy
     case 'TREE_COCONUT': return (
       <svg viewBox="0 0 72 112" width="88" height="138" style={{ display:'block' }}>
         <defs>
-          {/* Trunk — cylindrical, left edge lit */}
+          {/* Trunk — dark reddish-brown, vertical stripe texture */}
           <linearGradient id={g('cot')} x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%"   stopColor="#f2ca72"/>
-            <stop offset="28%"  stopColor="#c89038"/>
-            <stop offset="70%"  stopColor="#8a5820"/>
-            <stop offset="100%" stopColor="#503408"/>
+            <stop offset="0%"   stopColor="#c05030"/>
+            <stop offset="24%"  stopColor="#8a2c10"/>
+            <stop offset="65%"  stopColor="#5a1806"/>
+            <stop offset="100%" stopColor="#300802"/>
           </linearGradient>
           {/* Crown — radial sphere, lit upper-left */}
           <radialGradient id={g('coc')} cx="34%" cy="26%" r="70%">
@@ -607,19 +622,31 @@ const ObjectSVG: React.FC<{ object: string; tileX: number; tileY: number; tileTy
           </radialGradient>
         </defs>
 
-        {/* Trunk — tapered path with cylindrical shading */}
+        {/* ── Grass blades at base ── */}
+        <path d="M14,112 Q12,105 16,98"  stroke="#38901a" strokeWidth="2.4" fill="none" strokeLinecap="round"/>
+        <path d="M19,112 Q17,104 22,96"  stroke="#2e8012" strokeWidth="2.0" fill="none" strokeLinecap="round"/>
+        <path d="M25,112 Q23,104 27,95"  stroke="#3a9820" strokeWidth="2.2" fill="none" strokeLinecap="round"/>
+        <path d="M48,112 Q50,104 46,95"  stroke="#3a9820" strokeWidth="2.2" fill="none" strokeLinecap="round"/>
+        <path d="M54,112 Q56,104 51,96"  stroke="#2e8012" strokeWidth="2.0" fill="none" strokeLinecap="round"/>
+        <path d="M59,112 Q61,105 57,98"  stroke="#38901a" strokeWidth="2.4" fill="none" strokeLinecap="round"/>
+        {/* ── Trunk — dark reddish-brown with vertical stripe texture ── */}
         <path d="M22,108 Q26,84 30,62 L40,62 Q44,84 48,108Z" fill={`url(#${g('cot')})`}/>
-        {/* Left specular streak */}
-        <path d="M24.5,106 Q28,82 32,64" stroke="rgba(255,255,255,0.46)" strokeWidth="3.5" fill="none" strokeLinecap="round"/>
-        {/* Right rim shadow */}
-        <path d="M44,106 Q45.5,82 43.5,64" stroke="rgba(0,0,0,0.24)" strokeWidth="3" fill="none" strokeLinecap="round"/>
-        {/* Bark rings — curved cross-sections */}
-        {[70,78,87,96,104].map(y => (
-          <path key={y} d={`M24,${y} Q36,${y-3} 47,${y}`} stroke="rgba(0,0,0,0.20)" strokeWidth="2.0" fill="none" strokeLinecap="round"/>
-        ))}
-        {/* Bark knots */}
-        <ellipse cx="29" cy="82" rx="3.2" ry="1.8" fill="rgba(0,0,0,0.16)" transform="rotate(-8 29 82)"/>
-        <ellipse cx="41" cy="94" rx="2.8" ry="1.6" fill="rgba(0,0,0,0.13)" transform="rotate(7 41 94)"/>
+        {/* Left lit edge */}
+        <path d="M24.5,106 Q28,82 32,64" stroke="rgba(255,255,255,0.26)" strokeWidth="2.0" fill="none" strokeLinecap="round"/>
+        {/* Dark vertical stripe lines */}
+        {([0.12,0.28,0.44,0.60,0.76,0.91] as const).map((t, i) => {
+          const tx = (30 + t * 10).toFixed(1);
+          const bx = (22 + t * 26).toFixed(1);
+          const mx = ((30 + t * 10) * 0.4 + (22 + t * 26) * 0.6).toFixed(1);
+          return <path key={i} d={`M${tx},62 Q${mx},84 ${bx},108`} stroke="rgba(0,0,0,0.30)" strokeWidth="1.2" fill="none"/>;
+        })}
+        {/* Light highlight stripes between dark ones */}
+        {([0.05,0.20,0.36,0.52,0.68,0.84] as const).map((t, i) => {
+          const tx = (30 + t * 10).toFixed(1);
+          const bx = (22 + t * 26).toFixed(1);
+          const mx = ((30 + t * 10) * 0.4 + (22 + t * 26) * 0.6).toFixed(1);
+          return <path key={i} d={`M${tx},62 Q${mx},84 ${bx},108`} stroke="rgba(255,255,255,0.13)" strokeWidth="0.8" fill="none"/>;
+        })}
 
 
 
