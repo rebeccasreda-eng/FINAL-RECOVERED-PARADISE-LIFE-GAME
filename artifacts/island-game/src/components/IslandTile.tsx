@@ -8,7 +8,7 @@ import { useToast } from '@/hooks/use-toast';
 const COLORS = {
   GRASS:   { top: '#5aab3e', sideL: '#3f8a2a', sideR: '#4a9e32' },
   SAND:    { top: '#e8d29a', sideL: '#cdb277', sideR: '#d4b97f' },
-  WATER:   { top: '#3f8fc9', sideL: null,       sideR: null      },
+  WATER:   { top: '#52C8E4', sideL: null,       sideR: null      },
   CLEARED: { top: '#8b5a2b', sideL: '#5a3a18',  sideR: '#6a4420' },
 };
 
@@ -231,11 +231,35 @@ export const IslandTile: React.FC<IslandTileProps> = ({
         viewBox="0 0 80 44"
         style={{ width: 80, height: 44, display: 'block', overflow: 'visible' }}
       >
+        {/* Water gradient + clip defs — unique IDs per tile */}
+        {isWater && (() => {
+          const gid = `wg-${tile.x}-${tile.y}`;
+          const cid = `wc-${tile.x}-${tile.y}`;
+          /* Wave positions: stagger by tile coords so adjacent tiles feel connected */
+          const phase = (tile.x * 5 + tile.y * 3) % 8;
+          const y1 = 7  + phase * 0.4;
+          const y2 = 18 + phase * 0.25;
+          return (
+            <defs>
+              {/* Depth gradient: light sky-cyan top-left → vivid tropical center → deep edge */}
+              <linearGradient id={gid} x1="15%" y1="0%" x2="85%" y2="100%">
+                <stop offset="0%"   stopColor="#82DCF8" />
+                <stop offset="40%"  stopColor="#52C8E4" />
+                <stop offset="100%" stopColor="#30B0D2" />
+              </linearGradient>
+              {/* Clip to diamond so wave strokes don't bleed outside */}
+              <clipPath id={cid}>
+                <polygon points="40,0 80,14 40,28 0,14" />
+              </clipPath>
+            </defs>
+          );
+        })()}
+
         {/* Top face */}
         <polygon
           points="40,0 80,14 40,28 0,14"
-          fill={topFill}
-          stroke="rgba(0,0,0,0.12)"
+          fill={isWater ? `url(#wg-${tile.x}-${tile.y})` : topFill}
+          stroke={isWater ? 'none' : 'rgba(0,0,0,0.12)'}
           strokeWidth="1"
           strokeLinejoin="round"
         />
@@ -248,14 +272,34 @@ export const IslandTile: React.FC<IslandTileProps> = ({
           </>
         )}
 
-        {/* Water shimmer highlight */}
-        {isWater && (
-          <polygon
-            points="40,0 80,14 40,28 0,14"
-            fill="rgba(255,255,255,0.10)"
-            className="water-glint"
-          />
-        )}
+        {/* Water: painted wave strokes + shimmer */}
+        {isWater && (() => {
+          const cid   = `wc-${tile.x}-${tile.y}`;
+          const phase = (tile.x * 5 + tile.y * 3) % 8;
+          const y1    = 7  + phase * 0.4;
+          const y2    = 18 + phase * 0.25;
+          const cls1  = (tile.x + tile.y) % 2 === 0 ? 'water-wave-a' : 'water-wave-b';
+          const cls2  = (tile.x + tile.y) % 2 === 0 ? 'water-wave-b' : 'water-wave-a';
+          return (
+            <g clipPath={`url(#${cid})`}>
+              {/* Upper wave stroke */}
+              <path
+                d={`M -5,${y1} Q 20,${y1 - 2.5} 40,${y1} Q 60,${y1 + 2.5} 85,${y1}`}
+                fill="none" stroke="rgba(255,255,255,0.28)" strokeWidth="1.6"
+                strokeLinecap="round" className={cls1}
+              />
+              {/* Lower wave stroke */}
+              <path
+                d={`M -5,${y2} Q 20,${y2 + 2} 40,${y2} Q 60,${y2 - 2} 85,${y2}`}
+                fill="none" stroke="rgba(255,255,255,0.18)" strokeWidth="1.2"
+                strokeLinecap="round" className={cls2}
+              />
+              {/* Subtle centre highlight band — replicates the lighter area in the reference */}
+              <ellipse cx="40" cy="13" rx="18" ry="6"
+                fill="rgba(180,238,255,0.18)" className="water-glint" />
+            </g>
+          );
+        })()}
 
         {/* Danger zone red pulse */}
         {isDangerZone && (
