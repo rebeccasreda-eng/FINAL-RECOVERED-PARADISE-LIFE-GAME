@@ -96,6 +96,10 @@ export const IslandGrid: React.FC<IslandGridProps> = ({
           tileZIndex={(tile.x + tile.y) * 2}
           isDangerZone={dangerZoneTiles.has(tile.id)}
           onTileClick={onTileClick}
+          nbN={state.tiles[`${tile.x - 1},${tile.y}`]?.type}
+          nbE={state.tiles[`${tile.x},${tile.y - 1}`]?.type}
+          nbS={state.tiles[`${tile.x + 1},${tile.y}`]?.type}
+          nbW={state.tiles[`${tile.x},${tile.y + 1}`]?.type}
         />
       ))}
 

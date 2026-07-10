@@ -537,6 +537,67 @@ const SVG_OBJECTS = new Set(['TREE_PALM', 'TREE_APPLE', 'ROCK', 'FLOWER_BUSH', '
 /** Objects that sway in the breeze */
 const SWAY_OBJECTS = new Set(['TREE_PALM', 'TREE_APPLE', 'TREE_COCONUT', 'TREE_MANGO']);
 
+/* ── Shore scatter helper ────────────────────────────────────────────────
+   Deterministic per-tile RNG — no Math.random(), stable across renders.    */
+function tileRng(tx: number, ty: number, n: number): number {
+  let h = ((tx * 374761393) ^ (ty * 668265263) ^ (n * 2246822519)) | 0;
+  h ^= h >>> 13;
+  h  = Math.imul(h, 1540483477);
+  h ^= h >>> 15;
+  return ((h >>> 0) % 10000) / 10000;
+}
+
+/**
+ * Returns SVG <ellipse> elements scattered near each shore edge of a water tile.
+ * Diamond vertices: top=(40,-1) right=(81,14) bottom=(40,29) left=(-1,14)
+ * Isometric direction mapping:
+ *   nbN = tile(x-1,y) → upper-left edge  → scatter near (14, 7)
+ *   nbE = tile(x,y-1) → upper-right edge → scatter near (66, 7)
+ *   nbS = tile(x+1,y) → lower-right edge → scatter near (66, 21)
+ *   nbW = tile(x,y+1) → lower-left edge  → scatter near (14, 21)
+ */
+function shoreScatter(
+  tx: number, ty: number,
+  nN: boolean, nE: boolean, nS: boolean, nW: boolean,
+): React.ReactNode[] {
+  const out: React.ReactNode[] = [];
+  const edges = [
+    { active: nN, bcx: 14, bcy:  7  },
+    { active: nE, bcx: 66, bcy:  7  },
+    { active: nS, bcx: 66, bcy: 21  },
+    { active: nW, bcx: 14, bcy: 21  },
+  ];
+
+  edges.forEach(({ active, bcx, bcy }, ei) => {
+    if (!active) return;
+    const count = 3 + Math.floor(tileRng(tx, ty, ei * 7) * 3); // 3–5 blobs
+    for (let i = 0; i < count; i++) {
+      const base = ei * 100 + i;
+      const ox   = (tileRng(tx, ty, base + 11) - 0.5) * 16;
+      const oy   = (tileRng(tx, ty, base + 17) - 0.5) *  9;
+      const cx   = bcx + ox;
+      const cy   = bcy + oy;
+      // skip blobs too close to the diamond border
+      if (cx < 4 || cx > 76 || cy < 1 || cy > 28) continue;
+      const rx   = 2.2 + tileRng(tx, ty, base + 23) * 3.2;
+      const ry   = (1.0 + tileRng(tx, ty, base + 29) * 1.6) * 0.65;
+      const rot  = (tileRng(tx, ty, base + 37) - 0.5) * 60;
+      const op   = 0.28 + tileRng(tx, ty, base + 41) * 0.28;
+      // colours range from pale sand (#dfc87a) to warm tan (#c8aa60)
+      const sand = tileRng(tx, ty, base + 53) > 0.5 ? '#d4bc78' : '#c4a85c';
+      out.push(
+        <ellipse
+          key={`sh-${ei}-${i}`}
+          cx={cx} cy={cy} rx={rx} ry={ry}
+          fill={sand} opacity={op}
+          transform={`rotate(${rot.toFixed(1)} ${cx.toFixed(1)} ${cy.toFixed(1)})`}
+        />
+      );
+    }
+  });
+  return out;
+}
+
 /* ── Props ──────────────────────────────────────────────────────────────── */
 interface IslandTileProps {
   tile: TileData;
@@ -548,11 +609,14 @@ interface IslandTileProps {
   tileZIndex: number;
   isDangerZone?: boolean;
   onTileClick?: (x: number, y: number) => void;
+  /** Tile types of the 4 cardinal neighbours (undefined = outside map = water) */
+  nbN?: string; nbE?: string; nbS?: string; nbW?: string;
 }
 
 /* ── IslandTile ─────────────────────────────────────────────────────────── */
 export const IslandTile: React.FC<IslandTileProps> = ({
   tile, screenX, screenY, tileZIndex, isDangerZone, onTileClick,
+  nbN, nbE, nbS, nbW,
 }) => {
   const {
     state, dispatch, interact, plant, place,
@@ -588,7 +652,17 @@ export const IslandTile: React.FC<IslandTileProps> = ({
   const isWater   = tile.type === 'WATER';
   const isCleared = tile.object === 'CLEARED_LAND' || tile.object === 'CROP_PLOT';
 
-  // All water tiles render as bright ocean blue (#1fa8e8), matching the outer ocean background.
+  // Shore detection — a water tile is "near shore" if any cardinal neighbour is land
+  const isLand = (t?: string) => t === 'SAND' || t === 'GRASS';
+  const shN = isWater && isLand(nbN);
+  const shE = isWater && isLand(nbE);
+  const shS = isWater && isLand(nbS);
+  const shW = isWater && isLand(nbW);
+  const isShore = shN || shE || shS || shW;
+  // Shallow water is 1–2 tiles from land — check 2nd-order neighbours too (approximated by
+  // checking whether any neighbour is itself shore-adjacent, which we can't easily do here,
+  // so we simply extend to tiles that share a diagonal land neighbour via type check)
+  const isShallow = isShore; // used for colour shift
 
   /* ── Diamond colours ── */
   const palette = isCleared ? COLORS.CLEARED : (COLORS[tile.type] ?? COLORS.GRASS);
@@ -726,9 +800,26 @@ export const IslandTile: React.FC<IslandTileProps> = ({
         {/* Top face — expanded 1 px beyond nominal edges to seal sub-pixel seams */}
         <polygon
           points="40,-1 81,14 40,29 -1,14"
-          fill={isWater ? '#1fa8e8' : hovered ? topFill : `url(#lg-${tile.x}-${tile.y})`}
+          fill={isWater
+            ? (isShallow ? '#28bce0' : '#1fa8e8')
+            : hovered ? topFill : `url(#lg-${tile.x}-${tile.y})`}
           stroke="none"
         />
+
+        {/* ── Shore scatter: sandy blobs on water tiles adjacent to land ── */}
+        {isShore && shoreScatter(tile.x, tile.y, shN, shE, shS, shW)}
+
+        {/* ── Wet-sand tint: sand tiles adjacent to water get a subtle blue wash ── */}
+        {!isWater && tile.type === 'SAND' && (isLand(nbN) === false || isLand(nbE) === false || isLand(nbS) === false || isLand(nbW) === false) && (() => {
+          const hasWaterNb = nbN === 'WATER' || nbE === 'WATER' || nbS === 'WATER' || nbW === 'WATER';
+          if (!hasWaterNb) return null;
+          return (
+            <polygon
+              points="40,-1 81,14 40,29 -1,14"
+              fill="rgba(28,152,210,0.12)"
+            />
+          );
+        })()}
 
         {/* ── Grass blade texture overlay ── */}
         {!isWater && !isCleared && tile.type === 'GRASS' && (
