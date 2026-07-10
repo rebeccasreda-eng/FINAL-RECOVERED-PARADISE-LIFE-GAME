@@ -770,49 +770,47 @@ export const IslandTile: React.FC<IslandTileProps> = ({
         )}
       </svg>
 
-      {/* ── Fish jumping in water — ~1 in 5 water tiles ── */}
+      {/* ── Fish swimming in water — ~1 in 5 water tiles ── */}
       {isWater && (tile.x * 7 + tile.y * 11) % 5 === 0 && (() => {
-        const fish: React.ReactNode[] = [];
+        const delay = (tile.x * 5 + tile.y * 7) % 16;
+        // Alternate direction tile-by-tile
+        const goRight = (tile.x + tile.y) % 2 === 0;
+        const cls  = goRight ? 'fish-swim' : 'fish-swim-r';
+        // Facing: right-swimmer faces right, left-swimmer is mirrored
+        const flip = goRight ? 'none' : 'scaleX(-1)';
 
-        const makeFish = (key: string, delay: number, offsetX: number, orange: boolean) => {
-          const body  = orange ? '#f5a623' : '#7ddcf8';
-          const fin   = orange ? '#d4821a' : '#4ab8e0';
-          const belly = orange ? '#fdd280' : '#c0eeff';
-          return (
-            <div
-              key={key}
-              className="fish-jump"
-              style={{
-                position: 'absolute',
-                left: `calc(50% + ${offsetX}px)`,
-                top: 10,
-                animationDelay: `${delay}s`,
-                zIndex: tileZIndex + 4,
-              }}
+        return (
+          <div
+            className={cls}
+            style={{
+              position: 'absolute',
+              left: 0,
+              top: 12,                    // sits in the water, not above it
+              animationDelay: `${delay}s`,
+              zIndex: tileZIndex + 2,
+            }}
+          >
+            <svg
+              viewBox="0 0 22 11" width="20" height="10"
+              style={{ display: 'block', transform: flip }}
             >
-              <svg viewBox="0 0 22 11" width="20" height="10" style={{ display: 'block', transform: 'translate(-50%,-50%)' }}>
-                {/* tail */}
-                <polygon points="1,1 7,5.5 1,10" fill={fin}/>
-                {/* body */}
-                <ellipse cx="13" cy="5.5" rx="9.5" ry="4.5" fill={body}/>
-                {/* belly shimmer */}
-                <ellipse cx="13" cy="7.8" rx="6" ry="1.6" fill={belly} opacity="0.55"/>
-                {/* dorsal fin */}
-                <polygon points="8,1.5 11,5 14,1.5" fill={fin} opacity="0.8"/>
-                {/* eye */}
-                <circle cx="20" cy="4.2" r="1.4" fill="white"/>
-                <circle cx="20.4" cy="4.2" r="0.7" fill="#111"/>
-              </svg>
-            </div>
-          );
-        };
-
-        // Deterministic delay and colour variant — independent of spawn predicate
-        const delay   = (tile.x * 5 + tile.y * 7) % 13;
-        const orange  = (tile.x + tile.y) % 2 === 0;
-        fish.push(makeFish('f1', delay, -4, orange));
-
-        return <>{fish}</>;
+              {/* tail */}
+              <polygon points="1,1 7,5.5 1,10" fill="#3aa8d8"/>
+              {/* body */}
+              <ellipse cx="13" cy="5.5" rx="9.5" ry="4.5" fill="#55c8f0"/>
+              {/* belly shimmer */}
+              <ellipse cx="13" cy="7.8" rx="6" ry="1.6" fill="#b8eeff" opacity="0.60"/>
+              {/* dorsal fin */}
+              <polygon points="8,1.5 11,5 14,1.5" fill="#2e90c0" opacity="0.85"/>
+              {/* scale highlight */}
+              <ellipse cx="11" cy="4.5" rx="3.5" ry="1.8" fill="rgba(255,255,255,0.28)" transform="rotate(-10 11 4.5)"/>
+              {/* eye */}
+              <circle cx="20" cy="4.2" r="1.4" fill="white"/>
+              <circle cx="20.4" cy="4.2" r="0.7" fill="#0a2a40"/>
+              <circle cx="20.1" cy="3.9" r="0.35" fill="rgba(255,255,255,0.8)"/>
+            </svg>
+          </div>
+        );
       })()}
 
       {/* ── SVG art object (trees, rocks, flowers, driftwood) ── */}
