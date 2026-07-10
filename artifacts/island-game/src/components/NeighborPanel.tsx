@@ -33,16 +33,6 @@ const IcoAxe = () => (
     <path d="M14,7.5 Q15,7 16.5,6.5" stroke="#2a7010" strokeWidth="0.8" fill="none" strokeLinecap="round" opacity="0.8"/>
   </svg>
 );
-const IcoMarket = () => (
-  <svg viewBox="0 0 32 28" width="30" height="26">
-    <rect x="2" y="14" width="28" height="12" rx="2" fill="#d4a848"/>
-    <rect x="4" y="16" width="24" height="8" rx="1" fill="#f8e8b0"/>
-    {[8,14,20].map(x => <rect key={x} x={x} y="16" width="2" height="8" fill="#b88830" opacity="0.5"/>)}
-    <path d="M2,14 Q8,4 16,6 Q24,4 30,14Z" fill="#e84040"/>
-    <path d="M2,14 Q8,8 16,10 Q24,8 30,14" stroke="white" strokeWidth="1.5" fill="none" opacity="0.5"/>
-    <text x="16" y="13" textAnchor="middle" fontSize="5" fontWeight="900" fill="white" opacity="0.9">MARKET</text>
-  </svg>
-);
 const IcoCollect = () => (
   <svg viewBox="0 0 28 28" width="26" height="26">
     <polygon points="14,3 17,11 26,11 19,17 22,25 14,20 6,25 9,17 2,11 11,11"
@@ -120,91 +110,67 @@ const Tile = ({
   </button>
 );
 
-/* ─── Mini island SVG scene ────────────────────────────────────────────── */
-const IslandScene = () => (
-  <svg viewBox="0 0 260 68" preserveAspectRatio="xMidYMid slice"
-       style={{ position: 'absolute', inset: 0, width: '100%', height: '100%' }}>
-    {/* Sky gradient */}
+/* ─── Marina destination card illustration ─────────────────────────────── */
+const MarinaIllus = () => (
+  <svg viewBox="0 0 80 46" width="80" height="46" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%' }}>
     <defs>
-      <linearGradient id="skyG" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0%"   stopColor="#60c8f0"/>
-        <stop offset="100%" stopColor="#98dff8"/>
+      <linearGradient id="marSky" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stopColor="#3ab0f0"/><stop offset="100%" stopColor="#78d0f8"/>
       </linearGradient>
-      <linearGradient id="waterG" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0%"   stopColor="#1898d8"/>
-        <stop offset="100%" stopColor="#0e78b0"/>
+      <linearGradient id="marSea" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stopColor="#0e80c8"/><stop offset="100%" stopColor="#074e8a"/>
       </linearGradient>
     </defs>
-    <rect x="0"   y="0"  width="260" height="68" fill="url(#skyG)"/>
-    {/* Distant clouds */}
-    <ellipse cx="30"  cy="14" rx="18" ry="7"  fill="white" opacity="0.80"/>
-    <ellipse cx="22"  cy="16" rx="10" ry="5"  fill="white" opacity="0.75"/>
-    <ellipse cx="40"  cy="16" rx="10" ry="5"  fill="white" opacity="0.75"/>
-    <ellipse cx="200" cy="12" rx="22" ry="8"  fill="white" opacity="0.75"/>
-    <ellipse cx="191" cy="14" rx="12" ry="6"  fill="white" opacity="0.70"/>
-    <ellipse cx="213" cy="14" rx="12" ry="6"  fill="white" opacity="0.70"/>
-    {/* Water */}
-    <rect x="0" y="38" width="260" height="30" fill="url(#waterG)"/>
-    <rect x="0" y="38" width="260" height="5"  fill="#40b8e8" opacity="0.45"/>
-    {/* Water shimmer lines */}
-    <line x1="20"  y1="48" x2="50"  y2="48" stroke="rgba(255,255,255,0.30)" strokeWidth="1.5" strokeLinecap="round"/>
-    <line x1="80"  y1="52" x2="115" y2="52" stroke="rgba(255,255,255,0.25)" strokeWidth="1.5" strokeLinecap="round"/>
-    <line x1="160" y1="46" x2="195" y2="46" stroke="rgba(255,255,255,0.28)" strokeWidth="1.5" strokeLinecap="round"/>
-    <line x1="220" y1="54" x2="248" y2="54" stroke="rgba(255,255,255,0.22)" strokeWidth="1.5" strokeLinecap="round"/>
-    {/* Island sand base */}
-    <ellipse cx="130" cy="46" rx="90" ry="16" fill="#c8a040"/>
-    <ellipse cx="130" cy="43" rx="82" ry="12" fill="#e0c060"/>
-    {/* Island grass */}
-    <ellipse cx="130" cy="40" rx="58" ry="9"  fill="#68cc30"/>
-    <ellipse cx="130" cy="38" rx="48" ry="6"  fill="#80e040"/>
-    {/* Sand texture dots */}
-    <circle cx="90"  cy="46" r="1.5" fill="rgba(160,120,40,0.35)"/>
-    <circle cx="110" cy="48" r="1.5" fill="rgba(160,120,40,0.30)"/>
-    <circle cx="152" cy="47" r="1.5" fill="rgba(160,120,40,0.30)"/>
-    <circle cx="170" cy="45" r="1.5" fill="rgba(160,120,40,0.32)"/>
-    {/* Palm tree 1 (left) */}
-    <path d="M90 38 Q88 26 86 14" stroke="#7a5020" strokeWidth="3.5" fill="none" strokeLinecap="round"/>
-    <ellipse cx="86" cy="14" rx="14" ry="6"  fill="#28a818" transform="rotate(-20 86 14)"/>
-    <ellipse cx="86" cy="14" rx="14" ry="6"  fill="#38c020" transform="rotate( 15 86 14)" opacity="0.8"/>
-    <ellipse cx="86" cy="14" rx="10" ry="5"  fill="#48d828" transform="rotate(-50 86 14)" opacity="0.7"/>
-    <circle  cx="86" cy="14" r="2"            fill="#f0a818" opacity="0.85"/>
-    {/* Palm tree 2 (right) */}
-    <path d="M172 37 Q174 25 177 12" stroke="#7a5020" strokeWidth="3.5" fill="none" strokeLinecap="round"/>
-    <ellipse cx="177" cy="12" rx="14" ry="6"  fill="#28a818" transform="rotate( 18 177 12)"/>
-    <ellipse cx="177" cy="12" rx="14" ry="6"  fill="#38c020" transform="rotate(-15 177 12)" opacity="0.8"/>
-    <ellipse cx="177" cy="12" rx="10" ry="5"  fill="#48d828" transform="rotate( 48 177 12)" opacity="0.7"/>
-    <circle  cx="177" cy="12" r="2"            fill="#f0a818" opacity="0.85"/>
-    {/* Palm tree 3 (center, shorter) */}
-    <path d="M130 38 Q129 30 128 22" stroke="#7a5020" strokeWidth="3"   fill="none" strokeLinecap="round"/>
-    <ellipse cx="128" cy="22" rx="11" ry="5"  fill="#38b820" transform="rotate(-10 128 22)"/>
-    <ellipse cx="128" cy="22" rx="11" ry="5"  fill="#50cc28" transform="rotate( 25 128 22)" opacity="0.8"/>
-    <circle  cx="128" cy="22" r="1.8"          fill="#f0a818" opacity="0.8"/>
-    {/* Small accent flowers */}
-    <circle cx="106" cy="37" r="2.5" fill="#ff4488" opacity="0.9"/>
-    <circle cx="155" cy="37" r="2.5" fill="#ffcc00" opacity="0.9"/>
-    <circle cx="117" cy="36" r="2"   fill="#ff8022" opacity="0.85"/>
-    <circle cx="143" cy="36" r="2"   fill="#ff4488" opacity="0.80"/>
+    <rect width="80" height="46" fill="url(#marSky)"/>
+    {/* Clouds */}
+    <ellipse cx="14" cy="9"  rx="10" ry="4" fill="white" opacity="0.75"/>
+    <ellipse cx="9"  cy="10" rx="6"  ry="3" fill="white" opacity="0.70"/>
+    <ellipse cx="62" cy="7"  rx="12" ry="4" fill="white" opacity="0.70"/>
+    <ellipse cx="57" cy="8"  rx="7"  ry="3" fill="white" opacity="0.65"/>
+    {/* Sea */}
+    <rect y="28" width="80" height="18" fill="url(#marSea)"/>
+    <rect y="28" width="80" height="3"  fill="#40b0e0" opacity="0.40"/>
+    {/* Shimmer */}
+    <line x1="8"  y1="34" x2="22" y2="34" stroke="rgba(255,255,255,0.28)" strokeWidth="1.2" strokeLinecap="round"/>
+    <line x1="50" y1="38" x2="68" y2="38" stroke="rgba(255,255,255,0.22)" strokeWidth="1.2" strokeLinecap="round"/>
+    {/* Dock */}
+    <rect x="30" y="24" width="20" height="4" rx="1" fill="#8a5820"/>
+    <rect x="34" y="28" width="2"  height="9" fill="#6a4010"/>
+    <rect x="44" y="28" width="2"  height="9" fill="#6a4010"/>
+    {/* Boat hull */}
+    <path d="M18,28 Q20,35 32,36 Q44,35 46,28Z" fill="#e8e0c8"/>
+    <path d="M18,28 Q20,34 32,35 Q44,34 46,28" stroke="#b0a080" strokeWidth="1" fill="none"/>
+    {/* Sail */}
+    <line x1="32" y1="28" x2="32" y2="12" stroke="#8a7050" strokeWidth="1.5"/>
+    <path d="M32,13 L32,26 L46,22Z" fill="white" opacity="0.90"/>
+    <path d="M32,14 L32,24 L20,20Z" fill="#f8d0a0" opacity="0.80"/>
+    {/* Cabin */}
+    <rect x="26" y="24" width="8" height="4" rx="1" fill="#4a8ab8"/>
+    <rect x="27" y="25" width="2" height="2" rx="0.5" fill="#a0d0f0" opacity="0.8"/>
   </svg>
 );
 
-/* ─── Nav arrow button ──────────────────────────────────────────────────── */
-const NavArrow = ({ label }: { label: string }) => (
-  <button
-    className="active:scale-95 transition-transform"
-    style={{
-      width: 30,
-      background: 'rgba(0,0,0,0.38)',
-      border: 'none',
-      borderRight: label === '‹' ? '1px solid rgba(255,255,255,0.12)' : 'none',
-      borderLeft:  label === '›' ? '1px solid rgba(255,255,255,0.12)' : 'none',
-      color: 'rgba(255,255,255,0.90)',
-      fontSize: 22, fontWeight: 900,
-      cursor: 'pointer', flexShrink: 0,
-      display: 'flex', alignItems: 'center', justifyContent: 'center',
-    }}
-  >
-    {label}
-  </button>
+/* ─── Neighbor destination card illustration ───────────────────────────── */
+const NeighborIllus = () => (
+  <svg viewBox="0 0 80 46" width="80" height="46" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%' }}>
+    <defs>
+      <linearGradient id="nbSky" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stopColor="#a0d870"/><stop offset="100%" stopColor="#c8f090"/>
+      </linearGradient>
+    </defs>
+    <rect width="80" height="46" fill="url(#nbSky)"/>
+    {/* Island silhouettes (distant) */}
+    <ellipse cx="40" cy="38" rx="28" ry="10" fill="#68b830" opacity="0.5"/>
+    <ellipse cx="40" cy="36" rx="20" ry="7"  fill="#88d840" opacity="0.45"/>
+    <ellipse cx="18" cy="40" rx="12" ry="6"  fill="#58a828" opacity="0.40"/>
+    <ellipse cx="64" cy="40" rx="14" ry="6"  fill="#5ab030" opacity="0.40"/>
+    {/* Big "+" in the centre */}
+    <rect x="35" y="18" width="10" height="10" rx="2" fill="rgba(255,255,255,0.90)"/>
+    <rect x="35" y="18" width="10" height="10" rx="2" fill="rgba(60,180,20,0.20)"/>
+    <rect x="37" y="19.5" width="6" height="7"  rx="1" fill="rgba(255,255,255,0)" />
+    {/* Actual + paths */}
+    <path d="M40,20 L40,27 M36.5,23.5 L43.5,23.5" stroke="#1e8a08" strokeWidth="3" strokeLinecap="round"/>
+  </svg>
 );
 
 /* ─── NeighborPanel props ───────────────────────────────────────────────── */
@@ -264,13 +230,6 @@ export const NeighborPanel = ({
             gradient="linear-gradient(180deg, #7090b8 0%, #405878 100%)"
           >
             <IcoAxe />
-          </Tile>
-
-          <Tile
-            onClick={() => setShopOpen(true)}
-            gradient="linear-gradient(180deg, #70b030 0%, #408010 100%)"
-          >
-            <IcoMarket />
           </Tile>
 
           <Tile
@@ -345,38 +304,51 @@ export const NeighborPanel = ({
           </span>
         </div>
 
-        {/* Scene row: ‹  island scene  ADD NEIGHBOR  › */}
-        <div className="flex flex-1 items-stretch overflow-hidden">
+        {/* Destination cards row: Marina | Neighbor */}
+        <div className="flex flex-1 gap-1.5 px-1.5 py-1.5 items-stretch overflow-hidden">
 
-          <NavArrow label="‹" />
+          {/* Marina card */}
+          <button
+            className="flex-1 relative overflow-hidden active:scale-95 transition-transform flex flex-col items-center justify-end"
+            style={{
+              borderRadius: 10,
+              border: '2px solid #0a3868',
+              borderBottom: '3px solid #062040',
+              boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.18), 0 2px 6px rgba(0,0,0,0.40)',
+              cursor: 'pointer',
+              padding: '0 0 4px',
+            }}
+          >
+            <MarinaIllus />
+            <span style={{
+              position: 'relative', zIndex: 1,
+              color: '#ffffff', fontSize: 9, fontWeight: 900,
+              letterSpacing: '0.07em',
+              textShadow: '0 1px 4px rgba(0,0,0,0.80)',
+            }}>MARINA</span>
+          </button>
 
-          {/* Island scene with ADD NEIGHBOR overlay */}
-          <div className="flex-1 relative overflow-hidden flex items-center justify-center">
-            <IslandScene />
+          {/* Neighbor card */}
+          <button
+            className="flex-1 relative overflow-hidden active:scale-95 transition-transform flex flex-col items-center justify-end"
+            style={{
+              borderRadius: 10,
+              border: '2px solid #186408',
+              borderBottom: '3px solid #0e3c04',
+              boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.18), 0 2px 6px rgba(0,0,0,0.40)',
+              cursor: 'pointer',
+              padding: '0 0 4px',
+            }}
+          >
+            <NeighborIllus />
+            <span style={{
+              position: 'relative', zIndex: 1,
+              color: '#ffffff', fontSize: 9, fontWeight: 900,
+              letterSpacing: '0.07em',
+              textShadow: '0 1px 4px rgba(0,0,0,0.80)',
+            }}>ADD NEIGHBOR</span>
+          </button>
 
-            {/* ADD NEIGHBOR button */}
-            <button
-              className="relative active:scale-95 transition-transform"
-              style={{
-                zIndex: 2,
-                background: 'linear-gradient(180deg, #60d040 0%, #30a010 100%)',
-                border: '2px solid #186808',
-                borderBottom: '3px solid #105008',
-                color: 'white',
-                fontWeight: 900, fontSize: 10,
-                padding: '4px 14px',
-                borderRadius: 8,
-                boxShadow: '0 2px 8px rgba(0,0,0,0.40)',
-                textShadow: '0 1px 2px rgba(0,0,0,0.45)',
-                cursor: 'pointer',
-                letterSpacing: '0.05em',
-              }}
-            >
-              ADD NEIGHBOR
-            </button>
-          </div>
-
-          <NavArrow label="›" />
         </div>
       </div>
 
