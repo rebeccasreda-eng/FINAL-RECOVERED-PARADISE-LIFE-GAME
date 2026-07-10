@@ -246,7 +246,8 @@ export function generateIsland(): Record<string, TileData> {
           const treePct = 0.28 + ff * 0.22; // 28–50 % coverage
           if (r < treePct) {
             const tr = rand();
-            if      (tr < 0.28) tile.object = 'TREE_PALM';
+            if      (tr < 0.14) tile.object = 'TREE_COCONUT'; // first half of old palms → coconut
+            else if (tr < 0.28) { /* second half removed — empty tile */ }
             else if (tr < 0.52) tile.object = 'TREE_COCONUT';
             else if (tr < 0.78) tile.object = 'TREE_MANGO';
             else                tile.object = 'TREE_APPLE';
@@ -258,7 +259,7 @@ export function generateIsland(): Record<string, TileData> {
           // ── Transitional strip: mango + occasional palm ─────────────────
           const treePct = 0.07 + ff * 0.08;
           if (r < treePct) {
-            tile.object = rand() < 0.30 ? 'TREE_PALM' : 'TREE_MANGO';
+            { const pr = rand(); if (pr < 0.15) tile.object = 'TREE_COCONUT'; else if (pr >= 0.30) tile.object = 'TREE_MANGO'; }
           } else if (r < treePct + 0.04) {
             tile.object = 'FLOWER_BUSH';
           }
@@ -267,7 +268,8 @@ export function generateIsland(): Record<string, TileData> {
           // ── Front / open island: mango throughout, palm only near pond ──
           const palmChance  = adjToWater ? 0.12 : 0;
           const mangoChance = 0.06;
-          if      (r < palmChance)                    tile.object = 'TREE_PALM';
+          if      (r < palmChance * 0.5)              tile.object = 'TREE_COCONUT'; // first half → coconut
+          else if (r < palmChance)                    { /* second half removed */ }
           else if (r < palmChance + mangoChance)      tile.object = 'TREE_MANGO';
           else if (r < palmChance + mangoChance + 0.04) tile.object = 'FLOWER_BUSH';
         }
