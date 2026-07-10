@@ -21,7 +21,7 @@ description: Tile grid dimensions, world container size, iso projection constant
 | OX | 1100 (= WORLD_W/2) | IslandGrid.tsx |
 | OY | 80 | IslandGrid.tsx; tile (15,15) → screenY=420+80=500=WORLD_H/2 |
 | PLAYER_START | { x:15, y:15 } | Game.tsx |
-| localStorage key | island-game-state-v8 | GameContext.tsx |
+| localStorage key | island-game-state-v14 | GameContext.tsx |
 | INITIAL_ZOOM | 2.0 | Game.tsx |
 | MIN_ZOOM | 0.4 | Game.tsx |
 | MAX_ZOOM | 3.2 | Game.tsx |

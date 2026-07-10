@@ -227,6 +227,18 @@ export function generateIsland(): Record<string, TileData> {
   };
 
   // ── Object placement ────────────────────────────────────────────────────
+  // Track placed tree positions so we can enforce minimum spacing (prevents clumping).
+  const treePos: Array<[number, number]> = [];
+  const tooClose = (x: number, y: number, minDist: number) =>
+    treePos.some(([tx, ty]) => Math.abs(tx - x) <= minDist && Math.abs(ty - y) <= minDist);
+
+  const placeTree = (tile: TileData, type: string, minDist: number) => {
+    if (tooClose(tile.x, tile.y, minDist)) return false;
+    tile.object = type as any;
+    treePos.push([tile.x, tile.y]);
+    return true;
+  };
+
   for (let y = 0; y < GRID; y++) {
     for (let x = 0; x < GRID; x++) {
       if (x === CX && y === CY) continue;
@@ -235,11 +247,11 @@ export function generateIsland(): Record<string, TileData> {
       const ff = forestFactor(x, y);
 
       // Isometric "back" = small x+y (upper-screen area). Centre sum = CX+CY = 30.
-      const diagSum   = x + y;
-      const isDeepBack = diagSum < 20;          // dense forest zone at the back
-      const isMidBack  = diagSum >= 20 && diagSum < 26; // transition strip
+      const diagSum    = x + y;
+      const isDeepBack = diagSum < 22;            // dense-but-spaced forest zone
+      const isMidBack  = diagSum >= 22 && diagSum < 28; // light transition strip
 
-      // Adjacent to water → good place for a pond-side palm
+      // Adjacent to water → eligible for a waterside coconut palm
       const adjToWater = [[-1,0],[1,0],[0,-1],[0,1]].some(([dx,dy]) => {
         const n = tiles[`${x+dx},${y+dy}`];
         return n && n.type === 'WATER';
@@ -249,36 +261,42 @@ export function generateIsland(): Record<string, TileData> {
         const r = rand();
 
         if (isDeepBack) {
-          // ── Dense back forest: all tree types ──────────────────────────
-          const treePct = 0.28 + ff * 0.22; // 28–50 % coverage
+          // ── Back forest: high probability but minDist=1 → no two trees touch ──
+          // treePct: 45–62 % raw chance; spacing thins it to ~35–45 % actual fill
+          const treePct = 0.45 + ff * 0.17;
           if (r < treePct) {
             const tr = rand();
-            if      (tr < 0.14) tile.object = 'TREE_COCONUT'; // first half of old palms → coconut
-            else if (tr < 0.28) { /* second half removed — empty tile */ }
-            else if (tr < 0.52) tile.object = 'TREE_COCONUT';
-            else if (tr < 0.78) tile.object = 'TREE_MANGO';
-            else                tile.object = 'TREE_APPLE';
-          } else if (r < treePct + 0.05) {
+            const type = tr < 0.25 ? 'TREE_COCONUT'
+                       : tr < 0.55 ? 'TREE_MANGO'
+                       : tr < 0.80 ? 'TREE_APPLE'
+                       :             'TREE_COCONUT';
+            placeTree(tile, type, 1); // minDist=1: at least 1 gap between any two trees
+          } else if (r < treePct + 0.04) {
             tile.object = 'FLOWER_BUSH';
           }
 
         } else if (isMidBack) {
-          // ── Transitional strip: mango + occasional palm ─────────────────
-          const treePct = 0.07 + ff * 0.08;
+          // ── Mid zone: scattered trees with clear gaps ──────────────────
+          const treePct = 0.16 + ff * 0.10;
           if (r < treePct) {
-            { const pr = rand(); if (pr < 0.15) tile.object = 'TREE_COCONUT'; else if (pr >= 0.30) tile.object = 'TREE_MANGO'; }
+            const tr = rand();
+            const type = tr < 0.40 ? 'TREE_MANGO' : 'TREE_COCONUT';
+            placeTree(tile, type, 2); // minDist=2: trees well separated
           } else if (r < treePct + 0.04) {
             tile.object = 'FLOWER_BUSH';
           }
 
         } else {
-          // ── Front / open island: mango throughout, palm only near pond ──
-          const palmChance  = adjToWater ? 0.12 : 0;
-          const mangoChance = 0.06;
-          if      (r < palmChance * 0.5)              tile.object = 'TREE_COCONUT'; // first half → coconut
-          else if (r < palmChance)                    { /* second half removed */ }
-          else if (r < palmChance + mangoChance)      tile.object = 'TREE_MANGO';
-          else if (r < palmChance + mangoChance + 0.04) tile.object = 'FLOWER_BUSH';
+          // ── Front / open: only waterside coconuts + rare mango ────────
+          const palmChance  = adjToWater ? 0.10 : 0;
+          const mangoChance = 0.03;
+          if (r < palmChance) {
+            placeTree(tile, 'TREE_COCONUT', 3); // minDist=3: very spread out
+          } else if (r < palmChance + mangoChance) {
+            placeTree(tile, 'TREE_MANGO', 3);
+          } else if (r < palmChance + mangoChance + 0.04) {
+            tile.object = 'FLOWER_BUSH';
+          }
         }
 
       } else if (tile.type === 'SAND') {
