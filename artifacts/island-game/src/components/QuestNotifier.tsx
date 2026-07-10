@@ -15,7 +15,7 @@ import { QUESTS, QUEST_GROUPS } from '../game/gameData';
 
 /* ── Parrot-bush NPC ──────────────────────────────────────────────────── */
 const ParrotNPC = () => (
-  <svg viewBox="0 0 84 84" xmlns="http://www.w3.org/2000/svg" width="80" height="80">
+  <svg viewBox="0 0 84 84" xmlns="http://www.w3.org/2000/svg" width="46" height="46">
     {/* Shadow */}
     <ellipse cx="42" cy="81" rx="20" ry="4" fill="rgba(0,0,0,0.18)"/>
 
@@ -90,7 +90,7 @@ const ParrotNPC = () => (
 
 /* ── Crab NPC ──────────────────────────────────────────────────────────── */
 const CrabNPC = () => (
-  <svg viewBox="0 0 84 84" xmlns="http://www.w3.org/2000/svg" width="80" height="80">
+  <svg viewBox="0 0 84 84" xmlns="http://www.w3.org/2000/svg" width="46" height="46">
     <ellipse cx="42" cy="80" rx="26" ry="5" fill="rgba(0,0,0,0.18)"/>
     {/* Left big claw */}
     <path d="M22 44 Q6 34 8 20 Q12 10 20 14" stroke="#bf2000" strokeWidth="6" fill="none" strokeLinecap="round"/>
@@ -125,96 +125,87 @@ const CrabNPC = () => (
   </svg>
 );
 
-/* ── Palm-tree NPC ─────────────────────────────────────────────────────── */
+/* ── Axe NPC (chop-tree group icon) ────────────────────────────────────── */
 const TreeNPC = () => (
-  <svg viewBox="0 0 84 84" xmlns="http://www.w3.org/2000/svg" width="80" height="80">
-    <ellipse cx="42" cy="80" rx="20" ry="5" fill="rgba(0,0,0,0.18)"/>
-    {/* Trunk */}
-    <path d="M38 80 Q36 60 40 36 Q44 60 46 80Z" fill="#a07030"/>
-    <path d="M38 80 Q36 60 40 36" stroke="#805820" strokeWidth="1.5" fill="none" opacity="0.5"/>
-    {/* Coconuts */}
-    <circle cx="38" cy="36" r="5.5" fill="#8a6020" stroke="#6a4810" strokeWidth="1"/>
-    <circle cx="46" cy="33" r="5" fill="#8a6020" stroke="#6a4810" strokeWidth="1"/>
-    {/* Fronds */}
-    <path d="M40 34 Q22 20 10 24" stroke="#3a9818" strokeWidth="7" fill="none" strokeLinecap="round"/>
-    <path d="M40 34 Q32 12 38 4"  stroke="#3a9818" strokeWidth="7" fill="none" strokeLinecap="round"/>
-    <path d="M40 34 Q52 12 66 16" stroke="#3a9818" strokeWidth="7" fill="none" strokeLinecap="round"/>
-    <path d="M40 34 Q56 26 70 32" stroke="#40a820" strokeWidth="6" fill="none" strokeLinecap="round"/>
-    <path d="M40 34 Q24 28 12 38" stroke="#40a820" strokeWidth="6" fill="none" strokeLinecap="round"/>
-    {/* Axe handle */}
-    <rect x="55" y="50" width="5" height="26" rx="2.5" fill="#8a5020" transform="rotate(-20 57 63)"/>
-    {/* Axe head */}
-    <path d="M50 48 Q60 40 68 50 Q62 56 52 52Z" fill="#b0b0b0" stroke="#888" strokeWidth="1.2"/>
-    <path d="M50 48 Q58 44 68 50" stroke="#d0d0d0" strokeWidth="2" fill="none" opacity="0.5"/>
+  <svg viewBox="0 0 84 84" xmlns="http://www.w3.org/2000/svg" width="46" height="46">
+    <ellipse cx="42" cy="81" rx="22" ry="4.5" fill="rgba(0,0,0,0.20)"/>
+    {/* Circular badge background */}
+    <circle cx="42" cy="40" r="36" fill="#5a8030"/>
+    <circle cx="42" cy="40" r="36" fill="none" stroke="#3a5820" strokeWidth="2.5"/>
+    <circle cx="38" cy="36" r="36" fill="rgba(255,255,255,0.07)"/>
+    {/* Handle — diagonal, bottom-right to upper-left */}
+    <path d="M62,72 Q54,58 46,44 Q38,30 30,16"
+      stroke="#7a4e1c" strokeWidth="9" fill="none" strokeLinecap="round"/>
+    <path d="M62,72 Q54,58 46,44 Q38,30 30,16"
+      stroke="#c08840" strokeWidth="5" fill="none" strokeLinecap="round" opacity="0.55"/>
+    {/* Axe head — wide crescent blade at top of handle */}
+    <path d="M14,6 Q8,10 7,19 Q6,28 11,34 Q16,40 23,36 Q30,38 34,30 Q38,20 32,12 Q26,6 14,6Z"
+      fill="#8898b4"/>
+    <path d="M14,6 Q8,10 7,19 Q6,28 11,34"
+      stroke="#6070a0" strokeWidth="1.3" fill="none" opacity="0.7"/>
+    {/* Blade shine */}
+    <path d="M13,9 Q9,15 9,23"
+      stroke="rgba(210,225,255,0.60)" strokeWidth="2.8" fill="none" strokeLinecap="round"/>
+    <ellipse cx="24" cy="14" rx="4" ry="7" fill="rgba(200,215,255,0.20)" transform="rotate(25 24 14)"/>
+    {/* Blade edge highlight */}
+    <path d="M11,34 Q16,39 23,36"
+      stroke="rgba(220,235,255,0.50)" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
+    {/* Wood grain on handle */}
+    <path d="M44,48 Q46,50 48,48" stroke="#5a3810" strokeWidth="0.9" fill="none" opacity="0.4"/>
+    <path d="M50,58 Q52,60 54,58" stroke="#5a3810" strokeWidth="0.9" fill="none" opacity="0.4"/>
   </svg>
 );
 
-/* ── Fish NPC ──────────────────────────────────────────────────────────── */
+/* ── Fishing-rod NPC (fishing quest group icon) ─────────────────────────── */
 const FishNPC = () => (
-  <svg viewBox="0 0 84 84" xmlns="http://www.w3.org/2000/svg" width="80" height="80">
-    {/* Rounded water-filled "tank" background */}
-    <rect x="0" y="0" width="84" height="84" rx="12" fill="#1282c4"/>
-    {/* Deep water gradient layers */}
-    <rect x="0" y="42" width="84" height="42" rx="0" fill="#0e6eaa" opacity="0.6"/>
-    <rect x="0" y="60" width="84" height="24" rx="0" fill="#0a5890" opacity="0.5"/>
-    {/* Bottom sand */}
-    <ellipse cx="42" cy="82" rx="44" ry="10" fill="#c8a450"/>
-    <ellipse cx="42" cy="80" rx="38" ry="7" fill="#d8b460"/>
-    {/* Sandy bottom bumps */}
-    <ellipse cx="14" cy="80" rx="10" ry="5" fill="#caa850" opacity="0.8"/>
-    <ellipse cx="60" cy="80" rx="12" ry="5" fill="#c8a250" opacity="0.7"/>
-    {/* Coral left */}
-    <path d="M12,76 Q9,64 11,54 Q13,46 15,54 Q17,60 15,68" stroke="#e04040" strokeWidth="4" fill="none" strokeLinecap="round"/>
-    <circle cx="9"  cy="53" r="5"   fill="#e84848"/>
-    <circle cx="14" cy="49" r="4.5" fill="#f05050"/>
-    <circle cx="16" cy="54" r="4"   fill="#e03838"/>
-    {/* Seaweed right */}
-    <path d="M68,76 Q66,62 70,50 Q72,44 70,50" stroke="#28a030" strokeWidth="4" fill="none" strokeLinecap="round"/>
-    <path d="M72,76 Q75,63 72,52" stroke="#22961e" strokeWidth="3" fill="none" strokeLinecap="round"/>
-    <ellipse cx="70" cy="49" rx="7" ry="4"   fill="#38b838" transform="rotate(-20 70 49)"/>
-    <ellipse cx="73" cy="51" rx="6" ry="3.5" fill="#30ac30" transform="rotate(20 73 51)"/>
-    {/* Surface shimmer waves */}
-    <path d="M4,8 Q14,4 24,8 Q34,12 44,8 Q54,4 64,8 Q74,12 82,8" stroke="rgba(140,220,255,0.55)" strokeWidth="2.5" fill="none"/>
-    <path d="M2,14 Q12,10 22,14 Q32,18 42,14 Q52,10 62,14 Q72,18 82,14" stroke="rgba(140,220,255,0.35)" strokeWidth="2" fill="none"/>
-    {/* Light rays from surface */}
-    <path d="M20,0 L18,30" stroke="rgba(255,255,255,0.12)" strokeWidth="6" strokeLinecap="round"/>
-    <path d="M38,0 L36,25" stroke="rgba(255,255,255,0.10)" strokeWidth="5" strokeLinecap="round"/>
-    <path d="M58,0 L60,28" stroke="rgba(255,255,255,0.09)" strokeWidth="4" strokeLinecap="round"/>
-    {/* Fish body — clownfish, fully inside water */}
-    <ellipse cx="44" cy="44" rx="22" ry="14" fill="#ff6820"/>
-    {/* White stripes */}
-    <path d="M37,31 Q35,44 37,57" stroke="white" strokeWidth="4.5" fill="none" opacity="0.78"/>
-    <path d="M48,31 Q46,44 48,57" stroke="white" strokeWidth="4"   fill="none" opacity="0.65"/>
-    {/* Outline */}
-    <ellipse cx="44" cy="44" rx="22" ry="14" fill="none" stroke="#c84808" strokeWidth="1.5" opacity="0.55"/>
-    {/* Tail fin */}
-    <path d="M66,38 Q80,34 82,44 Q80,54 66,50 Q70,44 66,38Z" fill="#ff7830"/>
-    <path d="M66,38 Q70,44 66,50" stroke="white" strokeWidth="1.5" fill="none" opacity="0.4"/>
-    {/* Dorsal fin */}
-    <path d="M30,30 Q38,20 52,30 Q47,31 40,31 Q35,31 30,30Z" fill="#ff8030" stroke="#c84808" strokeWidth="1" opacity="0.9"/>
-    {/* Pectoral fin */}
-    <path d="M50,52 Q56,60 54,66 Q47,60 47,54Z" fill="#ff9840" opacity="0.7"/>
-    {/* Eye */}
-    <circle cx="26" cy="42" r="5.5" fill="white"/>
-    <circle cx="26" cy="42" r="3.5" fill="#1a1a1a"/>
-    <circle cx="24.5" cy="40.5" r="1.5" fill="white"/>
-    {/* Mouth */}
-    <path d="M18,47 Q20,50 23,48" stroke="#b83808" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
-    {/* Bubbles rising */}
-    <circle cx="14" cy="38" r="2.8" fill="none" stroke="rgba(180,230,255,0.80)" strokeWidth="1.5"/>
-    <circle cx="10" cy="28" r="2.2" fill="none" stroke="rgba(180,230,255,0.65)" strokeWidth="1.2"/>
-    <circle cx="14" cy="19" r="1.6" fill="none" stroke="rgba(180,230,255,0.50)" strokeWidth="1"/>
-    <circle cx="10" cy="11" r="1.2" fill="none" stroke="rgba(180,230,255,0.35)" strokeWidth="0.9"/>
-    {/* Small decorative fish (background) */}
-    <ellipse cx="62" cy="26" rx="8" ry="5" fill="#ff9c50" opacity="0.65"/>
-    <path d="M70,23 Q75,26 70,29Z" fill="#ffaa60" opacity="0.6"/>
-    <circle cx="57" cy="25" r="2" fill="#1a1a1a" opacity="0.55"/>
+  <svg viewBox="0 0 84 84" xmlns="http://www.w3.org/2000/svg" width="46" height="46">
+    <ellipse cx="42" cy="81" rx="22" ry="4.5" fill="rgba(0,0,0,0.20)"/>
+    {/* Circular badge background — ocean blue */}
+    <circle cx="42" cy="40" r="36" fill="#1282c4"/>
+    <circle cx="42" cy="40" r="36" fill="none" stroke="#0a5890" strokeWidth="2.5"/>
+    {/* Water in lower half */}
+    <clipPath id="fcClip"><circle cx="42" cy="40" r="36"/></clipPath>
+    <rect x="6" y="54" width="72" height="22" fill="#0e6eaa" clipPath="url(#fcClip)"/>
+    {/* Water shimmer */}
+    <path d="M8,55 Q18,52 28,55 Q38,58 48,55 Q58,52 76,55"
+      stroke="rgba(140,220,255,0.50)" strokeWidth="1.8" fill="none" clipPath="url(#fcClip)"/>
+    {/* ── Rod — diagonal from lower-left to upper-right ── */}
+    {/* Cork grip (thick dark section at butt) */}
+    <path d="M18,72 Q20,68 24,62"
+      stroke="#5a3010" strokeWidth="8" fill="none" strokeLinecap="round"/>
+    <path d="M18,72 Q20,68 24,62"
+      stroke="#8a5828" strokeWidth="5" fill="none" strokeLinecap="round" opacity="0.7"/>
+    {/* Main blank — tapers to tip */}
+    <path d="M24,62 Q36,46 50,30 Q58,20 66,12"
+      stroke="#7a5020" strokeWidth="5.5" fill="none" strokeLinecap="round"/>
+    <path d="M24,62 Q36,46 50,30 Q58,20 66,12"
+      stroke="#c09050" strokeWidth="3" fill="none" strokeLinecap="round" opacity="0.55"/>
+    {/* Reel seat */}
+    <ellipse cx="28" cy="58" rx="6" ry="4" fill="#4a4a60" transform="rotate(-45 28 58)"/>
+    <ellipse cx="28" cy="58" rx="5" ry="3" fill="#6060a0" transform="rotate(-45 28 58)"/>
+    {/* Guide rings along rod */}
+    <circle cx="40" cy="42" r="2.8" fill="none" stroke="#888" strokeWidth="1.5"/>
+    <circle cx="52" cy="28" r="2.2" fill="none" stroke="#888" strokeWidth="1.4"/>
+    <circle cx="60" cy="18" r="1.6" fill="none" stroke="#888" strokeWidth="1.2"/>
+    {/* ── Fishing line from tip curving down to water ── */}
+    <path d="M66,12 Q68,28 62,44 Q60,52 58,58"
+      stroke="rgba(220,240,255,0.85)" strokeWidth="1.2" fill="none" strokeLinecap="round"/>
+    {/* Hook */}
+    <path d="M58,58 Q62,62 60,66 Q57,69 54,66"
+      stroke="rgba(220,235,255,0.90)" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
+    {/* Small fish on hook */}
+    <ellipse cx="52" cy="64" rx="6" ry="3.5" fill="#ff7820" transform="rotate(20 52 64)"/>
+    <path d="M57,61 Q60,64 57,67Z" fill="#ff9030" transform="rotate(20 57 64)"/>
+    <circle cx="47" cy="63" r="1.4" fill="#1a1a1a" opacity="0.8"/>
+    {/* Bubbles */}
+    <circle cx="44" cy="58" r="2" fill="none" stroke="rgba(180,230,255,0.70)" strokeWidth="1.2"/>
+    <circle cx="40" cy="50" r="1.4" fill="none" stroke="rgba(180,230,255,0.55)" strokeWidth="1"/>
   </svg>
 );
 
 /* ── Axe-stump NPC ─────────────────────────────────────────────────────── */
 const AxeNPC = () => (
-  <svg viewBox="0 0 84 84" xmlns="http://www.w3.org/2000/svg" width="80" height="80">
+  <svg viewBox="0 0 84 84" xmlns="http://www.w3.org/2000/svg" width="46" height="46">
     <ellipse cx="42" cy="80" rx="30" ry="5" fill="rgba(0,0,0,0.18)"/>
     {/* Grass */}
     <ellipse cx="42" cy="74" rx="34" ry="11" fill="#3ab028"/>

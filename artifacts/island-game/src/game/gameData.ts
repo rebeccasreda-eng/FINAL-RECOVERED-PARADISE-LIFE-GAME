@@ -37,6 +37,7 @@ export interface QuestGroup {
 }
 
 export const QUEST_GROUPS: QuestGroup[] = [
+  { id: 'grp_parrot', npcType: 'parrot', quests: ['q_welcome'],             prereqs: [] },
   { id: 'grp_fish',   npcType: 'fish',   quests: ['q_fishing'],             prereqs: [] },
   { id: 'grp_axe',    npcType: 'axe',    quests: ['q_clear'],               prereqs: [] },
   { id: 'grp_crab',   npcType: 'crab',   quests: ['q_crab'],                prereqs: ['q_fishing', 'q_clear'] },
