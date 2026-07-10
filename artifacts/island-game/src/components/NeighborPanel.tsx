@@ -778,7 +778,6 @@ export const NeighborPanel = ({
 
             {/* PLAYER / MARKET / MARINA tabs */}
             <QuickTabBtn label="PLAYER" emoji="🧑" active={quickTab === 'player'} onClick={() => toggleTab('player')} />
-            <QuickTabBtn label="MARKET" emoji="🛒" active={quickTab === 'market'} onClick={() => toggleTab('market')} />
             <QuickTabBtn label="MARINA" emoji="⚓" active={quickTab === 'marina'} onClick={() => toggleTab('marina')} />
           </div>
         </div>
