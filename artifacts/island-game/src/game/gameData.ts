@@ -148,7 +148,7 @@ export const OBJECT_CONFIG: Record<string, any> = {
 };
 
 export const EMOJI_MAP: Record<string, string> = {
-  TREE_PALM: '🌴', TREE_APPLE: '🍎', ROCK: '🪨', FLOWER_BUSH: '🌸', DRIFTWOOD: '🪵', SUNFLOWER: '🌻',
+  TREE_PALM: '🌴', TREE_APPLE: '🍎', ROCK: '🪨', FLOWER_BUSH: '🌸', DRIFTWOOD: '🪵', SUNFLOWER: '🌻', PUDDLE: '💧',
   TREE_COCONUT: '🌴', TREE_MANGO: '🥭', GARDEN_PATCH: '🍍',
   CROP_PLOT: '🟫', CROP_GROWING: '🌱', CROP_READY: '🌽', CROP_WILTED: '🥀',
   FISH_SPOT: '', HUT: '🏚️', DOCK: '⛵', WELL: '💧', 
@@ -299,6 +299,19 @@ export function generateIsland(): Record<string, TileData> {
 
   const waterTiles = Object.values(tiles).filter(t => t.type === 'WATER');
   for (let i = 0; i < 6 && waterTiles.length; i++) pick(waterTiles).object = 'FISH_SPOT';
+
+  // ── Puddles near trees — small water pools under the canopy ─────────────
+  const ALL_TREE_TYPES: ObjectType[] = ['TREE_COCONUT', 'TREE_MANGO', 'TREE_APPLE', 'TREE_PALM'];
+  const treeTiles = Object.values(tiles).filter(t => t.object && ALL_TREE_TYPES.includes(t.object as ObjectType));
+  const TREE_NEIGHBORS = [[-1,0],[1,0],[0,-1],[0,1],[-1,-1],[1,-1],[-1,1],[1,1]] as const;
+  for (const tree of treeTiles) {
+    for (const [dx, dy] of TREE_NEIGHBORS) {
+      const nb = tiles[`${tree.x + dx},${tree.y + dy}`];
+      if (nb && nb.type === 'GRASS' && !nb.object && rand() < 0.28) {
+        nb.object = 'PUDDLE';
+      }
+    }
+  }
 
   // ── Sunflowers near garden patches — waiting to ripe ────────────────────
   const gardenTiles = Object.values(tiles).filter(t => t.object === 'GARDEN_PATCH');

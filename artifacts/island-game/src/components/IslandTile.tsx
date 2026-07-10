@@ -275,6 +275,60 @@ const ObjectSVG: React.FC<{ object: string; tileX: number; tileY: number }> = ({
       );
     }
 
+    /* ── PUDDLE (decorative water pool near trees) ─────────────────────── */
+    case 'PUDDLE': {
+      const pv = (tx * 11 + ty * 5) % 3;
+      // slight size variation per tile
+      const pr = pv === 0 ? 1.0 : pv === 1 ? 0.88 : 1.12;
+      const W = 26 * pr, H = 12 * pr;
+      const cx = 26, cy = 16;
+      return (
+        <svg viewBox="0 0 52 26" width="50" height="24" style={{ display:'block' }}>
+          {/* Ground shadow — slightly offset below */}
+          <ellipse cx={cx} cy={cy + 2} rx={W + 2} ry={H + 1} fill="rgba(0,0,0,0.15)"/>
+          {/* Water body */}
+          <ellipse cx={cx} cy={cy} rx={W} ry={H} fill="#2ab0d8"/>
+          {/* Depth gradient — darker edges */}
+          <ellipse cx={cx} cy={cy} rx={W} ry={H} fill="url(#pdg)"/>
+          <defs>
+            <radialGradient id={g('pdg')} cx="38%" cy="30%" r="75%">
+              <stop offset="0%"   stopColor="rgba(100,220,255,0.55)"/>
+              <stop offset="60%"  stopColor="rgba(30,160,210,0.20)"/>
+              <stop offset="100%" stopColor="rgba(10,80,140,0.45)"/>
+            </radialGradient>
+          </defs>
+          {/* Main surface reflection — bright streak */}
+          <ellipse cx={cx - 4} cy={cy - 3} rx={W * 0.38} ry={H * 0.28}
+            fill="rgba(200,240,255,0.58)" transform={`rotate(-18 ${cx-4} ${cy-3})`}/>
+          {/* Secondary shimmer */}
+          <ellipse cx={cx + 5} cy={cy - 1} rx={W * 0.18} ry={H * 0.18}
+            fill="rgba(255,255,255,0.36)" transform={`rotate(10 ${cx+5} ${cy-1})`}/>
+          {/* Ripple rings */}
+          <ellipse cx={cx} cy={cy} rx={W * 0.55} ry={H * 0.52}
+            fill="none" stroke="rgba(255,255,255,0.28)" strokeWidth="1.2"/>
+          <ellipse cx={cx} cy={cy} rx={W * 0.78} ry={H * 0.74}
+            fill="none" stroke="rgba(255,255,255,0.18)" strokeWidth="0.9"/>
+          {/* Rim highlight — thin bright edge on top half */}
+          <path d={`M ${cx - W} ${cy} A ${W} ${H} 0 0 1 ${cx + W} ${cy}`}
+            fill="none" stroke="rgba(180,240,255,0.55)" strokeWidth="1.4"/>
+          {/* Small lily pad (variant 0 only) */}
+          {pv === 0 && (
+            <g>
+              <ellipse cx={cx + 8} cy={cy + 2} rx="5.5" ry="3.5" fill="#2a8e18" opacity="0.85"
+                transform={`rotate(-12 ${cx+8} ${cy+2})`}/>
+              <path d={`M${cx+8},${cy-1.5} L${cx+8},${cy+5.5}`}
+                stroke="#1e7010" strokeWidth="0.9" fill="none" opacity="0.7"/>
+            </g>
+          )}
+          {/* Tiny floating leaf (variant 1) */}
+          {pv === 1 && (
+            <ellipse cx={cx - 6} cy={cy + 3} rx="4" ry="2.5" fill="#3a9820" opacity="0.75"
+              transform={`rotate(20 ${cx-6} ${cy+3})`}/>
+          )}
+        </svg>
+      );
+    }
+
     /* ── FLOWER BUSH ───────────────────────────────────────────────────── */
     case 'FLOWER_BUSH': {
       const pi   = (tx * 7 + ty * 13) % 3;
@@ -731,7 +785,7 @@ const ObjectSVG: React.FC<{ object: string; tileX: number; tileY: number }> = ({
 
 /** Objects that use SVG art instead of emoji */
 const SVG_OBJECTS = new Set(['TREE_PALM', 'TREE_APPLE', 'ROCK', 'FLOWER_BUSH', 'DRIFTWOOD',
-  'TREE_COCONUT', 'TREE_MANGO', 'GARDEN_PATCH', 'WEEDS', 'SUNFLOWER']);
+  'TREE_COCONUT', 'TREE_MANGO', 'GARDEN_PATCH', 'WEEDS', 'SUNFLOWER', 'PUDDLE']);
 /** Objects that sway in the breeze */
 const SWAY_OBJECTS = new Set(['TREE_PALM', 'TREE_APPLE', 'TREE_COCONUT', 'TREE_MANGO']);
 
