@@ -2,13 +2,19 @@ import React from 'react';
 import { useGame } from '../game/GameContext';
 import { QUESTS } from '../game/gameData';
 
-export const QuestPanel = () => {
+export const QuestPanel = ({ onClose }: { onClose: () => void }) => {
   const { state } = useGame();
   
   return (
-    <div className="absolute right-6 top-24 bottom-32 w-80 bg-[#fff5d7] border-8 border-[#8b5a2b] rounded-3xl shadow-2xl flex flex-col overflow-hidden z-10 select-none">
-      <div className="bg-[#8b5a2b] text-white p-4 text-center font-black text-2xl uppercase tracking-widest border-b-4 border-[#5c3a21] shadow-md">
+    <div className="absolute right-6 top-24 bottom-32 w-80 bg-[#fff5d7] border-8 border-[#8b5a2b] rounded-3xl shadow-2xl flex flex-col overflow-hidden z-30 select-none">
+      <div className="bg-[#8b5a2b] text-white p-4 text-center font-black text-2xl uppercase tracking-widest border-b-4 border-[#5c3a21] shadow-md relative">
         📋 Quests
+        <button
+          onClick={onClose}
+          className="absolute right-3 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full flex items-center justify-center text-lg font-black leading-none active:scale-90 transition-transform"
+          style={{ background: 'rgba(0,0,0,0.3)', color: 'white' }}
+          aria-label="Close quests"
+        >✕</button>
       </div>
       <div className="flex-1 overflow-y-auto p-4 space-y-4 custom-scrollbar">
         {QUESTS.map(q => {

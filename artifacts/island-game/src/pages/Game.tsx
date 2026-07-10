@@ -4,7 +4,7 @@ import { IslandGrid, WORLD_W, WORLD_H } from '../components/IslandGrid';
 import { HUD } from '../components/HUD';
 import { TopNav } from '../components/TopNav';
 import { QuestPanel } from '../components/QuestPanel';
-import { QuestBanner } from '../components/QuestBanner';
+import { QuestNotifier } from '../components/QuestNotifier';
 import { ShopModal } from '../components/ShopModal';
 import { CollectionsModal } from '../components/CollectionsModal';
 import { WeatherModal } from '../components/WeatherModal';
@@ -45,8 +45,9 @@ const WORLD_CY = WORLD_H / 2;
 /* ── GameInner ─────────────────────────────────────────────────────────── */
 const GameInner = ({ profile }: { profile: PlayerProfile }) => {
   const { shopOpen, tutorial, state, dispatch } = useGame();
-  const [collectionsOpen, setCollectionsOpen] = useState(false);
-  const [weatherOpen,     setWeatherOpen]     = useState(false);
+  const [collectionsOpen,  setCollectionsOpen]  = useState(false);
+  const [weatherOpen,      setWeatherOpen]      = useState(false);
+  const [questPanelOpen,   setQuestPanelOpen]   = useState(false);
 
   /* ── Player movement — tile-by-tile step walk (matches reference HTML) ── */
   // Current integer tile the player occupies
@@ -304,8 +305,8 @@ const GameInner = ({ profile }: { profile: PlayerProfile }) => {
         playerName={profile.name}
       />
       <NeighborPanel />
-      <QuestPanel />
-      <QuestBanner />
+      <QuestNotifier onOpenPanel={() => setQuestPanelOpen(true)} />
+      {questPanelOpen && <QuestPanel onClose={() => setQuestPanelOpen(false)} />}
       <CropPicker />
 
       {shopOpen         && <ShopModal />}
