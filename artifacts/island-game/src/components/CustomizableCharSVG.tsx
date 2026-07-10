@@ -16,14 +16,15 @@ export interface CharAppearance {
   noseStyle: string;  // 'button' | 'dot' | 'round' | 'snub'
 }
 
-export const DEFAULT_FEMALE: CharAppearance = {
+// Default boy: short reddish-auburn shaggy hair, warm brown striped sweater — matches reference chibi
+export const DEFAULT_MALE: CharAppearance = {
   skinTone: '#fde8d0',
-  hairStyle: 'long_wavy',
-  hairColor: '#7a4520',
+  hairStyle: 'shaggy',
+  hairColor: '#c85a28',
   outfitStyle: 'stripes',
-  outfitColor: '#4466cc',
+  outfitColor: '#5c3a20',
   hatStyle: 'none',
-  eyeColor: '#88551a',
+  eyeColor: '#3388ee',
   mouthStyle: 'smile',
   eyebrowStyle: 'natural',
   makeupStyle: 'none',
@@ -32,14 +33,15 @@ export const DEFAULT_FEMALE: CharAppearance = {
   noseStyle: 'button',
 };
 
-export const DEFAULT_MALE: CharAppearance = {
+// Default girl: bob auburn hair, pink striped top — same colour family as the boy
+export const DEFAULT_FEMALE: CharAppearance = {
   skinTone: '#fde8d0',
-  hairStyle: 'shaggy',
-  hairColor: '#cc4422',
-  outfitStyle: 'star',
-  outfitColor: '#222233',
+  hairStyle: 'bob',
+  hairColor: '#c85a28',
+  outfitStyle: 'stripes',
+  outfitColor: '#c84a7a',
   hatStyle: 'none',
-  eyeColor: '#3388ee',
+  eyeColor: '#88551a',
   mouthStyle: 'smile',
   eyebrowStyle: 'natural',
   makeupStyle: 'none',

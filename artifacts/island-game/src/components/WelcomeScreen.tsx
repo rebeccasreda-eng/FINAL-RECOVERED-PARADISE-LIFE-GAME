@@ -226,19 +226,69 @@ export const WelcomeScreen: React.FC<Props> = ({ onPlay }) => {
             {nameError && <p style={{ fontSize: 11, fontWeight: 900, marginTop: 3, color: '#a02f2f' }}>{nameError}</p>}
           </div>
 
-          {/* Character stage */}
+          {/* Character stage — girl left, boy right; click to select */}
           <div style={{ position: 'relative', height: 260, marginBottom: 12, borderRadius: 12, border: '4px solid #8a5a2b', overflow: 'hidden' }}>
             <StageBg/>
-            <div
-              className="idle-bob"
-              style={{
-                position: 'absolute', bottom: 22, left: '50%',
-                transform: 'translateX(-50%)', zIndex: 10,
-                filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.35))',
-              }}
-            >
-              <CustomizableCharSVG appearance={appearance} gender={currentGender} size={150}/>
-            </div>
+
+            {/* Girl */}
+            {(['female', 'male'] as const).map((g, i) => {
+              const isSelected = gender === g;
+              const charAppearance = gender === g ? appearance : (g === 'female' ? DEFAULT_FEMALE : DEFAULT_MALE);
+              return (
+                <div
+                  key={g}
+                  onClick={() => handleGender(g)}
+                  style={{
+                    position: 'absolute',
+                    bottom: 18,
+                    left: i === 0 ? '25%' : '75%',
+                    transform: 'translateX(-50%)',
+                    zIndex: 10,
+                    cursor: 'pointer',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    transition: 'transform 0.15s',
+                  }}
+                >
+                  {/* Green downward arrow above selected character */}
+                  <div style={{ height: 26, display: 'flex', alignItems: 'flex-end', justifyContent: 'center', marginBottom: 2 }}>
+                    {isSelected && (
+                      <svg width="26" height="22" viewBox="0 0 26 22" style={{ display: 'block' }}>
+                        <polygon points="13,22 0,0 26,0" fill="#33dd22" stroke="#1a8810" strokeWidth="1.5" strokeLinejoin="round"/>
+                        <polygon points="13,18 3,3 23,3" fill="#55ff44" opacity="0.5"/>
+                      </svg>
+                    )}
+                  </div>
+
+                  <div
+                    className={isSelected ? 'idle-bob' : undefined}
+                    style={{
+                      filter: isSelected
+                        ? 'drop-shadow(0 4px 10px rgba(0,0,0,0.4))'
+                        : 'drop-shadow(0 2px 4px rgba(0,0,0,0.25)) brightness(0.85)',
+                      transform: isSelected ? 'scale(1.08)' : 'scale(1)',
+                      transition: 'transform 0.15s, filter 0.15s',
+                    }}
+                  >
+                    <CustomizableCharSVG appearance={charAppearance} gender={g} size={118}/>
+                  </div>
+
+                  {/* Label badge */}
+                  <div style={{
+                    marginTop: 4,
+                    background: isSelected ? 'linear-gradient(180deg,#ffe860,#d4a020)' : 'rgba(0,0,0,0.35)',
+                    border: `2px solid ${isSelected ? '#a07010' : 'transparent'}`,
+                    borderRadius: 10, padding: '2px 8px',
+                    fontSize: 10, fontWeight: 900,
+                    color: isSelected ? '#4a2800' : '#f5e8c0',
+                    letterSpacing: 1,
+                  }}>
+                    {g === 'female' ? '♀ GIRL' : '♂ BOY'}
+                  </div>
+                </div>
+              );
+            })}
 
             {toast && (
               <div style={{
@@ -250,38 +300,16 @@ export const WelcomeScreen: React.FC<Props> = ({ onPlay }) => {
                 {toast}
               </div>
             )}
-          </div>
-
-          {/* Choose Your Gender */}
-          <div style={{ textAlign: 'center', marginBottom: 12 }}>
-            <p style={{ fontSize: 11, fontWeight: 900, textTransform: 'uppercase', letterSpacing: 4, color: '#6f4e2a', margin: '0 0 8px' }}>
-              Choose Your Gender
-            </p>
-            <div style={{ display: 'flex', justifyContent: 'center', gap: 20 }}>
-              {(['female','male'] as const).map(g => (
-                <button
-                  key={g}
-                  aria-label={g === 'female' ? 'Choose female' : 'Choose male'}
-                  onClick={() => handleGender(g)}
-                  style={{
-                    width: 52, height: 52, borderRadius: '50%',
-                    background: g === 'female' ? '#f7c6da' : '#bcdcf5',
-                    border: `3px solid ${gender === g ? (g === 'female' ? '#c23d73' : '#2f6da0') : (g === 'female' ? '#d4548a' : '#3f7fbf')}`,
-                    boxShadow: gender === g ? '0 0 0 3px #fff, 0 0 0 6px #e39a3c' : 'none',
-                    transform: gender === g ? 'scale(1.08)' : 'scale(1)',
-                    cursor: 'pointer',
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    transition: 'all 0.15s',
-                  }}
-                >
-                  {g === 'female'
-                    ? <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="#c23d73" strokeWidth="2.2"><circle cx="12" cy="8" r="5"/><path d="M12 13v8M9 18h6"/></svg>
-                    : <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="#2f6da0" strokeWidth="2.2"><circle cx="10" cy="14" r="5"/><path d="M14 10l6-6M14 4h6v6"/></svg>
-                  }
-                </button>
-              ))}
-            </div>
-            {genderError && <p style={{ fontSize: 11, fontWeight: 900, marginTop: 6, color: '#a02f2f' }}>{genderError}</p>}
+            {genderError && (
+              <div style={{
+                position: 'absolute', top: 8, left: '50%', transform: 'translateX(-50%)',
+                background: '#a02f2f', color: 'white', padding: '4px 12px',
+                borderRadius: 12, fontSize: 11, fontWeight: 900, zIndex: 30,
+                whiteSpace: 'nowrap',
+              }}>
+                {genderError}
+              </div>
+            )}
           </div>
 
           {/* Random / Customize row */}
