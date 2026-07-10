@@ -367,26 +367,50 @@ export const IslandTile: React.FC<IslandTileProps> = ({
         viewBox="0 0 80 44"
         style={{ width: 80, height: 44, display: 'block', overflow: 'visible' }}
       >
-        {/* Water gradient + clip defs — unique IDs per tile */}
-        {isWater && (() => {
-          const gid = `wg-${tile.x}-${tile.y}`;
+        {/* Per-tile gradient defs (water + land) */}
+        {(() => {
+          const gid = isWater ? `wg-${tile.x}-${tile.y}` : `lg-${tile.x}-${tile.y}`;
           const cid = `wc-${tile.x}-${tile.y}`;
-          /* Wave positions: stagger by tile coords so adjacent tiles feel connected */
-          const phase = (tile.x * 5 + tile.y * 3) % 8;
-          const y1 = 7  + phase * 0.4;
-          const y2 = 18 + phase * 0.25;
+
+          if (isWater) {
+            return (
+              <defs>
+                <linearGradient id={gid} x1="15%" y1="0%" x2="85%" y2="100%">
+                  <stop offset="0%"   stopColor="#82DCF8" />
+                  <stop offset="40%"  stopColor="#52C8E4" />
+                  <stop offset="100%" stopColor="#30B0D2" />
+                </linearGradient>
+                <clipPath id={cid}>
+                  <polygon points="40,0 80,14 40,28 0,14" />
+                </clipPath>
+              </defs>
+            );
+          }
+
+          // Slight per-tile brightness nudge: deterministic, no random
+          const v = ((tile.x * 11 + tile.y * 7) % 5) - 2; // -2 … +2
+
+          type RGB = [number, number, number];
+          const hex = (r: number, g: number, b: number) =>
+            `#${[r,g,b].map(c => Math.max(0,Math.min(255,c)).toString(16).padStart(2,'0')).join('')}`;
+          const shift = ([r,g,b]: RGB, d: number): string => hex(r+d, g+d, b+d);
+
+          let hi: RGB, lo: RGB;
+          if (isCleared) {
+            hi = [0xaa, 0x78, 0x42]; lo = [0x6a, 0x40, 0x18];
+          } else if (tile.type === 'SAND') {
+            hi = [0xf4, 0xe0, 0xb0]; lo = [0xd8, 0xbc, 0x84];
+          } else {
+            // GRASS (default)
+            hi = [0x72, 0xc4, 0x52]; lo = [0x48, 0x96, 0x2e];
+          }
+
           return (
             <defs>
-              {/* Depth gradient: light sky-cyan top-left → vivid tropical center → deep edge */}
-              <linearGradient id={gid} x1="15%" y1="0%" x2="85%" y2="100%">
-                <stop offset="0%"   stopColor="#82DCF8" />
-                <stop offset="40%"  stopColor="#52C8E4" />
-                <stop offset="100%" stopColor="#30B0D2" />
+              <linearGradient id={gid} x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%"   stopColor={shift(hi,  v)} />
+                <stop offset="100%" stopColor={shift(lo, -v)} />
               </linearGradient>
-              {/* Clip to diamond so wave strokes don't bleed outside */}
-              <clipPath id={cid}>
-                <polygon points="40,0 80,14 40,28 0,14" />
-              </clipPath>
             </defs>
           );
         })()}
@@ -394,7 +418,9 @@ export const IslandTile: React.FC<IslandTileProps> = ({
         {/* Top face */}
         <polygon
           points="40,0 80,14 40,28 0,14"
-          fill={isWater ? `url(#wg-${tile.x}-${tile.y})` : topFill}
+          fill={isWater
+            ? `url(#wg-${tile.x}-${tile.y})`
+            : hovered ? topFill : `url(#lg-${tile.x}-${tile.y})`}
           stroke="none"
         />
 

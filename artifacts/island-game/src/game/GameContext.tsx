@@ -285,7 +285,9 @@ function gameReducer(state: GameState, action: GameAction): GameState {
               if (obj.targetType !== type) return;
               const p = nextState.quests[q.id] || { progress: 0, completed: false, objectiveProgress: q.objectives!.map(() => 0) };
               if (p.completed) return;
-              const objProg = [...(p.objectiveProgress ?? q.objectives!.map(() => 0))];
+              // Normalise array to full length to handle partial/stale saves
+              const base = p.objectiveProgress ?? [];
+              const objProg = q.objectives!.map((_, j) => base[j] ?? 0);
               if (objProg[i] < obj.targetCount) objProg[i] += 1;
               const allDone = q.objectives!.every((o, j) => objProg[j] >= o.targetCount);
               nextState.quests[q.id] = { ...p, completed: allDone, progress: allDone ? 1 : 0, objectiveProgress: objProg };
@@ -432,6 +434,32 @@ function gameReducer(state: GameState, action: GameAction): GameState {
       return checkQuestCompletions(nextState);
     }
     
+    case 'TRACK': {
+      // Generic track dispatch — used by UI elements (e.g. parrot NPC click)
+      const nextState = { ...state, quests: { ...state.quests } };
+      const trackType = action.targetType;
+      for (const q of QUESTS) {
+        if (nextState.level < q.unlockLevel) continue;
+        if (q.prereqs && q.prereqs.some(pid => !nextState.quests[pid]?.completed)) continue;
+        if (q.objectives && q.objectives.length > 0) {
+          q.objectives.forEach((obj, i) => {
+            if (obj.targetType !== trackType) return;
+            const p = nextState.quests[q.id] || { progress: 0, completed: false, objectiveProgress: q.objectives!.map(() => 0) };
+            if (p.completed) return;
+            const base = p.objectiveProgress ?? [];
+            const objProg = q.objectives!.map((_, j) => base[j] ?? 0);
+            if (objProg[i] < obj.targetCount) objProg[i] += 1;
+            const allDone = q.objectives!.every((o, j) => objProg[j] >= o.targetCount);
+            nextState.quests[q.id] = { ...p, completed: allDone, progress: allDone ? 1 : 0, objectiveProgress: objProg };
+          });
+        } else if (q.targetType === trackType) {
+          const p = nextState.quests[q.id] || { progress: 0, completed: false };
+          if (!p.completed) nextState.quests[q.id] = { ...p, progress: p.progress + 1 };
+        }
+      }
+      return checkQuestCompletions(nextState);
+    }
+
     case 'CHECK_WEATHER': {
       const nextState = { ...state, quests: { ...state.quests }, stats: { ...state.stats, weatherChecked: (state.stats.weatherChecked || 0) + 1 } };
       for (const q of QUESTS) {

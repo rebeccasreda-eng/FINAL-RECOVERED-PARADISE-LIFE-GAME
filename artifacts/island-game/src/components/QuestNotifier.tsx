@@ -178,7 +178,7 @@ const SpeechBubble = ({ title }: { title: string }) => (
 
 /* ── Main component ───────────────────────────────────────────────────── */
 export const QuestNotifier = ({ onOpenPanel }: { onOpenPanel: () => void }) => {
-  const { state } = useGame();
+  const { state, dispatch } = useGame();
   const [hovered, setHovered] = useState(false);
 
   // First active (uncompleted, unlocked, prereqs met) quest
@@ -201,7 +201,7 @@ export const QuestNotifier = ({ onOpenPanel }: { onOpenPanel: () => void }) => {
         cursor: 'pointer',
         userSelect: 'none',
       }}
-      onClick={onOpenPanel}
+      onClick={() => { dispatch({ type: 'TRACK', targetType: 'feed_parrot' }); onOpenPanel(); }}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >

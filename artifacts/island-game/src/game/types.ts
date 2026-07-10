@@ -84,6 +84,7 @@ export interface GameState {
 
 export type GameAction = 
   | { type: 'TICK', now: number }
+  | { type: 'TRACK', targetType: string }
   | { type: 'INTERACT', tileId: string, energyCost?: number }
   | { type: 'PLANT', tileId: string, cropType: string }
   | { type: 'BUY', itemType: string, cost: number, count?: number }
