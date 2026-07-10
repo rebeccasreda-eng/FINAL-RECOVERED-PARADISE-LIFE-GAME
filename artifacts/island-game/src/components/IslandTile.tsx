@@ -980,37 +980,37 @@ const ObjectSVG: React.FC<{ object: string; tileX: number; tileY: number; tileTy
     case 'WEEDS': {
       const wv = (tx * 5 + ty * 11) % 3;
       const onSand = tileType === 'SAND';
-      // Sand: muted olive/sage tones that blend with sandy ground
-      // Grass: natural greens that blend with the turf
-      const [cDark, cMid, cFront, cHi] = onSand ? ([
-        ['#7a8428','#909a38','#a8b248','#c2cc5e'],  // dusty sage
-        ['#7e8830','#96a040','#aeba50','#c8d468'],  // warm olive
-        ['#788030','#8e9a3c','#a4b24c','#bece62'],  // deep olive
+      // cBase ≈ ground colour so the lowest tufts dissolve into the tile
+      // Grass palette anchored near grass-top #5cb828 so tall blades read
+      // as overgrown versions of the same turf rather than a foreign colour
+      const [cBase, cDark, cMid, cFront, cHi] = onSand ? ([
+        ['#b0bc48','#8a9a2c','#a0b238','#b8cc50','#d0e46a'],  // dusty sage
+        ['#b2be4c','#8c9c30','#a2b43c','#bacc54','#d2e46e'],  // warm olive
+        ['#acb844','#868e2a','#9ca636','#b2be4e','#cad668'],  // deep olive
       ] as const)[wv] : ([
-        ['#266c10','#3a9018','#52b020','#78d038'],  // pure cool green
-        ['#2a7012','#40981a','#56b422','#7acc3a'],  // slightly warmer
-        ['#246810','#368c18','#4eac1e','#72c836'],  // deep forest
+        // base ≈ #5cb828 grass top; dark/mid/front step up in brightness
+        ['#5cb828','#3e8e14','#52aa22','#6ecc36','#96ec52'],  // cool grass green
+        ['#5ebc2a','#409016','#56ae26','#72d03a','#9aee56'],  // slightly warmer
+        ['#5ab626','#3c8a12','#50a820','#6cca34','#92ea50'],  // deep forest
       ] as const)[wv];
 
-      // Helper: filled sword-blade shape — base centered at (cx,by), height h,
+      // Helper: filled sword-blade shape — base centered at (cx,baseY), height h,
       // tip leaning by `lean` px, half-width bw at widest point.
-      // Returns an SVG path "d" string.
-      const blade = (cx: number, by: number, h: number, lean: number, bw: number) => {
-        const tx = cx + lean, ty = by - h;
-        // Cubic bezier: base → bulge out mid → taper to tip (both sides)
-        return `M ${cx - bw},${by} `
-          + `C ${cx - bw * 0.85},${by - h * 0.35} ${tx - bw * 0.45},${by - h * 0.65} ${tx},${ty} `
-          + `C ${tx + bw * 0.45},${by - h * 0.65} ${cx + bw * 0.85},${by - h * 0.35} ${cx + bw},${by} Z`;
+      const blade = (cx: number, baseY: number, h: number, lean: number, bw: number) => {
+        const tipX = cx + lean, tipY = baseY - h;
+        return `M ${cx - bw},${baseY} `
+          + `C ${cx - bw * 0.85},${baseY - h * 0.35} ${tipX - bw * 0.45},${baseY - h * 0.65} ${tipX},${tipY} `
+          + `C ${tipX + bw * 0.45},${baseY - h * 0.65} ${cx + bw * 0.85},${baseY - h * 0.35} ${cx + bw},${baseY} Z`;
       };
-      // Midrib highlight down the center of each blade
-      const rib = (cx: number, by: number, h: number, lean: number) =>
-        `M ${cx},${by} C ${cx + lean * 0.3},${by - h * 0.35} ${cx + lean * 0.7},${by - h * 0.65} ${cx + lean},${by - h}`;
+      // Midrib highlight down the centre of each blade
+      const rib = (cx: number, baseY: number, h: number, lean: number) =>
+        `M ${cx},${baseY} C ${cx + lean * 0.3},${baseY - h * 0.35} ${cx + lean * 0.7},${baseY - h * 0.65} ${cx + lean},${baseY - h}`;
 
-      const by = 55; // base y (below visible bottom — creates ground-anchored look)
+      const by = 55;
       return (
         <svg viewBox="0 0 56 56" width="54" height="52" style={{ display:'block' }}>
-          {/* Ground shadow */}
-          <ellipse cx="28" cy="55" rx="24" ry="4.5" fill="rgba(0,0,0,0.22)"/>
+          {/* Very faint contact shadow — no harsh dark ring */}
+          <ellipse cx="28" cy="55" rx="22" ry="3" fill="rgba(0,0,0,0.07)"/>
 
           {/* ── BACK ROW — tallest, darkest ── */}
           <path d={blade(9,  by, 52, -3, 2.8)} fill={cDark}/>
@@ -1027,20 +1027,28 @@ const ObjectSVG: React.FC<{ object: string; tileX: number; tileY: number; tileTy
           <path d={blade(41, by, 40,  3, 2.4)} fill={cMid}/>
           <path d={blade(50, by, 38,  5, 2.2)} fill={cMid}/>
 
-          {/* ── FRONT ROW — shorter, brightest ── */}
+          {/* ── FRONT ROW — shorter, brighter ── */}
           <path d={blade(8,  by, 28, -4, 2.2)} fill={cFront}/>
           <path d={blade(17, by, 30, -1, 2.5)} fill={cFront}/>
           <path d={blade(27, by, 28,  0, 2.4)} fill={cFront}/>
           <path d={blade(37, by, 26,  2, 2.2)} fill={cFront}/>
           <path d={blade(47, by, 24,  4, 2.0)} fill={cFront}/>
 
+          {/* ── Ground tufts — grass-coloured, dissolve base into tile ── */}
+          <path d={blade(5,  by, 13, -3, 2.0)} fill={cBase} opacity="0.90"/>
+          <path d={blade(14, by, 11, -1, 2.2)} fill={cBase} opacity="0.85"/>
+          <path d={blade(23, by, 14,  0, 2.1)} fill={cBase} opacity="0.90"/>
+          <path d={blade(32, by, 12,  2, 2.0)} fill={cBase} opacity="0.85"/>
+          <path d={blade(41, by, 13,  3, 2.0)} fill={cBase} opacity="0.88"/>
+          <path d={blade(50, by, 10,  4, 1.8)} fill={cBase} opacity="0.80"/>
+
           {/* ── Midrib highlights ── */}
-          <path d={rib(18, by, 55, -1)} stroke={cHi} strokeWidth="0.9" fill="none" opacity="0.55" strokeLinecap="round"/>
-          <path d={rib(28, by, 57,  0)} stroke={cHi} strokeWidth="1.0" fill="none" opacity="0.60" strokeLinecap="round"/>
-          <path d={rib(37, by, 53,  2)} stroke={cHi} strokeWidth="0.9" fill="none" opacity="0.55" strokeLinecap="round"/>
-          <path d={rib(22, by, 44,  0)} stroke={cHi} strokeWidth="0.8" fill="none" opacity="0.45" strokeLinecap="round"/>
-          <path d={rib(17, by, 30, -1)} stroke={cHi} strokeWidth="0.7" fill="none" opacity="0.40" strokeLinecap="round"/>
-          <path d={rib(27, by, 28,  0)} stroke={cHi} strokeWidth="0.7" fill="none" opacity="0.38" strokeLinecap="round"/>
+          <path d={rib(18, by, 55, -1)} stroke={cHi} strokeWidth="0.9" fill="none" opacity="0.50" strokeLinecap="round"/>
+          <path d={rib(28, by, 57,  0)} stroke={cHi} strokeWidth="1.0" fill="none" opacity="0.55" strokeLinecap="round"/>
+          <path d={rib(37, by, 53,  2)} stroke={cHi} strokeWidth="0.9" fill="none" opacity="0.50" strokeLinecap="round"/>
+          <path d={rib(22, by, 44,  0)} stroke={cHi} strokeWidth="0.8" fill="none" opacity="0.40" strokeLinecap="round"/>
+          <path d={rib(17, by, 30, -1)} stroke={cHi} strokeWidth="0.7" fill="none" opacity="0.35" strokeLinecap="round"/>
+          <path d={rib(27, by, 28,  0)} stroke={cHi} strokeWidth="0.7" fill="none" opacity="0.33" strokeLinecap="round"/>
         </svg>
       );
     }
