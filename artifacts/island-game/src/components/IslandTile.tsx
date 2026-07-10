@@ -395,9 +395,7 @@ export const IslandTile: React.FC<IslandTileProps> = ({
         <polygon
           points="40,0 80,14 40,28 0,14"
           fill={isWater ? `url(#wg-${tile.x}-${tile.y})` : topFill}
-          stroke={isWater ? 'none' : 'rgba(0,0,0,0.12)'}
-          strokeWidth="1"
-          strokeLinejoin="round"
+          stroke="none"
         />
 
         {/* Side faces (land tiles only) */}
