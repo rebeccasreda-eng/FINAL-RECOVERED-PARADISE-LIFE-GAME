@@ -38,7 +38,7 @@ interface IslandGridProps {
   playerY: number;
   characterId: string;
   isWalking: boolean;
-  facing: 'left' | 'right';
+  facing: 'front' | 'back' | 'left' | 'right';
   onTileClick: (x: number, y: number) => void;
 }
 

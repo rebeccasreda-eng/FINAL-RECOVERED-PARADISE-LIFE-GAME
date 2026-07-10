@@ -1,14 +1,10 @@
 /**
  * CharacterOnIsland (pixel-isometric edition)
  *
- * Position is in world-space pixels (pre-computed by IslandGrid from
- * fractional tile coordinates). The character is a plain absolutely-
- * positioned element — no counter-rotation needed in 2.5-D iso space.
- *
  * Layer structure:
- *   outer div  → world-space position + facing flip (scaleX)
- *   inner div  → bob animation (translateY only, no conflict with outer transform)
- *   Char SVG   → drop-shadow filter
+ *   outer div  → world-space position + left/right scaleX flip
+ *   inner div  → drop-shadow filter
+ *   Char SVG   → facing-aware sprite
  */
 import React from 'react';
 import { CHARACTER_COMPONENTS, ChMia } from './CharacterSprites';
@@ -17,13 +13,15 @@ import { CHARACTER_COMPONENTS, ChMia } from './CharacterSprites';
 // Must match TH/2 in IslandGrid.tsx (currently TH=28 → 14)
 const TH_HALF = 14;
 
+type Facing = 'front' | 'back' | 'left' | 'right';
+
 interface Props {
   screenX: number;
   screenY: number;
   tileZIndex: number;
   characterId: string;
   isWalking: boolean;
-  facing: 'left' | 'right';
+  facing: Facing;
 }
 
 export const CharacterOnIsland: React.FC<Props> = ({
@@ -36,26 +34,24 @@ export const CharacterOnIsland: React.FC<Props> = ({
 }) => {
   const Char = CHARACTER_COMPONENTS[characterId] ?? ChMia;
   const SIZE = 52;
+  // scaleX flip only for left-facing; back/front/right all draw naturally
+  const scaleX = facing === 'left' ? -1 : 1;
 
   return (
     <div
       style={{
         position: 'absolute',
         left: screenX,
-        top: screenY + TH_HALF,      // align feet to diamond centre
+        top: screenY + TH_HALF,
         zIndex: tileZIndex,
-        // Horizontally centre, bottom-align, then flip for direction
-        transform: `translate(-50%, -100%) scaleX(${facing === 'left' ? -1 : 1})`,
+        transform: `translate(-50%, -100%) scaleX(${scaleX})`,
         transformOrigin: 'bottom center',
         pointerEvents: 'none',
-        // No CSS transition — position is updated every rAF frame for smooth movement
         willChange: 'left, top',
       }}
     >
-      <div
-        style={{ filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.40))' }}
-      >
-        <Char size={SIZE} isWalking={isWalking} />
+      <div style={{ filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.40))' }}>
+        <Char size={SIZE} isWalking={isWalking} facing={facing} />
       </div>
     </div>
   );

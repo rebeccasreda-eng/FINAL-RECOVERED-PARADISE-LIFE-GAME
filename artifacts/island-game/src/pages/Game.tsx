@@ -57,7 +57,7 @@ const GameInner = ({ profile }: { profile: PlayerProfile }) => {
   const playerPosRef = useRef<{ x: number; y: number }>({ x: PLAYER_START.x, y: PLAYER_START.y });
   const [playerPos, setPlayerPos] = useState(playerPosRef.current);
   const [isWalking, setIsWalking] = useState(false);
-  const [facing,    setFacing]    = useState<'left' | 'right'>('right');
+  const [facing,    setFacing]    = useState<'front' | 'back' | 'left' | 'right'>('front');
 
   // Click-to-glide destination; null = no pending target
   const targetRef = useRef<{ x: number; y: number } | null>(null);
@@ -69,7 +69,7 @@ const GameInner = ({ profile }: { profile: PlayerProfile }) => {
   const rafRef       = useRef<number | null>(null);
   const lastTimeRef  = useRef<number | null>(null);
   const wasWalkRef   = useRef(false);
-  const facingRef    = useRef<'left' | 'right'>('right');
+  const facingRef    = useRef<'front' | 'back' | 'left' | 'right'>('front');
 
   // Stale-closure-safe tiles access
   const tilesRef = useRef(state.tiles);
@@ -135,12 +135,18 @@ const GameInner = ({ profile }: { profile: PlayerProfile }) => {
         setPlayerPos({ x: fx, y: fy });
         moved = true;
 
-        // Facing = screen-horizontal direction of movement (vx − vy = screen-dx sign)
-        const screenDx = vx - vy;
-        if (screenDx !== 0) {
-          const nf = screenDx > 0 ? 'right' : 'left';
-          if (nf !== facingRef.current) { facingRef.current = nf; setFacing(nf); }
+        // 4-way facing from screen-space velocity components:
+        //   svx = vx−vy  (screen horizontal)  svx>0 → right, svx<0 → left
+        //   svy = vx+vy  (screen vertical)    svy>0 → front, svy<0 → back
+        const svx = vx - vy;
+        const svy = vx + vy;
+        let nf: 'front' | 'back' | 'left' | 'right';
+        if (Math.abs(svx) >= Math.abs(svy)) {
+          nf = svx > 0 ? 'right' : 'left';
+        } else {
+          nf = svy > 0 ? 'front' : 'back';
         }
+        if (nf !== facingRef.current) { facingRef.current = nf; setFacing(nf); }
       }
     }
 
@@ -445,7 +451,7 @@ export default function Game() {
             >
               <IslandGrid
                 playerX={-999} playerY={-999}
-                characterId="" isWalking={false} facing="right"
+                characterId="" isWalking={false} facing="front"
                 onTileClick={() => {}}
               />
             </div>
