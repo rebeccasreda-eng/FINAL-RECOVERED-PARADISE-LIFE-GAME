@@ -79,7 +79,7 @@ export const CharacterOnIsland: React.FC<Props> = ({
           position: 'absolute',
           top: -30,
           left: '50%',
-          animation: 'charArrowBounce 0.75s ease-in-out infinite',
+          animation: 'none',
           pointerEvents: 'none',
         }}
       >
