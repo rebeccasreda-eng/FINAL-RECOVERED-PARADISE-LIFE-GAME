@@ -285,8 +285,6 @@ const GameInner = ({ profile }: { profile: PlayerProfile }) => {
   return (
     <div className="w-full h-[100dvh] overflow-hidden relative" style={{ fontFamily: "'Fredoka', sans-serif" }}>
 
-      {/* Weather overlay */}
-      <div className={`weather-overlay ${state.weather}`} />
 
       {/* ── Viewport (overflow:hidden, handles drag events) ── */}
       <div
