@@ -1,26 +1,14 @@
 import React, { useState, useCallback } from 'react';
-import { ChMia, ChLeo, ChAva, ChKai, ChNora } from './CharacterSprites';
+import { CharAppearance, CustomizableCharSVG, DEFAULT_FEMALE, DEFAULT_MALE } from './CustomizableCharSVG';
+import { DressingRoom } from './DressingRoom';
 
 export interface PlayerProfile {
   name: string;
   gender: 'female' | 'male';
-  skinTone: number;
-  hairColor: string;
+  appearance: CharAppearance;
   characterId: string;
   hasSetup: boolean;
 }
-
-/* ── Character roster by gender ──────────────────────────────────────────── */
-const FEMALE_CHARS = [
-  { id: 'mia',  name: 'Mia',  Component: ChMia  },
-  { id: 'ava',  name: 'Ava',  Component: ChAva  },
-  { id: 'nora', name: 'Nora', Component: ChNora },
-];
-const MALE_CHARS = [
-  { id: 'leo', name: 'Leo', Component: ChLeo },
-  { id: 'kai', name: 'Kai', Component: ChKai },
-];
-const ALL_CHARS = [...FEMALE_CHARS, ...MALE_CHARS];
 
 /* ── Beach stage background SVG ─────────────────────────────────────────── */
 const StageBg = () => (
@@ -83,11 +71,15 @@ const StageBg = () => (
   </svg>
 );
 
-/* ── Customize swatches ──────────────────────────────────────────────────── */
-const HAIR_OPTS   = ['#7a4a2a','#2b2020','#c98a3a','#883a88','#dd4830'];
-const OUTFIT_OPTS = ['#3d5a8a','#dd4830','#3a8a5a','#8a3a7a','#e0a030'];
-
-interface CustomizeState { hair: string; outfit: string; }
+/* ── Map gender + appearance to a chibi characterId for the island ─── */
+function pickCharacterId(gender: 'female' | 'male', hairStyle: string): string {
+  if (gender === 'male') {
+    return hairStyle === 'pompadour' || hairStyle === 'spikey' ? 'kai' : 'leo';
+  }
+  if (hairStyle === 'braids' || hairStyle === 'wavy' || hairStyle === 'bob') return 'ava';
+  if (hairStyle === 'fro' || hairStyle === 'curly') return 'nora';
+  return 'mia';
+}
 
 interface Props {
   onPlay: (profile: PlayerProfile) => void;
@@ -96,16 +88,11 @@ interface Props {
 export const WelcomeScreen: React.FC<Props> = ({ onPlay }) => {
   const [name, setName]           = useState('Player');
   const [gender, setGender]       = useState<'female'|'male'|null>(null);
-  const [charId, setCharId]       = useState('mia');
   const [nameError, setNameError] = useState('');
   const [genderError, setGenderError] = useState('');
-  const [showCustomize, setShowCustomize] = useState(false);
-  const [customize, setCustomize] = useState<CustomizeState>({ hair: '#7a4a2a', outfit: '#3d5a8a' });
+  const [appearance, setAppearance] = useState<CharAppearance>(DEFAULT_FEMALE);
+  const [showDressingRoom, setShowDressingRoom] = useState(false);
   const [toast, setToast]         = useState('');
-
-  const genderChars = gender === 'female' ? FEMALE_CHARS : gender === 'male' ? MALE_CHARS : FEMALE_CHARS;
-  const displayChar = ALL_CHARS.find(c => c.id === charId) ?? FEMALE_CHARS[0];
-  const CharComp    = displayChar.Component;
 
   const showToast = (msg: string) => {
     setToast(msg);
@@ -115,22 +102,28 @@ export const WelcomeScreen: React.FC<Props> = ({ onPlay }) => {
   const handleGender = (g: 'female'|'male') => {
     setGender(g);
     setGenderError('');
-    const chars = g === 'female' ? FEMALE_CHARS : MALE_CHARS;
-    const currentIsFemale = FEMALE_CHARS.some(c => c.id === charId);
-    const currentGender = currentIsFemale ? 'female' : 'male';
-    if (currentGender !== g) setCharId(chars[0].id);
+    // Reset appearance to gender default when switching
+    setAppearance(g === 'female' ? DEFAULT_FEMALE : DEFAULT_MALE);
   };
 
   const handleRandom = useCallback(() => {
     const randomGender: 'female'|'male' = Math.random() < 0.5 ? 'female' : 'male';
-    const pool = randomGender === 'female' ? FEMALE_CHARS : MALE_CHARS;
-    const pick  = pool[Math.floor(Math.random() * pool.length)];
-    const hair  = HAIR_OPTS[Math.floor(Math.random()  * HAIR_OPTS.length)];
-    const outfit= OUTFIT_OPTS[Math.floor(Math.random()* OUTFIT_OPTS.length)];
+    const def = randomGender === 'female' ? DEFAULT_FEMALE : DEFAULT_MALE;
+    const hairOpts = randomGender === 'female'
+      ? ['long_wavy','curly','ponytail','bob','braids','pigtails']
+      : ['shaggy','messy','fro','pompadour','spikey','wavy'];
+    const hairColors = ['#7a4520','#dd4488','#2b2020','#c98a3a','#1a1010','#cc4422','#e8c040','#5a3020','#ff4488','#884499'];
+    const outfitColors = ['#4466cc','#dd4499','#222233','#f07020','#3a9a6a','#8a5aaa','#cc3322'];
+    const hatOpts = ['none','none','none','cap','cowboy','crown','party','santa'];
     setGender(randomGender);
-    setCharId(pick.id);
-    setCustomize({ hair, outfit });
     setGenderError('');
+    setAppearance({
+      ...def,
+      hairStyle: hairOpts[Math.floor(Math.random() * hairOpts.length)],
+      hairColor: hairColors[Math.floor(Math.random() * hairColors.length)],
+      outfitColor: outfitColors[Math.floor(Math.random() * outfitColors.length)],
+      hatStyle: hatOpts[Math.floor(Math.random() * hatOpts.length)],
+    });
     showToast('New look generated!');
   }, []);
 
@@ -140,246 +133,212 @@ export const WelcomeScreen: React.FC<Props> = ({ onPlay }) => {
     if (!trimmed || trimmed.length < 2) { setNameError('Enter at least 2 characters'); ok = false; }
     if (!gender) { setGenderError('Choose a gender to continue'); ok = false; }
     if (!ok) return;
+    const g = gender!;
     onPlay({
       name: trimmed,
-      gender: gender!,
-      skinTone: 0,
-      hairColor: customize.hair,
-      characterId: charId,
+      gender: g,
+      appearance,
+      characterId: pickCharacterId(g, appearance.hairStyle),
       hasSetup: true,
     });
   };
 
+  const handleDressingRoomSave = useCallback((
+    newAppearance: CharAppearance,
+    newName: string,
+    newGender: 'female' | 'male',
+  ) => {
+    setAppearance(newAppearance);
+    setName(newName);
+    setGender(newGender);
+    setGenderError('');
+    setShowDressingRoom(false);
+    showToast('Look saved!');
+  }, []);
+
+  const currentGender = gender ?? 'female';
+
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
-      <div className="absolute inset-0 bg-black/40" />
+    <>
+      {showDressingRoom && (
+        <DressingRoom
+          initialAppearance={appearance}
+          gender={currentGender}
+          name={name}
+          onSave={handleDressingRoomSave}
+          onCancel={() => setShowDressingRoom(false)}
+        />
+      )}
 
-      {/* Outer wood frame */}
-      <div
-        className="relative rounded-[20px] shadow-2xl"
-        style={{
-          fontFamily: "'Fredoka', sans-serif",
-          width: 420,
-          background: 'repeating-linear-gradient(90deg,rgba(0,0,0,0.04) 0 2px,transparent 2px 26px), linear-gradient(180deg,#d8c193,#c9ac76)',
-          border: '9px solid #7a4620',
-          boxShadow: '0 0 0 3px #52290f inset, 0 0 0 13px #8a5426 inset, 0 12px 40px rgba(0,0,0,0.6)',
-          padding: '18px 16px 16px',
-        }}
-      >
-        {/* Corner nails */}
-        <div className="absolute top-[6px] left-[6px] w-5 h-[9px] rounded bg-[#e8dcc0] border border-[#7a4620]"/>
-        <div className="absolute top-[6px] right-[6px] w-5 h-[9px] rounded bg-[#e8dcc0] border border-[#7a4620]"/>
+      <div className="fixed inset-0 z-40 flex items-center justify-center">
+        <div className="absolute inset-0 bg-black/40"/>
 
-        {/* WELCOME! banner */}
+        {/* Outer wood frame */}
         <div
-          className="text-center rounded-3xl px-4 py-[5px] mb-4"
-          style={{ background: '#c2521f', border: '4px solid #7a4620', boxShadow: '0 3px 0 rgba(0,0,0,0.2) inset' }}
+          style={{
+            position: 'relative',
+            width: 420,
+            fontFamily: "'Fredoka', sans-serif",
+            background: 'repeating-linear-gradient(90deg,rgba(0,0,0,0.04) 0 2px,transparent 2px 26px), linear-gradient(180deg,#d8c193,#c9ac76)',
+            border: '9px solid #7a4620',
+            boxShadow: '0 0 0 3px #52290f inset, 0 0 0 13px #8a5426 inset, 0 12px 40px rgba(0,0,0,0.6)',
+            borderRadius: 20,
+            padding: '18px 16px 16px',
+          }}
         >
-          <h1
-            className="text-[28px] m-0 leading-none"
-            style={{
+          {/* Corner nails */}
+          <div className="absolute top-[6px] left-[6px] w-5 h-[9px] rounded bg-[#e8dcc0] border border-[#7a4620]"/>
+          <div className="absolute top-[6px] right-[6px] w-5 h-[9px] rounded bg-[#e8dcc0] border border-[#7a4620]"/>
+
+          {/* WELCOME! banner */}
+          <div
+            style={{ background: '#c2521f', border: '4px solid #7a4620', borderRadius: 24, boxShadow: '0 3px 0 rgba(0,0,0,0.2) inset', padding: '5px 16px', marginBottom: 14, textAlign: 'center' }}
+          >
+            <h1 style={{
               fontFamily: "'Luckiest Guy','Fredoka',cursive",
+              fontSize: 28, margin: 0, lineHeight: 1,
               color: '#fff2d6',
               WebkitTextStroke: '2px #6b3f1a',
               paintOrder: 'stroke fill',
-              letterSpacing: '2px',
-            }}
-          >
-            WELCOME!
-          </h1>
-        </div>
-
-        {/* Name section */}
-        <div
-          className="rounded-xl px-3 py-2 mb-3 text-center"
-          style={{ background: '#e8dcb8', border: '3px solid #a9884f' }}
-        >
-          <p className="text-xs font-extrabold uppercase tracking-widest mb-1" style={{ color: '#6f4e2a' }}>
-            Name Your Character
-          </p>
-          <input
-            className="w-full text-center rounded-md px-3 py-[6px] text-[17px] font-extrabold outline-none border-2 transition-shadow"
-            style={{
-              background: '#fbf6e8',
-              borderColor: nameError ? '#c0392b' : '#c9a86a',
-              color: '#4a3520',
-              fontFamily: "'Fredoka',sans-serif",
-            }}
-            maxLength={12}
-            value={name}
-            onChange={e => { setName(e.target.value); setNameError(''); }}
-            onKeyDown={e => e.key === 'Enter' && handlePlay()}
-            onFocus={e => (e.target as HTMLInputElement).select()}
-          />
-          {nameError && <p className="text-[11px] font-extrabold mt-1" style={{ color: '#a02f2f' }}>{nameError}</p>}
-        </div>
-
-        {/* Character stage */}
-        <div
-          className="relative mb-3 overflow-hidden"
-          style={{ height: 260, borderRadius: 12, border: '4px solid #8a5a2b' }}
-        >
-          <StageBg />
-          <div
-            className="idle-bob absolute bottom-[22px] left-1/2 -translate-x-1/2 z-10"
-            style={{ filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.35))' }}
-          >
-            <CharComp size={150} />
+              letterSpacing: 2,
+            }}>WELCOME!</h1>
           </div>
 
-          {/* Customize overlay */}
-          {showCustomize && (
+          {/* Name section */}
+          <div style={{ background: '#e8dcb8', border: '3px solid #a9884f', borderRadius: 12, padding: '8px 12px', marginBottom: 12, textAlign: 'center' }}>
+            <p style={{ fontSize: 11, fontWeight: 900, textTransform: 'uppercase', letterSpacing: 4, color: '#6f4e2a', margin: '0 0 4px' }}>
+              Name Your Character
+            </p>
+            <input
+              className="w-full text-center rounded-md px-3 py-[6px] text-[17px] font-extrabold outline-none border-2 transition-shadow"
+              style={{
+                background: '#fbf6e8',
+                borderColor: nameError ? '#c0392b' : '#c9a86a',
+                color: '#4a3520',
+                fontFamily: "'Fredoka',sans-serif",
+              }}
+              maxLength={12}
+              value={name}
+              onChange={e => { setName(e.target.value); setNameError(''); }}
+              onKeyDown={e => e.key === 'Enter' && handlePlay()}
+              onFocus={e => (e.target as HTMLInputElement).select()}
+            />
+            {nameError && <p style={{ fontSize: 11, fontWeight: 900, marginTop: 3, color: '#a02f2f' }}>{nameError}</p>}
+          </div>
+
+          {/* Character stage */}
+          <div style={{ position: 'relative', height: 260, marginBottom: 12, borderRadius: 12, border: '4px solid #8a5a2b', overflow: 'hidden' }}>
+            <StageBg/>
             <div
-              className="absolute inset-0 flex items-center justify-center z-20"
-              style={{ background: 'rgba(30,24,12,0.58)', borderRadius: 8 }}
-            >
-              <div className="w-[88%] rounded-[14px] p-3" style={{ background: '#f4e6c1', border: '4px solid #8a5a2b' }}>
-                <h2 className="text-sm font-extrabold uppercase tracking-wide text-center mb-3" style={{ color: '#6f4e2a' }}>
-                  Customize
-                </h2>
-                <div className="mb-3">
-                  <p className="text-[11px] font-extrabold uppercase tracking-wide mb-1" style={{ color: '#7a5a30' }}>Character</p>
-                  <div className="flex gap-2 justify-center">
-                    {genderChars.map(c => (
-                      <button
-                        key={c.id}
-                        onClick={() => setCharId(c.id)}
-                        className="rounded-xl overflow-hidden transition-all"
-                        style={{
-                          border: charId === c.id ? '3px solid #e39a3c' : '3px solid #c9a86a',
-                          boxShadow: charId === c.id ? '0 0 0 2px #e39a3c' : 'none',
-                          background: charId === c.id ? '#fff8d0' : '#fbf6e8',
-                          padding: '4px 6px',
-                        }}
-                      >
-                        <c.Component size={48} />
-                        <p className="text-[9px] font-extrabold text-center mt-0.5" style={{ color: '#6f4e2a' }}>{c.name}</p>
-                      </button>
-                    ))}
-                  </div>
-                </div>
-                <div className="mb-2">
-                  <p className="text-[11px] font-extrabold uppercase tracking-wide mb-1" style={{ color: '#7a5a30' }}>Hair color</p>
-                  <div className="flex gap-2">
-                    {HAIR_OPTS.map(c => (
-                      <button key={c} onClick={() => setCustomize(s => ({ ...s, hair: c }))}
-                        className="rounded-full transition-all"
-                        style={{ width: 26, height: 26, background: c,
-                          border: customize.hair === c ? '3px solid #4a3520' : '2px solid rgba(0,0,0,0.15)',
-                          boxShadow: customize.hair === c ? '0 0 0 2px white inset' : 'none' }} />
-                    ))}
-                  </div>
-                </div>
-                <div className="mb-3">
-                  <p className="text-[11px] font-extrabold uppercase tracking-wide mb-1" style={{ color: '#7a5a30' }}>Outfit color</p>
-                  <div className="flex gap-2">
-                    {OUTFIT_OPTS.map(c => (
-                      <button key={c} onClick={() => setCustomize(s => ({ ...s, outfit: c }))}
-                        className="rounded-full transition-all"
-                        style={{ width: 26, height: 26, background: c,
-                          border: customize.outfit === c ? '3px solid #4a3520' : '2px solid rgba(0,0,0,0.15)',
-                          boxShadow: customize.outfit === c ? '0 0 0 2px white inset' : 'none' }} />
-                    ))}
-                  </div>
-                </div>
-                <div className="flex gap-2">
-                  <button onClick={() => setShowCustomize(false)}
-                    className="flex-1 rounded-2xl py-2 text-sm font-extrabold transition-all active:scale-95"
-                    style={{ background: 'linear-gradient(180deg,#fbf6e8,#ecdcae)', border: '3px solid #a9884f', color: '#6f4e2a' }}>
-                    Cancel
-                  </button>
-                  <button onClick={() => { setShowCustomize(false); showToast('Look saved!'); }}
-                    className="flex-1 rounded-2xl py-2 text-sm font-extrabold transition-all active:scale-95"
-                    style={{ background: '#8fd15a', border: '3px solid #3c7d2e', color: '#234a12' }}>
-                    Save
-                  </button>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {toast && (
-            <div className="absolute bottom-3 left-1/2 -translate-x-1/2 px-4 py-2 rounded-2xl text-xs font-extrabold text-white z-30 pointer-events-none"
-              style={{ background: '#234a12', whiteSpace: 'nowrap' }}>
-              {toast}
-            </div>
-          )}
-        </div>
-
-        {/* Choose Your Gender */}
-        <div className="text-center mb-3">
-          <p className="text-xs font-extrabold uppercase tracking-widest mb-2" style={{ color: '#6f4e2a' }}>
-            Choose Your Gender
-          </p>
-          <div className="flex justify-center gap-5">
-            <button
-              onClick={() => handleGender('female')}
-              className="flex items-center justify-center rounded-full transition-all active:scale-95"
+              className="idle-bob"
               style={{
-                width: 52, height: 52,
-                background: '#f7c6da',
-                border: `3px solid ${gender === 'female' ? '#c23d73' : '#d4548a'}`,
-                boxShadow: gender === 'female' ? '0 0 0 3px #fff, 0 0 0 6px #e39a3c' : 'none',
-                transform: gender === 'female' ? 'scale(1.08)' : 'scale(1)',
+                position: 'absolute', bottom: 22, left: '50%',
+                transform: 'translateX(-50%)', zIndex: 10,
+                filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.35))',
               }}
-              aria-label="Select female"
             >
-              <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="#c23d73" strokeWidth="2.2">
-                <circle cx="12" cy="8" r="5"/><path d="M12 13v8M9 18h6"/>
-              </svg>
+              <CustomizableCharSVG appearance={appearance} gender={currentGender} size={150}/>
+            </div>
+
+            {toast && (
+              <div style={{
+                position: 'absolute', bottom: 12, left: '50%', transform: 'translateX(-50%)',
+                background: '#234a12', color: 'white', padding: '6px 14px',
+                borderRadius: 20, fontSize: 12, fontWeight: 900, zIndex: 30,
+                pointerEvents: 'none', whiteSpace: 'nowrap',
+              }}>
+                {toast}
+              </div>
+            )}
+          </div>
+
+          {/* Choose Your Gender */}
+          <div style={{ textAlign: 'center', marginBottom: 12 }}>
+            <p style={{ fontSize: 11, fontWeight: 900, textTransform: 'uppercase', letterSpacing: 4, color: '#6f4e2a', margin: '0 0 8px' }}>
+              Choose Your Gender
+            </p>
+            <div style={{ display: 'flex', justifyContent: 'center', gap: 20 }}>
+              {(['female','male'] as const).map(g => (
+                <button
+                  key={g}
+                  aria-label={g === 'female' ? 'Choose female' : 'Choose male'}
+                  onClick={() => handleGender(g)}
+                  style={{
+                    width: 52, height: 52, borderRadius: '50%',
+                    background: g === 'female' ? '#f7c6da' : '#bcdcf5',
+                    border: `3px solid ${gender === g ? (g === 'female' ? '#c23d73' : '#2f6da0') : (g === 'female' ? '#d4548a' : '#3f7fbf')}`,
+                    boxShadow: gender === g ? '0 0 0 3px #fff, 0 0 0 6px #e39a3c' : 'none',
+                    transform: gender === g ? 'scale(1.08)' : 'scale(1)',
+                    cursor: 'pointer',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    transition: 'all 0.15s',
+                  }}
+                >
+                  {g === 'female'
+                    ? <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="#c23d73" strokeWidth="2.2"><circle cx="12" cy="8" r="5"/><path d="M12 13v8M9 18h6"/></svg>
+                    : <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="#2f6da0" strokeWidth="2.2"><circle cx="10" cy="14" r="5"/><path d="M14 10l6-6M14 4h6v6"/></svg>
+                  }
+                </button>
+              ))}
+            </div>
+            {genderError && <p style={{ fontSize: 11, fontWeight: 900, marginTop: 6, color: '#a02f2f' }}>{genderError}</p>}
+          </div>
+
+          {/* Random / Customize row */}
+          <div style={{ display: 'flex', gap: 12, marginBottom: 12 }}>
+            <button
+              onClick={handleRandom}
+              style={{
+                flex: 1, fontFamily: "'Fredoka',sans-serif",
+                fontWeight: 900, fontSize: 14, textTransform: 'uppercase', letterSpacing: 1,
+                padding: '9px', borderRadius: 16,
+                border: '3px solid #a9884f',
+                background: 'linear-gradient(180deg,#fbf6e8,#ecdcae)',
+                color: '#6f4e2a', cursor: 'pointer',
+              }}
+            >
+              Random
             </button>
             <button
-              onClick={() => handleGender('male')}
-              className="flex items-center justify-center rounded-full transition-all active:scale-95"
+              onClick={() => setShowDressingRoom(true)}
               style={{
-                width: 52, height: 52,
-                background: '#bcdcf5',
-                border: `3px solid ${gender === 'male' ? '#2f6da0' : '#3f7fbf'}`,
-                boxShadow: gender === 'male' ? '0 0 0 3px #fff, 0 0 0 6px #e39a3c' : 'none',
-                transform: gender === 'male' ? 'scale(1.08)' : 'scale(1)',
+                flex: 1, fontFamily: "'Fredoka',sans-serif",
+                fontWeight: 900, fontSize: 14, textTransform: 'uppercase', letterSpacing: 1,
+                padding: '9px', borderRadius: 16,
+                border: '3px solid #a9884f',
+                background: 'linear-gradient(180deg,#fbf6e8,#ecdcae)',
+                color: '#6f4e2a', cursor: 'pointer',
               }}
-              aria-label="Select male"
             >
-              <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="#2f6da0" strokeWidth="2.2">
-                <circle cx="10" cy="14" r="5"/><path d="M14 10l6-6M14 4h6v6"/>
-              </svg>
+              Customize
             </button>
           </div>
-          {genderError && <p className="text-[11px] font-extrabold mt-2" style={{ color: '#a02f2f' }}>{genderError}</p>}
-        </div>
 
-        {/* Random / Customize row */}
-        <div className="flex gap-3 mb-3">
-          <button onClick={handleRandom}
-            className="flex-1 rounded-2xl py-[9px] text-sm font-extrabold uppercase tracking-wide transition-all active:scale-95"
-            style={{ background: 'linear-gradient(180deg,#fbf6e8,#ecdcae)', border: '3px solid #a9884f', color: '#6f4e2a' }}>
-            Random
-          </button>
-          <button onClick={() => setShowCustomize(true)}
-            className="flex-1 rounded-2xl py-[9px] text-sm font-extrabold uppercase tracking-wide transition-all active:scale-95"
-            style={{ background: 'linear-gradient(180deg,#fbf6e8,#ecdcae)', border: '3px solid #a9884f', color: '#6f4e2a' }}>
-            Customize
+          {/* PLAY */}
+          <button
+            onClick={handlePlay}
+            style={{
+              width: '100%',
+              fontFamily: "'Luckiest Guy','Fredoka',cursive",
+              fontSize: 22,
+              fontWeight: 900,
+              textTransform: 'uppercase',
+              letterSpacing: 3,
+              padding: '11px',
+              borderRadius: 24,
+              border: '3px solid #2f6d1f',
+              background: 'linear-gradient(180deg,#9fdd5f,#63b23a)',
+              color: '#fff2d6',
+              WebkitTextStroke: '1.5px #2f6d1f',
+              paintOrder: 'stroke fill',
+              boxShadow: '0 4px 0 #1e4a10, 0 6px 16px rgba(99,178,58,0.45)',
+              cursor: 'pointer',
+            }}
+          >
+            PLAY
           </button>
         </div>
-
-        {/* PLAY */}
-        <button
-          onClick={handlePlay}
-          className="w-full rounded-3xl font-extrabold uppercase tracking-widest text-[22px] py-[11px] transition-all active:scale-[0.98]"
-          style={{
-            fontFamily: "'Luckiest Guy','Fredoka',cursive",
-            background: 'linear-gradient(180deg,#9fdd5f,#63b23a)',
-            border: '3px solid #2f6d1f',
-            color: '#fff2d6',
-            WebkitTextStroke: '1.5px #2f6d1f',
-            paintOrder: 'stroke fill',
-            boxShadow: '0 4px 0 #1e4a10, 0 6px 16px rgba(99,178,58,0.45)',
-            letterSpacing: '3px',
-          }}
-        >
-          PLAY
-        </button>
       </div>
-    </div>
+    </>
   );
 };

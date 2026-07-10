@@ -1,4 +1,4 @@
-import { QuestDef, TileData, TileType, ObjectType, WeatherType } from './types';
+ import { QuestDef, TileData, TileType, ObjectType, WeatherType } from './types';
 
 export const DEV_SPEEDUP = 100;
 export const SCALED = (ms: number) => Math.max(1000, ms / DEV_SPEEDUP); // Don't go below 1 second to avoid missing ticks

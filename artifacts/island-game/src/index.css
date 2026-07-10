@@ -103,14 +103,6 @@
   filter: grayscale(80%) sepia(50%) hue-rotate(-30deg);
 }
 
-.water-wave {
-  animation: waveBg 4s infinite alternate ease-in-out;
-}
-
-@keyframes waveBg {
-  0% { background-color: #4facfe; }
-  100% { background-color: #00f2fe; }
-}
 
 .weather-overlay {
   pointer-events: none;
