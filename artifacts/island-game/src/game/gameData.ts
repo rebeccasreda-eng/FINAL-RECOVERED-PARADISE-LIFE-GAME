@@ -52,6 +52,9 @@ export const OBJECT_CONFIG: Record<string, any> = {
   ROCK: { action: 'Mine', energy: 1, coins: 8, xp: 15, drops: { stone: 1 }, respawn: SCALED(90000) },
   FLOWER_BUSH: { action: 'Harvest', energy: 1, coins: 3, xp: 8, respawn: SCALED(45000) },
   DRIFTWOOD: { action: 'Clear', energy: 1, coins: 3, xp: 5, drops: { wood: 1 }, respawn: SCALED(80000) },
+  TREE_COCONUT: { action: 'Harvest', energy: 1, coins: 6, xp: 12, drops: { food: 2 }, respawn: SCALED(70000) },
+  TREE_MANGO: { action: 'Harvest', energy: 1, coins: 8, xp: 14, drops: { food: 3 }, respawn: SCALED(80000) },
+  GARDEN_PATCH: { action: 'Harvest', energy: 1, coins: 10, xp: 18, drops: { food: 2 }, respawn: SCALED(50000) },
   CROP_READY: { action: 'Harvest', energy: 1, coins: 10, xp: 20 },
   CROP_WILTED: { action: 'Clear', energy: 1, coins: 0, xp: 2 },
   FISH_SPOT: { action: 'Fish', energy: 1, coins: 12, xp: 15, respawn: SCALED(120000) },
@@ -61,6 +64,7 @@ export const OBJECT_CONFIG: Record<string, any> = {
 
 export const EMOJI_MAP: Record<string, string> = {
   TREE_PALM: '🌴', TREE_APPLE: '🍎', ROCK: '🪨', FLOWER_BUSH: '🌸', DRIFTWOOD: '🪵',
+  TREE_COCONUT: '🌴', TREE_MANGO: '🥭', GARDEN_PATCH: '🍍',
   CROP_PLOT: '🟫', CROP_GROWING: '🌱', CROP_READY: '🌽', CROP_WILTED: '🥀',
   FISH_SPOT: '✨', HUT: '🏚️', DOCK: '⛵', WELL: '💧', 
   FLOWER_POT: '🪴', FENCE: '🚧', LANTERN: '🏮', CRAB: '🦀', BOAR: '🐗'
@@ -140,6 +144,9 @@ export function generateIsland(): Record<string, TileData> {
   const pick = (arr: TileData[]) => arr.splice(Math.floor(rand() * arr.length), 1)[0];
 
   for (let i = 0; i < 3 && emptyGrass.length; i++) pick(emptyGrass).object = 'TREE_APPLE';
+  for (let i = 0; i < 4 && emptyGrass.length; i++) pick(emptyGrass).object = 'TREE_COCONUT';
+  for (let i = 0; i < 3 && emptyGrass.length; i++) pick(emptyGrass).object = 'TREE_MANGO';
+  for (let i = 0; i < 2 && emptyGrass.length; i++) pick(emptyGrass).object = 'GARDEN_PATCH';
   for (let i = 0; i < 6 && emptyGrass.length; i++) pick(emptyGrass).object = 'GRASS_PATCH';
   for (let i = 0; i < 1 && emptyGrass.length; i++) pick(emptyGrass).object = 'CROP_PLOT';
 
