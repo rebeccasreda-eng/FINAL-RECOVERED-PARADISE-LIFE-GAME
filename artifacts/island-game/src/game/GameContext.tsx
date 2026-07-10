@@ -373,7 +373,7 @@ function gameReducer(state: GameState, action: GameAction): GameState {
         nextState.energy = nextState.maxEnergy;
       }
 
-      if (obj === 'GRASS_PATCH') track('clear_grass');
+      if (obj === 'GRASS_PATCH' || obj === 'WEEDS') track('clear_grass');
       if (obj === 'DRIFTWOOD') track('clear_driftwood');
       if (obj === 'TREE_PALM' || obj === 'TREE_APPLE' || obj === 'TREE_COCONUT') track('chop_tree');
       if (obj === 'TREE_MANGO') track('harvest_mango');

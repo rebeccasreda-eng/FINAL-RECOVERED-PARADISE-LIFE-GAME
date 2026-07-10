@@ -3,7 +3,7 @@ export type ResourceType = 'coins' | 'wood' | 'stone' | 'produce' | 'food' | 'sh
 export type TileType = 'WATER' | 'GRASS' | 'SAND';
 
 export type ObjectType = 
-  | 'GRASS_PATCH' | 'TREE_PALM' | 'TREE_APPLE' | 'ROCK' | 'FLOWER_BUSH' | 'DRIFTWOOD'
+  | 'GRASS_PATCH' | 'WEEDS' | 'TREE_PALM' | 'TREE_APPLE' | 'ROCK' | 'FLOWER_BUSH' | 'DRIFTWOOD'
   | 'TREE_COCONUT' | 'TREE_MANGO' | 'GARDEN_PATCH'
   | 'CROP_PLOT' | 'CROP_GROWING' | 'CROP_READY' | 'CROP_WILTED'
   | 'CLEARED_LAND' | 'FISH_SPOT' 

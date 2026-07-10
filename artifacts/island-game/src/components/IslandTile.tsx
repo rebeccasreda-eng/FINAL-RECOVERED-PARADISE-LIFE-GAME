@@ -606,13 +606,69 @@ const ObjectSVG: React.FC<{ object: string; tileX: number; tileY: number }> = ({
       </svg>
     );
 
+    /* ── WEEDS (overgrown grass clump — clearable) ─────────────────────── */
+    case 'WEEDS': {
+      // 3 deterministic color variants per tile
+      const wv = (tx * 5 + ty * 11) % 3;
+      const [ws1, ws2, ws3, ws4, wseed] = ([
+        ['#327016','#4e8e20','#6aa828','#92b830','#b89830'],  // dark green
+        ['#4a7810','#669a18','#88b424','#aabe2c','#c8a828'],  // olive-yellow
+        ['#266010','#3e7e1c','#5a9a24','#7aae2c','#a89030'],  // cool green
+      ] as const)[wv];
+      return (
+        <svg viewBox="0 0 52 46" width="50" height="44" style={{ display:'block' }}>
+          {/* Ground shadow */}
+          <ellipse cx="26" cy="45" rx="21" ry="4" fill="rgba(0,0,0,0.22)"/>
+          {/* Base vine / sprawl */}
+          <path d="M4,41 Q14,38 26,39 Q38,40 49,38" stroke="#3a5a0e" strokeWidth="1.8" fill="none" strokeLinecap="round" opacity="0.60"/>
+          <path d="M2,39 Q11,36 20,38 Q30,40 38,37 Q44,35 51,37" stroke="#4a700a" strokeWidth="1.4" fill="none" strokeLinecap="round" opacity="0.45"/>
+
+          {/* ── BACK ROW — tallest blades ── */}
+          <path d="M9,43  Q7,31  6,19  Q5,11  8,2"   stroke={ws1} strokeWidth="2.8" fill="none" strokeLinecap="round"/>
+          <path d="M18,43 Q16,31 14,20 Q12,11 14,3"  stroke={ws3} strokeWidth="2.6" fill="none" strokeLinecap="round"/>
+          <path d="M26,43 Q25,30 24,18 Q23,10 26,2"  stroke={ws1} strokeWidth="2.8" fill="none" strokeLinecap="round"/>
+          <path d="M35,43 Q37,30 39,19 Q40,10 38,2"  stroke={ws3} strokeWidth="2.6" fill="none" strokeLinecap="round"/>
+          <path d="M44,43 Q46,31 47,19 Q48,11 46,3"  stroke={ws1} strokeWidth="2.8" fill="none" strokeLinecap="round"/>
+
+          {/* ── MID ROW — angled blades ── */}
+          <path d="M7,43  Q9,31  13,19 Q16,10 13,2"  stroke={ws2} strokeWidth="2.5" fill="none" strokeLinecap="round"/>
+          <path d="M22,43 Q21,31 20,21 Q19,12 21,3"  stroke={ws4} strokeWidth="2.4" fill="none" strokeLinecap="round"/>
+          <path d="M31,43 Q32,31 33,21 Q34,12 32,3"  stroke={ws2} strokeWidth="2.4" fill="none" strokeLinecap="round"/>
+          <path d="M46,43 Q44,31 43,21 Q42,12 44,3"  stroke={ws4} strokeWidth="2.5" fill="none" strokeLinecap="round"/>
+
+          {/* ── FRONT ROW — leaning outward ── */}
+          <path d="M14,44 Q10,33  7,22  Q5,13  8,5"  stroke={ws2} strokeWidth="2.7" fill="none" strokeLinecap="round"/>
+          <path d="M38,44 Q42,33 45,22 Q47,13 45,5"  stroke={ws2} strokeWidth="2.7" fill="none" strokeLinecap="round"/>
+
+          {/* ── YELLOWED / dried blades (overgrown look) ── */}
+          <path d="M21,44 Q23,33 24,22 Q25,13 22,4"  stroke="#98ac28" strokeWidth="2.2" fill="none" strokeLinecap="round" opacity="0.80"/>
+          <path d="M31,44 Q29,33 28,22 Q27,13 30,4"  stroke="#a4b020" strokeWidth="2.0" fill="none" strokeLinecap="round" opacity="0.75"/>
+
+          {/* ── Seed heads on tallest blades ── */}
+          <ellipse cx="8"  cy="1.5" rx="2.0" ry="3.6" fill={wseed} opacity="0.90"/>
+          <ellipse cx="14" cy="2.5" rx="1.6" ry="2.8" fill={wseed} opacity="0.80"/>
+          <ellipse cx="26" cy="1.5" rx="2.2" ry="4.0" fill={wseed} opacity="0.88"/>
+          <ellipse cx="38" cy="2.5" rx="1.6" ry="2.8" fill={wseed} opacity="0.80"/>
+          <ellipse cx="46" cy="1.5" rx="2.0" ry="3.6" fill={wseed} opacity="0.88"/>
+
+          {/* ── Small weed flowers ── */}
+          <circle cx="17" cy="9"  r="2.4" fill="#dcd030" opacity="0.72"/>
+          <circle cx="35" cy="8"  r="2.1" fill="#e4d828" opacity="0.68"/>
+
+          {/* ── Subtle blade edge highlights ── */}
+          <path d="M9,43  Q7,31 6,19"  stroke="rgba(255,255,255,0.18)" strokeWidth="1.1" fill="none" strokeLinecap="round"/>
+          <path d="M44,43 Q46,31 47,19" stroke="rgba(255,255,255,0.16)" strokeWidth="1.1" fill="none" strokeLinecap="round"/>
+        </svg>
+      );
+    }
+
     default: return null;
   }
 };
 
 /** Objects that use SVG art instead of emoji */
 const SVG_OBJECTS = new Set(['TREE_PALM', 'TREE_APPLE', 'ROCK', 'FLOWER_BUSH', 'DRIFTWOOD',
-  'TREE_COCONUT', 'TREE_MANGO', 'GARDEN_PATCH']);
+  'TREE_COCONUT', 'TREE_MANGO', 'GARDEN_PATCH', 'WEEDS']);
 /** Objects that sway in the breeze */
 const SWAY_OBJECTS = new Set(['TREE_PALM', 'TREE_APPLE', 'TREE_COCONUT', 'TREE_MANGO']);
 
