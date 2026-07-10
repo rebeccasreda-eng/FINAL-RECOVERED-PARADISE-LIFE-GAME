@@ -3,6 +3,7 @@ import { GameProvider, useGame } from '../game/GameContext';
 import { IslandGrid, WORLD_W, WORLD_H } from '../components/IslandGrid';
 import { HUD } from '../components/HUD';
 import { TopNav } from '../components/TopNav';
+import { useBgm } from '../hooks/useBgm';
 import { QuestPanel } from '../components/QuestPanel';
 import { QuestNotifier } from '../components/QuestNotifier';
 import { ShopModal } from '../components/ShopModal';
@@ -48,6 +49,7 @@ const GameInner = ({ profile }: { profile: PlayerProfile }) => {
   const [collectionsOpen,  setCollectionsOpen]  = useState(false);
   const [weatherOpen,      setWeatherOpen]      = useState(false);
   const [questPanelOpen,   setQuestPanelOpen]   = useState(false);
+  const { muted: bgmMuted, toggle: toggleBgm } = useBgm('/bgm.mp3');
 
   /* ── Player movement — tile-by-tile step walk (matches reference HTML) ── */
   // Current integer tile the player occupies
@@ -298,6 +300,8 @@ const GameInner = ({ profile }: { profile: PlayerProfile }) => {
         playerName={profile.name}
         onOpenCollections={() => setCollectionsOpen(true)}
         onOpenShop={() => {}}
+        bgmMuted={bgmMuted}
+        onToggleBgm={toggleBgm}
       />
       <HUD
         onOpenCollections={() => setCollectionsOpen(true)}

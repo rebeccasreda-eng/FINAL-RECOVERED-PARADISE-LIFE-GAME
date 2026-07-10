@@ -4,6 +4,8 @@ interface TopNavProps {
   playerName: string;
   onOpenCollections: () => void;
   onOpenShop: () => void;
+  bgmMuted?: boolean;
+  onToggleBgm?: () => void;
 }
 
 const NAV_TABS = [
@@ -15,7 +17,7 @@ const NAV_TABS = [
   { label: 'FORUMS', icon: null },
 ];
 
-export const TopNav: React.FC<TopNavProps> = ({ playerName, onOpenCollections, onOpenShop }) => {
+export const TopNav: React.FC<TopNavProps> = ({ playerName, onOpenCollections, onOpenShop, bgmMuted, onToggleBgm }) => {
   return (
     <div
       className="absolute top-0 left-0 right-0 z-30 flex items-stretch h-9 select-none"
@@ -87,8 +89,25 @@ export const TopNav: React.FC<TopNavProps> = ({ playerName, onOpenCollections, o
         </button>
       </div>
 
-      {/* Right side: player name display */}
-      <div className="ml-auto flex items-center pr-3">
+      {/* Right side: music toggle + player name */}
+      <div className="ml-auto flex items-center gap-2 pr-3">
+        {onToggleBgm && (
+          <button
+            onClick={onToggleBgm}
+            title={bgmMuted ? 'Unmute music' : 'Mute music'}
+            className="flex items-center justify-center w-7 h-6 rounded-sm text-sm active:scale-95 transition-transform"
+            style={{
+              background: bgmMuted
+                ? 'linear-gradient(180deg, #888, #555)'
+                : 'linear-gradient(180deg, #f0d888 0%, #c8a030 100%)',
+              border: '1px solid #8a6010',
+              borderBottom: '2px solid #5a3a08',
+              fontSize: 14,
+            }}
+          >
+            {bgmMuted ? '🔇' : '🎵'}
+          </button>
+        )}
         <span className="text-[11px] font-bold text-yellow-100 opacity-80">{playerName}'s Island</span>
       </div>
     </div>
