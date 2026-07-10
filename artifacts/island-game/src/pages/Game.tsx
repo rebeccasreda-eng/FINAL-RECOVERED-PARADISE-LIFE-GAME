@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useRef, useEffect } from 'react';
+import React, { useState, useCallback, useRef, useEffect, useLayoutEffect } from 'react';
 import { GameProvider, useGame } from '../game/GameContext';
 import { IslandGrid, WORLD_W, WORLD_H } from '../components/IslandGrid';
 import { HUD } from '../components/HUD';
@@ -34,7 +34,7 @@ const BOT_H = 96;
 
 // Player start tile — centre of the 21×21 elliptical island
 const PLAYER_START = { x: 10, y: 10 };
-const WALK_SPEED   = 3.8; // tiles per second
+const MS_PER_TILE  = 420; // walk speed in milliseconds per tile (matches reference)
 
 // World centre (used to offset the world container so island is centred on load)
 const WORLD_CX = WORLD_W / 2;
@@ -65,51 +65,78 @@ const GameInner = ({ profile }: { profile: PlayerProfile }) => {
   const [collectionsOpen, setCollectionsOpen] = useState(false);
   const [weatherOpen,     setWeatherOpen]     = useState(false);
 
-  /* ── Player movement (RAF-based, ref-driven for no stale closures) ── */
-  const posRef    = useRef({ x: PLAYER_START.x + 0.5, y: PLAYER_START.y + 0.5 });
-  const targetRef = useRef<{ x: number; y: number } | null>(null);
-  const lastTRef  = useRef(0);
-  const rafRef    = useRef(0);
+  /* ── Player movement — tile-by-tile step walk (matches reference HTML) ── */
+  // Current integer tile the player occupies
+  const playerTileRef = useRef({ x: PLAYER_START.x, y: PLAYER_START.y });
+  // Blocks new moves while walking (ref avoids stale closures in setTimeout chain)
+  const movingRef = useRef(false);
 
-  const [displayPos, setDisplayPos] = useState(posRef.current);
+  const [playerTile, setPlayerTile] = useState(playerTileRef.current);
   const [isWalking,  setIsWalking]  = useState(false);
   const [facing,     setFacing]     = useState<'left' | 'right'>('right');
 
-  const animate = useCallback((now: number) => {
-    const dt  = Math.min((now - (lastTRef.current || now)) / 1000, 0.1);
-    lastTRef.current = now;
-    const tgt = targetRef.current;
-    if (tgt) {
-      const { x, y } = posRef.current;
-      const dx = tgt.x - x, dy = tgt.y - y;
-      const dist = Math.sqrt(dx * dx + dy * dy);
-      if (dist < 0.04) {
-        posRef.current  = { ...tgt };
-        targetRef.current = null;
-        setDisplayPos({ ...tgt });
-        setIsWalking(false);
-      } else {
-        const step  = WALK_SPEED * dt;
-        const ratio = Math.min(step / dist, 1);
-        posRef.current = { x: x + dx * ratio, y: y + dy * ratio };
-        setDisplayPos({ ...posRef.current });
-        if (Math.abs(dx) > 0.02) setFacing(dx > 0 ? 'right' : 'left');
-      }
-    }
-    rafRef.current = requestAnimationFrame(animate);
+  // Keep a layout-synchronous snapshot of tiles so the setTimeout chain always
+  // sees the most recent tile state without stale-closure risk.
+  const tilesRef = useRef(state.tiles);
+  useLayoutEffect(() => { tilesRef.current = state.tiles; }, [state.tiles]);
+
+  // Stores the pending walk-step timer so it can be cancelled on unmount.
+  const walkTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Cancel any in-flight walk when the component unmounts.
+  useEffect(() => () => {
+    if (walkTimerRef.current !== null) clearTimeout(walkTimerRef.current);
   }, []);
 
-  useEffect(() => {
-    rafRef.current = requestAnimationFrame(animate);
-    return () => cancelAnimationFrame(rafRef.current);
-  }, [animate]);
+  const moveTo = useCallback((tx: number, ty: number) => {
+    if (movingRef.current) return;                           // ignore clicks mid-walk
+    const dest = tilesRef.current[`${tx},${ty}`];
+    if (!dest || dest.type === 'WATER') return;
 
-  const moveTo = useCallback((x: number, y: number) => {
-    const tile = state.tiles[`${x},${y}`];
-    if (!tile || tile.type === 'WATER') return;
-    targetRef.current = { x: x + 0.5, y: y + 0.5 };
+    // Build a Chebyshev (8-directional) straight-line path to the target.
+    // Stop at the first blocked tile so the character never hops over water.
+    const path: { x: number; y: number }[] = [];
+    const { x: ox, y: oy } = playerTileRef.current;
+    const steps = Math.max(Math.abs(tx - ox), Math.abs(ty - oy));
+    for (let i = 1; i <= steps; i++) {
+      const nx = Math.round(ox + (tx - ox) * i / steps);
+      const ny = Math.round(oy + (ty - oy) * i / steps);
+      const t  = tilesRef.current[`${nx},${ny}`];
+      if (!t || t.type === 'WATER') break;                  // stop, don't skip
+      path.push({ x: nx, y: ny });
+    }
+    if (!path.length) return;
+
+    movingRef.current = true;
     setIsWalking(true);
-  }, [state.tiles]);
+
+    // Set initial facing direction
+    const firstDx = path[0].x - playerTileRef.current.x;
+    if (firstDx !== 0) setFacing(firstDx > 0 ? 'right' : 'left');
+
+    let idx = 0;
+    function step() {
+      const p    = path[idx];
+      const prev = playerTileRef.current;
+
+      // Update facing per step so diagonal paths look natural
+      const dx = p.x - prev.x;
+      if (dx !== 0) setFacing(dx > 0 ? 'right' : 'left');
+
+      playerTileRef.current = p;
+      setPlayerTile({ ...p });                              // triggers CSS transition
+
+      idx++;
+      if (idx < path.length) {
+        walkTimerRef.current = setTimeout(step, MS_PER_TILE);
+      } else {
+        walkTimerRef.current = null;
+        movingRef.current = false;
+        setIsWalking(false);
+      }
+    }
+    step();
+  }, []);
 
   /* ── Pan + zoom (imperative DOM for 60fps drag perf) ── */
   const viewportRef  = useRef<HTMLDivElement>(null);
@@ -267,8 +294,8 @@ const GameInner = ({ profile }: { profile: PlayerProfile }) => {
           }}
         >
           <IslandGrid
-            playerX={displayPos.x}
-            playerY={displayPos.y}
+            playerX={playerTile.x}
+            playerY={playerTile.y}
             characterId={profile.characterId || 'mia'}
             isWalking={isWalking}
             facing={facing}

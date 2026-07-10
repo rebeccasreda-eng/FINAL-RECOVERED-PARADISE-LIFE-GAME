@@ -47,6 +47,8 @@ export const CharacterOnIsland: React.FC<Props> = ({
         transform: `translate(-50%, -100%) scaleX(${facing === 'left' ? -1 : 1})`,
         transformOrigin: 'bottom center',
         pointerEvents: 'none',
+        // Smooth CSS slide between tile positions — one transition per tile step
+        transition: 'left 420ms linear, top 420ms linear',
         willChange: 'left, top',
       }}
     >
