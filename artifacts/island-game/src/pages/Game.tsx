@@ -32,8 +32,8 @@ function saveProfile(p: PlayerProfile) {
 const TOP_H = 88;
 const BOT_H = 96;
 
-// Player start tile
-const PLAYER_START = { x: 7, y: 5 };
+// Player start tile — centre of the 21×21 elliptical island
+const PLAYER_START = { x: 10, y: 10 };
 const WALK_SPEED   = 3.8; // tiles per second
 
 // World centre (used to offset the world container so island is centred on load)

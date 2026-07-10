@@ -7,16 +7,22 @@ import { CharacterOnIsland } from './CharacterOnIsland';
 const TW = 64;   // tile width
 const TH = 32;   // tile diamond height
 
-const GRID_COLS = 15;
-const GRID_ROWS = 12;
+export const GRID_COLS = 21;
+export const GRID_ROWS = 21;
 
-// World container size (px)
-export const WORLD_W = 928;
-export const WORLD_H = 488;
+// World container size (px) — sized to contain the 21×21 elliptical island
+// Center tile (10,10) is at (OX, 320+OY) = (440, 320) = (WORLD_W/2, WORLD_H/2)
+// so island is visually centred on load.
+export const WORLD_W = 880;
+export const WORLD_H = 640;
 
-// World-space origin so all tiles fit and island center ≈ world center
-const OX = 400;
-const OY = 52;
+// Iso origin — tile (tx,ty) maps to:
+//   screenX = (tx-ty)*(TW/2) + OX
+//   screenY = (tx+ty)*(TH/2) + OY
+// Center tile (10,10): screenX = 0+440 = 440, screenY = 320+0 = 320
+// → equals (WORLD_W/2, WORLD_H/2) ✓
+const OX = WORLD_W / 2;   // 440
+const OY = 0;              // tile (10,10) lands at screenY=320 = WORLD_H/2
 
 /** Screen X of tile (tx, ty) within the world div */
 export function isoScreenX(tx: number, ty: number): number {

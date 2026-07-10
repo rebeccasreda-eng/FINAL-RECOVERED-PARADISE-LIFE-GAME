@@ -1,2 +1,3 @@
 - [Island game character system](char-system.md) — CustomizableCharSVG uses CharAppearance; fro hair must render before the head circle (SVG paint order); all 12 dressing room tabs are now functional.
 - [Island game WelcomeScreen profile](welcome-profile.md) — PlayerProfile uses CharAppearance (not raw skinTone/hairColor strings); characterId derived via pickCharacterId(gender, hairStyle).
+- [Island game world layout](island-layout.md) — 21×21 ellipse island; seeded LCG PRNG (seed=7); OX=440,OY=0,WORLD_W=880,WORLD_H=640; player starts at (10,10); localStorage key is v6.

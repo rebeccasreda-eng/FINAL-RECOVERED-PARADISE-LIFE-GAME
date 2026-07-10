@@ -4,11 +4,11 @@ import { TileData } from '../game/types';
 import { OBJECT_CONFIG, EMOJI_MAP, CROP_TYPES } from '../game/gameData';
 import { useToast } from '@/hooks/use-toast';
 
-/* ── Diamond colour palette ─────────────────────────────────────────────── */
+/* ── Diamond colour palette — matches HTML reference ────────────────────── */
 const COLORS = {
   GRASS:   { top: '#5aab3e', sideL: '#3f8a2a', sideR: '#4a9e32' },
   SAND:    { top: '#e8d29a', sideL: '#cdb277', sideR: '#d4b97f' },
-  WATER:   { top: '#4faad4', sideL: null,       sideR: null      },
+  WATER:   { top: '#3f8fc9', sideL: null,       sideR: null      },
   CLEARED: { top: '#8b5a2b', sideL: '#5a3a18',  sideR: '#6a4420' },
 };
 
@@ -22,6 +22,85 @@ function lightenHex(hex: string, amount = 22): string {
     return `#${((r << 16) | (g << 8) | b).toString(16).padStart(6, '0')}`;
   } catch { return hex; }
 }
+
+/* ── SVG art for natural objects (matches HTML reference style) ─────────── */
+const PETAL_COLORS = ['#e8628a', '#f2c94c', '#8a5ad4'];
+
+const ObjectSVG: React.FC<{ object: string; tileX: number; tileY: number }> = ({ object, tileX, tileY }) => {
+  switch (object) {
+    case 'TREE_PALM':
+      return (
+        <svg viewBox="0 0 54 80" width="54" height="80" style={{ display: 'block' }}>
+          <rect x="24" y="40" width="6" height="34" fill="#8a5a2b"/>
+          <ellipse cx="27" cy="30" rx="22" ry="16" fill="#3f8a3a"/>
+          <ellipse cx="15" cy="24" rx="14" ry="11" fill="#4aa044"/>
+          <ellipse cx="39" cy="24" rx="14" ry="11" fill="#4aa044"/>
+          <ellipse cx="27" cy="20" rx="11" ry="8" fill="#55b04e"/>
+        </svg>
+      );
+    case 'TREE_APPLE':
+      return (
+        <svg viewBox="0 0 54 80" width="54" height="80" style={{ display: 'block' }}>
+          <rect x="24" y="40" width="6" height="34" fill="#7a5025"/>
+          <ellipse cx="27" cy="28" rx="22" ry="18" fill="#3a8840"/>
+          <ellipse cx="15" cy="22" rx="13" ry="10" fill="#4aaa4a"/>
+          <ellipse cx="39" cy="22" rx="13" ry="10" fill="#4aaa4a"/>
+          <ellipse cx="27" cy="18" rx="10" ry="7" fill="#55b455"/>
+          {/* Apples */}
+          <circle cx="18" cy="30" r="4.5" fill="#dd3322"/>
+          <circle cx="36" cy="28" r="4.5" fill="#dd3322"/>
+          <circle cx="27" cy="34" r="4" fill="#cc2211"/>
+          <circle cx="19" cy="30.5" r="1.5" fill="rgba(255,255,255,0.4)"/>
+          <circle cx="37" cy="28.5" r="1.5" fill="rgba(255,255,255,0.4)"/>
+        </svg>
+      );
+    case 'ROCK':
+      return (
+        <svg viewBox="0 0 36 26" width="36" height="26" style={{ display: 'block' }}>
+          <ellipse cx="18" cy="16" rx="17" ry="10" fill="#8a8a82"/>
+          <ellipse cx="18" cy="14" rx="15" ry="8" fill="#9a9a92"/>
+          <ellipse cx="13" cy="11" rx="7" ry="5" fill="#b0b0a8"/>
+          <ellipse cx="24" cy="13" rx="4" ry="3" fill="#a8a8a0"/>
+        </svg>
+      );
+    case 'FLOWER_BUSH': {
+      const petal = PETAL_COLORS[(tileX * 7 + tileY * 13) % 3];
+      return (
+        <svg viewBox="0 0 28 28" width="28" height="28" style={{ display: 'block' }}>
+          {/* Stem/leaves */}
+          <ellipse cx="14" cy="22" rx="8" ry="4" fill="#3a8a2a" opacity="0.7"/>
+          {/* Petals */}
+          <circle cx="14" cy="10" r="4" fill={petal}/>
+          <circle cx="9"  cy="14" r="4" fill={petal}/>
+          <circle cx="19" cy="14" r="4" fill={petal}/>
+          <circle cx="9"  cy="8"  r="3.5" fill={petal}/>
+          <circle cx="19" cy="8"  r="3.5" fill={petal}/>
+          {/* Centre */}
+          <circle cx="14" cy="13" r="4" fill="#f2c94c"/>
+          <circle cx="14" cy="12" r="2" fill="#e8b820"/>
+        </svg>
+      );
+    }
+    case 'DRIFTWOOD':
+      return (
+        <svg viewBox="0 0 38 18" width="38" height="18" style={{ display: 'block' }}>
+          <rect x="0" y="5" width="38" height="6" rx="3" fill="#a9884f"/>
+          <rect x="4" y="0" width="30" height="5" rx="2" fill="#c9a86a"/>
+          <rect x="8" y="11" width="22" height="4" rx="2" fill="#8a6a3a"/>
+          {/* Wood grain */}
+          <line x1="10" y1="2" x2="16" y2="2" stroke="#b09050" strokeWidth="1" opacity="0.5"/>
+          <line x1="22" y1="2" x2="30" y2="2" stroke="#b09050" strokeWidth="1" opacity="0.5"/>
+        </svg>
+      );
+    default:
+      return null;
+  }
+};
+
+/** Objects that use SVG art instead of emoji */
+const SVG_OBJECTS = new Set(['TREE_PALM', 'TREE_APPLE', 'ROCK', 'FLOWER_BUSH', 'DRIFTWOOD']);
+/** Objects that sway in the breeze */
+const SWAY_OBJECTS = new Set(['TREE_PALM', 'TREE_APPLE']);
 
 /* ── Props ──────────────────────────────────────────────────────────────── */
 interface IslandTileProps {
@@ -77,7 +156,6 @@ export const IslandTile: React.FC<IslandTileProps> = ({
   const neighbor   = isNeighbor
     ? state.neighbors.find(n => n.id === state.visitingNeighbor!.neighborId)
     : null;
-  const isTree     = /PALM|TREE|COCO|MANGO|BAMBOO|BUSH|FLOWER/.test(tile.object || '');
 
   /* ── Diamond colours ── */
   const palette = isCleared ? COLORS.CLEARED : (COLORS[tile.type] ?? COLORS.GRASS);
@@ -89,9 +167,12 @@ export const IslandTile: React.FC<IslandTileProps> = ({
     else                                           topFill = lightenHex(palette.top);
   }
 
-  /* ── Emoji / object ── */
+  /* ── Object rendering — SVG art or emoji ── */
+  const hasSvg  = !isCleared && !isNeighbor && tile.object && SVG_OBJECTS.has(tile.object);
+  const doSway  = hasSvg && tile.object && SWAY_OBJECTS.has(tile.object);
+
   let emoji = '';
-  if (tile.object && !isCleared) {
+  if (!hasSvg && tile.object && !isCleared) {
     if (tile.object === 'CROP_READY' && tile.cropType && CROP_TYPES[tile.cropType]) {
       emoji = CROP_TYPES[tile.cropType].emoji;
     } else {
@@ -137,7 +218,7 @@ export const IslandTile: React.FC<IslandTileProps> = ({
         top: screenY,
         width: 64,
         height: 48,
-        // centre horizontally on screenX; top of diamond at screenY
+        // Centre horizontally on screenX; top of diamond at screenY
         transform: 'translate(-50%, 0)',
         zIndex: tileZIndex,
         cursor: isWater ? 'default' : 'pointer',
@@ -157,8 +238,8 @@ export const IslandTile: React.FC<IslandTileProps> = ({
         <polygon
           points="32,0 64,16 32,32 0,16"
           fill={topFill}
-          stroke="rgba(0,0,0,0.14)"
-          strokeWidth="0.6"
+          stroke="rgba(0,0,0,0.12)"
+          strokeWidth="1"
           strokeLinejoin="round"
         />
 
@@ -206,28 +287,44 @@ export const IslandTile: React.FC<IslandTileProps> = ({
         )}
       </svg>
 
-      {/* ── Object / emoji above diamond ───────────────── */}
+      {/* ── SVG art object (trees, rocks, flowers, driftwood) ── */}
+      {hasSvg && tile.object && (
+        <div
+          style={{
+            position: 'absolute',
+            left: '50%',
+            top: 16,          // diamond vertical centre
+            transform: 'translate(-50%, -100%)',
+            pointerEvents: 'none',
+            userSelect: 'none',
+            filter: 'drop-shadow(0 3px 5px rgba(0,0,0,0.38))',
+            animation: doSway ? 'treeSway 2.8s ease-in-out infinite alternate' : undefined,
+            transformOrigin: 'bottom center',
+          }}
+        >
+          <ObjectSVG object={tile.object} tileX={tile.x} tileY={tile.y}/>
+        </div>
+      )}
+
+      {/* ── Emoji object (crops, fish, structures, enemies, neighbour) ── */}
       {emoji && (
         <div
           style={{
             position: 'absolute',
             left: '50%',
-            top: 16,           // diamond vertical centre within the div
+            top: 16,
             transform: 'translate(-50%, -100%)',
             pointerEvents: 'none',
             userSelect: 'none',
           }}
         >
-          {/* Sway or static wrapper */}
           <div
             style={{
-              fontSize: isTree ? 36 : 28,
+              fontSize: 28,
               lineHeight: 1,
               filter: tile.object === 'CROP_WILTED'
                 ? 'grayscale(80%) sepia(40%)'
                 : 'drop-shadow(0 3px 4px rgba(0,0,0,0.35))',
-              animation:  isTree   ? 'treeSway 2.8s ease-in-out infinite alternate' : undefined,
-              transformOrigin: 'bottom center',
             }}
           >
             {emoji}

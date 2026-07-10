@@ -51,6 +51,7 @@ export const OBJECT_CONFIG: Record<string, any> = {
   TREE_APPLE: { action: 'Harvest', energy: 1, coins: 5, xp: 10, drops: { wood: 1, food: 2 }, respawn: SCALED(60000) },
   ROCK: { action: 'Mine', energy: 1, coins: 8, xp: 15, drops: { stone: 1 }, respawn: SCALED(90000) },
   FLOWER_BUSH: { action: 'Harvest', energy: 1, coins: 3, xp: 8, respawn: SCALED(45000) },
+  DRIFTWOOD: { action: 'Clear', energy: 1, coins: 3, xp: 5, drops: { wood: 1 }, respawn: SCALED(80000) },
   CROP_READY: { action: 'Harvest', energy: 1, coins: 10, xp: 20 },
   CROP_WILTED: { action: 'Clear', energy: 1, coins: 0, xp: 2 },
   FISH_SPOT: { action: 'Fish', energy: 1, coins: 12, xp: 15, respawn: SCALED(120000) },
@@ -59,7 +60,7 @@ export const OBJECT_CONFIG: Record<string, any> = {
 };
 
 export const EMOJI_MAP: Record<string, string> = {
-  TREE_PALM: '🌴', TREE_APPLE: '🍎', ROCK: '🪨', FLOWER_BUSH: '🌸', 
+  TREE_PALM: '🌴', TREE_APPLE: '🍎', ROCK: '🪨', FLOWER_BUSH: '🌸', DRIFTWOOD: '🪵',
   CROP_PLOT: '🟫', CROP_GROWING: '🌱', CROP_READY: '🌽', CROP_WILTED: '🥀',
   FISH_SPOT: '✨', HUT: '🏚️', DOCK: '⛵', WELL: '💧', 
   FLOWER_POT: '🪴', FENCE: '🚧', LANTERN: '🏮', CRAB: '🦀', BOAR: '🐗'
@@ -72,43 +73,78 @@ export const INITIAL_NEIGHBORS = [
 ];
 
 export function generateIsland(): Record<string, TileData> {
+  const GRID = 21;
+  const TW = 64, TH = 32;
+  // Center tile is (10,10); all iso coords are relative to it
+  const originX = 0;  // (cx-cy)*(TW/2) = 0 since cx=cy=10
+  const originY = 320; // (cx+cy)*(TH/2) = 20*16
+
+  // Iso coords of tile (x,y) relative to center
+  const isoX = (x: number, y: number) => (x - y) * (TW / 2) - originX;
+  const isoY = (x: number, y: number) => (x + y) * (TH / 2) - originY;
+
+  // Build type map for all 21×21 tiles (for PRNG parity even on outer water)
+  const tmap: number[][] = [];
+  for (let y = 0; y < GRID; y++) {
+    tmap[y] = [];
+    for (let x = 0; x < GRID; x++) {
+      const sx = isoX(x, y), sy = isoY(x, y);
+      const e = (sx * sx) / (255 * 255) + (sy * sy) / (85 * 85);
+      tmap[y][x] = e < 1 ? 2 : (e < 1.35 ? 1 : 0);
+    }
+  }
+
+  // Create tile data only for tiles within the rendered ellipse (e ≤ 1.8)
   const tiles: Record<string, TileData> = {};
-  const cx = 7, cy = 5.5;
-  for (let x = 0; x < 15; x++) {
-    for (let y = 0; y < 12; y++) {
-      const dist = Math.sqrt(Math.pow(x - cx, 2) + Math.pow(y - cy, 2) * 1.2);
+  for (let y = 0; y < GRID; y++) {
+    for (let x = 0; x < GRID; x++) {
+      const sx = isoX(x, y), sy = isoY(x, y);
+      const e = (sx * sx) / (255 * 255) + (sy * sy) / (85 * 85);
+      if (e > 1.8) continue;
       let type: TileType = 'WATER';
-      if (dist < 4.5) type = 'GRASS';
-      else if (dist < 5.8) type = 'SAND';
+      if (e < 1) type = 'GRASS';
+      else if (e < 1.35) type = 'SAND';
       tiles[`${x},${y}`] = { id: `${x},${y}`, x, y, type };
     }
   }
 
-  const grassTiles = Object.values(tiles).filter(t => t.type === 'GRASS');
-  const waterTiles = Object.values(tiles).filter(t => t.type === 'WATER');
-  
-  const placeRandom = (count: number, obj: ObjectType) => {
-    for (let i = 0; i < count; i++) {
-      const empty = grassTiles.filter(t => !t.object);
-      if (empty.length > 0) {
-        const t = empty[Math.floor(Math.random() * empty.length)];
-        t.object = obj;
-        if (obj === 'CROP_GROWING') t.placedAt = Date.now();
+  // Seeded PRNG — identical LCG to the HTML reference for deterministic layout
+  let seed = 7;
+  const rand = () => { seed = (seed * 9301 + 49297) % 233280; return seed / 233280; };
+
+  // Place natural decorations — same iteration order and probability chain as HTML
+  // Water tiles (tmap=0) call rand() 0 times; grass calls 1-2 times; sand calls 1-2 times
+  for (let y = 0; y < GRID; y++) {
+    for (let x = 0; x < GRID; x++) {
+      const tile = tiles[`${x},${y}`];
+      const t = tmap[y][x];
+      if (t === 2) {           // grass
+        if (rand() < 0.1) {
+          if (tile && !tile.object) tile.object = 'TREE_PALM';
+        } else if (rand() < 0.08) {
+          if (tile && !tile.object) tile.object = 'FLOWER_BUSH';
+        }
+      } else if (t === 1) {   // sand
+        if (rand() < 0.08) {
+          if (tile && !tile.object) tile.object = 'ROCK';
+        } else if (rand() < 0.05) {
+          if (tile && !tile.object) tile.object = 'DRIFTWOOD';
+        }
       }
+      // water (t=0): no rand() calls — matches HTML
     }
-  };
-
-  placeRandom(6, 'TREE_PALM');
-  placeRandom(4, 'TREE_APPLE');
-  placeRandom(6, 'GRASS_PATCH');
-  placeRandom(3, 'ROCK');
-  placeRandom(4, 'FLOWER_BUSH');
-  placeRandom(1, 'CROP_PLOT');
-
-  for (let i = 0; i < 3; i++) {
-    const empty = waterTiles.filter(t => !t.object);
-    if (empty.length > 0) empty[Math.floor(Math.random() * empty.length)].object = 'FISH_SPOT';
   }
+
+  // Additional game-specific objects placed after the main seeded loop
+  const emptyGrass = Object.values(tiles).filter(t => t.type === 'GRASS' && !t.object);
+  const pick = (arr: TileData[]) => arr.splice(Math.floor(rand() * arr.length), 1)[0];
+
+  for (let i = 0; i < 3 && emptyGrass.length; i++) pick(emptyGrass).object = 'TREE_APPLE';
+  for (let i = 0; i < 6 && emptyGrass.length; i++) pick(emptyGrass).object = 'GRASS_PATCH';
+  for (let i = 0; i < 1 && emptyGrass.length; i++) pick(emptyGrass).object = 'CROP_PLOT';
+
+  const waterTiles = Object.values(tiles).filter(t => t.type === 'WATER');
+  for (let i = 0; i < 4 && waterTiles.length; i++) pick(waterTiles).object = 'FISH_SPOT';
 
   return tiles;
 }
