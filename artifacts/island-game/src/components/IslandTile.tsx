@@ -804,7 +804,7 @@ export const IslandTile: React.FC<IslandTileProps> = ({
             style={{
               position: 'absolute',
               left: 0,
-              top: 12,                    // sits in the water, not above it
+              top: 18,                    // lower half of diamond — near the terrain edge
               animationDelay: `${delay}s`,
               zIndex: tileZIndex + 2,
             }}

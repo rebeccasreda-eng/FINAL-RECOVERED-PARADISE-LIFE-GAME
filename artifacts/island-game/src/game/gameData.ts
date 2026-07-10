@@ -140,35 +140,65 @@ export function generateIsland(): Record<string, TileData> {
   const rand = () => { seed = (seed * 9301 + 49297) % 233280; return seed / 233280; };
 
   // ── Forest intensity: high near island edge, low at centre ──────────────
-  // Clusters trees toward the coastal/periphery areas like the reference.
   const forestFactor = (x: number, y: number): number => {
     const dx = x - CX, dy = y - CY;
     const r = Math.sqrt(dx * dx + dy * dy);
-    return Math.max(0, Math.min(1, (r - 3) / 8)); // 0 within r=3, reaches 1 at r=11
+    return Math.max(0, Math.min(1, (r - 3) / 8));
   };
 
   // ── Object placement ────────────────────────────────────────────────────
   for (let y = 0; y < GRID; y++) {
     for (let x = 0; x < GRID; x++) {
-      if (x === CX && y === CY) continue; // keep player-start tile clear
+      if (x === CX && y === CY) continue;
       const tile = tiles[`${x},${y}`];
       if (!tile) continue;
       const ff = forestFactor(x, y);
 
+      // Isometric "back" = small x+y (upper-screen area). Centre sum = CX+CY = 30.
+      const diagSum   = x + y;
+      const isDeepBack = diagSum < 20;          // dense forest zone at the back
+      const isMidBack  = diagSum >= 20 && diagSum < 26; // transition strip
+
+      // Adjacent to water → good place for a pond-side palm
+      const adjToWater = [[-1,0],[1,0],[0,-1],[0,1]].some(([dx,dy]) => {
+        const n = tiles[`${x+dx},${y+dy}`];
+        return n && n.type === 'WATER';
+      });
+
       if (tile.type === 'GRASS') {
         const r = rand();
-        const treePct   = 0.03 + ff * 0.14; // 3% at centre → 17% at edge (spaced out)
-        const floralPct = treePct + 0.07;    // additional 7% flowers / ground cover
 
-        if (r < treePct) {
-          const tr = rand();
-          if      (tr < 0.42 + ff * 0.16) tile.object = 'TREE_PALM';
-          else if (tr < 0.68)              tile.object = 'TREE_COCONUT';
-          else if (tr < 0.84)              tile.object = 'TREE_MANGO';
-          else                             tile.object = 'TREE_APPLE';
-        } else if (r < floralPct) {
-          tile.object = rand() < 0.58 ? 'FLOWER_BUSH' : 'GRASS_PATCH';
+        if (isDeepBack) {
+          // ── Dense back forest: all tree types ──────────────────────────
+          const treePct = 0.28 + ff * 0.22; // 28–50 % coverage
+          if (r < treePct) {
+            const tr = rand();
+            if      (tr < 0.28) tile.object = 'TREE_PALM';
+            else if (tr < 0.52) tile.object = 'TREE_COCONUT';
+            else if (tr < 0.78) tile.object = 'TREE_MANGO';
+            else                tile.object = 'TREE_APPLE';
+          } else if (r < treePct + 0.05) {
+            tile.object = 'FLOWER_BUSH';
+          }
+
+        } else if (isMidBack) {
+          // ── Transitional strip: mango + occasional palm ─────────────────
+          const treePct = 0.07 + ff * 0.08;
+          if (r < treePct) {
+            tile.object = rand() < 0.30 ? 'TREE_PALM' : 'TREE_MANGO';
+          } else if (r < treePct + 0.04) {
+            tile.object = 'FLOWER_BUSH';
+          }
+
+        } else {
+          // ── Front / open island: mango throughout, palm only near pond ──
+          const palmChance  = adjToWater ? 0.12 : 0;
+          const mangoChance = 0.06;
+          if      (r < palmChance)                    tile.object = 'TREE_PALM';
+          else if (r < palmChance + mangoChance)      tile.object = 'TREE_MANGO';
+          else if (r < palmChance + mangoChance + 0.04) tile.object = 'FLOWER_BUSH';
         }
+
       } else if (tile.type === 'SAND') {
         const r = rand();
         if      (r < 0.13) tile.object = 'ROCK';

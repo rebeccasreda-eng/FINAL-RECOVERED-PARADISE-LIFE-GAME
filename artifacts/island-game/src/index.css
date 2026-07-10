@@ -170,24 +170,22 @@
 
 /* ── Fish swim through water ───────────────────────────────── */
 @keyframes fishSwim {
-  0%    { transform: translateX(-18px) translateY(0px);  opacity: 0; }
-  7%    { transform: translateX(-8px)  translateY(-1px); opacity: 0.80; }
-  22%   { transform: translateX(14px)  translateY(2px);  opacity: 0.80; }
-  38%   { transform: translateX(36px)  translateY(-1px); opacity: 0.80; }
-  54%   { transform: translateX(58px)  translateY(2px);  opacity: 0.80; }
-  66%   { transform: translateX(74px)  translateY(-1px); opacity: 0.80; }
-  72%   { transform: translateX(84px)  translateY(0px);  opacity: 0; }
-  100%  { transform: translateX(-18px) translateY(0px);  opacity: 0; }
+  0%    { transform: translateX(10px)  translateY(0px);  opacity: 0; }
+  10%   { transform: translateX(14px)  translateY(-1px); opacity: 0.82; }
+  30%   { transform: translateX(24px)  translateY(1px);  opacity: 0.82; }
+  55%   { transform: translateX(36px)  translateY(-1px); opacity: 0.82; }
+  75%   { transform: translateX(46px)  translateY(1px);  opacity: 0.82; }
+  88%   { transform: translateX(52px)  translateY(0px);  opacity: 0; }
+  100%  { transform: translateX(10px)  translateY(0px);  opacity: 0; }
 }
 @keyframes fishSwimR {
-  0%    { transform: translateX(98px)  translateY(0px);  opacity: 0; }
-  7%    { transform: translateX(88px)  translateY(-1px); opacity: 0.75; }
-  22%   { transform: translateX(66px)  translateY(2px);  opacity: 0.75; }
-  38%   { transform: translateX(44px)  translateY(-1px); opacity: 0.75; }
-  54%   { transform: translateX(22px)  translateY(2px);  opacity: 0.75; }
-  66%   { transform: translateX(6px)   translateY(-1px); opacity: 0.75; }
-  72%   { transform: translateX(-4px)  translateY(0px);  opacity: 0; }
-  100%  { transform: translateX(98px)  translateY(0px);  opacity: 0; }
+  0%    { transform: translateX(52px)  translateY(0px);  opacity: 0; }
+  10%   { transform: translateX(48px)  translateY(-1px); opacity: 0.78; }
+  30%   { transform: translateX(38px)  translateY(1px);  opacity: 0.78; }
+  55%   { transform: translateX(26px)  translateY(-1px); opacity: 0.78; }
+  75%   { transform: translateX(16px)  translateY(1px);  opacity: 0.78; }
+  88%   { transform: translateX(10px)  translateY(0px);  opacity: 0; }
+  100%  { transform: translateX(52px)  translateY(0px);  opacity: 0; }
 }
 .fish-swim   { animation: fishSwim  16s ease-in-out infinite; pointer-events: none; }
 .fish-swim-r { animation: fishSwimR 18s ease-in-out infinite; pointer-events: none; }
