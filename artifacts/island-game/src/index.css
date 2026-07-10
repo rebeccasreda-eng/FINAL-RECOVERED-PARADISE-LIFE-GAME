@@ -256,6 +256,22 @@
   50%       { transform: translateX(-50%) translateY(-7px);  }
 }
 
+/* ── Quest icon white glow pulse ───────────────────────── */
+@keyframes questIconGlow {
+  0%, 100% { filter: drop-shadow(0 0 4px rgba(255,255,255,0.55)) drop-shadow(0 0 8px rgba(255,255,255,0.30)) drop-shadow(2px 4px 6px rgba(0,0,0,0.40)); }
+  50%       { filter: drop-shadow(0 0 10px rgba(255,255,255,0.95)) drop-shadow(0 0 18px rgba(255,255,255,0.60)) drop-shadow(2px 4px 6px rgba(0,0,0,0.40)); }
+}
+
+/* ── Quest sign nudge leftward (points toward the icon) ── */
+@keyframes questSignNudge {
+  0%   { transform: translateX(0px);   }
+  18%  { transform: translateX(-10px); }
+  34%  { transform: translateX(-7px);  }
+  50%  { transform: translateX(-10px); }
+  68%  { transform: translateX(0px);   }
+  100% { transform: translateX(0px);   }
+}
+
 /* ── Chop swing animation ───────────────────────────────── */
 @keyframes charChopSwing {
   0%   { transform: rotate(0deg) translateX(0px); }
