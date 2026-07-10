@@ -172,178 +172,34 @@ const GameInner = ({ profile }: { profile: PlayerProfile }) => {
   }, []);
 
   /* ── Pan + zoom (imperative DOM for 60fps drag perf) ── */
-  const viewportRef  = useRef<HTMLDivElement>(null);
-  const worldRef     = useRef<HTMLDivElement>(null);
-  const INITIAL_ZOOM    = 2.0;
-  const MAX_ZOOM        = 3.2;
-  const ZOOM_OUT_LEVELS = [INITIAL_ZOOM, 1.35, 0.85, 0.55];
-  const MIN_ZOOM        = ZOOM_OUT_LEVELS[ZOOM_OUT_LEVELS.length - 1];
-  // Centre the island on load: world-centre should map to viewport-centre.
-  // screen_x = vp_cx + (px - WORLD_CX) + wx*z  →  for wx=WORLD_CX: px = WORLD_CX*(1-z)
-  const panRef = useRef({ x: WORLD_CX * (1 - INITIAL_ZOOM), y: WORLD_CY * (1 - INITIAL_ZOOM) });
+  const worldRef = useRef<HTMLDivElement>(null);
+  const FIXED_ZOOM = 2.0;
 
-  /** Clamp pan so the world div always covers the full viewport (no void showing). */
-  const clampPan = useCallback((px: number, py: number, z: number) => {
-    const vp = viewportRef.current;
-    if (!vp) return { x: px, y: py };
-    const VW = vp.clientWidth;
-    const VH = vp.clientHeight;
-    // world div: translate(px-WORLD_CX, py-WORLD_CY) scale(z), origin 0,0
-    // left screen edge of world  = px - WORLD_CX
-    // right screen edge of world = px - WORLD_CX + WORLD_W*z
-    const scaledW = WORLD_W * z;
-    const scaledH = WORLD_H * z;
-    let cx = px, cy = py;
-    if (scaledW >= VW) {
-      cx = Math.min(WORLD_CX, Math.max(px, VW - scaledW + WORLD_CX));
-    }
-    if (scaledH >= VH) {
-      cy = Math.min(WORLD_CY, Math.max(py, VH - scaledH + WORLD_CY));
-    }
-    return { x: cx, y: cy };
-  }, []);
-  const zoomRef      = useRef(INITIAL_ZOOM);
-  const [zoom, setZoom]     = useState(INITIAL_ZOOM);
-  const [cursor, setCursor] = useState<'grab' | 'grabbing'>('grab');
-  const dragStartRef = useRef<{ mx: number; my: number; px: number; py: number } | null>(null);
-  const didDragRef   = useRef(false);
-
-  /** Apply translate+scale directly to the world container DOM node. */
-  const applyTransform = useCallback((px: number, py: number, z: number) => {
+  // Lock the world to a fixed centred transform — island centre always at viewport centre.
+  // translate(-WORLD_CX*z, -WORLD_CY*z) shifts the world so its centre lands on
+  // the CSS left:50% top:50% anchor point. scale(z) grows from that origin.
+  useEffect(() => {
     if (worldRef.current) {
       worldRef.current.style.transform =
-        `translate(${px - WORLD_CX}px, ${py - WORLD_CY}px) scale(${z})`;
+        `translate(${-WORLD_CX * FIXED_ZOOM}px, ${-WORLD_CY * FIXED_ZOOM}px) scale(${FIXED_ZOOM})`;
     }
   }, []);
-
-  // Apply centred initial transform on mount
-  useEffect(() => {
-    applyTransform(panRef.current.x, panRef.current.y, INITIAL_ZOOM);
-  }, [applyTransform]); // eslint-disable-line react-hooks/exhaustive-deps
-
-  /* Mouse-wheel zoom — centre-anchored; scroll-out snaps discrete levels, scroll-in is smooth. */
-  useEffect(() => {
-    const el = viewportRef.current;
-    if (!el) return;
-    const handler = (e: WheelEvent) => {
-      if (e.ctrlKey || e.metaKey) return;
-      e.preventDefault();
-
-      const oldZ = zoomRef.current;
-
-      if (e.deltaY > 0) {
-        // ── ZOOM OUT — discrete snap, island always centred ─────────────────
-        const nextZ = [...ZOOM_OUT_LEVELS].sort((a, b) => b - a)
-          .find(l => l < oldZ - 0.02);
-        if (nextZ == null) return;
-        const { x, y } = clampPan(WORLD_CX * (1 - nextZ), WORLD_CY * (1 - nextZ), nextZ);
-        panRef.current  = { x, y };
-        zoomRef.current = nextZ;
-        applyTransform(x, y, nextZ);
-        setZoom(nextZ);
-      } else {
-        // ── ZOOM IN — island centre stays fixed: newPan = CX*(1-r) + oldPan*r
-        const newZ = Math.min(MAX_ZOOM, oldZ * 1.18);
-        if (newZ === oldZ) return;
-        const ratio = newZ / oldZ;
-        const rawPX = WORLD_CX * (1 - ratio) + panRef.current.x * ratio;
-        const rawPY = WORLD_CY * (1 - ratio) + panRef.current.y * ratio;
-        const { x, y } = clampPan(rawPX, rawPY, newZ);
-        panRef.current  = { x, y };
-        zoomRef.current = newZ;
-        applyTransform(x, y, newZ);
-        setZoom(newZ);
-      }
-    };
-    el.addEventListener('wheel', handler, { passive: false });
-    return () => el.removeEventListener('wheel', handler);
-  }, [applyTransform]);
-
-  const onMouseDown = useCallback((e: React.MouseEvent) => {
-    if ((e.target as HTMLElement).closest('[data-nodrag], button, input')) return;
-    dragStartRef.current = {
-      mx: e.clientX, my: e.clientY,
-      px: panRef.current.x, py: panRef.current.y,
-    };
-    didDragRef.current = false;
-    setCursor('grabbing');
-    e.preventDefault();
-  }, []);
-
-  const onMouseMove = useCallback((e: React.MouseEvent) => {
-    if (!dragStartRef.current) return;
-    const dx = e.clientX - dragStartRef.current.mx;
-    const dy = e.clientY - dragStartRef.current.my;
-    if (!didDragRef.current && Math.abs(dx) + Math.abs(dy) > 3) didDragRef.current = true;
-    if (didDragRef.current) {
-      const raw = { x: dragStartRef.current.px + dx, y: dragStartRef.current.py + dy };
-      const { x: nx, y: ny } = clampPan(raw.x, raw.y, zoomRef.current);
-      panRef.current = { x: nx, y: ny };
-      applyTransform(nx, ny, zoomRef.current);
-    }
-  }, [applyTransform]);
-
-  const onMouseUp = useCallback(() => {
-    dragStartRef.current = null;
-    setCursor('grab');
-    // Delay clearing didDrag so the browser's click event (which fires after mouseup)
-    // can still be suppressed when the user was panning.
-    setTimeout(() => { didDragRef.current = false; }, 0);
-  }, []);
-
-  /** Zoom button helper.
-   *  Zoom-out (factor < 1): snaps to next ZOOM_OUT_LEVELS level, locked to centre.
-   *  Zoom-in  (factor > 1): continuous, centred on viewport. */
-  const zoomBy = useCallback((factor: number) => {
-    if (factor < 1) {
-      const nextZ = [...ZOOM_OUT_LEVELS].sort((a, b) => b - a)
-        .find(l => l < zoomRef.current - 0.02);
-      if (nextZ == null) return;
-      const { x, y } = clampPan(WORLD_CX * (1 - nextZ), WORLD_CY * (1 - nextZ), nextZ);
-      panRef.current  = { x, y };
-      zoomRef.current = nextZ;
-      applyTransform(x, y, nextZ);
-      setZoom(nextZ);
-    } else {
-      const newZ  = Math.min(MAX_ZOOM, zoomRef.current * factor);
-      const ratio = newZ / zoomRef.current;
-      const { x, y } = clampPan(
-        WORLD_CX * (1 - ratio) + panRef.current.x * ratio,
-        WORLD_CY * (1 - ratio) + panRef.current.y * ratio,
-        newZ,
-      );
-      panRef.current  = { x, y };
-      zoomRef.current = newZ;
-      applyTransform(x, y, newZ);
-      setZoom(newZ);
-    }
-  }, [applyTransform, clampPan]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <div className="w-full h-[100dvh] overflow-hidden relative" style={{ fontFamily: "'Fredoka', sans-serif" }}>
 
 
-      {/* ── Viewport (overflow:hidden, handles drag events) ── */}
+      {/* ── Viewport — fixed, no pan/zoom ── */}
       <div
-        ref={viewportRef}
         className="absolute"
         style={{
           top: TOP_H, bottom: BOT_H, left: 0, right: 0,
           overflow: 'hidden',
-          cursor,
           background: '#1fa8e8',
         }}
-        onMouseDown={onMouseDown}
-        onMouseMove={onMouseMove}
-        onMouseUp={onMouseUp}
-        onMouseLeave={onMouseUp}
       >
-        {/*
-          World container — positioned so its (left: 50%, top: 50%) anchor
-          maps to the viewport centre. The CSS transform is managed imperatively
-          via worldRef for 60fps drag performance.
-          Initial transform: translate(-WORLD_CX, -WORLD_CY) centres the island.
-        */}
+        {/* World: left/top 50% puts the origin at viewport centre;
+            transform shifts so the world's own centre lands there. */}
         <div
           ref={worldRef}
           style={{
@@ -351,7 +207,6 @@ const GameInner = ({ profile }: { profile: PlayerProfile }) => {
             left: '50%',
             top: '50%',
             transformOrigin: '0 0',
-            willChange: 'transform',
           }}
         >
           <IslandGrid
@@ -363,32 +218,6 @@ const GameInner = ({ profile }: { profile: PlayerProfile }) => {
             onTileClick={moveTo}
           />
         </div>
-      </div>
-
-      {/* ── Zoom controls ── */}
-      <div
-        data-nodrag
-        className="absolute z-40 flex flex-col gap-1"
-        style={{ bottom: BOT_H + 8, right: 12 }}
-      >
-        <button
-          onClick={() => zoomBy(1.2)}
-          className="w-9 h-9 rounded-full shadow-lg text-lg font-black flex items-center justify-center active:scale-95 transition-transform"
-          style={{ background: 'rgba(255,255,255,0.92)', border: '2px solid #c8a56a', color: '#5c3a21' }}
-          title="Zoom in"
-        >+</button>
-        <button
-          onClick={() => { const rx = WORLD_CX*(1-INITIAL_ZOOM), ry = WORLD_CY*(1-INITIAL_ZOOM); panRef.current = { x: rx, y: ry }; zoomRef.current = INITIAL_ZOOM; applyTransform(rx, ry, INITIAL_ZOOM); setZoom(INITIAL_ZOOM); }}
-          className="w-9 h-9 rounded-full shadow-lg text-xs font-black flex items-center justify-center active:scale-95 transition-transform"
-          style={{ background: 'rgba(255,255,255,0.92)', border: '2px solid #c8a56a', color: '#5c3a21' }}
-          title="Reset view"
-        >⌂</button>
-        <button
-          onClick={() => zoomBy(0.83)}
-          className="w-9 h-9 rounded-full shadow-lg text-lg font-black flex items-center justify-center active:scale-95 transition-transform"
-          style={{ background: 'rgba(255,255,255,0.92)', border: '2px solid #c8a56a', color: '#5c3a21' }}
-          title="Zoom out"
-        >−</button>
       </div>
 
       {/* ── Chop progress bar (inside viewport overlay) ── */}
