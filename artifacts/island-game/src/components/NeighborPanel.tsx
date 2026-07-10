@@ -519,13 +519,13 @@ const NeighborCard = ({
   <div
     className="active:scale-95 transition-transform"
     style={{
-      width: 80, flexShrink: 0, height: '100%',
-      border: '2px solid #c8880a',
-      borderBottom: '3px solid #8a5004',
-      borderRadius: 8,
+      width: 116, flexShrink: 0, height: '100%',
+      border: '2.5px solid #c8880a',
+      borderBottom: '4px solid #8a5004',
+      borderRadius: 10,
       background: 'linear-gradient(180deg, #f5dea0 0%, #d4b060 100%)',
       display: 'flex', flexDirection: 'column', overflow: 'hidden', cursor: 'pointer',
-      boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.35), 0 2px 6px rgba(0,0,0,0.35)',
+      boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.40), 0 3px 8px rgba(0,0,0,0.40)',
     }}
   >
     {/* Name tab */}
