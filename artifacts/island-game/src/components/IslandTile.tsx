@@ -854,15 +854,46 @@ export const IslandTile: React.FC<IslandTileProps> = ({
           }
 
           const isGrass = !isCleared && tile.type === 'GRASS';
+          const isSand  = !isCleared && tile.type === 'SAND';
           const gpid = `gp-${tile.x}-${tile.y}`;
+          const spid = `sp-${tile.x}-${tile.y}`;
           return (
             <defs>
-              {/* Top face: radial gradient — lit from upper-left */}
-              <radialGradient id={gid} cx="30%" cy="22%" r="84%">
-                <stop offset="0%"   stopColor={shift(hi, v + 20)} />
-                <stop offset="55%"  stopColor={shift(hi, v)} />
-                <stop offset="100%" stopColor={shift(lo, -v)} />
-              </radialGradient>
+              {/* Top face gradient.
+                  Sand: consistent LINEAR direction across every tile so adjacent tiles
+                  share the same gradient direction — no per-tile bright spots, no gridlines.
+                  Everything else: radial lit from upper-left as before. */}
+              {isSand ? (
+                <linearGradient id={gid} x1="20%" y1="0%" x2="80%" y2="100%">
+                  <stop offset="0%"   stopColor="#f2dca6"/>
+                  <stop offset="100%" stopColor="#dcc480"/>
+                </linearGradient>
+              ) : (
+                <radialGradient id={gid} cx="30%" cy="22%" r="84%">
+                  <stop offset="0%"   stopColor={shift(hi, v + 20)} />
+                  <stop offset="55%"  stopColor={shift(hi, v)} />
+                  <stop offset="100%" stopColor={shift(lo, -v)} />
+                </radialGradient>
+              )}
+              {/* Sand stipple + ripple texture */}
+              {isSand && (
+                <pattern id={spid} x="0" y="0" width="16" height="11" patternUnits="userSpaceOnUse">
+                  {/* grain dots — irregular scatter */}
+                  <circle cx="2"  cy="3"   r="0.9" fill="rgba(155,110,50,0.26)"/>
+                  <circle cx="7"  cy="8"   r="0.8" fill="rgba(170,130,60,0.20)"/>
+                  <circle cx="12" cy="2"   r="0.9" fill="rgba(150,105,45,0.24)"/>
+                  <circle cx="5"  cy="10"  r="0.7" fill="rgba(165,125,58,0.18)"/>
+                  <circle cx="14" cy="7"   r="0.8" fill="rgba(155,110,50,0.20)"/>
+                  <circle cx="9"  cy="4.5" r="0.7" fill="rgba(145,100,42,0.22)"/>
+                  <circle cx="3"  cy="7"   r="0.8" fill="rgba(175,135,65,0.16)"/>
+                  <circle cx="11" cy="9.5" r="0.7" fill="rgba(160,120,55,0.18)"/>
+                  {/* subtle wind-ripple lines */}
+                  <path d="M0,9 Q4,7.5 8,9 Q12,10.5 16,9"
+                        stroke="rgba(145,100,42,0.13)" strokeWidth="0.7" fill="none"/>
+                  <path d="M0,4.5 Q4,3 8,4.5 Q12,6 16,4.5"
+                        stroke="rgba(145,100,42,0.09)" strokeWidth="0.6" fill="none"/>
+                </pattern>
+              )}
               {/* Grass blade texture pattern */}
               {isGrass && (
                 <pattern id={gpid} x="0" y="0" width="10" height="8" patternUnits="userSpaceOnUse">
@@ -899,6 +930,14 @@ export const IslandTile: React.FC<IslandTileProps> = ({
             />
           );
         })()}
+
+        {/* ── Sand stipple texture overlay ── */}
+        {!isWater && !isCleared && tile.type === 'SAND' && (
+          <polygon
+            points="40,-1 81,14 40,29 -1,14"
+            fill={`url(#sp-${tile.x}-${tile.y})`}
+          />
+        )}
 
         {/* ── Grass blade texture overlay ── */}
         {!isWater && !isCleared && tile.type === 'GRASS' && (
