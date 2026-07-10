@@ -41,23 +41,6 @@ const WORLD_CX = WORLD_W / 2;
 const WORLD_CY = WORLD_H / 2;
 
 /* ── Cloud layer (fixed in viewport, not panned) ──────────────────────── */
-const CLOUDS = [
-  { top: '12%', width: 160, duration: '28s', delay: '0s',    opacity: 0.78 },
-  { top: '22%', width: 110, duration: '38s', delay: '-12s',  opacity: 0.60 },
-  { top:  '6%', width: 200, duration: '22s', delay: '-7s',   opacity: 0.85 },
-  { top: '30%', width:  90, duration: '45s', delay: '-20s',  opacity: 0.50 },
-  { top: '16%', width: 130, duration: '33s', delay: '-3s',   opacity: 0.68 },
-];
-
-const CloudSVG = ({ opacity = 0.9 }: { opacity?: number }) => (
-  <svg viewBox="0 0 160 70" xmlns="http://www.w3.org/2000/svg" style={{ display: 'block' }}>
-    <ellipse cx="80"  cy="55" rx="68" ry="22" fill="white" opacity={opacity}/>
-    <ellipse cx="50"  cy="42" rx="34" ry="28" fill="white" opacity={opacity}/>
-    <ellipse cx="90"  cy="36" rx="40" ry="30" fill="white" opacity={opacity}/>
-    <ellipse cx="128" cy="48" rx="26" ry="20" fill="white" opacity={opacity * 0.9}/>
-    <ellipse cx="80"  cy="60" rx="64" ry="11" fill="#c8ddf0" opacity="0.28"/>
-  </svg>
-);
 
 /* ── GameInner ─────────────────────────────────────────────────────────── */
 const GameInner = ({ profile }: { profile: PlayerProfile }) => {
@@ -241,27 +224,6 @@ const GameInner = ({ profile }: { profile: PlayerProfile }) => {
           }}
         />
       )}
-
-      {/* ── Cloud layer (fixed in viewport — NOT panned with the world) ── */}
-      <div
-        className="absolute pointer-events-none overflow-hidden"
-        style={{ top: TOP_H, bottom: BOT_H, left: 0, right: 0, zIndex: 12 }}
-        aria-hidden="true"
-      >
-        {CLOUDS.map((c, i) => (
-          <div
-            key={i}
-            className="cloud-drift absolute"
-            style={{
-              top: c.top, width: c.width,
-              animationDuration: c.duration,
-              animationDelay: c.delay,
-            }}
-          >
-            <CloudSVG opacity={c.opacity} />
-          </div>
-        ))}
-      </div>
 
       {/* ── Viewport (overflow:hidden, handles drag events) ── */}
       <div
