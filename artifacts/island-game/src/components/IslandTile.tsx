@@ -1312,13 +1312,25 @@ export const IslandTile: React.FC<IslandTileProps> = ({
                         stroke="rgba(148,118,80,0.05)" strokeWidth="0.6" fill="none"/>
                 </pattern>
               )}
-              {/* Grass blade texture pattern */}
+              {/* Grass blade texture pattern — curved blades */}
               {isGrass && (
-                <pattern id={gpid} x="0" y="0" width="10" height="8" patternUnits="userSpaceOnUse">
-                  <line x1="1.5" y1="7.5" x2="3"   y2="4.5" stroke="#4a9010" strokeWidth="1.1" opacity="0.50"/>
-                  <line x1="5.5" y1="7"   x2="7"   y2="3.8" stroke="#4a9010" strokeWidth="1"   opacity="0.42"/>
-                  <line x1="8.5" y1="7.5" x2="9.5" y2="5"   stroke="#5aaa14" strokeWidth="0.9" opacity="0.32"/>
-                  <line x1="3.5" y1="7.8" x2="4.5" y2="5.5" stroke="#3a7a08" strokeWidth="0.8" opacity="0.28"/>
+                <pattern id={gpid} x="0" y="0" width="14" height="12" patternUnits="userSpaceOnUse">
+                  {/* blade A — left edge, sweeps right — base well above bottom to avoid cap-clip */}
+                  <path d="M1.5,9.5 Q0,6.5 1.5,3.5"  stroke="#4a9010" strokeWidth="1.3" fill="none" opacity="0.55" strokeLinecap="round"/>
+                  {/* blade B — left-centre, arcs right */}
+                  <path d="M4.5,9   Q6.5,6 5.5,3.5"   stroke="#52aa12" strokeWidth="1.2" fill="none" opacity="0.48" strokeLinecap="round"/>
+                  {/* blade C — centre S-curve */}
+                  <path d="M7.5,9   Q9,6 7.5,4.5 Q6.5,3.2 7.5,2" stroke="#4a9c10" strokeWidth="1.1" fill="none" opacity="0.42" strokeLinecap="round"/>
+                  {/* blade D — right-centre, sweeps left */}
+                  <path d="M10.5,9  Q8.5,6.5 10,4"     stroke="#3a7a08" strokeWidth="1.0" fill="none" opacity="0.36" strokeLinecap="round"/>
+                  {/* blade E — right edge, gentle curve right — crosses right boundary for seamless tiling */}
+                  <path d="M13,9    Q14.5,7 13.5,5"     stroke="#5ab414" strokeWidth="1.1" fill="none" opacity="0.38" strokeLinecap="round"/>
+                  {/* short wisp — left-centre low */}
+                  <path d="M3,9.5  Q2,8 3,7"            stroke="#3a7a08" strokeWidth="0.9" fill="none" opacity="0.28" strokeLinecap="round"/>
+                  {/* bright tip highlights */}
+                  <path d="M1.5,3.5  Q1.2,2.8 1.6,2.2"  stroke="#78cc20" strokeWidth="0.7" fill="none" opacity="0.42" strokeLinecap="round"/>
+                  <path d="M5.5,3.5  Q5.3,2.7 5.7,2.1"  stroke="#78cc20" strokeWidth="0.6" fill="none" opacity="0.36" strokeLinecap="round"/>
+                  <path d="M7.5,2    Q7.3,1.4 7.6,0.8"  stroke="#88d828" strokeWidth="0.6" fill="none" opacity="0.34" strokeLinecap="round"/>
                 </pattern>
               )}
             </defs>
