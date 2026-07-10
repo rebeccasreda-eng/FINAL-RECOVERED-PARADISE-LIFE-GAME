@@ -6,7 +6,7 @@ import { useToast } from '@/hooks/use-toast';
 
 /* ── Diamond colour palette — matches HTML reference ────────────────────── */
 const COLORS = {
-  GRASS:   { top: '#7ec420', sideL: '#3a8808', sideR: '#48a010' },
+  GRASS:   { top: '#5cb828', sideL: '#2e8008', sideR: '#3a9810' },
   SAND:    { top: '#f0e8cc', sideL: '#d4c49a', sideR: '#dccca4' },
   WATER:   { top: '#52C8E4', sideL: null,       sideR: null      },
   CLEARED: { top: '#8b5a2b', sideL: '#5a3a18',  sideR: '#6a4420' },
@@ -1746,9 +1746,9 @@ export const IslandTile: React.FC<IslandTileProps> = ({
             hi = [0xf4, 0xe0, 0xb0]; lo = [0xd8, 0xbc, 0x84];
             sL = '#d4c49a'; sR = '#dccca4';
           } else {
-            // GRASS — bright lime-green matching reference image
-            hi = [0xa8, 0xe4, 0x22]; lo = [0x6c, 0xb4, 0x0c];
-            sL = '#52a00c'; sR = '#60b010';
+            // GRASS — medium bright green matching reference
+            hi = [0x70, 0xd0, 0x30]; lo = [0x3a, 0x90, 0x10];
+            sL = '#2e8008'; sR = '#3a9810';
           }
 
           const isGrass = !isCleared && tile.type === 'GRASS';
@@ -1792,18 +1792,19 @@ export const IslandTile: React.FC<IslandTileProps> = ({
                         stroke="rgba(148,118,80,0.05)" strokeWidth="0.6" fill="none"/>
                 </pattern>
               )}
-              {/* Grass blade texture — simple two-layer blades */}
+              {/* Grass — subtle organic mottling, no blades */}
               {isGrass && (
-                <pattern id={gpid} x="0" y="0" width="14" height="12" patternUnits="userSpaceOnUse">
-                  {/* Back blades — darker, thinner */}
-                  <path d="M2,12  Q1,8  2,4"   stroke="#2e8810" strokeWidth="1.3" fill="none" strokeLinecap="round"/>
-                  <path d="M7,12  Q8,7  7,3"   stroke="#30900e" strokeWidth="1.3" fill="none" strokeLinecap="round"/>
-                  <path d="M12,12 Q11,7 12,4"  stroke="#2e8810" strokeWidth="1.3" fill="none" strokeLinecap="round"/>
-                  {/* Front blades — brighter */}
-                  <path d="M0,12  Q1,8  0,5"   stroke="#50b81e" strokeWidth="1.6" fill="none" strokeLinecap="round"/>
-                  <path d="M5,12  Q4,8  5,4"   stroke="#54c020" strokeWidth="1.6" fill="none" strokeLinecap="round"/>
-                  <path d="M10,12 Q11,7 10,4"  stroke="#50b81e" strokeWidth="1.6" fill="none" strokeLinecap="round"/>
-                  <path d="M14,12 Q13,8 14,5"  stroke="#54c020" strokeWidth="1.6" fill="none" strokeLinecap="round"/>
+                <pattern id={gpid} x="0" y="0" width="20" height="16" patternUnits="userSpaceOnUse">
+                  {/* Slightly darker blobs */}
+                  <ellipse cx="3"  cy="4"  rx="4.5" ry="3.5" fill="rgba(0,60,0,0.07)"/>
+                  <ellipse cx="13" cy="3"  rx="5"   ry="3"   fill="rgba(0,60,0,0.06)"/>
+                  <ellipse cx="8"  cy="10" rx="5.5" ry="3.5" fill="rgba(0,60,0,0.07)"/>
+                  <ellipse cx="18" cy="11" rx="4"   ry="3"   fill="rgba(0,60,0,0.05)"/>
+                  <ellipse cx="1"  cy="13" rx="3.5" ry="2.5" fill="rgba(0,60,0,0.06)"/>
+                  {/* Slightly lighter highlights */}
+                  <ellipse cx="6"  cy="7"  rx="3.5" ry="2.5" fill="rgba(255,255,255,0.06)"/>
+                  <ellipse cx="16" cy="7"  rx="4"   ry="2.5" fill="rgba(255,255,255,0.05)"/>
+                  <ellipse cx="11" cy="14" rx="3"   ry="2"   fill="rgba(255,255,255,0.05)"/>
                 </pattern>
               )}
             </defs>
