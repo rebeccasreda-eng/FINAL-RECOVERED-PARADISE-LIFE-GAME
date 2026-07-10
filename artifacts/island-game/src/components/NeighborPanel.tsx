@@ -773,19 +773,6 @@ export const NeighborPanel = ({
             {/* 5 Add-Neighbor cards — flex-fill */}
             {Array.from({ length: 5 }, (_, i) => <AddNeighborCard key={i} />)}
 
-            {/* Thin divider before nav arrows */}
-            <div style={{ width: 2, background: 'rgba(0,0,0,0.28)', borderRadius: 1, flexShrink: 0, margin: '2px 4px' }} />
-
-            {/* 3 nav arrow buttons */}
-            <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 3, flexShrink: 0 }}>
-              <NavArrowBtn symbol="◀" title="Previous" />
-              <NavArrowBtn symbol="●" title="Home" />
-              <NavArrowBtn symbol="▶" title="Next" />
-            </div>
-
-            {/* AddNeighbor card */}
-            <AddNeighborCard />
-
             {/* Thin divider before market */}
             <div style={{ width: 2, background: 'rgba(0,0,0,0.28)', borderRadius: 1, flexShrink: 0, margin: '2px 4px' }} />
 
