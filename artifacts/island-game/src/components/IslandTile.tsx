@@ -7,7 +7,7 @@ import { useToast } from '@/hooks/use-toast';
 /* ── Diamond colour palette — matches HTML reference ────────────────────── */
 const COLORS = {
   GRASS:   { top: '#7ccc18', sideL: '#52a00c', sideR: '#60b010' },
-  SAND:    { top: '#e8d29a', sideL: '#cdb277', sideR: '#d4b97f' },
+  SAND:    { top: '#f0e8cc', sideL: '#d4c49a', sideR: '#dccca4' },
   WATER:   { top: '#52C8E4', sideL: null,       sideR: null      },
   CLEARED: { top: '#8b5a2b', sideL: '#5a3a18',  sideR: '#6a4420' },
 };
@@ -835,8 +835,8 @@ function shoreScatter(
       const ry   = (1.0 + tileRng(tx, ty, base + 29) * 1.6) * 0.65;
       const rot  = (tileRng(tx, ty, base + 37) - 0.5) * 60;
       const op   = 0.28 + tileRng(tx, ty, base + 41) * 0.28;
-      // colours range from pale sand (#dfc87a) to warm tan (#c8aa60)
-      const sand = tileRng(tx, ty, base + 53) > 0.5 ? '#d4bc78' : '#c4a85c';
+      // colours range from pale cream (#ede4c8) to warm buff (#dcd0b0)
+      const sand = tileRng(tx, ty, base + 53) > 0.5 ? '#e8dcc0' : '#dcd0aa';
       out.push(
         <ellipse
           key={`sh-${ei}-${i}`}
@@ -1019,7 +1019,7 @@ export const IslandTile: React.FC<IslandTileProps> = ({
             sL = '#5a3a18'; sR = '#6a4420';
           } else if (tile.type === 'SAND') {
             hi = [0xf4, 0xe0, 0xb0]; lo = [0xd8, 0xbc, 0x84];
-            sL = '#cdb277'; sR = '#d4b97f';
+            sL = '#d4c49a'; sR = '#dccca4';
           } else {
             // GRASS — bright lime-green matching reference image
             hi = [0xa8, 0xe4, 0x22]; lo = [0x6c, 0xb4, 0x0c];
@@ -1038,8 +1038,8 @@ export const IslandTile: React.FC<IslandTileProps> = ({
                   Everything else: radial lit from upper-left as before. */}
               {isSand ? (
                 <linearGradient id={gid} x1="20%" y1="0%" x2="80%" y2="100%">
-                  <stop offset="0%"   stopColor="#f2dca6"/>
-                  <stop offset="100%" stopColor="#dcc480"/>
+                  <stop offset="0%"   stopColor="#f8f2e0"/>
+                  <stop offset="100%" stopColor="#e8dcc4"/>
                 </linearGradient>
               ) : (
                 <radialGradient id={gid} cx="30%" cy="22%" r="84%">
@@ -1052,19 +1052,19 @@ export const IslandTile: React.FC<IslandTileProps> = ({
               {isSand && (
                 <pattern id={spid} x="0" y="0" width="16" height="11" patternUnits="userSpaceOnUse">
                   {/* grain dots — irregular scatter */}
-                  <circle cx="2"  cy="3"   r="0.9" fill="rgba(155,110,50,0.26)"/>
-                  <circle cx="7"  cy="8"   r="0.8" fill="rgba(170,130,60,0.20)"/>
-                  <circle cx="12" cy="2"   r="0.9" fill="rgba(150,105,45,0.24)"/>
-                  <circle cx="5"  cy="10"  r="0.7" fill="rgba(165,125,58,0.18)"/>
-                  <circle cx="14" cy="7"   r="0.8" fill="rgba(155,110,50,0.20)"/>
-                  <circle cx="9"  cy="4.5" r="0.7" fill="rgba(145,100,42,0.22)"/>
-                  <circle cx="3"  cy="7"   r="0.8" fill="rgba(175,135,65,0.16)"/>
-                  <circle cx="11" cy="9.5" r="0.7" fill="rgba(160,120,55,0.18)"/>
+                  <circle cx="2"  cy="3"   r="0.9" fill="rgba(160,130,90,0.13)"/>
+                  <circle cx="7"  cy="8"   r="0.8" fill="rgba(170,140,95,0.10)"/>
+                  <circle cx="12" cy="2"   r="0.9" fill="rgba(155,125,85,0.12)"/>
+                  <circle cx="5"  cy="10"  r="0.7" fill="rgba(165,132,90,0.09)"/>
+                  <circle cx="14" cy="7"   r="0.8" fill="rgba(158,128,88,0.10)"/>
+                  <circle cx="9"  cy="4.5" r="0.7" fill="rgba(150,122,84,0.11)"/>
+                  <circle cx="3"  cy="7"   r="0.8" fill="rgba(172,138,92,0.08)"/>
+                  <circle cx="11" cy="9.5" r="0.7" fill="rgba(162,130,88,0.09)"/>
                   {/* subtle wind-ripple lines */}
                   <path d="M0,9 Q4,7.5 8,9 Q12,10.5 16,9"
-                        stroke="rgba(145,100,42,0.13)" strokeWidth="0.7" fill="none"/>
+                        stroke="rgba(148,118,80,0.07)" strokeWidth="0.7" fill="none"/>
                   <path d="M0,4.5 Q4,3 8,4.5 Q12,6 16,4.5"
-                        stroke="rgba(145,100,42,0.09)" strokeWidth="0.6" fill="none"/>
+                        stroke="rgba(148,118,80,0.05)" strokeWidth="0.6" fill="none"/>
                 </pattern>
               )}
               {/* Grass blade texture pattern */}
