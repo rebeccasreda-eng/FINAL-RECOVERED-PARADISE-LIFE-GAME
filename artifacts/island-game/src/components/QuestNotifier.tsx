@@ -273,8 +273,8 @@ const AxeNPC = () => (
 
 const NPC_MAP: Record<string, React.FC> = { parrot: ParrotNPC, crab: CrabNPC, tree: TreeNPC, fish: FishNPC, axe: AxeNPC };
 
-/* ── Wooden arrow sign with quest icon ─────────────────────────────────── */
-const QuestSign = ({ icon, onClick }: { icon: string; onClick: () => void }) => (
+/* ── Wooden arrow sign ──────────────────────────────────────────────────── */
+const QuestSign = ({ onClick }: { onClick: () => void }) => (
   <button
     onClick={onClick}
     className="active:scale-95 transition-transform"
@@ -283,7 +283,6 @@ const QuestSign = ({ icon, onClick }: { icon: string; onClick: () => void }) => 
       border: 'none',
       padding: 0,
       cursor: 'pointer',
-      position: 'relative',
       display: 'block',
       lineHeight: 0,
     }}
@@ -294,16 +293,6 @@ const QuestSign = ({ icon, onClick }: { icon: string; onClick: () => void }) => 
       height="46"
       style={{ display: 'block', filter: 'drop-shadow(2px 3px 4px rgba(0,0,0,0.4))' }}
     >
-      {/* Arrow-shaped plank */}
-      <path
-        d="M4 4 L142 4 L164 23 L142 42 L4 42 Z"
-        fill="#c8a050"
-        stroke="#7a4c10"
-        strokeWidth="2.5"
-        strokeLinejoin="round"
-      />
-      {/* Top sheen */}
-      <path d="M4 4 L142 4 L164 23 L142 42 L4 42 Z" fill="url(#nqGrad)" opacity="0.14"/>
       <defs>
         <linearGradient id="nqGrad" x1="0" y1="0" x2="0" y2="1">
           <stop offset="0%" stopColor="white"/>
@@ -311,17 +300,16 @@ const QuestSign = ({ icon, onClick }: { icon: string; onClick: () => void }) => 
           <stop offset="100%" stopColor="rgba(0,0,0,0.15)"/>
         </linearGradient>
       </defs>
+      {/* Arrow-shaped plank */}
+      <path d="M4 4 L142 4 L164 23 L142 42 L4 42 Z" fill="#c8a050" stroke="#7a4c10" strokeWidth="2.5" strokeLinejoin="round"/>
+      <path d="M4 4 L142 4 L164 23 L142 42 L4 42 Z" fill="url(#nqGrad)" opacity="0.14"/>
       {/* Grain lines */}
-      <line x1="44" y1="9"  x2="136" y2="9"  stroke="#a07830" strokeWidth="1" opacity="0.35"/>
-      <line x1="44" y1="23" x2="152" y2="23" stroke="#a07830" strokeWidth="1" opacity="0.25"/>
-      <line x1="44" y1="37" x2="136" y2="37" stroke="#a07830" strokeWidth="1" opacity="0.35"/>
-      {/* Icon backing circle */}
-      <circle cx="24" cy="23" r="15" fill="#8a5808" stroke="#5a3808" strokeWidth="1.5"/>
-      {/* Nail divider */}
-      <circle cx="46" cy="23" r="3.2" fill="#7a5010" stroke="#5a3808" strokeWidth="1"/>
-      {/* NEW QUEST text */}
+      <line x1="14" y1="9"  x2="136" y2="9"  stroke="#a07830" strokeWidth="1" opacity="0.35"/>
+      <line x1="14" y1="23" x2="152" y2="23" stroke="#a07830" strokeWidth="1" opacity="0.25"/>
+      <line x1="14" y1="37" x2="136" y2="37" stroke="#a07830" strokeWidth="1" opacity="0.35"/>
+      {/* NEW QUEST text — centred in the plank */}
       <text
-        x="110"
+        x="80"
         y="29"
         textAnchor="middle"
         fontFamily="'Fredoka', 'Arial Black', sans-serif"
@@ -333,21 +321,6 @@ const QuestSign = ({ icon, onClick }: { icon: string; onClick: () => void }) => 
         NEW QUEST
       </text>
     </svg>
-    {/* Emoji icon overlaid on the circle */}
-    <span
-      style={{
-        position: 'absolute',
-        left: 10,
-        top: '50%',
-        transform: 'translateY(-50%)',
-        fontSize: 20,
-        lineHeight: 1,
-        pointerEvents: 'none',
-        userSelect: 'none',
-      }}
-    >
-      {icon}
-    </span>
   </button>
 );
 
@@ -418,7 +391,6 @@ export const QuestNotifier = ({ onOpenPanel }: { onOpenPanel: (questId: string) 
                 {newSigns.map(q => (
                   <QuestSign
                     key={q.id}
-                    icon={q.icon}
                     onClick={() => {
                       dispatch({ type: 'ACCEPT_QUEST', questId: q.id });
                       onOpenPanel(q.id);
