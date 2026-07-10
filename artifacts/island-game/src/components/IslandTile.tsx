@@ -2053,7 +2053,54 @@ export const IslandTile: React.FC<IslandTileProps> = ({
           />
         )}
 
+        {/* ── Terrain edge blends ─────────────────────────────────────────────
+            For each edge where the neighbour is a different terrain type, draw
+            a gradient-filled triangle (one quarter of the diamond) that bleeds
+            the neighbour's colour onto this tile from that shared edge inward.
+            Diamond vertices: top (40,-1)  right (81,14)  bot (40,29)  left (-1,14)
+            Centre: (40,14).  Edge midpoints used as gradient start:
+              NW (nbN) = (19.5,6.5)   NE (nbE) = (60.5,6.5)
+              SW (nbW) = (19.5,21.5)  SE (nbS) = (60.5,21.5)           ── */}
+        {(() => {
+          const myType = isCleared ? 'CLEARED' : tile.type;
+          const edges = [
+            { dir:'NW', nb:nbN, pts:'40,-1 -1,14 40,14',  ex:19.5, ey:6.5  },
+            { dir:'NE', nb:nbE, pts:'40,-1 81,14 40,14',  ex:60.5, ey:6.5  },
+            { dir:'SW', nb:nbW, pts:'-1,14 40,29 40,14',  ex:19.5, ey:21.5 },
+            { dir:'SE', nb:nbS, pts:'81,14 40,29 40,14',  ex:60.5, ey:21.5 },
+          ] as const;
 
+          // RGB string for the terrain colour to bleed onto this tile.
+          // undefined = outside map boundary, treated the same as WATER.
+          const blendRgb = (t?: string): string | null => {
+            const resolved = t ?? 'WATER'; // outside map = ocean
+            if (resolved === myType) return null;
+            if (resolved === 'WATER') return '28,152,215';
+            if (resolved === 'SAND')  return '232,214,168';
+            if (resolved === 'GRASS') return '78,186,34';
+            return null;
+          };
+
+          return edges.map(({ dir, nb, pts, ex, ey }) => {
+            const rgb = blendRgb(nb);
+            if (!rgb) return null;
+            // Water↔land transitions are stronger; sand↔grass are subtler
+            const op = (nb === 'WATER' || myType === 'WATER') ? 0.52 : 0.40;
+            const gid = `tb-${dir}-${tile.x}-${tile.y}`;
+            return (
+              <React.Fragment key={dir}>
+                <defs>
+                  <linearGradient id={gid} gradientUnits="userSpaceOnUse"
+                    x1={ex} y1={ey} x2={40} y2={14}>
+                    <stop offset="0%"  stopColor={`rgb(${rgb})`} stopOpacity={op}/>
+                    <stop offset="82%" stopColor={`rgb(${rgb})`} stopOpacity={0}/>
+                  </linearGradient>
+                </defs>
+                <polygon points={pts} fill={`url(#${gid})`}/>
+              </React.Fragment>
+            );
+          });
+        })()}
 
         {/* Danger zone red pulse — same expanded points as base diamond */}
         {isDangerZone && (

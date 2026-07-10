@@ -303,8 +303,12 @@ const GameInner = ({ profile }: { profile: PlayerProfile }) => {
       applyTransform(x, y, nextZ);
       setZoom(nextZ);
     } else {
+      // Zoom-in — centre-anchored (matches wheel zoom-in behaviour)
       const newZ = Math.min(MAX_ZOOM, zoomRef.current * factor);
-      const { x, y } = clampPan(panRef.current.x, panRef.current.y, newZ);
+      const ratio = newZ / zoomRef.current;
+      const rawPX = panRef.current.x + WORLD_CX * (1 - ratio);
+      const rawPY = panRef.current.y + WORLD_CY * (1 - ratio);
+      const { x, y } = clampPan(rawPX, rawPY, newZ);
       panRef.current  = { x, y };
       zoomRef.current = newZ;
       applyTransform(x, y, newZ);
