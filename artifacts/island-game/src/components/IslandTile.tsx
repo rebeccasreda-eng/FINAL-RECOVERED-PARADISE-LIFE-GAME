@@ -215,6 +215,66 @@ const ObjectSVG: React.FC<{ object: string; tileX: number; tileY: number }> = ({
       </svg>
     );
 
+    /* ── SUNFLOWER (unripe — waiting to bloom) ─────────────────────────── */
+    case 'SUNFLOWER': {
+      // Slight variation per tile so clusters look natural
+      const sv = (tx * 3 + ty * 7) % 3;
+      const lean = sv === 0 ? -1.5 : sv === 1 ? 1.5 : 0;
+      return (
+        <svg viewBox="0 0 34 60" width="32" height="56" style={{ display:'block' }}>
+          {/* Ground shadow */}
+          <ellipse cx="17" cy="59" rx="9" ry="2.5" fill="rgba(0,0,0,0.18)"/>
+          {/* Stem — slightly leaning per variant */}
+          <path d={`M17,58 Q${16+lean},44 ${17+lean},30 Q${18+lean},20 ${17+lean},10`}
+            stroke="#4a9c1c" strokeWidth="3.5" fill="none" strokeLinecap="round"/>
+          {/* Stem highlight */}
+          <path d={`M16,58 Q${15+lean},44 ${16+lean},30`}
+            stroke="rgba(255,255,255,0.20)" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
+          {/* Left leaf */}
+          <path d={`M${16+lean},46 Q${7+lean},41 ${4+lean},33 Q${8+lean},30 ${13+lean},38 Q${15+lean},42 ${16+lean},46Z`}
+            fill="#52a81e"/>
+          <path d={`M${16+lean},46 Q${9+lean},41 ${4+lean},33`}
+            stroke="#3a8010" strokeWidth="0.9" fill="none" opacity="0.60"/>
+          {/* Right leaf */}
+          <path d={`M${18+lean},33 Q${27+lean},28 ${30+lean},21 Q${26+lean},19 ${21+lean},26 Q${18+lean},30 ${18+lean},33Z`}
+            fill="#52a81e"/>
+          <path d={`M${18+lean},33 Q${24+lean},27 ${30+lean},21`}
+            stroke="#3a8010" strokeWidth="0.9" fill="none" opacity="0.60"/>
+          {/* ── Flower head — unripe, petals just opening ── */}
+          {/* Petal backing (pale greenish-yellow, short) */}
+          {Array.from({ length: 12 }, (_, i) => (
+            <ellipse key={i}
+              cx={17 + lean} cy={7}
+              rx="2.8" ry="5.5"
+              fill={i % 2 === 0 ? '#c8d830' : '#b8c828'}
+              opacity="0.88"
+              transform={`rotate(${i * 30} ${17 + lean} 12)`}
+            />
+          ))}
+          {/* Center disk — green, unripe (not dark brown yet) */}
+          <circle cx={17 + lean} cy={12} r="8" fill="#2e7c14"/>
+          <circle cx={17 + lean} cy={12} r="7" fill="#3a9020"/>
+          {/* Seed-head texture dots — sparse, small */}
+          {([
+            [0,-4],[3,-3],[5,0],[4,3],[1,5],[-2,5],[-5,3],[-5,0],[-3,-3],
+          ] as const).map(([dx,dy], i) => (
+            <circle key={i} cx={(17+lean)+dx} cy={12+dy} r="1.1"
+              fill="#1e5e0a" opacity="0.55"/>
+          ))}
+          {/* Center highlight */}
+          <ellipse cx={(17+lean)-2.5} cy={10} rx="3" ry="2"
+            fill="rgba(255,255,255,0.22)" transform={`rotate(-20 ${(17+lean)-2.5} 10)`}/>
+          {/* Petal tips — lighter, slightly greener */}
+          {Array.from({ length: 12 }, (_, i) => {
+            const angle = (i * 30 * Math.PI) / 180;
+            const tx2 = (17 + lean) + Math.sin(angle) * 11.5;
+            const ty2 = 12 - Math.cos(angle) * 11.5;
+            return <circle key={i} cx={tx2} cy={ty2} r="1.8" fill="#d8e040" opacity="0.70"/>;
+          })}
+        </svg>
+      );
+    }
+
     /* ── FLOWER BUSH ───────────────────────────────────────────────────── */
     case 'FLOWER_BUSH': {
       const pi   = (tx * 7 + ty * 13) % 3;
@@ -671,7 +731,7 @@ const ObjectSVG: React.FC<{ object: string; tileX: number; tileY: number }> = ({
 
 /** Objects that use SVG art instead of emoji */
 const SVG_OBJECTS = new Set(['TREE_PALM', 'TREE_APPLE', 'ROCK', 'FLOWER_BUSH', 'DRIFTWOOD',
-  'TREE_COCONUT', 'TREE_MANGO', 'GARDEN_PATCH', 'WEEDS']);
+  'TREE_COCONUT', 'TREE_MANGO', 'GARDEN_PATCH', 'WEEDS', 'SUNFLOWER']);
 /** Objects that sway in the breeze */
 const SWAY_OBJECTS = new Set(['TREE_PALM', 'TREE_APPLE', 'TREE_COCONUT', 'TREE_MANGO']);
 

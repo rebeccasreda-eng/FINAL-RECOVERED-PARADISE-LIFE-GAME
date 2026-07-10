@@ -135,6 +135,7 @@ export const OBJECT_CONFIG: Record<string, any> = {
   TREE_APPLE: { action: 'Harvest', energy: 1, coins: 5, xp: 10, drops: { wood: 1, food: 2 }, respawn: SCALED(60000) },
   ROCK: { action: 'Mine', energy: 1, coins: 8, xp: 15, drops: { stone: 1 }, respawn: SCALED(90000) },
   FLOWER_BUSH: { action: 'Harvest', energy: 1, coins: 3, xp: 8, respawn: SCALED(45000) },
+  SUNFLOWER:   { action: 'Harvest', energy: 1, coins: 6, xp: 12, respawn: SCALED(90000) },
   DRIFTWOOD: { action: 'Clear', energy: 1, coins: 3, xp: 5, drops: { wood: 1 }, respawn: SCALED(80000) },
   TREE_COCONUT: { action: 'Harvest', energy: 1, coins: 6, xp: 12, drops: { food: 2 }, respawn: SCALED(70000) },
   TREE_MANGO: { action: 'Harvest', energy: 1, coins: 8, xp: 14, drops: { food: 3 }, respawn: SCALED(80000) },
@@ -147,7 +148,7 @@ export const OBJECT_CONFIG: Record<string, any> = {
 };
 
 export const EMOJI_MAP: Record<string, string> = {
-  TREE_PALM: '🌴', TREE_APPLE: '🍎', ROCK: '🪨', FLOWER_BUSH: '🌸', DRIFTWOOD: '🪵',
+  TREE_PALM: '🌴', TREE_APPLE: '🍎', ROCK: '🪨', FLOWER_BUSH: '🌸', DRIFTWOOD: '🪵', SUNFLOWER: '🌻',
   TREE_COCONUT: '🌴', TREE_MANGO: '🥭', GARDEN_PATCH: '🍍',
   CROP_PLOT: '🟫', CROP_GROWING: '🌱', CROP_READY: '🌽', CROP_WILTED: '🥀',
   FISH_SPOT: '', HUT: '🏚️', DOCK: '⛵', WELL: '💧', 
@@ -298,6 +299,18 @@ export function generateIsland(): Record<string, TileData> {
 
   const waterTiles = Object.values(tiles).filter(t => t.type === 'WATER');
   for (let i = 0; i < 6 && waterTiles.length; i++) pick(waterTiles).object = 'FISH_SPOT';
+
+  // ── Sunflowers near garden patches — waiting to ripe ────────────────────
+  const gardenTiles = Object.values(tiles).filter(t => t.object === 'GARDEN_PATCH');
+  const GARDEN_NEIGHBORS = [[-1,0],[1,0],[0,-1],[0,1],[-1,-1],[1,-1],[-1,1],[1,1]] as const;
+  for (const garden of gardenTiles) {
+    for (const [dx, dy] of GARDEN_NEIGHBORS) {
+      const nb = tiles[`${garden.x + dx},${garden.y + dy}`];
+      if (nb && nb.type === 'GRASS' && !nb.object && rand() < 0.60) {
+        nb.object = 'SUNFLOWER';
+      }
+    }
+  }
 
   // ── Weeds near rocks — overgrown look around boulders ───────────────────
   const rockTiles = Object.values(tiles).filter(t => t.object === 'ROCK');
