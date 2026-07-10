@@ -205,11 +205,6 @@
 
 /* ── Character bob animations — squish/stretch for 3-D weight ─── */
 /* scaleX (facing) lives on the parent; bob wrapper owns scaleY only */
-@keyframes charIdleBob {
-  0%, 88%, 100% { transform: translateY(0px)  scaleY(1.00); }
-  44%, 56%      { transform: translateY(-7px) scaleY(1.05); }
-  92%           { transform: translateY(0px)  scaleY(0.97); }
-}
 /* One cycle = one footstep (0.35 s); squish on land, stretch on lift */
 @keyframes charWalkBob {
   0%   { transform: translateY(0px)  scaleY(0.93); }   /* land  → squish */
