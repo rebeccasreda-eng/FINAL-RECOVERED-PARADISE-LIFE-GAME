@@ -320,8 +320,8 @@ export function generateIsland(): Record<string, TileData> {
 
       } else if (tile.type === 'SAND') {
         const r = rand();
-        if      (r < 0.13) tile.object = 'ROCK';
-        else if (r < 0.20) tile.object = 'DRIFTWOOD';
+        if (r < 0.13) tile.object = 'ROCK';
+        // DRIFTWOOD only appears when a coconut tree is chopped — not in world gen
       }
     }
   }

@@ -324,7 +324,9 @@ function gameReducer(state: GameState, action: GameAction): GameState {
         nextState.tiles[tileId] = { ...tile, object: 'CLEARED_LAND' };
         if (Math.random() < 0.3) nextState.inventory.wood += 1;
       } else {
-        nextState.tiles[tileId] = { ...tile, object: undefined };
+        // Coconut trees leave a log behind when chopped down
+        const dropsLog = obj === 'TREE_COCONUT' || obj === 'TREE_COCONUT_UNRIPE';
+        nextState.tiles[tileId] = { ...tile, object: dropsLog ? ('DRIFTWOOD' as ObjectType) : undefined };
       }
 
       // ── Rewards — only reached on final/single hit ────────────────────────
@@ -643,7 +645,7 @@ export const GameProvider: React.FC<{children: React.ReactNode}> = ({ children }
   const { toast } = useToast();
   
   const [state, dispatch] = useReducer(gameReducer, undefined, () => {
-    const saved = localStorage.getItem('island-game-state-v17');
+    const saved = localStorage.getItem('island-game-state-v18');
     if (saved) {
       try {
         const parsed = JSON.parse(saved);
@@ -696,7 +698,7 @@ export const GameProvider: React.FC<{children: React.ReactNode}> = ({ children }
   const [chopCount, setChopCount] = useState(0);
 
   useEffect(() => {
-    localStorage.setItem('island-game-state-v17', JSON.stringify(state));
+    localStorage.setItem('island-game-state-v18', JSON.stringify(state));
   }, [state]);
 
   useEffect(() => {
