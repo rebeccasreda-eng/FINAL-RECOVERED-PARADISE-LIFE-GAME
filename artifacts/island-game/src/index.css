@@ -197,3 +197,36 @@
 .floating-xp  { color: #a0e840; font-size: 1rem; }
 .floating-coin { color: #ffe040; font-size: 1rem; }
 .floating-energy { color: #60c0ff; font-size: 0.95rem; }
+
+/* ── Character on island: idle float ───────────────────── */
+/*
+  The isometric board has: rotateX(60deg) rotateZ(-45deg)
+  Counter-rotation to stand upright: rotateZ(45deg) rotateX(-60deg)
+  Then translateY lifts the character off the tile surface.
+*/
+.char-idle {
+  transform: rotateZ(45deg) rotateX(-60deg) translateY(-12px);
+  transform-origin: center bottom;
+  animation: charIdleAnim 2.6s ease-in-out infinite;
+}
+@keyframes charIdleAnim {
+  0%,100% { transform: rotateZ(45deg) rotateX(-60deg) translateY(-12px); }
+  48%     { transform: rotateZ(45deg) rotateX(-60deg) translateY(-22px); }
+  52%     { transform: rotateZ(45deg) rotateX(-60deg) translateY(-22px); }
+}
+
+/* ── Character on island: walking bob ──────────────────── */
+.char-walk {
+  transform-origin: center bottom;
+  animation: charWalkAnim 0.32s ease-in-out infinite;
+}
+@keyframes charWalkAnim {
+  0%,100% { transform: rotateZ(45deg) rotateX(-60deg) translateY(-6px); }
+  50%     { transform: rotateZ(45deg) rotateX(-60deg) translateY(-18px); }
+}
+
+/* ── Walk destination marker pulse ─────────────────────── */
+@keyframes destPulse {
+  0%,100% { opacity: 0.8; transform: scale(1); }
+  50%     { opacity: 0.3; transform: scale(1.4); }
+}

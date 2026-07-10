@@ -4,7 +4,15 @@ import { TileData } from '../game/types';
 import { OBJECT_CONFIG, EMOJI_MAP, CROP_TYPES } from '../game/gameData';
 import { useToast } from '@/hooks/use-toast';
 
-export const IslandTile = ({ tile, isDangerZone }: { tile: TileData, isDangerZone?: boolean }) => {
+export const IslandTile = ({
+  tile,
+  isDangerZone,
+  onTileClick,
+}: {
+  tile: TileData;
+  isDangerZone?: boolean;
+  onTileClick?: (x: number, y: number) => void;
+}) => {
   const { state, dispatch, interact, plant, place, activeTool, activeBuildItem, floatingTexts, setNeighborVisitPrompt } = useGame();
   const { toast } = useToast();
   
@@ -18,6 +26,9 @@ export const IslandTile = ({ tile, isDangerZone }: { tile: TileData, isDangerZon
   }, [tile.object]);
 
   const handleInteraction = () => {
+    // Always move character to clicked tile (skipping water is handled in Game.tsx)
+    onTileClick?.(tile.x, tile.y);
+
     if (activeTool === 'plant') {
       plant(tile.id);
     } else if (activeTool === 'build' && activeBuildItem) {
