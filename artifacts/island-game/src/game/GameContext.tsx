@@ -643,7 +643,7 @@ export const GameProvider: React.FC<{children: React.ReactNode}> = ({ children }
   const { toast } = useToast();
   
   const [state, dispatch] = useReducer(gameReducer, undefined, () => {
-    const saved = localStorage.getItem('island-game-state-v16');
+    const saved = localStorage.getItem('island-game-state-v17');
     if (saved) {
       try {
         const parsed = JSON.parse(saved);
@@ -696,7 +696,7 @@ export const GameProvider: React.FC<{children: React.ReactNode}> = ({ children }
   const [chopCount, setChopCount] = useState(0);
 
   useEffect(() => {
-    localStorage.setItem('island-game-state-v16', JSON.stringify(state));
+    localStorage.setItem('island-game-state-v17', JSON.stringify(state));
   }, [state]);
 
   useEffect(() => {

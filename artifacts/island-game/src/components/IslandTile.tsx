@@ -2067,44 +2067,47 @@ export const IslandTile: React.FC<IslandTileProps> = ({
         )}
       </svg>
 
-      {/* ── Fish swimming in water — ~1 in 5 water tiles ── */}
-      {isWater && (tile.x * 7 + tile.y * 11) % 5 === 0 && (() => {
-        const delay = (tile.x * 5 + tile.y * 7) % 16;
-        // Alternate direction tile-by-tile
+      {/* ── Fish swimming in water ──────────────────────────────────────────
+           FISH_SPOT tiles always show a larger, clearly visible fish.
+           Other water tiles show a small ambient fish on ~1-in-5 tiles.   */}
+      {isWater && (tile.object === 'FISH_SPOT' || (tile.x * 7 + tile.y * 11) % 5 === 0) && (() => {
+        const isFishSpot = tile.object === 'FISH_SPOT';
+        const delay  = (tile.x * 5 + tile.y * 7) % 16;
         const goRight = (tile.x + tile.y) % 2 === 0;
-        const cls  = goRight ? 'fish-swim' : 'fish-swim-r';
-        // Facing: right-swimmer faces right, left-swimmer is mirrored
-        const flip = goRight ? 'none' : 'scaleX(-1)';
+        const cls   = goRight ? 'fish-swim' : 'fish-swim-r';
+        const flip  = goRight ? 'none' : 'scaleX(-1)';
+        // FISH_SPOT: bigger fish centred on the tile; ambient: small, near edge
+        const w   = isFishSpot ? 34 : 20;
+        const h   = isFishSpot ? 17 : 10;
+        const top = isFishSpot ? 8  : 18;
 
         return (
           <div
             className={cls}
             style={{
               position: 'absolute',
-              left: 0,
-              top: 18,                    // lower half of diamond — near the terrain edge
+              left: isFishSpot ? 20 : 0,
+              top,
               animationDelay: `${delay}s`,
               zIndex: tileZIndex + 2,
             }}
           >
             <svg
-              viewBox="0 0 22 11" width="20" height="10"
+              viewBox="0 0 22 11" width={w} height={h}
               style={{ display: 'block', transform: flip }}
             >
-              {/* tail */}
               <polygon points="1,1 7,5.5 1,10" fill="#3aa8d8"/>
-              {/* body */}
               <ellipse cx="13" cy="5.5" rx="9.5" ry="4.5" fill="#55c8f0"/>
-              {/* belly shimmer */}
               <ellipse cx="13" cy="7.8" rx="6" ry="1.6" fill="#b8eeff" opacity="0.60"/>
-              {/* dorsal fin */}
               <polygon points="8,1.5 11,5 14,1.5" fill="#2e90c0" opacity="0.85"/>
-              {/* scale highlight */}
               <ellipse cx="11" cy="4.5" rx="3.5" ry="1.8" fill="rgba(255,255,255,0.28)" transform="rotate(-10 11 4.5)"/>
-              {/* eye */}
               <circle cx="20" cy="4.2" r="1.4" fill="white"/>
               <circle cx="20.4" cy="4.2" r="0.7" fill="#0a2a40"/>
               <circle cx="20.1" cy="3.9" r="0.35" fill="rgba(255,255,255,0.8)"/>
+              {/* extra ripple rings on the prominent dock fish */}
+              {isFishSpot && <>
+                <ellipse cx="4" cy="5.5" rx="2.5" ry="1.2" fill="none" stroke="#a0dff8" strokeWidth="0.5" opacity="0.7"/>
+              </>}
             </svg>
           </div>
         );

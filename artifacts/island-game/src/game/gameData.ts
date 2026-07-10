@@ -369,6 +369,29 @@ export function generateIsland(): Record<string, TileData> {
   });
   if (interiorWater.length && !interiorWater[0].object) {
     interiorWater[0].object = 'DOCK';
+    // Guarantee a visible fish near the dock. Check immediate neighbours
+    // first; fall back to any empty water tile within distance 3.
+    const dock = interiorWater[0];
+    let placed = false;
+    for (const [dx, dy] of [[-1,0],[1,0],[0,-1],[0,1]] as const) {
+      const nb = tiles[`${dock.x+dx},${dock.y+dy}`];
+      if (nb && nb.type === 'WATER' && !nb.object) {
+        nb.object = 'FISH_SPOT';
+        placed = true;
+        break;
+      }
+    }
+    if (!placed) {
+      // Extended fallback — search water tiles up to radius 3
+      const fallback = waterTiles
+        .filter(t => !t.object)
+        .sort((a, b) => {
+          const da = (a.x - dock.x) ** 2 + (a.y - dock.y) ** 2;
+          const db = (b.x - dock.x) ** 2 + (b.y - dock.y) ** 2;
+          return da - db;
+        });
+      if (fallback.length) fallback[0].object = 'FISH_SPOT';
+    }
   }
 
   // ── Fish spots — on water tiles that don't already have an object ──────

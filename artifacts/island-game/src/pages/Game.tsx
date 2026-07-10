@@ -81,10 +81,10 @@ const GameInner = ({ profile }: { profile: PlayerProfile }) => {
   const tilesRef = useRef(state.tiles);
   useLayoutEffect(() => { tilesRef.current = state.tiles; }, [state.tiles]);
 
-  /** True if the tile nearest (x, y) exists and is not water */
+  /** True if the tile at (x, y) is walkable land (GRASS or SAND only). */
   const canWalk = useCallback((x: number, y: number): boolean => {
     const t = tilesRef.current[`${Math.round(x)},${Math.round(y)}`];
-    return !!t && t.type !== 'WATER';
+    return !!t && (t.type === 'GRASS' || t.type === 'SAND');
   }, []);
 
   // Main game loop — runs every animation frame
@@ -162,13 +162,45 @@ const GameInner = ({ profile }: { profile: PlayerProfile }) => {
   // Click-to-glide: set target; optionally queue an interact on arrival
   const moveTo = useCallback((tx: number, ty: number, interactTileId?: string) => {
     const dest = tilesRef.current[`${tx},${ty}`];
-    if (!dest || dest.type === 'WATER') {
-      // Invalid destination — always cancel any stale queued action
+
+    // Helper: fully cancel any pending movement + interact
+    const cancel = () => {
+      targetRef.current = null;
       pendingInteractTileRef.current = null;
+    };
+
+    if (!dest) { cancel(); return; }
+
+    // Walkable land — go directly
+    if (dest.type === 'GRASS' || dest.type === 'SAND') {
+      targetRef.current = { x: tx, y: ty };
+      pendingInteractTileRef.current = interactTileId ?? null;
       return;
     }
-    targetRef.current = { x: tx, y: ty };
-    pendingInteractTileRef.current = interactTileId ?? null;
+
+    // DOCK sits on a WATER tile — redirect to the closest adjacent land tile
+    // relative to the player's current position so the path feels natural.
+    if (dest.object === 'DOCK') {
+      const { x: px, y: py } = playerPosRef.current;
+      const landNeighbours = ([ [-1,0],[1,0],[0,-1],[0,1] ] as const)
+        .map(([dx, dy]) => {
+          const nb = tilesRef.current[`${tx+dx},${ty+dy}`];
+          return nb && (nb.type === 'GRASS' || nb.type === 'SAND')
+            ? { x: tx+dx, y: ty+dy, d: (tx+dx-px)**2 + (ty+dy-py)**2 }
+            : null;
+        })
+        .filter(Boolean) as { x: number; y: number; d: number }[];
+
+      if (landNeighbours.length) {
+        landNeighbours.sort((a, b) => a.d - b.d);
+        targetRef.current = { x: landNeighbours[0].x, y: landNeighbours[0].y };
+        pendingInteractTileRef.current = interactTileId ?? null;
+        return;
+      }
+    }
+
+    // Water or anything else — cancel both target and pending action
+    cancel();
   }, []);
 
   /* ── Discrete zoom — island always centred, no panning ── */
