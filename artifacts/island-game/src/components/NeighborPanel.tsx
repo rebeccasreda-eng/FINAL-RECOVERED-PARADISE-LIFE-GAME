@@ -349,6 +349,69 @@ const MarinaIllus = () => (
   </svg>
 );
 
+/* ─── Scattered-star background helper ──────────────────────────────────── */
+const StarsBg = ({ fill = '#d4b060' }: { fill?: string }) => (
+  <>
+    <rect width="72" height="54" fill={fill}/>
+    {([[8,6],[58,8],[65,22],[10,38],[52,44],[30,48],[20,22],[60,34],[36,14],[44,40]] as [number,number][]).map(([x,y],i) => (
+      <polygon key={i}
+        points={`${x},${y-4} ${x+1.2},${y-1.2} ${x+4},${y-1.2} ${x+2},${y+1.2} ${x+2.5},${y+4} ${x},${y+2} ${x-2.5},${y+4} ${x-2},${y+1.2} ${x-4},${y-1.2} ${x-1.2},${y-1.2}`}
+        fill="#f8d820" opacity={0.35 + (i % 3) * 0.12}/>
+    ))}
+  </>
+);
+
+/* ─── Player blank card illustration ─────────────────────────────────────── */
+const PlayerBlankIllus = () => (
+  <svg viewBox="0 0 72 54" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%' }}>
+    <StarsBg fill="#c8b8a0"/>
+    {/* Grey silhouette */}
+    <circle cx="36" cy="19" r="10" fill="#9a8878" opacity="0.55"/>
+    <ellipse cx="36" cy="44" rx="14" ry="10" fill="#9a8878" opacity="0.55"/>
+    {/* Question mark */}
+    <text x="36" y="24" textAnchor="middle" fontSize="13" fontWeight="900" fill="rgba(255,255,255,0.7)" fontFamily="'Fredoka',sans-serif">?</text>
+  </svg>
+);
+
+/* ─── Marina character illustration ─────────────────────────────────────── */
+const MarinaCharIllus = () => (
+  <svg viewBox="0 0 72 54" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%' }}>
+    <StarsBg fill="#c0b0e8"/>
+    {/* Body */}
+    <ellipse cx="36" cy="50" rx="14" ry="9" fill="#e060a8"/>
+    {/* Shirt detail */}
+    <ellipse cx="36" cy="44" rx="10" ry="6" fill="#f070b8"/>
+    {/* Neck */}
+    <rect x="33" y="36" width="6" height="6" rx="2" fill="#f5c890"/>
+    {/* Head */}
+    <circle cx="36" cy="30" r="11" fill="#f5c890"/>
+    {/* Hair back layer */}
+    <ellipse cx="36" cy="24" rx="13" ry="9" fill="#f050b0"/>
+    {/* Hair sides */}
+    <ellipse cx="25" cy="32" rx="5" ry="11" fill="#f050b0"/>
+    <ellipse cx="47" cy="32" rx="5" ry="11" fill="#f050b0"/>
+    {/* Hair front */}
+    <ellipse cx="36" cy="20" rx="12" ry="7" fill="#ff80cc"/>
+    {/* Hair highlight */}
+    <ellipse cx="31" cy="19" rx="4" ry="3" fill="#ffaade" opacity="0.7"/>
+    {/* Eyes */}
+    <ellipse cx="31.5" cy="30" rx="3" ry="3.5" fill="#5050e8"/>
+    <ellipse cx="40.5" cy="30" rx="3" ry="3.5" fill="#5050e8"/>
+    <ellipse cx="31.5" cy="29" rx="2.5" ry="3" fill="#7070ff"/>
+    <ellipse cx="40.5" cy="29" rx="2.5" ry="3" fill="#7070ff"/>
+    <circle cx="32.5" cy="28" r="1.2" fill="white"/>
+    <circle cx="41.5" cy="28" r="1.2" fill="white"/>
+    {/* Lashes */}
+    <path d="M28.5,27.5 Q29.5,26 31,27" stroke="#2020a0" strokeWidth="1" fill="none"/>
+    <path d="M37.5,27.5 Q38.5,26 40,27" stroke="#2020a0" strokeWidth="1" fill="none"/>
+    {/* Smile */}
+    <path d="M33,34.5 Q36,37.5 39,34.5" stroke="#c06840" strokeWidth="1.3" fill="none" strokeLinecap="round"/>
+    {/* Rosy cheeks */}
+    <circle cx="28" cy="33" r="3" fill="#ff9090" opacity="0.45"/>
+    <circle cx="44" cy="33" r="3" fill="#ff9090" opacity="0.45"/>
+  </svg>
+);
+
 /* ─── Add-neighbor placeholder illustration ─────────────────────────────── */
 const AddNeighborIllus = () => (
   <svg viewBox="0 0 72 54" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%' }}>
@@ -778,8 +841,8 @@ export const NeighborPanel = ({
             <div style={{ width: 2, background: 'rgba(0,0,0,0.28)', borderRadius: 1, flexShrink: 0, margin: '2px 4px' }} />
 
             {/* PLAYER / MARKET / MARINA tabs */}
-            <QuickTabBtn label="PLAYER" emoji="🧑" active={quickTab === 'player'} onClick={() => toggleTab('player')} />
-            <QuickTabBtn label="MARINA" emoji="⚓" active={quickTab === 'marina'} onClick={() => toggleTab('marina')} />
+            <NeighborCard name="Player" illus={<PlayerBlankIllus />} hearts={1} stars={2} />
+            <NeighborCard name="Marina" illus={<MarinaCharIllus />} hearts={1} stars={5} />
 
             {/* Right-pointing arrows after MARINA */}
             <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 3, flexShrink: 0 }}>
