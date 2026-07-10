@@ -183,10 +183,13 @@ const ObjectSVG: React.FC<{ object: string; tileX: number; tileY: number; tileTy
     /* ── ROCK ───────────────────────────────────────────────────────────── */
     case 'ROCK': {
       const rg1 = g('rg1'), rg2 = g('rg2'), rg3 = g('rg3');
-      // Deterministic grass lean per tile
       const rlv = (tx * 7 + ty * 13) % 3;
-      const rGrass = '#1e6c0c', rGrassMid = '#2a8a12', rGrassFront = '#38a818';
-      // Helper: single grass blade as a thick rounded stroke
+      // Colours anchored near grass-tile top (#5cb828) so blades read as
+      // natural turf framing the rocks, not a separate darker biome
+      const rGrassBase  = '#5cb828'; // ground-level tufts — dissolve into tile
+      const rGrass      = '#3e8e14'; // back blades — slightly darker (receding)
+      const rGrassMid   = '#50aa20'; // mid blades
+      const rGrassFront = '#68c430'; // front blades — closest to viewer
       const rb = (cx: number, by: number, h: number, lean: number) =>
         `M ${cx},${by} Q ${cx + lean * 0.5},${by - h * 0.55} ${cx + lean},${by - h}`;
       return (
@@ -209,8 +212,8 @@ const ObjectSVG: React.FC<{ object: string; tileX: number; tileY: number; tileTy
             </radialGradient>
           </defs>
 
-          {/* Ground shadow */}
-          <ellipse cx="36" cy="58" rx="30" ry="4" fill="rgba(0,0,0,0.22)"/>
+          {/* Very faint contact shadow — no harsh dark ring */}
+          <ellipse cx="36" cy="58" rx="28" ry="3" fill="rgba(0,0,0,0.08)"/>
 
           {/* ── Back grass blades (behind rocks) ── */}
           <path d={rb(8,  54, 44, -3 + rlv)} stroke={rGrass} strokeWidth="3.2" fill="none" strokeLinecap="round"/>
@@ -239,14 +242,23 @@ const ObjectSVG: React.FC<{ object: string; tileX: number; tileY: number; tileTy
           <ellipse cx="22" cy="22" rx="14" ry="4.5" fill="rgba(255,255,255,0.44)" transform="rotate(-14 22 22)"/>
           <ellipse cx="12" cy="30" rx="5"  ry="2"   fill="rgba(255,255,255,0.22)" transform="rotate(-6 12 30)"/>
           <path d="M34,22 Q36,32 35,44" stroke="rgba(0,0,0,0.09)" strokeWidth="1.4" fill="none"/>
-          <ellipse cx="46" cy="50" rx="8" ry="2.5" fill="#4a8818" opacity="0.30"/>
-          <ellipse cx="18" cy="50" rx="5" ry="2"   fill="#3e7814" opacity="0.24"/>
+          {/* Moss patches — now match the grass palette */}
+          <ellipse cx="46" cy="50" rx="8" ry="2.5" fill="#5cb828" opacity="0.32"/>
+          <ellipse cx="18" cy="50" rx="5" ry="2"   fill="#50aa20" opacity="0.28"/>
 
           {/* ── Front grass blades (in front of rocks) ── */}
           <path d={rb(10, 54, 26, -3 + rlv)} stroke={rGrassFront} strokeWidth="2.8" fill="none" strokeLinecap="round"/>
           <path d={rb(20, 54, 24, -1 + rlv)} stroke={rGrassFront} strokeWidth="3.0" fill="none" strokeLinecap="round"/>
           <path d={rb(50, 54, 24,  1 + rlv)} stroke={rGrassFront} strokeWidth="2.8" fill="none" strokeLinecap="round"/>
           <path d={rb(60, 54, 22,  3 + rlv)} stroke={rGrassFront} strokeWidth="2.6" fill="none" strokeLinecap="round"/>
+
+          {/* ── Ground tufts — grass-coloured, dissolve base into tile ── */}
+          <path d={rb(4,  54,  9, -2)} stroke={rGrassBase} strokeWidth="2.8" fill="none" strokeLinecap="round" opacity="0.90"/>
+          <path d={rb(13, 54, 10,  1)} stroke={rGrassBase} strokeWidth="3.0" fill="none" strokeLinecap="round" opacity="0.85"/>
+          <path d={rb(32, 54,  8,  0)} stroke={rGrassBase} strokeWidth="2.6" fill="none" strokeLinecap="round" opacity="0.88"/>
+          <path d={rb(42, 54,  9, -1)} stroke={rGrassBase} strokeWidth="2.8" fill="none" strokeLinecap="round" opacity="0.85"/>
+          <path d={rb(55, 54,  8,  2)} stroke={rGrassBase} strokeWidth="2.6" fill="none" strokeLinecap="round" opacity="0.88"/>
+          <path d={rb(66, 54,  7,  3)} stroke={rGrassBase} strokeWidth="2.4" fill="none" strokeLinecap="round" opacity="0.80"/>
         </svg>
       );
     }
