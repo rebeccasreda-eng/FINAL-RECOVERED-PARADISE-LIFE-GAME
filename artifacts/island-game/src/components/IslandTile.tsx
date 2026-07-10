@@ -6,7 +6,7 @@ import { useToast } from '@/hooks/use-toast';
 
 /* ── Diamond colour palette — matches HTML reference ────────────────────── */
 const COLORS = {
-  GRASS:   { top: '#5aab3e', sideL: '#3f8a2a', sideR: '#4a9e32' },
+  GRASS:   { top: '#58c030', sideL: '#3aaa1c', sideR: '#44b826' },
   SAND:    { top: '#e8d29a', sideL: '#cdb277', sideR: '#d4b97f' },
   WATER:   { top: '#52C8E4', sideL: null,       sideR: null      },
   CLEARED: { top: '#8b5a2b', sideL: '#5a3a18',  sideR: '#6a4420' },
@@ -48,73 +48,69 @@ const ObjectSVG: React.FC<{ object: string; tileX: number; tileY: number }> = ({
       <svg viewBox="0 0 60 92" width="58" height="88" style={{ display:'block' }}>
         <defs>
           <linearGradient id={g('plt')} x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%"   stopColor="#e0aa4a"/>
-            <stop offset="40%"  stopColor="#a07030"/>
-            <stop offset="100%" stopColor="#5e3a10"/>
+            <stop offset="0%"   stopColor="#e8b85a"/>
+            <stop offset="40%"  stopColor="#b07c38"/>
+            <stop offset="100%" stopColor="#7a4e1c"/>
           </linearGradient>
           <radialGradient id={g('plc')} cx="36%" cy="30%" r="72%">
-            <stop offset="0%"   stopColor="#92f060"/>
-            <stop offset="52%"  stopColor="#46b430"/>
-            <stop offset="100%" stopColor="#1c6410"/>
+            <stop offset="0%"   stopColor="#a8f468"/>
+            <stop offset="52%"  stopColor="#52c83a"/>
+            <stop offset="100%" stopColor="#1e7414"/>
           </radialGradient>
         </defs>
-        {/* Ground shadow */}
-        <ellipse cx="30" cy="90" rx="16" ry="5" fill="rgba(0,0,0,0.30)"/>
-        {/* Trunk dark right side */}
-        <path d="M32,90 Q35,72 36,52 L39,52 Q42,72 42,90Z" fill="#3c1e06" opacity="0.50"/>
-        {/* Trunk main — wider, more sculptural */}
-        <path d="M19,90 Q23,72 27,52 L33,52 Q37,72 41,90Z" fill={`url(#${g('plt')})`}/>
+        {/* Soft ground blend — no hard shadow */}
+        <ellipse cx="30" cy="89" rx="13" ry="3.5" fill="rgba(120,90,40,0.28)"/>
+        {/* Trunk — single clean path, no dark overlay */}
+        <path d="M19,89 Q23,72 27,52 L33,52 Q37,72 41,89Z" fill={`url(#${g('plt')})`}/>
         {/* Left highlight stripe */}
-        <path d="M21.5,88 Q25,70 28.5,54" stroke="rgba(255,255,255,0.36)" strokeWidth="2.5" fill="none" strokeLinecap="round"/>
+        <path d="M21.5,87 Q25,70 28.5,54" stroke="rgba(255,255,255,0.42)" strokeWidth="2.5" fill="none" strokeLinecap="round"/>
         {/* Bark vertical groove */}
-        <path d="M34,88 Q35,70 34.5,54" stroke="rgba(0,0,0,0.22)" strokeWidth="1.4" fill="none" strokeLinecap="round"/>
-        {/* Bark rings — wider, more defined */}
+        <path d="M34,87 Q35,70 34.5,54" stroke="rgba(0,0,0,0.16)" strokeWidth="1.4" fill="none" strokeLinecap="round"/>
+        {/* Bark rings */}
         {[56,64,72,80].map(y => (
-          <path key={y} d={`M21,${y} Q30,${y-2} 39,${y}`} stroke="rgba(0,0,0,0.32)" strokeWidth="2" fill="none" strokeLinecap="round"/>
+          <path key={y} d={`M21,${y} Q30,${y-2} 39,${y}`} stroke="rgba(0,0,0,0.24)" strokeWidth="2" fill="none" strokeLinecap="round"/>
         ))}
         {/* Bark knot texture */}
-        <ellipse cx="27" cy="68" rx="2.5" ry="1.5" fill="rgba(0,0,0,0.18)" transform="rotate(-8 27 68)"/>
-        <ellipse cx="33" cy="77" rx="2"   ry="1.2" fill="rgba(0,0,0,0.16)" transform="rotate(5 33 77)"/>
+        <ellipse cx="27" cy="68" rx="2.5" ry="1.5" fill="rgba(0,0,0,0.14)" transform="rotate(-8 27 68)"/>
+        <ellipse cx="33" cy="77" rx="2"   ry="1.2" fill="rgba(0,0,0,0.12)" transform="rotate(5 33 77)"/>
         {/* Back drooping fronds */}
-        <path d="M30,48 Q10,56 2,62"  stroke="#1a6010" strokeWidth="11" fill="none" strokeLinecap="round" opacity="0.80"/>
-        <path d="M30,48 Q50,56 58,62" stroke="#1a6010" strokeWidth="11" fill="none" strokeLinecap="round" opacity="0.80"/>
+        <path d="M30,48 Q10,56 2,62"  stroke="#228018" strokeWidth="11" fill="none" strokeLinecap="round" opacity="0.80"/>
+        <path d="M30,48 Q50,56 58,62" stroke="#228018" strokeWidth="11" fill="none" strokeLinecap="round" opacity="0.80"/>
         {/* Mid fronds */}
-        <path d="M30,46 Q8,40 2,28"   stroke="#286e18" strokeWidth="10.5" fill="none" strokeLinecap="round"/>
-        <path d="M30,46 Q52,40 58,28" stroke="#286e18" strokeWidth="10.5" fill="none" strokeLinecap="round"/>
+        <path d="M30,46 Q8,40 2,28"   stroke="#30901e" strokeWidth="10.5" fill="none" strokeLinecap="round"/>
+        <path d="M30,46 Q52,40 58,28" stroke="#30901e" strokeWidth="10.5" fill="none" strokeLinecap="round"/>
         {/* Upper fronds */}
-        <path d="M30,44 Q16,28 10,12"  stroke="#349020" strokeWidth="10" fill="none" strokeLinecap="round"/>
-        <path d="M30,44 Q44,28 50,12"  stroke="#349020" strokeWidth="10" fill="none" strokeLinecap="round"/>
+        <path d="M30,44 Q16,28 10,12"  stroke="#3eaa28" strokeWidth="10" fill="none" strokeLinecap="round"/>
+        <path d="M30,44 Q44,28 50,12"  stroke="#3eaa28" strokeWidth="10" fill="none" strokeLinecap="round"/>
         {/* Top frond */}
-        <path d="M30,42 Q30,22 29,4"   stroke="#42aa28" strokeWidth="9.5" fill="none" strokeLinecap="round"/>
-        {/* Leaflet pairs on left frond */}
-        <path d="M20,52 L16,46" stroke="#2e8820" strokeWidth="2.2" fill="none" strokeLinecap="round"/>
-        <path d="M20,52 L17,58" stroke="#226014" strokeWidth="2.2" fill="none" strokeLinecap="round"/>
-        <path d="M11,57 L7,51"  stroke="#2e8820" strokeWidth="2" fill="none" strokeLinecap="round"/>
-        <path d="M11,57 L8,63"  stroke="#226014" strokeWidth="2" fill="none" strokeLinecap="round"/>
-        {/* Leaflet pairs on right frond */}
-        <path d="M40,52 L44,46" stroke="#2e8820" strokeWidth="2.2" fill="none" strokeLinecap="round"/>
-        <path d="M40,52 L43,58" stroke="#226014" strokeWidth="2.2" fill="none" strokeLinecap="round"/>
-        <path d="M49,57 L53,51" stroke="#2e8820" strokeWidth="2" fill="none" strokeLinecap="round"/>
-        <path d="M49,57 L52,63" stroke="#226014" strokeWidth="2" fill="none" strokeLinecap="round"/>
-        {/* Leaflet pairs on upper fronds */}
-        <path d="M21,39 L17,34" stroke="#3a9e24" strokeWidth="2" fill="none" strokeLinecap="round"/>
-        <path d="M39,39 L43,34" stroke="#3a9e24" strokeWidth="2" fill="none" strokeLinecap="round"/>
+        <path d="M30,42 Q30,22 29,4"   stroke="#50c032" strokeWidth="9.5" fill="none" strokeLinecap="round"/>
+        {/* Leaflet pairs */}
+        <path d="M20,52 L16,46" stroke="#38a022" strokeWidth="2.2" fill="none" strokeLinecap="round"/>
+        <path d="M20,52 L17,58" stroke="#28781a" strokeWidth="2.2" fill="none" strokeLinecap="round"/>
+        <path d="M11,57 L7,51"  stroke="#38a022" strokeWidth="2" fill="none" strokeLinecap="round"/>
+        <path d="M11,57 L8,63"  stroke="#28781a" strokeWidth="2" fill="none" strokeLinecap="round"/>
+        <path d="M40,52 L44,46" stroke="#38a022" strokeWidth="2.2" fill="none" strokeLinecap="round"/>
+        <path d="M40,52 L43,58" stroke="#28781a" strokeWidth="2.2" fill="none" strokeLinecap="round"/>
+        <path d="M49,57 L53,51" stroke="#38a022" strokeWidth="2" fill="none" strokeLinecap="round"/>
+        <path d="M49,57 L52,63" stroke="#28781a" strokeWidth="2" fill="none" strokeLinecap="round"/>
+        <path d="M21,39 L17,34" stroke="#48b82c" strokeWidth="2" fill="none" strokeLinecap="round"/>
+        <path d="M39,39 L43,34" stroke="#48b82c" strokeWidth="2" fill="none" strokeLinecap="round"/>
         {/* Frond tip highlights */}
-        <path d="M30,48 Q10,56 2,62"  stroke="#68d84a" strokeWidth="3.5" fill="none" strokeLinecap="round" opacity="0.55"/>
-        <path d="M30,48 Q50,56 58,62" stroke="#68d84a" strokeWidth="3.5" fill="none" strokeLinecap="round" opacity="0.55"/>
-        <path d="M30,44 Q16,28 10,12"  stroke="#68d84a" strokeWidth="3" fill="none" strokeLinecap="round" opacity="0.55"/>
-        <path d="M30,44 Q44,28 50,12"  stroke="#68d84a" strokeWidth="3" fill="none" strokeLinecap="round" opacity="0.55"/>
-        {/* Crown base */}
-        <circle cx="30" cy="46" r="13" fill="#196010"/>
+        <path d="M30,48 Q10,56 2,62"  stroke="#78e852" strokeWidth="3.5" fill="none" strokeLinecap="round" opacity="0.55"/>
+        <path d="M30,48 Q50,56 58,62" stroke="#78e852" strokeWidth="3.5" fill="none" strokeLinecap="round" opacity="0.55"/>
+        <path d="M30,44 Q16,28 10,12"  stroke="#78e852" strokeWidth="3" fill="none" strokeLinecap="round" opacity="0.55"/>
+        <path d="M30,44 Q44,28 50,12"  stroke="#78e852" strokeWidth="3" fill="none" strokeLinecap="round" opacity="0.55"/>
+        {/* Crown */}
+        <circle cx="30" cy="46" r="13" fill="#1e7012"/>
         <circle cx="30" cy="44" r="10" fill={`url(#${g('plc')})`}/>
         {/* Specular */}
-        <ellipse cx="25" cy="38" rx="6" ry="3.8" fill="rgba(255,255,255,0.36)" transform="rotate(-15 25 38)"/>
+        <ellipse cx="25" cy="38" rx="6" ry="3.8" fill="rgba(255,255,255,0.40)" transform="rotate(-15 25 38)"/>
         {/* Coconuts */}
         <circle cx="23" cy="50" r="4.8" fill="#7a4418"/>
         <circle cx="37" cy="51" r="4.4" fill="#6a3c12"/>
         <circle cx="30" cy="54" r="4"   fill="#723e16"/>
-        <circle cx="21.5" cy="48" r="1.7" fill="rgba(255,255,255,0.34)"/>
-        <circle cx="35.5" cy="49" r="1.5" fill="rgba(255,255,255,0.30)"/>
+        <circle cx="21.5" cy="48" r="1.7" fill="rgba(255,255,255,0.36)"/>
+        <circle cx="35.5" cy="49" r="1.5" fill="rgba(255,255,255,0.32)"/>
       </svg>
     );
 
@@ -123,73 +119,63 @@ const ObjectSVG: React.FC<{ object: string; tileX: number; tileY: number }> = ({
       <svg viewBox="0 0 62 90" width="60" height="86" style={{ display:'block' }}>
         <defs>
           <linearGradient id={g('apt')} x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%"   stopColor="#d48840"/>
-            <stop offset="44%"  stopColor="#8a5228"/>
-            <stop offset="100%" stopColor="#4e2c10"/>
+            <stop offset="0%"   stopColor="#e0a060"/>
+            <stop offset="40%"  stopColor="#b07038"/>
+            <stop offset="100%" stopColor="#78461c"/>
           </linearGradient>
-          <radialGradient id={g('apc')} cx="35%" cy="28%" r="70%">
-            <stop offset="0%"   stopColor="#84ee60"/>
-            <stop offset="52%"  stopColor="#3cb030"/>
-            <stop offset="100%" stopColor="#186010"/>
+          <radialGradient id={g('apc')} cx="30%" cy="22%" r="76%">
+            <stop offset="0%"   stopColor="#b8f460"/>
+            <stop offset="44%"  stopColor="#54c42a"/>
+            <stop offset="100%" stopColor="#1a7210"/>
           </radialGradient>
           <radialGradient id={g('apr')} cx="36%" cy="30%" r="66%">
-            <stop offset="0%"   stopColor="#ff7a68"/>
-            <stop offset="52%"  stopColor="#e02c1a"/>
+            <stop offset="0%"   stopColor="#ff8070"/>
+            <stop offset="52%"  stopColor="#e03020"/>
             <stop offset="100%" stopColor="#a01008"/>
           </radialGradient>
         </defs>
-        {/* Ground shadow */}
-        <ellipse cx="31" cy="88" rx="18" ry="5.5" fill="rgba(0,0,0,0.28)"/>
-        {/* Trunk right shadow */}
-        <path d="M33,86 Q35,70 36,52 L38,52 Q40,70 40,86Z" fill="#2e1404" opacity="0.50"/>
-        {/* Trunk — wider, with roots flare */}
-        <path d="M22,86 Q26,68 28,52 L34,52 Q36,68 40,86Z" fill={`url(#${g('apt')})`}/>
+        {/* Trunk — thin, clean, no dark overlay */}
+        <rect x="26" y="54" width="10" height="34" rx="4.5" fill={`url(#${g('apt')})`}/>
         {/* Trunk highlight */}
-        <path d="M24,84 Q27.5,66 29.5,54" stroke="rgba(255,255,255,0.30)" strokeWidth="2.2" fill="none" strokeLinecap="round"/>
-        {/* Bark groove */}
-        <path d="M35,84 Q36,66 35.5,54" stroke="rgba(0,0,0,0.20)" strokeWidth="1.3" fill="none" strokeLinecap="round"/>
+        <path d="M28,86 Q28,68 28.5,56" stroke="rgba(255,255,255,0.38)" strokeWidth="1.8" fill="none" strokeLinecap="round"/>
         {/* Bark rings */}
-        {[60,70,78].map(y => (
-          <path key={y} d={`M23,${y} Q31,${y-1.5} 39,${y}`} stroke="rgba(0,0,0,0.28)" strokeWidth="1.8" fill="none" strokeLinecap="round"/>
+        {[63,72,81].map(y => (
+          <path key={y} d={`M27,${y} Q31,${y-1} 35,${y}`} stroke="rgba(0,0,0,0.16)" strokeWidth="1.3" fill="none" strokeLinecap="round"/>
         ))}
-        {/* Root flare bumps */}
-        <ellipse cx="24" cy="85" rx="4" ry="2.5" fill="#3e1e0a" opacity="0.50" transform="rotate(-12 24 85)"/>
-        <ellipse cx="38" cy="85" rx="4" ry="2.5" fill="#3e1e0a" opacity="0.45" transform="rotate(12 38 85)"/>
-        {/* Deep canopy shadow */}
-        <ellipse cx="31" cy="38" rx="29" ry="23" fill="#144808" opacity="0.65"/>
-        {/* Main canopy */}
-        <ellipse cx="31" cy="32" rx="28" ry="23" fill={`url(#${g('apc')})`}/>
-        {/* Side leaf clusters */}
-        <ellipse cx="10" cy="38" rx="17" ry="13" fill="#247a16"/>
-        <ellipse cx="52" cy="38" rx="17" ry="13" fill="#2a8e1c"/>
-        {/* Mid leaf texture bumps */}
-        <ellipse cx="20" cy="28" rx="12" ry="9" fill="#3a9820"/>
-        <ellipse cx="42" cy="28" rx="12" ry="9" fill="#3ea824"/>
-        <ellipse cx="31" cy="22" rx="14" ry="10" fill="#42a828"/>
-        {/* Upper dome */}
-        <ellipse cx="31" cy="16" rx="18" ry="14" fill="#50b830"/>
-        {/* Leaf edge texture — dark micro-bumps */}
-        <ellipse cx="8"  cy="30" rx="6" ry="5" fill="#1e6010" opacity="0.70"/>
-        <ellipse cx="54" cy="30" rx="6" ry="5" fill="#1e6010" opacity="0.70"/>
-        <ellipse cx="10" cy="48" rx="7" ry="5" fill="#1e6010" opacity="0.60"/>
-        <ellipse cx="52" cy="48" rx="7" ry="5" fill="#1e6010" opacity="0.60"/>
-        {/* Canopy specular */}
-        <ellipse cx="19" cy="17" rx="12" ry="7" fill="rgba(255,255,255,0.30)" transform="rotate(-13 19 17)"/>
+        {/* Soft ground blend */}
+        <ellipse cx="31" cy="87" rx="12" ry="3.5" fill="rgba(130,100,50,0.30)"/>
+        {/* Canopy depth base */}
+        <circle cx="31" cy="36" r="27" fill="#186010" opacity="0.65"/>
+        {/* Lower side clusters — fluffy edge */}
+        <circle cx="7"  cy="46" r="16" fill="#22780e"/>
+        <circle cx="55" cy="46" r="16" fill="#258018"/>
+        {/* Main canopy ball */}
+        <ellipse cx="31" cy="32" rx="26" ry="23" fill={`url(#${g('apc')})`}/>
+        {/* Side clusters mid */}
+        <circle cx="8"  cy="36" r="17" fill="#30901a"/>
+        <circle cx="54" cy="36" r="17" fill="#349a1e"/>
+        {/* Upper leaf bumps */}
+        <circle cx="18" cy="23" r="14" fill="#42a822"/>
+        <circle cx="44" cy="21" r="13" fill="#44ae24"/>
+        {/* Top bright dome */}
+        <circle cx="31" cy="14" r="15" fill="#56c02c"/>
+        <circle cx="31" cy="10" r="10" fill="#68d038"/>
+        {/* Specular highlight */}
+        <ellipse cx="18" cy="14" rx="12" ry="7" fill="rgba(255,255,255,0.42)" transform="rotate(-14 18 14)"/>
         {/* Apples */}
-        <circle cx="14" cy="39" r="6.2" fill={`url(#${g('apr')})`}/>
-        <circle cx="42" cy="37" r="6.2" fill={`url(#${g('apr')})`}/>
-        <circle cx="28" cy="45" r="5.6" fill={`url(#${g('apr')})`}/>
-        <circle cx="44" cy="48" r="5" fill={`url(#${g('apr')})`}/>
+        <circle cx="12" cy="44" r="5.8" fill={`url(#${g('apr')})`}/>
+        <circle cx="44" cy="42" r="5.8" fill={`url(#${g('apr')})`}/>
+        <circle cx="28" cy="49" r="5.2" fill={`url(#${g('apr')})`}/>
+        <circle cx="46" cy="50" r="4.6" fill={`url(#${g('apr')})`}/>
         {/* Apple shine */}
-        <circle cx="12"  cy="36.5" r="2.4" fill="rgba(255,255,255,0.58)"/>
-        <circle cx="40"  cy="34.5" r="2.4" fill="rgba(255,255,255,0.58)"/>
-        <circle cx="26"  cy="42.5" r="2.2" fill="rgba(255,255,255,0.58)"/>
-        <circle cx="42.5" cy="45.5" r="2" fill="rgba(255,255,255,0.55)"/>
+        <circle cx="10"  cy="41.5" r="2.2" fill="rgba(255,255,255,0.62)"/>
+        <circle cx="42"  cy="39.5" r="2.2" fill="rgba(255,255,255,0.62)"/>
+        <circle cx="26"  cy="46.5" r="2"   fill="rgba(255,255,255,0.62)"/>
+        <circle cx="44.5" cy="47.5" r="1.8" fill="rgba(255,255,255,0.58)"/>
         {/* Stems */}
-        <line x1="14" y1="32.5" x2="15" y2="29"   stroke="#286010" strokeWidth="1.4"/>
-        <line x1="42" y1="30.5" x2="43" y2="27"   stroke="#286010" strokeWidth="1.4"/>
-        <line x1="28" y1="38.8" x2="29" y2="35.5" stroke="#286010" strokeWidth="1.4"/>
-        <line x1="44" y1="42"   x2="45" y2="39"   stroke="#286010" strokeWidth="1.3"/>
+        <line x1="12" y1="37.8" x2="13" y2="34.5" stroke="#2a6814" strokeWidth="1.3"/>
+        <line x1="44" y1="35.8" x2="45" y2="32.5" stroke="#2a6814" strokeWidth="1.3"/>
+        <line x1="28" y1="43"   x2="29" y2="40"   stroke="#2a6814" strokeWidth="1.3"/>
       </svg>
     );
 
@@ -315,75 +301,73 @@ const ObjectSVG: React.FC<{ object: string; tileX: number; tileY: number }> = ({
       <svg viewBox="0 0 70 108" width="64" height="99" style={{ display:'block' }}>
         <defs>
           <linearGradient id={g('cot')} x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%"   stopColor="#e0aa48"/>
-            <stop offset="44%"  stopColor="#9e6e2c"/>
-            <stop offset="100%" stopColor="#5a3810"/>
+            <stop offset="0%"   stopColor="#e8b85a"/>
+            <stop offset="44%"  stopColor="#aa7832"/>
+            <stop offset="100%" stopColor="#6a4418"/>
           </linearGradient>
           <radialGradient id={g('coc')} cx="36%" cy="28%" r="70%">
-            <stop offset="0%"   stopColor="#7ee050"/>
-            <stop offset="54%"  stopColor="#2e9018"/>
-            <stop offset="100%" stopColor="#126010"/>
+            <stop offset="0%"   stopColor="#a4f062"/>
+            <stop offset="54%"  stopColor="#3aaa20"/>
+            <stop offset="100%" stopColor="#147014"/>
           </radialGradient>
         </defs>
-        {/* Ground shadow */}
-        <ellipse cx="35" cy="106" rx="18" ry="6" fill="rgba(0,0,0,0.30)"/>
-        {/* Trunk dark right side */}
-        <path d="M36,104 Q40,82 41,60 L45,60 Q48,82 48,104Z" fill="#2e1004" opacity="0.52"/>
-        {/* Trunk main — wide, with natural lean */}
+        {/* Soft ground blend — no dark shadow */}
+        <ellipse cx="35" cy="105" rx="15" ry="4" fill="rgba(120,90,40,0.28)"/>
+        {/* Trunk — single clean path, no dark overlay */}
         <path d="M23,104 Q27,82 31,60 L38,60 Q42,82 46,104Z" fill={`url(#${g('cot')})`}/>
         {/* Left highlight */}
-        <path d="M25.5,102 Q29,80 33,62" stroke="rgba(255,255,255,0.34)" strokeWidth="3" fill="none" strokeLinecap="round"/>
+        <path d="M25.5,102 Q29,80 33,62" stroke="rgba(255,255,255,0.40)" strokeWidth="3" fill="none" strokeLinecap="round"/>
         {/* Bark groove */}
-        <path d="M40,102 Q41,82 40,62" stroke="rgba(0,0,0,0.22)" strokeWidth="1.6" fill="none" strokeLinecap="round"/>
-        {/* Bark rings — full curved paths for realism */}
+        <path d="M40,102 Q41,82 40,62" stroke="rgba(0,0,0,0.15)" strokeWidth="1.6" fill="none" strokeLinecap="round"/>
+        {/* Bark rings */}
         {[68,76,84,92,100].map(y => (
-          <path key={y} d={`M25,${y} Q35,${y-2.5} 45,${y}`} stroke="rgba(0,0,0,0.32)" strokeWidth="2.2" fill="none" strokeLinecap="round"/>
+          <path key={y} d={`M25,${y} Q35,${y-2.5} 45,${y}`} stroke="rgba(0,0,0,0.22)" strokeWidth="2.2" fill="none" strokeLinecap="round"/>
         ))}
         {/* Bark knots */}
-        <ellipse cx="30" cy="80" rx="3" ry="1.8" fill="rgba(0,0,0,0.18)" transform="rotate(-6 30 80)"/>
-        <ellipse cx="39" cy="90" rx="2.5" ry="1.5" fill="rgba(0,0,0,0.16)" transform="rotate(8 39 90)"/>
+        <ellipse cx="30" cy="80" rx="3" ry="1.8" fill="rgba(0,0,0,0.14)" transform="rotate(-6 30 80)"/>
+        <ellipse cx="39" cy="90" rx="2.5" ry="1.5" fill="rgba(0,0,0,0.12)" transform="rotate(8 39 90)"/>
         {/* Back drooping fronds */}
-        <path d="M34,56 Q14,62 4,68"  stroke="#1a6010" strokeWidth="13" fill="none" strokeLinecap="round" opacity="0.80"/>
-        <path d="M34,56 Q54,62 66,68" stroke="#1a6010" strokeWidth="13" fill="none" strokeLinecap="round" opacity="0.80"/>
+        <path d="M34,56 Q14,62 4,68"  stroke="#228020" strokeWidth="13" fill="none" strokeLinecap="round" opacity="0.80"/>
+        <path d="M34,56 Q54,62 66,68" stroke="#228020" strokeWidth="13" fill="none" strokeLinecap="round" opacity="0.80"/>
         {/* Mid fronds */}
-        <path d="M34,54 Q12,48 4,36"   stroke="#228418" strokeWidth="12" fill="none" strokeLinecap="round"/>
-        <path d="M34,54 Q56,48 66,36"  stroke="#228418" strokeWidth="12" fill="none" strokeLinecap="round"/>
+        <path d="M34,54 Q12,48 4,36"   stroke="#309c28" strokeWidth="12" fill="none" strokeLinecap="round"/>
+        <path d="M34,54 Q56,48 66,36"  stroke="#309c28" strokeWidth="12" fill="none" strokeLinecap="round"/>
         {/* Upper fronds */}
-        <path d="M34,52 Q16,38 10,20"  stroke="#2c9e20" strokeWidth="11.5" fill="none" strokeLinecap="round"/>
-        <path d="M34,52 Q52,38 60,20"  stroke="#2c9e20" strokeWidth="11.5" fill="none" strokeLinecap="round"/>
+        <path d="M34,52 Q16,38 10,20"  stroke="#3cb230" strokeWidth="11.5" fill="none" strokeLinecap="round"/>
+        <path d="M34,52 Q52,38 60,20"  stroke="#3cb230" strokeWidth="11.5" fill="none" strokeLinecap="round"/>
         {/* Top fronds */}
-        <path d="M34,50 Q24,30 20,10"  stroke="#38b02a" strokeWidth="10.5" fill="none" strokeLinecap="round"/>
-        <path d="M34,50 Q44,30 50,10"  stroke="#38b02a" strokeWidth="10.5" fill="none" strokeLinecap="round"/>
-        <path d="M34,48 Q34,28 33,8"   stroke="#46c234" strokeWidth="10"   fill="none" strokeLinecap="round"/>
+        <path d="M34,50 Q24,30 20,10"  stroke="#48c43a" strokeWidth="10.5" fill="none" strokeLinecap="round"/>
+        <path d="M34,50 Q44,30 50,10"  stroke="#48c43a" strokeWidth="10.5" fill="none" strokeLinecap="round"/>
+        <path d="M34,48 Q34,28 33,8"   stroke="#58d445" strokeWidth="10"   fill="none" strokeLinecap="round"/>
         {/* Leaflet pairs left drooping frond */}
-        <path d="M22,60 L17,54" stroke="#2a8c1e" strokeWidth="2.5" fill="none" strokeLinecap="round"/>
-        <path d="M22,60 L18,66" stroke="#1e6412" strokeWidth="2.5" fill="none" strokeLinecap="round"/>
-        <path d="M12,65 L7,59"  stroke="#2a8c1e" strokeWidth="2.2" fill="none" strokeLinecap="round"/>
-        <path d="M12,65 L8,71"  stroke="#1e6412" strokeWidth="2.2" fill="none" strokeLinecap="round"/>
+        <path d="M22,60 L17,54" stroke="#34a428" strokeWidth="2.5" fill="none" strokeLinecap="round"/>
+        <path d="M22,60 L18,66" stroke="#267818" strokeWidth="2.5" fill="none" strokeLinecap="round"/>
+        <path d="M12,65 L7,59"  stroke="#34a428" strokeWidth="2.2" fill="none" strokeLinecap="round"/>
+        <path d="M12,65 L8,71"  stroke="#267818" strokeWidth="2.2" fill="none" strokeLinecap="round"/>
         {/* Leaflet pairs right drooping frond */}
-        <path d="M46,60 L51,54" stroke="#2a8c1e" strokeWidth="2.5" fill="none" strokeLinecap="round"/>
-        <path d="M46,60 L50,66" stroke="#1e6412" strokeWidth="2.5" fill="none" strokeLinecap="round"/>
-        <path d="M56,65 L61,59" stroke="#2a8c1e" strokeWidth="2.2" fill="none" strokeLinecap="round"/>
-        <path d="M56,65 L60,71" stroke="#1e6412" strokeWidth="2.2" fill="none" strokeLinecap="round"/>
+        <path d="M46,60 L51,54" stroke="#34a428" strokeWidth="2.5" fill="none" strokeLinecap="round"/>
+        <path d="M46,60 L50,66" stroke="#267818" strokeWidth="2.5" fill="none" strokeLinecap="round"/>
+        <path d="M56,65 L61,59" stroke="#34a428" strokeWidth="2.2" fill="none" strokeLinecap="round"/>
+        <path d="M56,65 L60,71" stroke="#267818" strokeWidth="2.2" fill="none" strokeLinecap="round"/>
         {/* Leaflet pairs upper fronds */}
-        <path d="M22,43 L17,37" stroke="#349e22" strokeWidth="2.2" fill="none" strokeLinecap="round"/>
-        <path d="M46,43 L51,37" stroke="#349e22" strokeWidth="2.2" fill="none" strokeLinecap="round"/>
+        <path d="M22,43 L17,37" stroke="#42b830" strokeWidth="2.2" fill="none" strokeLinecap="round"/>
+        <path d="M46,43 L51,37" stroke="#42b830" strokeWidth="2.2" fill="none" strokeLinecap="round"/>
         {/* Frond tip highlights */}
-        <path d="M34,56 Q14,62 4,68"  stroke="#68e040" strokeWidth="4" fill="none" strokeLinecap="round" opacity="0.52"/>
-        <path d="M34,56 Q54,62 66,68" stroke="#68e040" strokeWidth="4" fill="none" strokeLinecap="round" opacity="0.52"/>
-        <path d="M34,52 Q16,38 10,20"  stroke="#68e040" strokeWidth="3.5" fill="none" strokeLinecap="round" opacity="0.52"/>
-        <path d="M34,52 Q52,38 60,20"  stroke="#68e040" strokeWidth="3.5" fill="none" strokeLinecap="round" opacity="0.52"/>
+        <path d="M34,56 Q14,62 4,68"  stroke="#7aec52" strokeWidth="4" fill="none" strokeLinecap="round" opacity="0.52"/>
+        <path d="M34,56 Q54,62 66,68" stroke="#7aec52" strokeWidth="4" fill="none" strokeLinecap="round" opacity="0.52"/>
+        <path d="M34,52 Q16,38 10,20"  stroke="#7aec52" strokeWidth="3.5" fill="none" strokeLinecap="round" opacity="0.52"/>
+        <path d="M34,52 Q52,38 60,20"  stroke="#7aec52" strokeWidth="3.5" fill="none" strokeLinecap="round" opacity="0.52"/>
         {/* Crown */}
-        <circle cx="34" cy="54" r="15" fill="#186010"/>
+        <circle cx="34" cy="54" r="15" fill="#1a7014"/>
         <circle cx="34" cy="52" r="11" fill={`url(#${g('coc')})`}/>
         {/* Specular */}
-        <ellipse cx="27" cy="44" rx="7.5" ry="4.5" fill="rgba(255,255,255,0.36)" transform="rotate(-18 27 44)"/>
+        <ellipse cx="27" cy="44" rx="7.5" ry="4.5" fill="rgba(255,255,255,0.42)" transform="rotate(-18 27 44)"/>
         {/* Coconuts */}
         <circle cx="26" cy="58" r="6"   fill="#7a4418"/>
         <circle cx="40" cy="59" r="5.5" fill="#6a3c12"/>
         <circle cx="34" cy="63" r="5"   fill="#723e14"/>
-        <circle cx="24.5" cy="56" r="2" fill="rgba(255,255,255,0.32)"/>
-        <circle cx="38.5" cy="57" r="1.8" fill="rgba(255,255,255,0.28)"/>
+        <circle cx="24.5" cy="56" r="2" fill="rgba(255,255,255,0.34)"/>
+        <circle cx="38.5" cy="57" r="1.8" fill="rgba(255,255,255,0.30)"/>
       </svg>
     );
 
@@ -392,75 +376,59 @@ const ObjectSVG: React.FC<{ object: string; tileX: number; tileY: number }> = ({
       <svg viewBox="0 0 74 92" width="68" height="85" style={{ display:'block' }}>
         <defs>
           <linearGradient id={g('mgt')} x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%"   stopColor="#d47e38"/>
-            <stop offset="44%"  stopColor="#8a4e20"/>
-            <stop offset="100%" stopColor="#4c280c"/>
+            <stop offset="0%"   stopColor="#e2a862"/>
+            <stop offset="40%"  stopColor="#b07838"/>
+            <stop offset="100%" stopColor="#784818"/>
           </linearGradient>
-          <radialGradient id={g('mgc')} cx="34%" cy="27%" r="72%">
-            <stop offset="0%"   stopColor="#7edc48"/>
-            <stop offset="52%"  stopColor="#2e8e14"/>
-            <stop offset="100%" stopColor="#105808"/>
+          <radialGradient id={g('mgc')} cx="30%" cy="22%" r="76%">
+            <stop offset="0%"   stopColor="#b4f05a"/>
+            <stop offset="44%"  stopColor="#50bc26"/>
+            <stop offset="100%" stopColor="#186210"/>
           </radialGradient>
           <radialGradient id={g('mgm')} cx="38%" cy="28%" r="68%">
-            <stop offset="0%"   stopColor="#ffe050"/>
-            <stop offset="55%"  stopColor="#e09810"/>
-            <stop offset="100%" stopColor="#a06008"/>
+            <stop offset="0%"   stopColor="#ffe858"/>
+            <stop offset="55%"  stopColor="#e8a018"/>
+            <stop offset="100%" stopColor="#a8680a"/>
           </radialGradient>
         </defs>
-        {/* Ground shadow */}
-        <ellipse cx="37" cy="90" rx="22" ry="6.5" fill="rgba(0,0,0,0.30)"/>
-        {/* Trunk dark right */}
-        <path d="M37,88 Q40,70 41,56 L44,56 Q47,70 47,88Z" fill="#2a1004" opacity="0.52"/>
-        {/* Trunk — wide, tapered */}
-        <path d="M27,88 Q31,70 34,56 L40,56 Q43,70 47,88Z" fill={`url(#${g('mgt')})`}/>
-        {/* Highlight */}
-        <path d="M29.5,86 Q33,68 35.5,58" stroke="rgba(255,255,255,0.30)" strokeWidth="2.4" fill="none" strokeLinecap="round"/>
-        {/* Bark groove */}
-        <path d="M42,86 Q43,68 41.5,58" stroke="rgba(0,0,0,0.22)" strokeWidth="1.4" fill="none" strokeLinecap="round"/>
+        {/* Trunk — thin, clean, no dark overlay */}
+        <rect x="31" y="54" width="12" height="35" rx="5" fill={`url(#${g('mgt')})`}/>
+        {/* Trunk highlight */}
+        <path d="M33,87 Q33,68 33.5,56" stroke="rgba(255,255,255,0.40)" strokeWidth="2" fill="none" strokeLinecap="round"/>
         {/* Bark rings */}
-        {[64,72,80].map(y => (
-          <path key={y} d={`M28,${y} Q37,${y-2} 46,${y}`} stroke="rgba(0,0,0,0.30)" strokeWidth="2" fill="none" strokeLinecap="round"/>
+        {[64,73,82].map(y => (
+          <path key={y} d={`M32,${y} Q37,${y-1.5} 42,${y}`} stroke="rgba(0,0,0,0.16)" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
         ))}
-        {/* Bark knots */}
-        <ellipse cx="33" cy="67" rx="2.8" ry="1.6" fill="rgba(0,0,0,0.18)" transform="rotate(-7 33 67)"/>
-        <ellipse cx="41" cy="78" rx="2.5" ry="1.4" fill="rgba(0,0,0,0.16)" transform="rotate(6 41 78)"/>
-        {/* Root flare */}
-        <ellipse cx="29" cy="87" rx="4.5" ry="2.5" fill="#3c1a08" opacity="0.48" transform="rotate(-15 29 87)"/>
-        <ellipse cx="45" cy="87" rx="4.5" ry="2.5" fill="#3c1a08" opacity="0.44" transform="rotate(15 45 87)"/>
-        {/* Canopy depth — back layers */}
-        <ellipse cx="37" cy="44" rx="35" ry="28" fill="#0c4606" opacity="0.68"/>
-        <ellipse cx="13" cy="50" rx="18" ry="15" fill="#145c0c"/>
-        <ellipse cx="61" cy="50" rx="18" ry="15" fill="#186612"/>
-        {/* Mid canopy */}
-        <ellipse cx="37" cy="36" rx="31" ry="25" fill="#1e5e12"/>
-        <ellipse cx="14" cy="42" rx="18" ry="15" fill="#246c16"/>
-        <ellipse cx="60" cy="42" rx="18" ry="15" fill="#28761a"/>
-        {/* Leaf texture bumps on sides */}
-        <ellipse cx="8"  cy="36" rx="9" ry="7" fill="#0e4a08" opacity="0.70"/>
-        <ellipse cx="66" cy="36" rx="9" ry="7" fill="#0e4a08" opacity="0.70"/>
-        <ellipse cx="11" cy="50" rx="8" ry="6" fill="#124e0c" opacity="0.65"/>
-        <ellipse cx="63" cy="50" rx="8" ry="6" fill="#124e0c" opacity="0.65"/>
-        {/* Upper canopy with radial gradient */}
-        <ellipse cx="37" cy="28" rx="27" ry="22" fill={`url(#${g('mgc')})`}/>
-        <ellipse cx="19" cy="34" rx="16" ry="13" fill="#348a22"/>
-        <ellipse cx="55" cy="34" rx="16" ry="13" fill="#38942a"/>
-        {/* Upper leaf clusters */}
-        <ellipse cx="26" cy="22" rx="12" ry="9" fill="#3e9c28"/>
-        <ellipse cx="48" cy="22" rx="12" ry="9" fill="#42a02c"/>
-        {/* Top dome */}
-        <ellipse cx="37" cy="14" rx="20" ry="16" fill="#4eae30"/>
-        {/* Canopy specular */}
-        <ellipse cx="23" cy="14" rx="13" ry="7.5" fill="rgba(255,255,255,0.28)" transform="rotate(-14 23 14)"/>
+        {/* Soft ground blend */}
+        <ellipse cx="37" cy="88" rx="14" ry="4" fill="rgba(130,100,50,0.30)"/>
+        {/* Canopy depth base */}
+        <ellipse cx="37" cy="38" rx="34" ry="27" fill="#145408" opacity="0.65"/>
+        {/* Lower side clusters */}
+        <circle cx="7"  cy="48" r="20" fill="#1e6810"/>
+        <circle cx="67" cy="48" r="20" fill="#227014"/>
+        {/* Main canopy */}
+        <ellipse cx="37" cy="33" rx="31" ry="26" fill={`url(#${g('mgc')})`}/>
+        {/* Side clusters mid */}
+        <circle cx="9"  cy="38" r="19" fill="#2e8a18"/>
+        <circle cx="65" cy="38" r="19" fill="#32941c"/>
+        {/* Upper clusters */}
+        <circle cx="22" cy="22" r="16" fill="#3ea820"/>
+        <circle cx="52" cy="20" r="15" fill="#42ae24"/>
+        {/* Top bright dome */}
+        <circle cx="37" cy="13" r="18" fill="#52be2c"/>
+        <circle cx="37" cy="8"  r="12" fill="#66d038"/>
+        {/* Specular */}
+        <ellipse cx="22" cy="12" rx="14" ry="8" fill="rgba(255,255,255,0.40)" transform="rotate(-14 22 12)"/>
         {/* Mangoes */}
-        <ellipse cx="14" cy="50" rx="7.5" ry="10" fill={`url(#${g('mgm')})`} transform="rotate(-20 14 50)"/>
-        <ellipse cx="36" cy="55" rx="7.5" ry="10" fill={`url(#${g('mgm')})`} transform="rotate(10 36 55)"/>
-        <ellipse cx="57" cy="50" rx="7.5" ry="10" fill={`url(#${g('mgm')})`} transform="rotate(20 57 50)"/>
-        <ellipse cx="23" cy="44" rx="6.5" ry="8.5" fill={`url(#${g('mgm')})`} transform="rotate(-12 23 44)"/>
-        <ellipse cx="51" cy="44" rx="6.5" ry="8.5" fill={`url(#${g('mgm')})`} transform="rotate(14 51 44)"/>
+        <ellipse cx="11" cy="50" rx="7" ry="9.5" fill={`url(#${g('mgm')})`} transform="rotate(-18 11 50)"/>
+        <ellipse cx="37" cy="56" rx="7" ry="9.5" fill={`url(#${g('mgm')})`} transform="rotate(8 37 56)"/>
+        <ellipse cx="63" cy="50" rx="7" ry="9.5" fill={`url(#${g('mgm')})`} transform="rotate(18 63 50)"/>
+        <ellipse cx="22" cy="45" rx="6" ry="8" fill={`url(#${g('mgm')})`} transform="rotate(-10 22 45)"/>
+        <ellipse cx="52" cy="45" rx="6" ry="8" fill={`url(#${g('mgm')})`} transform="rotate(12 52 45)"/>
         {/* Mango shine */}
-        <ellipse cx="11.5" cy="47" rx="3" ry="4" fill="rgba(255,255,255,0.50)" transform="rotate(-20 11.5 47)"/>
-        <ellipse cx="33.5" cy="52" rx="3" ry="4" fill="rgba(255,255,255,0.48)" transform="rotate(10 33.5 52)"/>
-        <ellipse cx="54.5" cy="47" rx="3" ry="4" fill="rgba(255,255,255,0.46)" transform="rotate(20 54.5 47)"/>
+        <ellipse cx="8.5"  cy="47" rx="2.8" ry="3.8" fill="rgba(255,255,255,0.52)" transform="rotate(-18 8.5 47)"/>
+        <ellipse cx="34.5" cy="53" rx="2.8" ry="3.8" fill="rgba(255,255,255,0.50)" transform="rotate(8 34.5 53)"/>
+        <ellipse cx="60.5" cy="47" rx="2.8" ry="3.8" fill="rgba(255,255,255,0.48)" transform="rotate(18 60.5 47)"/>
       </svg>
     );
 
@@ -727,9 +695,9 @@ export const IslandTile: React.FC<IslandTileProps> = ({
             hi = [0xf4, 0xe0, 0xb0]; lo = [0xd8, 0xbc, 0x84];
             sL = '#cdb277'; sR = '#d4b97f';
           } else {
-            // GRASS (default)
-            hi = [0x72, 0xc4, 0x52]; lo = [0x48, 0x96, 0x2e];
-            sL = '#3f8a2a'; sR = '#4a9e32';
+            // GRASS (default) — bright saturated lime-green matching reference
+            hi = [0x8a, 0xde, 0x48]; lo = [0x54, 0xb2, 0x22];
+            sL = '#3aaa1c'; sR = '#44b826';
           }
 
           const isGrass = !isCleared && tile.type === 'GRASS';
@@ -745,10 +713,10 @@ export const IslandTile: React.FC<IslandTileProps> = ({
               {/* Grass blade texture pattern */}
               {isGrass && (
                 <pattern id={gpid} x="0" y="0" width="10" height="8" patternUnits="userSpaceOnUse">
-                  <line x1="1.5" y1="7.5" x2="3"   y2="4.5" stroke="#267016" strokeWidth="1.1" opacity="0.55"/>
-                  <line x1="5.5" y1="7"   x2="7"   y2="3.8" stroke="#267016" strokeWidth="1"   opacity="0.45"/>
-                  <line x1="8.5" y1="7.5" x2="9.5" y2="5"   stroke="#306020" strokeWidth="0.9" opacity="0.35"/>
-                  <line x1="3.5" y1="7.8" x2="4.5" y2="5.5" stroke="#1e5a12" strokeWidth="0.8" opacity="0.30"/>
+                  <line x1="1.5" y1="7.5" x2="3"   y2="4.5" stroke="#28901a" strokeWidth="1.1" opacity="0.50"/>
+                  <line x1="5.5" y1="7"   x2="7"   y2="3.8" stroke="#28901a" strokeWidth="1"   opacity="0.42"/>
+                  <line x1="8.5" y1="7.5" x2="9.5" y2="5"   stroke="#349c22" strokeWidth="0.9" opacity="0.32"/>
+                  <line x1="3.5" y1="7.8" x2="4.5" y2="5.5" stroke="#1e7c10" strokeWidth="0.8" opacity="0.28"/>
                 </pattern>
               )}
             </defs>
