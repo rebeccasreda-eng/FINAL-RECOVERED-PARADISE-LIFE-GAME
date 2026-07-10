@@ -153,6 +153,7 @@ export const OBJECT_CONFIG: Record<string, any> = {
   CRAB:        { action: 'Attack', energy: 1, coins: 5, xp: 10 },
   BOAR:        { action: 'Shoo',  energy: 1, coins: 8, xp: 12 },
   BABY_PARROT: { action: 'Feed',  energy: 0, coins: 2, xp: 5  },
+  TALL_ROCK:   { action: 'Mine', energy: 1, coins: 10, xp: 18, drops: { stone: 2 }, respawn: SCALED(120000) },
 };
 
 export const EMOJI_MAP: Record<string, string> = {
@@ -161,7 +162,7 @@ export const EMOJI_MAP: Record<string, string> = {
   TREE_COCONUT: '🌴', TREE_MANGO: '🥭', GARDEN_PATCH: '🍍',
   CROP_PLOT: '🟫', CROP_GROWING: '🌱', CROP_READY: '🌽', CROP_WILTED: '🥀',
   FISH_SPOT: '', HUT: '🏚️', DOCK: '⛵', WELL: '💧', 
-  FLOWER_POT: '🪴', FENCE: '🚧', LANTERN: '🏮', CRAB: '🦀', BOAR: '🐗', BABY_PARROT: '🦜'
+  FLOWER_POT: '🪴', FENCE: '🚧', LANTERN: '🏮', CRAB: '🦀', BOAR: '🐗', BABY_PARROT: '🦜', TALL_ROCK: '🪨'
 };
 
 export const INITIAL_NEIGHBORS = [
@@ -349,6 +350,16 @@ export function generateIsland(): Record<string, TileData> {
       const nb = tiles[`${tree.x + dx},${tree.y + dy}`];
       if (nb && nb.type === 'GRASS' && !nb.object && rand() < 0.28) {
         nb.object = 'PUDDLE';
+      }
+    }
+  }
+
+  // ── Tall rocks near trees — mossy standing stones beside the canopy ──────
+  for (const tree of treeTiles) {
+    for (const [dx, dy] of TREE_NEIGHBORS) {
+      const nb = tiles[`${tree.x + dx},${tree.y + dy}`];
+      if (nb && nb.type === 'GRASS' && !nb.object && rand() < 0.14) {
+        nb.object = 'TALL_ROCK';
       }
     }
   }

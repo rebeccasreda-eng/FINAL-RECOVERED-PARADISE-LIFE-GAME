@@ -181,40 +181,75 @@ const ObjectSVG: React.FC<{ object: string; tileX: number; tileY: number }> = ({
     );
 
     /* ── ROCK ───────────────────────────────────────────────────────────── */
-    case 'ROCK': return (
-      <svg viewBox="0 0 56 36" width="54" height="34" style={{ display:'block' }}>
-        <defs>
-          <radialGradient id={g('rkg')} cx="30%" cy="28%" r="75%">
-            <stop offset="0%"   stopColor="#d8d8d0"/>
-            <stop offset="50%"  stopColor="#a0a098"/>
-            <stop offset="100%" stopColor="#606058"/>
-          </radialGradient>
-          <radialGradient id={g('rks')} cx="35%" cy="30%" r="70%">
-            <stop offset="0%"   stopColor="#c6c6be"/>
-            <stop offset="55%"  stopColor="#888882"/>
-            <stop offset="100%" stopColor="#525248"/>
-          </radialGradient>
-        </defs>
-        {/* Ground shadow — wide, low */}
-        <ellipse cx="26" cy="34" rx="26" ry="4.5" fill="rgba(0,0,0,0.22)"/>
-        {/* Small back rock — flat */}
-        <ellipse cx="44" cy="22" rx="11" ry="6"   fill={`url(#${g('rks')})`}/>
-        <ellipse cx="40" cy="19" rx="4"  ry="1.8" fill="rgba(255,255,255,0.26)" transform="rotate(-10 40 19)"/>
-        {/* Main boulder — wide and flat */}
-        <ellipse cx="22" cy="26" rx="23" ry="10"  fill={`url(#${g('rkg')})`}/>
-        {/* Rim */}
-        <ellipse cx="22" cy="26" rx="23" ry="10"  fill="none" stroke="rgba(0,0,0,0.12)" strokeWidth="1.4"/>
-        {/* Specular highlight */}
-        <ellipse cx="11" cy="21" rx="10" ry="3.5" fill="rgba(255,255,255,0.42)" transform="rotate(-12 11 21)"/>
-        {/* Secondary highlight */}
-        <ellipse cx="7"  cy="26" rx="3.5" ry="1.5" fill="rgba(255,255,255,0.20)" transform="rotate(-6 7 26)"/>
-        {/* Subtle crack */}
-        <path d="M20,22 Q22,26 21,31" stroke="rgba(0,0,0,0.10)" strokeWidth="1.2" fill="none"/>
-        {/* Mossy patch */}
-        <ellipse cx="30" cy="29" rx="6" ry="2.5" fill="#5a8820" opacity="0.28"/>
-        <ellipse cx="14" cy="30" rx="4" ry="2"   fill="#4a7818" opacity="0.22"/>
-      </svg>
-    );
+    case 'ROCK': {
+      const rg1 = g('rg1'), rg2 = g('rg2'), rg3 = g('rg3');
+      // Deterministic grass lean per tile
+      const rlv = (tx * 7 + ty * 13) % 3;
+      const rGrass = '#1e6c0c', rGrassMid = '#2a8a12', rGrassFront = '#38a818';
+      // Helper: single grass blade as a thick rounded stroke
+      const rb = (cx: number, by: number, h: number, lean: number) =>
+        `M ${cx},${by} Q ${cx + lean * 0.5},${by - h * 0.55} ${cx + lean},${by - h}`;
+      return (
+        <svg viewBox="0 0 72 60" width="68" height="56" style={{ display:'block' }}>
+          <defs>
+            <radialGradient id={rg1} cx="28%" cy="24%" r="76%">
+              <stop offset="0%"   stopColor="#e4e4dc"/>
+              <stop offset="48%"  stopColor="#a2a29a"/>
+              <stop offset="100%" stopColor="#5e5e56"/>
+            </radialGradient>
+            <radialGradient id={rg2} cx="30%" cy="26%" r="72%">
+              <stop offset="0%"   stopColor="#d8d8d0"/>
+              <stop offset="50%"  stopColor="#9898908"/>
+              <stop offset="100%" stopColor="#585850"/>
+            </radialGradient>
+            <radialGradient id={rg3} cx="32%" cy="22%" r="70%">
+              <stop offset="0%"   stopColor="#dcdcd4"/>
+              <stop offset="50%"  stopColor="#9c9c94"/>
+              <stop offset="100%" stopColor="#5c5c54"/>
+            </radialGradient>
+          </defs>
+
+          {/* Ground shadow */}
+          <ellipse cx="36" cy="58" rx="30" ry="4" fill="rgba(0,0,0,0.22)"/>
+
+          {/* ── Back grass blades (behind rocks) ── */}
+          <path d={rb(8,  54, 44, -3 + rlv)} stroke={rGrass} strokeWidth="3.2" fill="none" strokeLinecap="round"/>
+          <path d={rb(16, 54, 48, -1 + rlv)} stroke={rGrass} strokeWidth="3.4" fill="none" strokeLinecap="round"/>
+          <path d={rb(28, 54, 46,  0 + rlv)} stroke={rGrass} strokeWidth="3.6" fill="none" strokeLinecap="round"/>
+          <path d={rb(52, 54, 42, -2 + rlv)} stroke={rGrass} strokeWidth="3.0" fill="none" strokeLinecap="round"/>
+          <path d={rb(62, 54, 40,  2 + rlv)} stroke={rGrass} strokeWidth="2.8" fill="none" strokeLinecap="round"/>
+          <path d={rb(70, 54, 36,  3 + rlv)} stroke={rGrass} strokeWidth="2.6" fill="none" strokeLinecap="round"/>
+
+          {/* ── Back-right small rock ── */}
+          <path d="M50,28 Q58,20 68,24 Q74,28 70,38 Q66,44 56,42 Q46,40 46,34 Q46,30 50,28Z" fill={`url(#${rg2})`}/>
+          <ellipse cx="56" cy="24" rx="9" ry="3" fill="rgba(255,255,255,0.38)" transform="rotate(-12 56 24)"/>
+          <path d="M60,28 Q62,34 61,40" stroke="rgba(0,0,0,0.09)" strokeWidth="1.2" fill="none"/>
+
+          {/* ── Back-left medium rock ── */}
+          <path d="M2,30 Q4,20 16,18 Q26,18 28,28 Q30,36 20,40 Q10,42 5,36 Q2,33 2,30Z" fill={`url(#${rg3})`}/>
+          <ellipse cx="12" cy="21" rx="8" ry="3" fill="rgba(255,255,255,0.36)" transform="rotate(-10 12 21)"/>
+          <path d="M14,26 Q16,32 15,38" stroke="rgba(0,0,0,0.09)" strokeWidth="1.2" fill="none"/>
+
+          {/* ── Mid grass blades (between rocks) ── */}
+          <path d={rb(36, 54, 32,  0)} stroke={rGrassMid} strokeWidth="3.0" fill="none" strokeLinecap="round"/>
+          <path d={rb(44, 54, 28,  2)} stroke={rGrassMid} strokeWidth="2.6" fill="none" strokeLinecap="round"/>
+
+          {/* ── Main centre boulder ── */}
+          <path d="M8,46 Q6,34 14,26 Q22,18 36,16 Q50,14 58,22 Q66,28 64,40 Q60,50 44,54 Q26,58 16,54 Q9,50 8,46Z" fill={`url(#${rg1})`}/>
+          <ellipse cx="22" cy="22" rx="14" ry="4.5" fill="rgba(255,255,255,0.44)" transform="rotate(-14 22 22)"/>
+          <ellipse cx="12" cy="30" rx="5"  ry="2"   fill="rgba(255,255,255,0.22)" transform="rotate(-6 12 30)"/>
+          <path d="M34,22 Q36,32 35,44" stroke="rgba(0,0,0,0.09)" strokeWidth="1.4" fill="none"/>
+          <ellipse cx="46" cy="50" rx="8" ry="2.5" fill="#4a8818" opacity="0.30"/>
+          <ellipse cx="18" cy="50" rx="5" ry="2"   fill="#3e7814" opacity="0.24"/>
+
+          {/* ── Front grass blades (in front of rocks) ── */}
+          <path d={rb(10, 54, 26, -3 + rlv)} stroke={rGrassFront} strokeWidth="2.8" fill="none" strokeLinecap="round"/>
+          <path d={rb(20, 54, 24, -1 + rlv)} stroke={rGrassFront} strokeWidth="3.0" fill="none" strokeLinecap="round"/>
+          <path d={rb(50, 54, 24,  1 + rlv)} stroke={rGrassFront} strokeWidth="2.8" fill="none" strokeLinecap="round"/>
+          <path d={rb(60, 54, 22,  3 + rlv)} stroke={rGrassFront} strokeWidth="2.6" fill="none" strokeLinecap="round"/>
+        </svg>
+      );
+    }
 
     /* ── SUNFLOWER (unripe — waiting to bloom) ─────────────────────────── */
     case 'SUNFLOWER': {
@@ -1214,6 +1249,86 @@ const ObjectSVG: React.FC<{ object: string; tileX: number; tileY: number }> = ({
       );
     }
 
+    /* ── TALL ROCK — standing stone with weeds at the base ──────────────── */
+    case 'TALL_ROCK': {
+      const trg = g('trg'), trs = g('trs');
+      const tlv = (tx * 11 + ty * 7) % 3;
+      // Slight shape variant per tile: wider, narrower, or leaning
+      const tw = tlv === 0 ? 26 : tlv === 1 ? 22 : 24;
+      const th = tlv === 0 ? 48 : tlv === 1 ? 54 : 50;
+      const lean = tlv === 0 ? -2 : tlv === 1 ? 2 : 0;
+      // Grass colour
+      const tgDark = '#1a6408', tgMid = '#268c10', tgFront = '#34aa18';
+      const trb = (cx: number, by: number, h: number, l: number) =>
+        `M ${cx},${by} Q ${cx + l * 0.5},${by - h * 0.55} ${cx + l},${by - h}`;
+      // Stone centred at x=28, base at y=64
+      const sx = 28 + lean, sy = 64 - th;
+      return (
+        <svg viewBox="0 0 56 70" width="52" height="66" style={{ display:'block' }}>
+          <defs>
+            <linearGradient id={trg} x1="0" y1="0" x2="1" y2="0">
+              <stop offset="0%"   stopColor="#e2e2da"/>
+              <stop offset="55%"  stopColor="#c4c4bc"/>
+              <stop offset="100%" stopColor="#7a7a72"/>
+            </linearGradient>
+            <linearGradient id={trs} x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%"   stopColor="rgba(255,255,255,0.35)"/>
+              <stop offset="100%" stopColor="rgba(0,0,0,0.00)"/>
+            </linearGradient>
+          </defs>
+
+          {/* Ground shadow */}
+          <ellipse cx="28" cy="67" rx="18" ry="4" fill="rgba(0,0,0,0.24)"/>
+
+          {/* Back grass blades */}
+          <path d={trb(14, 64, 38, -3)} stroke={tgDark} strokeWidth="3.2" fill="none" strokeLinecap="round"/>
+          <path d={trb(20, 64, 36, -1)} stroke={tgDark} strokeWidth="3.0" fill="none" strokeLinecap="round"/>
+          <path d={trb(36, 64, 36,  2)} stroke={tgDark} strokeWidth="3.0" fill="none" strokeLinecap="round"/>
+          <path d={trb(42, 64, 34,  3)} stroke={tgDark} strokeWidth="2.8" fill="none" strokeLinecap="round"/>
+
+          {/* ── Standing stone body ── */}
+          {/* Main face — rounded-rectangle shape */}
+          <path
+            d={`M ${sx - tw/2},${sy + 12} Q ${sx - tw/2},${sy} ${sx - tw/2 + 8},${sy - 4} Q ${sx},${sy - 8} ${sx + tw/2 - 8},${sy - 4} Q ${sx + tw/2},${sy} ${sx + tw/2},${sy + 12} L ${sx + tw/2},64 Q ${sx + tw/2 - 4},66 ${sx},66 Q ${sx - tw/2 + 4},66 ${sx - tw/2},64 Z`}
+            fill={`url(#${trg})`}
+          />
+          {/* Top sheen overlay */}
+          <path
+            d={`M ${sx - tw/2},${sy + 12} Q ${sx - tw/2},${sy} ${sx - tw/2 + 8},${sy - 4} Q ${sx},${sy - 8} ${sx + tw/2 - 8},${sy - 4} Q ${sx + tw/2},${sy} ${sx + tw/2},${sy + 12} L ${sx + tw/2},${sy + 28} L ${sx - tw/2},${sy + 28} Z`}
+            fill={`url(#${trs})`}
+          />
+          {/* Left specular streak */}
+          <path
+            d={`M ${sx - tw/2 + 4},${sy + 6} Q ${sx - tw/2 + 5},${sy + th * 0.45} ${sx - tw/2 + 4},${sy + th * 0.65}`}
+            stroke="rgba(255,255,255,0.40)" strokeWidth="3.5" fill="none" strokeLinecap="round"
+          />
+          {/* Right shadow edge */}
+          <path
+            d={`M ${sx + tw/2 - 3},${sy + 8} L ${sx + tw/2 - 3},${sy + th - 6}`}
+            stroke="rgba(0,0,0,0.18)" strokeWidth="3" fill="none" strokeLinecap="round"
+          />
+          {/* Crack 1 */}
+          <path
+            d={`M ${sx - 2},${sy + 10} Q ${sx},${sy + 20} ${sx - 3},${sy + 30}`}
+            stroke="rgba(0,0,0,0.12)" strokeWidth="1.3" fill="none"
+          />
+          {/* Crack 2 */}
+          <path
+            d={`M ${sx + 5},${sy + 28} Q ${sx + 6},${sy + 38} ${sx + 4},${sy + 46}`}
+            stroke="rgba(0,0,0,0.09)" strokeWidth="1.0" fill="none"
+          />
+          {/* Mossy band at base */}
+          <ellipse cx={sx} cy="63" rx={tw / 2 - 1} ry="3" fill="#3a7e12" opacity="0.36"/>
+
+          {/* Front grass blades (flanking the stone) */}
+          <path d={trb(10, 64, 30, -4)} stroke={tgMid}   strokeWidth="2.8" fill="none" strokeLinecap="round"/>
+          <path d={trb(16, 64, 28, -2)} stroke={tgFront} strokeWidth="2.6" fill="none" strokeLinecap="round"/>
+          <path d={trb(38, 64, 28,  2)} stroke={tgFront} strokeWidth="2.6" fill="none" strokeLinecap="round"/>
+          <path d={trb(44, 64, 26,  4)} stroke={tgMid}   strokeWidth="2.4" fill="none" strokeLinecap="round"/>
+        </svg>
+      );
+    }
+
     /* ── PINEAPPLE PLANT ─────────────────────────────────────────────────── */
     case 'PINEAPPLE_PLANT': {
       return (
@@ -1297,7 +1412,7 @@ const CHOP_TREES = new Set(['TREE_PALM', 'TREE_APPLE', 'TREE_COCONUT', 'TREE_MAN
 /** Objects that use SVG art instead of emoji */
 const SVG_OBJECTS = new Set(['TREE_PALM', 'TREE_APPLE', 'ROCK', 'FLOWER_BUSH', 'DRIFTWOOD',
   'TREE_COCONUT', 'TREE_MANGO', 'GARDEN_PATCH', 'WEEDS', 'SUNFLOWER', 'PUDDLE', 'THORNS',
-  'BLUEBELL', 'PANSY', 'TULIP', 'PINEAPPLE_PLANT', 'BLUEBERRY_BUSH', 'BABY_PARROT']);
+  'BLUEBELL', 'PANSY', 'TULIP', 'PINEAPPLE_PLANT', 'BLUEBERRY_BUSH', 'BABY_PARROT', 'TALL_ROCK']);
 /** Objects that sway in the breeze */
 const SWAY_OBJECTS = new Set(['TREE_PALM', 'TREE_APPLE', 'TREE_COCONUT', 'TREE_MANGO']);
 

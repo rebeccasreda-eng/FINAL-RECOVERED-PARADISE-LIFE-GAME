@@ -9,7 +9,7 @@ export type ObjectType =
   | 'CLEARED_LAND' | 'FISH_SPOT' | 'SUNFLOWER' | 'PUDDLE' | 'THORNS'
   | 'BLUEBELL' | 'PANSY' | 'TULIP' | 'PINEAPPLE_PLANT' | 'BLUEBERRY_BUSH'
   | 'HUT' | 'DOCK' | 'WELL' | 'FLOWER_POT' | 'FENCE' | 'LANTERN'
-  | 'CRAB' | 'BOAR' | 'BABY_PARROT';
+  | 'CRAB' | 'BOAR' | 'BABY_PARROT' | 'TALL_ROCK';
 
 export type WeatherType = 'SUNNY' | 'RAINY' | 'CLOUDY' | 'STORMY' | 'WINDY';
 
