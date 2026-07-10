@@ -221,15 +221,6 @@ const GameInner = ({ profile }: { profile: PlayerProfile }) => {
 
       {/* Weather overlay */}
       <div className={`weather-overlay ${state.weather}`} />
-      {state.weather === 'RAINY' && (
-        <div
-          className="absolute inset-0 pointer-events-none opacity-50 z-10 animate-[slide_1s_linear_infinite]"
-          style={{
-            backgroundImage: "url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0IiBoZWlnaHQ9IjIwIj48cmVjdCB3aWR0aD0iMSIgaGVpZ2h0PSIxMCIgZmlsbD0icmdiYSgyNTUsIDI1NSwgMjU1LCAwLjUpIiB4PSIyIiB5PSI1Ii8+PC9zdmc+')",
-            backgroundSize: '20px 100px',
-          }}
-        />
-      )}
 
       {/* ── Viewport (overflow:hidden, handles drag events) ── */}
       <div
