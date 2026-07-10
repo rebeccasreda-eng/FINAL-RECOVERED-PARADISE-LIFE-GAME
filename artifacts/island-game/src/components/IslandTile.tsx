@@ -6,7 +6,7 @@ import { useToast } from '@/hooks/use-toast';
 
 /* ── Diamond colour palette — matches HTML reference ────────────────────── */
 const COLORS = {
-  GRASS:   { top: '#5ab410', sideL: '#3a8808', sideR: '#48a010' },
+  GRASS:   { top: '#7ec420', sideL: '#3a8808', sideR: '#48a010' },
   SAND:    { top: '#f0e8cc', sideL: '#d4c49a', sideR: '#dccca4' },
   WATER:   { top: '#52C8E4', sideL: null,       sideR: null      },
   CLEARED: { top: '#8b5a2b', sideL: '#5a3a18',  sideR: '#6a4420' },
@@ -1714,45 +1714,18 @@ export const IslandTile: React.FC<IslandTileProps> = ({
                         stroke="rgba(148,118,80,0.05)" strokeWidth="0.6" fill="none"/>
                 </pattern>
               )}
-              {/* Fluffy grass blade pattern — thick layered blades with globe tips */}
+              {/* Grass blade texture — simple two-layer blades */}
               {isGrass && (
-                <pattern id={gpid} x="0" y="0" width="22" height="20" patternUnits="userSpaceOnUse">
-                  {/* ── Back layer: dark narrow blades ── */}
-                  <path d="M3,20  Q1,13 3,6"    stroke="#1a5c08" strokeWidth="2.6" fill="none" strokeLinecap="round"/>
-                  <path d="M9,20  Q11,12 9,5"   stroke="#185808" strokeWidth="2.4" fill="none" strokeLinecap="round"/>
-                  <path d="M16,20 Q14,12 16,5"  stroke="#1c6008" strokeWidth="2.6" fill="none" strokeLinecap="round"/>
-                  <path d="M22,20 Q20,13 22,6"  stroke="#1a5c08" strokeWidth="2.4" fill="none" strokeLinecap="round"/>
-                  {/* ── Mid layer: main medium blades ── */}
-                  <path d="M0,20  Q-2,11 1,5"   stroke="#27800e" strokeWidth="3.6" fill="none" strokeLinecap="round"/>
-                  <path d="M6,20  Q8,11 6,4"    stroke="#2e8c12" strokeWidth="3.4" fill="none" strokeLinecap="round"/>
-                  <path d="M13,20 Q11,11 13,4"  stroke="#2c8a12" strokeWidth="3.6" fill="none" strokeLinecap="round"/>
-                  <path d="M19,20 Q21,12 19,4"  stroke="#27800e" strokeWidth="3.4" fill="none" strokeLinecap="round"/>
-                  {/* ── Front layer: wide bright blades ── */}
-                  <path d="M4,20  Q6,12 4,6"    stroke="#44b41a" strokeWidth="4.8" fill="none" strokeLinecap="round"/>
-                  <path d="M11,20 Q9,12 11,6"   stroke="#4abc1c" strokeWidth="4.6" fill="none" strokeLinecap="round"/>
-                  <path d="M17,20 Q15,12 17,6"  stroke="#44b41a" strokeWidth="4.8" fill="none" strokeLinecap="round"/>
-                  {/* ── Globe tips — back layer ── */}
-                  <circle cx="3"  cy="6"  r="2.2" fill="#2a7e0e"/>
-                  <circle cx="9"  cy="5"  r="2.1" fill="#287a0c"/>
-                  <circle cx="16" cy="5"  r="2.2" fill="#2a7e0e"/>
-                  <circle cx="22" cy="6"  r="2.0" fill="#287a0c"/>
-                  {/* ── Globe tips — mid layer ── */}
-                  <circle cx="1"  cy="5"  r="2.8" fill="#3ea418"/>
-                  <circle cx="6"  cy="4"  r="2.7" fill="#44ac1c"/>
-                  <circle cx="13" cy="4"  r="2.8" fill="#3ea418"/>
-                  <circle cx="19" cy="4"  r="2.7" fill="#44ac1c"/>
-                  {/* ── Globe tips — front layer (biggest, brightest) ── */}
-                  <circle cx="4"  cy="6"  r="3.4" fill="#62d028"/>
-                  <circle cx="11" cy="6"  r="3.3" fill="#6add2a"/>
-                  <circle cx="17" cy="6"  r="3.4" fill="#62d028"/>
-                  {/* Specular glints on front tips */}
-                  <circle cx="3.5"  cy="4.8" r="1.2" fill="rgba(255,255,255,0.58)"/>
-                  <circle cx="10.5" cy="4.8" r="1.2" fill="rgba(255,255,255,0.58)"/>
-                  <circle cx="16.5" cy="4.8" r="1.2" fill="rgba(255,255,255,0.58)"/>
-                  {/* Mid-layer glints */}
-                  <circle cx="1"  cy="3.8" r="0.9" fill="rgba(255,255,255,0.40)"/>
-                  <circle cx="6"  cy="2.8" r="0.9" fill="rgba(255,255,255,0.40)"/>
-                  <circle cx="13" cy="2.8" r="0.9" fill="rgba(255,255,255,0.40)"/>
+                <pattern id={gpid} x="0" y="0" width="14" height="12" patternUnits="userSpaceOnUse">
+                  {/* Back blades — darker, thinner */}
+                  <path d="M2,12  Q1,8  2,4"   stroke="#2e8810" strokeWidth="1.3" fill="none" strokeLinecap="round"/>
+                  <path d="M7,12  Q8,7  7,3"   stroke="#30900e" strokeWidth="1.3" fill="none" strokeLinecap="round"/>
+                  <path d="M12,12 Q11,7 12,4"  stroke="#2e8810" strokeWidth="1.3" fill="none" strokeLinecap="round"/>
+                  {/* Front blades — brighter */}
+                  <path d="M0,12  Q1,8  0,5"   stroke="#50b81e" strokeWidth="1.6" fill="none" strokeLinecap="round"/>
+                  <path d="M5,12  Q4,8  5,4"   stroke="#54c020" strokeWidth="1.6" fill="none" strokeLinecap="round"/>
+                  <path d="M10,12 Q11,7 10,4"  stroke="#50b81e" strokeWidth="1.6" fill="none" strokeLinecap="round"/>
+                  <path d="M14,12 Q13,8 14,5"  stroke="#54c020" strokeWidth="1.6" fill="none" strokeLinecap="round"/>
                 </pattern>
               )}
             </defs>
@@ -1799,42 +1772,6 @@ export const IslandTile: React.FC<IslandTileProps> = ({
           />
         )}
 
-        {/* ── Fluffy 3-D grass tufts — rise above the tile surface ── */}
-        {!isWater && !isCleared && tile.type === 'GRASS' && (() => {
-          const gx = tile.x, gy = tile.y;
-          const h = (gx * 13 + gy * 7 + gx * gy * 3) | 0;
-          // 9 candidate positions inside diamond top half (clipped naturally by overflow:visible)
-          const slots: [number, number][] = [
-            [22, 4], [36, 1], [50, 1], [59, 4],
-            [14, 9], [40, 5], [67, 9],
-            [30, 9], [52, 9],
-          ];
-          const chosen = slots.filter((_, i) => (h * (i + 3) * 17 + i * 31) % 3 !== 0);
-          return chosen.map(([sx, sy], i) => {
-            const lean = ((h * (i + 5) * 13) % 14) - 7;
-            const ht   = 9 + ((h * (i + 2) * 11) % 6);
-            const tier = i % 3;
-            const mid  = tier === 0 ? '#2e8c12' : tier === 1 ? '#309a1a' : '#288a0e';
-            const tip  = tier === 0 ? '#5edc24' : tier === 1 ? '#68e42c' : '#56d420';
-            return (
-              <g key={i} transform={`translate(${sx},${sy})`}>
-                {/* Side blades */}
-                <path d={`M-2.5,0 Q${lean-3},${-ht*0.55} ${lean-1},${-ht}`} stroke="#185808" strokeWidth="2.8" fill="none" strokeLinecap="round"/>
-                <path d={`M2.5,0  Q${lean+3},${-ht*0.55} ${lean+1},${-ht}`} stroke="#185808" strokeWidth="2.8" fill="none" strokeLinecap="round"/>
-                {/* Centre blade */}
-                <path d={`M0,0 Q${lean},${-ht*0.5} ${lean},${-ht}`} stroke={mid} strokeWidth="4.0" fill="none" strokeLinecap="round"/>
-                {/* Ground contact shadow */}
-                <ellipse cx={lean} cy="1.5" rx="5" ry="1.8" fill="rgba(0,0,0,0.20)"/>
-                {/* Fluffy globe cluster at tip */}
-                <circle cx={lean-1.5} cy={-ht}     r="3.0" fill={mid}/>
-                <circle cx={lean+1.5} cy={-ht}     r="3.0" fill={mid}/>
-                <circle cx={lean}     cy={-ht-1}   r="3.6" fill={tip}/>
-                {/* Specular glint */}
-                <circle cx={lean-0.6} cy={-ht-2.2} r="1.4" fill="rgba(255,255,255,0.64)"/>
-              </g>
-            );
-          });
-        })()}
 
 
         {/* Danger zone red pulse — same expanded points as base diamond */}

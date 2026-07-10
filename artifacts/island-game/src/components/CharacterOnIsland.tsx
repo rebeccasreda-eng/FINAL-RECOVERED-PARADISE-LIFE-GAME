@@ -73,12 +73,13 @@ export const CharacterOnIsland: React.FC<Props> = ({
         willChange: 'left, top',
       }}
     >
-      {/* Bouncing 3-D block arrow */}
+      {/* 3-D block arrow — centred above head */}
       <div
         style={{
           position: 'absolute',
           top: -30,
           left: '50%',
+          transform: 'translateX(-50%)',
           animation: 'none',
           pointerEvents: 'none',
         }}
