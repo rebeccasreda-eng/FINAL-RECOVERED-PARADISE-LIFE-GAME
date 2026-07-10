@@ -1,318 +1,220 @@
 import React, { useState } from 'react';
 import { useGame } from '../game/GameContext';
-import { COLLECTIONS, EMOJI_MAP } from '../game/gameData';
+import { EMOJI_MAP } from '../game/gameData';
 import { ResourceType } from '../game/types';
 import { useToast } from '@/hooks/use-toast';
 
-/* ─── "Add Neighbor" pair avatars (chibi boy + girl + pet) ──────────────── */
-
-/** Reusable chibi head helper – keeps each pair SVG concise */
-const ChibiHead = ({
-  cx, cy, r = 13,
-  skin = '#fde8d0',
-  hairColor, hairStyle,
-  eyeColor,
-  blushColor = '#ff8888',
-}: {
-  cx: number; cy: number; r?: number;
-  skin?: string; hairColor: string; hairStyle: 'short'|'twintail'|'wavy'|'spiky'|'ponytail'|'bob';
-  eyeColor: string; blushColor?: string;
-}) => {
-  const top = cy - r;
-  return (
-    <g>
-      {/* Hair back */}
-      <ellipse cx={cx} cy={cy - r * 0.3} rx={r + 2} ry={r * 0.95} fill={hairColor} />
-      {/* Side hair */}
-      {(hairStyle === 'twintail') && (<>
-        <path d={`M${cx-r+1} ${cy+2} Q${cx-r-5} ${cy+18} ${cx-r+2} ${cy+28}`} stroke={hairColor} strokeWidth="7" fill="none" strokeLinecap="round"/>
-        <path d={`M${cx+r-1} ${cy+2} Q${cx+r+5} ${cy+18} ${cx+r-2} ${cy+28}`} stroke={hairColor} strokeWidth="7" fill="none" strokeLinecap="round"/>
-      </>)}
-      {(hairStyle === 'wavy') && (<>
-        <path d={`M${cx-r+1} ${cy} Q${cx-r-6} ${cy+16} ${cx-r+1} ${cy+26}`} stroke={hairColor} strokeWidth="8" fill="none" strokeLinecap="round"/>
-        <path d={`M${cx+r-1} ${cy} Q${cx+r+6} ${cy+16} ${cx+r-1} ${cy+26}`} stroke={hairColor} strokeWidth="8" fill="none" strokeLinecap="round"/>
-      </>)}
-      {(hairStyle === 'ponytail') && (
-        <path d={`M${cx+r-1} ${cy-4} Q${cx+r+10} ${cy+6} ${cx+r+6} ${cy+22}`} stroke={hairColor} strokeWidth="7" fill="none" strokeLinecap="round"/>
-      )}
-      {/* Head */}
-      <circle cx={cx} cy={cy} r={r} fill={skin} />
-      {/* Bangs / top hair */}
-      <path d={`M${cx-r} ${cy-2} Q${cx-r+3} ${top-5} ${cx} ${top-5} Q${cx+r-3} ${top-5} ${cx+r} ${cy-2} Q${cx+r-2} ${top+3} ${cx} ${top+2} Q${cx-r+2} ${top+3} ${cx-r} ${cy-2}Z`} fill={hairColor}/>
-      {(hairStyle === 'spiky') && (<>
-        <polygon points={`${cx-6},${top+2} ${cx-9},${top-7} ${cx-2},${top-2}`} fill={hairColor}/>
-        <polygon points={`${cx},${top} ${cx},${top-9} ${cx+5},${top-2}`} fill={hairColor}/>
-        <polygon points={`${cx+5},${top+2} ${cx+10},${top-6} ${cx+7},${top+4}`} fill={hairColor}/>
-      </>)}
-      {/* Eyes */}
-      <ellipse cx={cx-4.5} cy={cy+1} rx={3.2} ry={3.8} fill="white"/>
-      <ellipse cx={cx+4.5} cy={cy+1} rx={3.2} ry={3.8} fill="white"/>
-      <ellipse cx={cx-4.5} cy={cy+1.5} rx={2.1} ry={2.6} fill={eyeColor}/>
-      <ellipse cx={cx+4.5} cy={cy+1.5} rx={2.1} ry={2.6} fill={eyeColor}/>
-      <circle cx={cx-4.2} cy={cy+1.8} r={1.4} fill="#111"/>
-      <circle cx={cx+4.8} cy={cy+1.8} r={1.4} fill="#111"/>
-      <circle cx={cx-3.5} cy={cy+0.8} r={0.7} fill="white"/>
-      <circle cx={cx+5.5} cy={cy+0.8} r={0.7} fill="white"/>
-      {/* Blush */}
-      <ellipse cx={cx-r+3} cy={cy+4} rx={3.2} ry={1.8} fill={blushColor} opacity="0.45"/>
-      <ellipse cx={cx+r-3} cy={cy+4} rx={3.2} ry={1.8} fill={blushColor} opacity="0.45"/>
-      {/* Smile */}
-      <path d={`M${cx-3.5} ${cy+6} Q${cx} ${cy+9.5} ${cx+3.5} ${cy+6}`} stroke="#cc4466" strokeWidth="1.3" fill="none" strokeLinecap="round"/>
-    </g>
-  );
-};
-
-/** Small chibi body (shirt + arms) */
-const ChibiBody = ({ cx, cy, shirtColor }: { cx: number; cy: number; shirtColor: string }) => (
-  <g>
-    <path d={`M${cx-9} ${cy} Q${cx-10} ${cy+18} ${cx-6} ${cy+24} Q${cx} ${cy+27} ${cx+6} ${cy+24} Q${cx+10} ${cy+18} ${cx+9} ${cy}Z`} fill={shirtColor}/>
-    <path d={`M${cx-9} ${cy+2} Q${cx-16} ${cy+7} ${cx-14} ${cy+15}`} stroke="#fde8d0" strokeWidth="5" fill="none" strokeLinecap="round"/>
-    <path d={`M${cx+9} ${cy+2} Q${cx+16} ${cy+7} ${cx+14} ${cy+15}`} stroke="#fde8d0" strokeWidth="5" fill="none" strokeLinecap="round"/>
-  </g>
-);
-
-/* ── Pair 1: Blonde boy + dark twintail girl + white cat (closest to reference) */
-const AvatarPair1 = () => (
-  <svg viewBox="0 0 80 72" xmlns="http://www.w3.org/2000/svg" width="80" height="72">
-    {/* Boy (left) */}
-    <ChibiBody cx={21} cy={42} shirtColor="#6699ee"/>
-    <ChibiHead cx={21} cy={27} hairColor="#f0c840" hairStyle="short" eyeColor="#4488cc"/>
-    {/* Girl (right) */}
-    <ChibiBody cx={57} cy={42} shirtColor="#ffaacc"/>
-    <ChibiHead cx={57} cy={27} hairColor="#5a3010" hairStyle="twintail" eyeColor="#cc6688"/>
-    {/* Yellow dress skirt on girl */}
-    <path d="M48 55 Q57 62 66 55 Q63 68 57 70 Q51 68 48 55Z" fill="#ffcc44"/>
-    {/* Cat in middle */}
-    <ellipse cx="39" cy="60" rx="9" ry="7" fill="#f8f0e8"/>
-    <circle cx="39" cy="55" r="7" fill="#f8f0e8"/>
-    <polygon points="33,51 35,44 38,51" fill="#f8f0e8"/>
-    <polygon points="45,51 43,44 40,51" fill="#f8f0e8"/>
-    <polygon points="34,51 35,46 37.5,51" fill="#ffc0c0"/>
-    <polygon points="44,51 43,46 40.5,51" fill="#ffc0c0"/>
-    <ellipse cx="37" cy="56.5" rx="1.8" ry="2.2" fill="#333"/>
-    <ellipse cx="41" cy="56.5" rx="1.8" ry="2.2" fill="#333"/>
-    <circle cx="37.3" cy="55.8" r="0.7" fill="white"/>
-    <circle cx="41.3" cy="55.8" r="0.7" fill="white"/>
-    <ellipse cx="39" cy="59" rx="2" ry="1.2" fill="#e09090"/>
-    <line x1="32" y1="58" x2="39" y2="59.5" stroke="#aaa" strokeWidth="0.7"/>
-    <line x1="32" y1="60" x2="39" y2="60.5" stroke="#aaa" strokeWidth="0.7"/>
-    <line x1="46" y1="58" x2="39" y2="59.5" stroke="#aaa" strokeWidth="0.7"/>
-    <line x1="46" y1="60" x2="39" y2="60.5" stroke="#aaa" strokeWidth="0.7"/>
-    {/* Blonde boy hair accessories - small star */}
-    <circle cx="21" cy="14" r="2.5" fill="#ffd700" stroke="#e0b000" strokeWidth="0.8"/>
+/* ─── Marina chibi portrait SVG ─────────────────────────────────────────── */
+const MarinaPortrait = () => (
+  <svg viewBox="0 0 56 68" width="56" height="68" xmlns="http://www.w3.org/2000/svg">
+    {/* Sky background */}
+    <rect x="0" y="0" width="56" height="68" fill="#c0e8ff"/>
+    <rect x="0" y="42" width="56" height="26" fill="#90c870"/>
+    {/* Back hair */}
+    <ellipse cx="28" cy="28" rx="21" ry="20" fill="#ff5baa"/>
+    {/* Long side hair left */}
+    <path d="M8,32 Q3,50 6,66" stroke="#ff5baa" strokeWidth="10" fill="none" strokeLinecap="round"/>
+    {/* Long side hair right */}
+    <path d="M48,32 Q53,50 50,66" stroke="#ff5baa" strokeWidth="10" fill="none" strokeLinecap="round"/>
+    {/* Neck + body */}
+    <rect x="22" y="44" width="12" height="12" rx="3" fill="#fde8d0"/>
+    <path d="M16,56 Q22,52 28,54 Q34,52 40,56 Q38,68 28,68 Q18,68 16,56Z" fill="#e86888"/>
+    {/* Head */}
+    <ellipse cx="28" cy="28" rx="17" ry="18" fill="#fde8d0"/>
+    {/* Fringe bangs */}
+    <path d="M11,26 Q14,10 28,10 Q42,10 45,26 Q38,16 28,17 Q18,16 11,26Z" fill="#ff5baa"/>
+    {/* Side fringe pieces */}
+    <path d="M11,26 Q8,30 10,36" stroke="#ff5baa" strokeWidth="5" fill="none" strokeLinecap="round"/>
+    <path d="M45,26 Q48,30 46,36" stroke="#ff5baa" strokeWidth="5" fill="none" strokeLinecap="round"/>
+    {/* Eyes — big sparkly */}
+    <ellipse cx="20" cy="29" rx="5" ry="6" fill="white"/>
+    <ellipse cx="36" cy="29" rx="5" ry="6" fill="white"/>
+    <ellipse cx="20" cy="30" rx="3.5" ry="4.5" fill="#2244cc"/>
+    <ellipse cx="36" cy="30" rx="3.5" ry="4.5" fill="#2244cc"/>
+    <circle cx="20" cy="29.5" r="2.2" fill="#111"/>
+    <circle cx="36" cy="29.5" r="2.2" fill="#111"/>
+    <circle cx="21.2" cy="28.2" r="1.1" fill="white"/>
+    <circle cx="37.2" cy="28.2" r="1.1" fill="white"/>
+    <circle cx="19.2" cy="30.8" r="0.6" fill="rgba(255,255,255,0.7)"/>
+    <circle cx="35.2" cy="30.8" r="0.6" fill="rgba(255,255,255,0.7)"/>
+    {/* Eyelashes */}
+    <path d="M15,24 Q17,22 20,23" stroke="#333" strokeWidth="1.1" fill="none"/>
+    <path d="M31,24 Q33,22 36,23" stroke="#333" strokeWidth="1.1" fill="none"/>
+    {/* Blush */}
+    <ellipse cx="13" cy="33" rx="4" ry="2.2" fill="#ff8888" opacity="0.5"/>
+    <ellipse cx="43" cy="33" rx="4" ry="2.2" fill="#ff8888" opacity="0.5"/>
+    {/* Nose */}
+    <circle cx="28" cy="35" r="1.2" fill="#e0b090" opacity="0.6"/>
+    {/* Smile */}
+    <path d="M22,40 Q28,45 34,40" stroke="#cc4466" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
+    {/* Hair accessories — star clips */}
+    <polygon points="38,15 39.4,18.2 42.8,18.2 40.1,20.2 41.1,23.5 38,21.5 34.9,23.5 35.9,20.2 33.2,18.2 36.6,18.2"
+             fill="#ffe040" stroke="#e0b000" strokeWidth="0.6"/>
+    <circle cx="38" cy="19.5" r="1.5" fill="white" opacity="0.5"/>
   </svg>
 );
 
-/* ── Pair 2: Blue spiky boy + pink wavy girl + orange fox */
-const AvatarPair2 = () => (
-  <svg viewBox="0 0 80 72" xmlns="http://www.w3.org/2000/svg" width="80" height="72">
-    <ChibiBody cx={21} cy={42} shirtColor="#ee6644"/>
-    <ChibiHead cx={21} cy={27} hairColor="#4488dd" hairStyle="spiky" eyeColor="#223388"/>
-    <ChibiBody cx={57} cy={42} shirtColor="#cc88ee"/>
-    <ChibiHead cx={57} cy={27} hairColor="#ff88bb" hairStyle="wavy" eyeColor="#8844cc"/>
-    {/* Purple skirt on girl */}
-    <path d="M48 55 Q57 62 66 55 Q63 68 57 70 Q51 68 48 55Z" fill="#cc88ee"/>
-    {/* Pink hair bow */}
-    <path d="M50 18 Q57 13 64 18 Q57 23 50 18Z" fill="#ff88bb" stroke="#ff5599" strokeWidth="0.6"/>
-    <circle cx="57" cy="18" r="2.2" fill="#ff66aa"/>
-    {/* Fox */}
-    <ellipse cx="39" cy="61" rx="9" ry="6.5" fill="#e87820"/>
-    <circle cx="39" cy="55" r="7" fill="#e87820"/>
-    <polygon points="33,51 35,43 38,51" fill="#e87820"/>
-    <polygon points="45,51 43,43 40,51" fill="#e87820"/>
-    <circle cx="39" cy="57" r="4" fill="#f8d8c0"/>
-    <ellipse cx="36.5" cy="56" rx="1.6" ry="2" fill="#111"/>
-    <ellipse cx="41.5" cy="56" rx="1.6" ry="2" fill="#111"/>
-    <circle cx="36.8" cy="55.3" r="0.6" fill="white"/>
-    <circle cx="41.8" cy="55.3" r="0.6" fill="white"/>
-    <ellipse cx="39" cy="58.5" rx="1.8" ry="1.1" fill="#c06040"/>
-    {/* Bushy tail */}
-    <path d="M48 62 Q58 56 60 64 Q55 70 48 64Z" fill="#e87820"/>
-    <path d="M52 63 Q58 58 59 65 Q55 69 52 64Z" fill="white" opacity="0.8"/>
+/* ─── Blank player card portrait ─────────────────────────────────────────── */
+const PlayerPortrait = () => (
+  <svg viewBox="0 0 56 68" width="56" height="68" xmlns="http://www.w3.org/2000/svg">
+    {/* Background */}
+    <rect x="0" y="0" width="56" height="68" fill="#b0d8f0"/>
+    <rect x="0" y="44" width="56" height="24" fill="#88b858"/>
+    {/* Silhouette person */}
+    <circle cx="28" cy="24" r="12" fill="rgba(80,100,140,0.35)"/>
+    <path d="M10,68 Q14,44 28,42 Q42,44 46,68Z" fill="rgba(80,100,140,0.30)"/>
+    {/* Dashed border hint */}
+    <rect x="4" y="4" width="48" height="60" rx="3" fill="none"
+          stroke="rgba(255,255,255,0.55)" strokeWidth="1.5" strokeDasharray="4 3"/>
+    {/* Plus icon */}
+    <rect x="25" y="18" width="6" height="18" rx="2" fill="rgba(255,255,255,0.65)"/>
+    <rect x="19" y="24" width="18" height="6" rx="2" fill="rgba(255,255,255,0.65)"/>
   </svg>
 );
 
-/* ── Pair 3: Brown boy + red-ponytail girl + yellow duck */
-const AvatarPair3 = () => (
-  <svg viewBox="0 0 80 72" xmlns="http://www.w3.org/2000/svg" width="80" height="72">
-    <ChibiBody cx={21} cy={42} shirtColor="#66bb55"/>
-    <ChibiHead cx={21} cy={27} hairColor="#8b5a2b" hairStyle="short" eyeColor="#6b8c40"/>
-    <ChibiBody cx={57} cy={42} shirtColor="#ff8844"/>
-    <ChibiHead cx={57} cy={27} hairColor="#cc3322" hairStyle="ponytail" eyeColor="#882200"/>
-    {/* Orange skirt */}
-    <path d="M48 55 Q57 62 66 55 Q63 68 57 70 Q51 68 48 55Z" fill="#ffaa44"/>
-    {/* Duck */}
-    <ellipse cx="39" cy="62" rx="9" ry="6" fill="#f8e840"/>
-    <circle cx="39" cy="55.5" r="7" fill="#f8e840"/>
-    <path d="M32 56 Q28 59 32 60 Q30 62 33 61Z" fill="#f09820"/>
-    <ellipse cx="36.5" cy="55.5" rx="2" ry="2.2" fill="#224488"/>
-    <ellipse cx="41.5" cy="55.5" rx="2" ry="2.2" fill="#224488"/>
-    <circle cx="36.8" cy="54.8" r="0.7" fill="white"/>
-    <circle cx="41.8" cy="54.8" r="0.7" fill="white"/>
-    {/* Wing */}
-    <path d="M30 62 Q35 67 44 64 Q44 70 38 70 Q30 69 30 62Z" fill="#f0d820"/>
-    {/* Head tuft */}
-    <path d="M37 50 Q39 46 41 50" stroke="#f0d820" strokeWidth="3" fill="none" strokeLinecap="round"/>
-  </svg>
-);
-
-/* ── Pair 4: Silver boy + purple girl + white bunny */
-const AvatarPair4 = () => (
-  <svg viewBox="0 0 80 72" xmlns="http://www.w3.org/2000/svg" width="80" height="72">
-    <ChibiBody cx={21} cy={42} shirtColor="#6688cc"/>
-    <ChibiHead cx={21} cy={27} hairColor="#c8cce0" hairStyle="short" eyeColor="#8899cc"/>
-    <ChibiBody cx={57} cy={42} shirtColor="#aaeedd"/>
-    <ChibiHead cx={57} cy={27} hairColor="#8855cc" hairStyle="bob" eyeColor="#5533aa"/>
-    {/* Mint skirt */}
-    <path d="M48 55 Q57 62 66 55 Q63 68 57 70 Q51 68 48 55Z" fill="#88ddcc"/>
-    {/* Purple hair bow */}
-    <path d="M50 19 Q57 14 64 19 Q57 24 50 19Z" fill="#8855cc" stroke="#6633aa" strokeWidth="0.6"/>
-    <circle cx="57" cy="19" r="2.2" fill="#6633bb"/>
-    {/* Bunny */}
-    <ellipse cx="39" cy="62" rx="8" ry="6" fill="white"/>
-    <circle cx="39" cy="56" r="7" fill="white"/>
-    {/* Ears */}
-    <ellipse cx="34" cy="48" rx="3" ry="7" fill="white"/>
-    <ellipse cx="44" cy="48" rx="3" ry="7" fill="white"/>
-    <ellipse cx="34" cy="48" rx="1.5" ry="5.5" fill="#ffbbcc"/>
-    <ellipse cx="44" cy="48" rx="1.5" ry="5.5" fill="#ffbbcc"/>
-    <ellipse cx="37" cy="57.5" rx="1.8" ry="2" fill="#333"/>
-    <ellipse cx="41" cy="57.5" rx="1.8" ry="2" fill="#333"/>
-    <circle cx="37.3" cy="56.8" r="0.6" fill="white"/>
-    <circle cx="41.3" cy="56.8" r="0.6" fill="white"/>
-    <ellipse cx="39" cy="60" rx="2" ry="1.2" fill="#ffaacc"/>
-    <line x1="33" y1="59.5" x2="39" y2="60.5" stroke="#ccc" strokeWidth="0.7"/>
-    <line x1="33" y1="61" x2="39" y2="61.5" stroke="#ccc" strokeWidth="0.7"/>
-    <line x1="45" y1="59.5" x2="39" y2="60.5" stroke="#ccc" strokeWidth="0.7"/>
-    <line x1="45" y1="61" x2="39" y2="61.5" stroke="#ccc" strokeWidth="0.7"/>
-  </svg>
-);
-
-const ADD_NEIGHBOR_AVATARS = [
-  { avatar: <AvatarPair1 />, bg: 'linear-gradient(160deg, #a8d888 0%, #78c048 100%)' },
-  { avatar: <AvatarPair2 />, bg: 'linear-gradient(160deg, #a0d8a0 0%, #68b858 100%)' },
-  { avatar: <AvatarPair3 />, bg: 'linear-gradient(160deg, #b0d890 0%, #70b840 100%)' },
-  { avatar: <AvatarPair4 />, bg: 'linear-gradient(160deg, #a8e0a0 0%, #60b850 100%)' },
-];
-
-/* ─── Neighbor portrait component ───────────────────────────────────────── */
-const NeighborPortrait = ({
-  n, onVisit, onHire, onHover, onLeave, isHovered, ownedCollections, dispatch, toast,
-}: any) => (
+/* ─── Neighbour card (shared frame for Player and Marina) ────────────────── */
+interface NeighbourCardProps {
+  portrait: React.ReactNode;
+  name: string;
+  hearts: number;
+  stars: number;
+  onClick?: () => void;
+}
+const NeighbourCard = ({ portrait, name, hearts, stars, onClick }: NeighbourCardProps) => (
   <div
-    className="relative flex flex-col items-center"
-    onMouseEnter={() => onHover(n.id)}
-    onMouseLeave={onLeave}
+    className="flex flex-col items-center shrink-0 cursor-pointer"
+    style={{ width: 72 }}
+    onClick={onClick}
   >
-    {/* Golden frame portrait */}
+    {/* Golden frame */}
     <div
-      className="relative w-[68px] h-[72px] flex flex-col items-center justify-end pb-1 cursor-pointer"
-      onClick={() => onVisit(n)}
+      className="relative overflow-hidden"
       style={{
-        background: 'linear-gradient(180deg, #d4a020 0%, #a87010 40%, #d4a020 100%)',
-        borderRadius: '50% 50% 8px 8px',
+        width: 68,
+        height: 72,
+        borderRadius: '50% 50% 10px 10px',
         border: '3px solid #8a5808',
-        boxShadow: '0 4px 8px rgba(0,0,0,0.4), inset 0 1px 2px rgba(255,220,80,0.6)',
+        background: 'linear-gradient(180deg, #d4a020 0%, #a07010 40%, #d4a020 100%)',
+        boxShadow: '0 4px 10px rgba(0,0,0,0.45), inset 0 1px 3px rgba(255,220,80,0.6)',
       }}
     >
-      {/* Inner portrait area */}
+      {/* Portrait inset */}
       <div
-        className="absolute inset-[3px] rounded-[50%_50%_5px_5px] overflow-hidden flex items-center justify-center"
-        style={{ background: 'linear-gradient(180deg, #c0e8ff 0%, #70b0e0 50%, #a0d060 100%)' }}
+        className="absolute overflow-hidden flex items-center justify-center"
+        style={{
+          inset: 3,
+          borderRadius: '50% 50% 7px 7px',
+        }}
       >
-        {typeof n.avatar === 'string' && n.avatar.startsWith('/') ? (
-          <img src={n.avatar} alt={n.name ?? ''} className="w-full h-full object-cover" />
-        ) : (
-          <span className="text-4xl">{n.avatar ?? '🧑'}</span>
-        )}
+        {portrait}
       </div>
-      {/* Level badge */}
+      {/* Top sheen */}
       <div
-        className="absolute -bottom-1.5 left-1 text-[10px] font-black text-white w-5 h-5 rounded-full flex items-center justify-center border-2 border-white z-10"
-        style={{ background: n.level >= 5 ? '#e04020' : '#20a040' }}
-      >
-        {n.level}
-      </div>
-      {/* Stars */}
-      <div className="absolute -bottom-1.5 right-1 z-10 flex">
-        {'⭐'.repeat(Math.min(n.level, 3)).split('').map((s, i) => (
-          <span key={i} style={{ fontSize: 8, marginLeft: -1 }}>⭐</span>
-        ))}
-      </div>
+        className="absolute top-0 left-0 right-0 pointer-events-none"
+        style={{
+          height: '40%',
+          borderRadius: '50% 50% 0 0',
+          background: 'linear-gradient(180deg, rgba(255,255,255,0.28) 0%, transparent 100%)',
+        }}
+      />
     </div>
+
+    {/* Name label */}
     <span
-      className="mt-2 text-[10px] font-bold text-center leading-tight"
-      style={{ color: '#f5e8c0', textShadow: '0 1px 2px rgba(0,0,0,0.6)', maxWidth: 68 }}
+      className="mt-1 text-[10px] font-black text-center leading-none"
+      style={{ color: '#f5e8c0', textShadow: '0 1px 2px rgba(0,0,0,0.7)', maxWidth: 68 }}
     >
-      {(n.name ?? '?').replace('Tropical', '').replace('Coconut', '').replace('Island', '')}
+      {name}
     </span>
 
-    {/* Hire button below name */}
-    <button
-      onClick={(e) => { e.stopPropagation(); onHire(n); }}
-      className="mt-0.5 text-[9px] font-black px-2 py-0.5 rounded border active:scale-95 transition-transform"
-      style={{
-        background: 'linear-gradient(180deg, #50cc30, #289010)',
-        borderColor: '#186808',
-        borderBottomWidth: 2,
-        color: 'white',
-      }}
-    >
-      Hire
-    </button>
-
-    {/* ◄ ► arrows beside portrait */}
-    <div className="absolute -left-3 top-6">
-      <div
-        className="w-3 h-3 rounded-sm flex items-center justify-center text-[10px] font-black text-white cursor-pointer"
-        style={{ background: '#506080' }}
-      >◄</div>
+    {/* Heart badges row */}
+    <div className="flex items-center gap-0.5 mt-0.5">
+      {Array.from({ length: Math.min(hearts, 3) }).map((_, i) => (
+        <div
+          key={i}
+          className="flex items-center justify-center"
+          style={{
+            width: 16, height: 16,
+            background: 'linear-gradient(180deg, #e84444, #a81818)',
+            borderRadius: '50% 50% 48% 48%',
+            border: '1.5px solid #7a1010',
+            boxShadow: '0 2px 4px rgba(0,0,0,0.35)',
+          }}
+        >
+          <span style={{ fontSize: 8, color: 'white', fontWeight: 900, lineHeight: 1 }}>{i + 1}</span>
+        </div>
+      ))}
+      {/* Stars */}
+      {Array.from({ length: Math.min(stars, 3) }).map((_, i) => (
+        <span key={`s${i}`} style={{ fontSize: 9 }}>⭐</span>
+      ))}
     </div>
-    <div className="absolute -right-3 top-6">
-      <div
-        className="w-3 h-3 rounded-sm flex items-center justify-center text-[10px] font-black text-white cursor-pointer"
-        style={{ background: '#506080' }}
-      >►</div>
-    </div>
+  </div>
+);
 
-    {/* Wishlist popover */}
-    {isHovered && n.wishlist?.length > 0 && (
-      <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 w-44 bg-white border-4 border-pink-400 rounded-xl p-3 shadow-2xl z-50 animate-in fade-in slide-in-from-bottom-2">
-        <div className="text-center font-black text-pink-500 text-xs uppercase tracking-wider mb-2">Wishlist</div>
-        {n.wishlist.map((itemId: string) => {
-          const item = COLLECTIONS.find((c) => c.id === itemId);
-          if (!item) return null;
-          const has = ownedCollections[itemId];
-          return (
-            <div key={itemId} className="flex items-center justify-between gap-1 bg-gray-50 p-1 rounded mb-1 border border-gray-200">
-              <span className="text-base">{item.emoji}</span>
-              <span className="text-[10px] font-bold text-gray-600 flex-1 ml-1">{item.name}</span>
-              {has && (
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    dispatch({ type: 'GIFT_ITEM', itemId, neighborId: n.id });
-                    toast({ title: 'Gift Sent! 🎁', description: `+5 Favor` });
-                  }}
-                  className="bg-pink-500 text-white text-[9px] px-1.5 py-0.5 rounded font-bold active:scale-95"
-                >
-                  Send
-                </button>
-              )}
-            </div>
-          );
-        })}
-        <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-3 h-3 bg-pink-400 rotate-45" />
-      </div>
-    )}
+/* ─── Nav arrow button ───────────────────────────────────────────────────── */
+const NavArrow = ({ label }: { label: string }) => (
+  <div
+    className="flex items-center justify-center cursor-pointer active:scale-95 transition-transform select-none"
+    style={{
+      width: 22,
+      height: 19,
+      background: 'linear-gradient(180deg, #8090a8, #506070)',
+      border: '1.5px solid #304050',
+      borderBottomWidth: 3,
+      borderRadius: 4,
+      color: 'white',
+      fontSize: 11,
+      fontWeight: 900,
+    }}
+  >
+    {label}
+  </div>
+);
+
+/* ─── Market item cell ───────────────────────────────────────────────────── */
+const MarketCell = ({ emoji, bg }: { emoji: string; bg: string }) => (
+  <div
+    className="flex items-center justify-center cursor-pointer active:scale-95 transition-transform"
+    style={{
+      width: 36, height: 34,
+      background: bg,
+      border: '2px solid #7a5010',
+      borderBottomWidth: 3,
+      borderRadius: 6,
+    }}
+  >
+    <span style={{ fontSize: 18 }}>{emoji}</span>
+  </div>
+);
+
+/* ─── Top icon button ────────────────────────────────────────────────────── */
+const TopIcon = ({ icon, bg, title }: { icon: string; bg: string; title?: string }) => (
+  <div
+    title={title}
+    className="flex items-center justify-center cursor-pointer active:scale-95 transition-transform"
+    style={{
+      width: 26, height: 24,
+      background: bg,
+      border: '1.5px solid #3a2000',
+      borderBottomWidth: 3,
+      borderRadius: 5,
+      fontSize: 13,
+    }}
+  >
+    {icon}
   </div>
 );
 
 /* ─── Main bottom bar ────────────────────────────────────────────────────── */
-export const NeighborPanel = () => {
+interface NeighborPanelProps {
+  playerName?: string;
+  playerLevel?: number;
+}
+
+export const NeighborPanel = ({ playerName = 'Player', playerLevel = 1 }: NeighborPanelProps) => {
   const { state, dispatch, activeTool, setActiveTool, activeBuildItem, setActiveBuildItem, setShopOpen } = useGame();
   const { toast } = useToast();
-  const [hovered, setHovered] = useState<string | null>(null);
 
   const ownedStructures = ['HUT','DOCK','WELL','FLOWER_POT','FENCE','LANTERN'].filter(
     (i) => (state.inventory[i as ResourceType] || 0) > 0
@@ -338,203 +240,205 @@ export const NeighborPanel = () => {
     toast({ title: `${n.name} is helping! +3 ⚡`, duration: 2000 });
   };
 
+  // Marina is always the first (and only) neighbour
+  const marina = state.neighbors?.find(n => n.id === 'n1');
+
   return (
     <div
       className="absolute bottom-0 left-0 right-0 z-30 flex items-stretch select-none"
       style={{
         height: 96,
-        background: 'linear-gradient(180deg, #9a7a50 0%, #7a5a30 100%)',
+        background: 'linear-gradient(180deg, #b89a6a 0%, #8a6a3a 100%)',
         borderTop: '3px solid #5a3a10',
-        boxShadow: '0 -4px 12px rgba(0,0,0,0.5)',
+        boxShadow: '0 -4px 14px rgba(0,0,0,0.55)',
         fontFamily: "'Fredoka', sans-serif",
       }}
     >
-      {/* ── LEFT: island name + icons ── */}
+      {/* ── LEFT: island name + ?/chat/⚙ icons ── */}
       <div
         className="flex flex-col justify-center px-3 shrink-0"
         style={{
-          minWidth: 110,
+          minWidth: 112,
           borderRight: '2px solid #5a3a10',
           background: 'linear-gradient(180deg, #7a6040 0%, #5a4020 100%)',
         }}
       >
-        <span className="text-white font-black text-sm leading-tight drop-shadow">{state.level > 1 ? `Lv${state.level}` : ''}</span>
+        <span className="text-white font-black text-sm leading-tight drop-shadow">
+          {playerLevel > 1 ? `Lv${playerLevel}` : ''}
+        </span>
         <span
           className="font-black text-xs leading-tight"
           style={{ color: '#ffd060', textShadow: '0 1px 3px rgba(0,0,0,0.7)' }}
         >
-          Player's Island
+          {playerName}'s Island
         </span>
         <div className="flex gap-1 mt-1">
-          {[['?','#4080c0'],['💬','#40a060'],['⚙️','#806040']].map(([icon, bg]) => (
-            <div
-              key={icon}
-              className="w-6 h-6 flex items-center justify-center rounded text-xs cursor-pointer active:scale-95 transition-transform border"
-              style={{ background: bg as string, borderColor: '#2a1a00', borderBottomWidth: 2 }}
-            >
-              {icon}
-            </div>
-          ))}
+          <TopIcon icon="?" bg="#3070c0" title="Help"/>
+          <TopIcon icon="💬" bg="#30a060" title="Chat"/>
+          <TopIcon icon="⚙️" bg="#806040" title="Settings"/>
         </div>
       </div>
 
-      {/* ── CENTER: scroll arrows + ADD NEIGHBOR + neighbor portraits ── */}
-      <div className="flex items-center flex-1 overflow-hidden px-1 gap-1">
-        {/* Left arrow */}
-        <button
-          className="w-7 h-20 rounded flex items-center justify-center text-white font-black text-lg shrink-0 active:scale-95 transition-transform border-b-2"
-          style={{ background: 'linear-gradient(180deg, #708090, #4a5a6a)', borderColor: '#2a3a4a' }}
-        >
-          ◄
-        </button>
+      {/* ── NEIGHBOUR CARDS: Player + Marina ── */}
+      <div
+        className="flex items-center gap-2 px-3 shrink-0"
+        style={{ borderRight: '2px solid #5a3a10' }}
+      >
+        {/* Player card */}
+        <NeighbourCard
+          portrait={<PlayerPortrait />}
+          name={playerName}
+          hearts={2}
+          stars={1}
+        />
 
-        {/* ADD NEIGHBOR slots */}
-        {ADD_NEIGHBOR_AVATARS.map(({ avatar, bg }, idx) => (
+        {/* Marina card */}
+        {marina && (
+          <div className="flex flex-col items-center gap-1">
+            <NeighbourCard
+              portrait={<MarinaPortrait />}
+              name="Marina"
+              hearts={3}
+              stars={2}
+              onClick={() => handleVisit(marina)}
+            />
+            {/* Hire button */}
+            <button
+              onClick={() => handleHire(marina)}
+              className="text-[9px] font-black px-2 py-0.5 rounded border active:scale-95 transition-transform"
+              style={{
+                background: 'linear-gradient(180deg, #50cc30, #289010)',
+                borderColor: '#186808',
+                borderBottomWidth: 2,
+                color: 'white',
+                marginTop: -4,
+              }}
+            >
+              Hire
+            </button>
+          </div>
+        )}
+      </div>
+
+      {/* ── NAV ARROWS (4 stacked) ── */}
+      <div
+        className="flex flex-col items-center justify-center gap-1 px-2 shrink-0"
+        style={{ borderRight: '2px solid #5a3a10' }}
+      >
+        <NavArrow label="◄"/>
+        <NavArrow label="◄"/>
+        <NavArrow label="◄"/>
+        <NavArrow label="◄"/>
+      </div>
+
+      {/* ── TOOLS column ── */}
+      <div className="flex flex-col items-center justify-center gap-1 px-2 shrink-0"
+        style={{ borderRight: '2px solid #5a3a10' }}
+      >
+        {/* Build tray popup */}
+        {activeTool === 'build' && (
           <div
-            key={idx}
-            className="flex flex-col items-center justify-end shrink-0 cursor-pointer rounded-lg overflow-hidden active:scale-95 transition-transform relative"
+            className="absolute bottom-[100px] right-[168px] bg-[#5a3a10] p-2 rounded-xl flex gap-2 border-4 border-[#3a1a00] shadow-2xl z-50"
+          >
+            {ownedStructures.length === 0 ? (
+              <span className="text-yellow-200 text-xs font-bold px-2 py-1">Buy in Shop!</span>
+            ) : (
+              ownedStructures.map((item) => (
+                <button
+                  key={item}
+                  onClick={() => setActiveBuildItem(item as any)}
+                  className="w-12 h-12 rounded-lg border-3 flex items-center justify-center relative active:scale-95"
+                  style={{
+                    background: activeBuildItem === item ? '#f5c842' : '#fff5d7',
+                    border: `3px solid ${activeBuildItem === item ? '#d4a020' : '#c0a070'}`,
+                  }}
+                >
+                  <span className="text-2xl">{EMOJI_MAP[item]}</span>
+                  <span className="absolute -top-2 -right-2 bg-red-500 text-white text-[9px] font-black px-1 rounded-full border border-white">
+                    {state.inventory[item as ResourceType]}
+                  </span>
+                </button>
+              ))
+            )}
+          </div>
+        )}
+
+        {[
+          { tool: 'clear' as const,  label: '👆', title: 'Pointer' },
+          { tool: 'plant' as const,  label: '🌱', title: 'Plant'   },
+          { tool: 'build' as const,  label: '🔨', title: 'Build'   },
+        ].map(({ tool, label, title }) => (
+          <button
+            key={tool}
+            title={title}
+            onClick={() => {
+              setActiveTool(tool);
+              if (tool === 'build' && !activeBuildItem && ownedStructures.length > 0) {
+                setActiveBuildItem(ownedStructures[0] as any);
+              }
+            }}
+            className="w-10 h-10 rounded-lg flex items-center justify-center text-xl active:scale-95 transition-transform border-b-2"
             style={{
-              width: 84,
-              height: 90,
-              background: bg,
-              border: '3px solid #3a8a2a',
-              boxShadow: '0 3px 8px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.3)',
+              background: activeTool === tool
+                ? 'linear-gradient(180deg, #ffe860, #d4a020)'
+                : 'linear-gradient(180deg, #b09060, #806040)',
+              borderColor: activeTool === tool ? '#a07010' : '#3a2000',
+              boxShadow: activeTool === tool ? '0 0 8px rgba(255,200,0,0.6)' : 'none',
             }}
           >
-            {/* Inner highlight rim */}
-            <div className="absolute inset-0 rounded-lg pointer-events-none" style={{ boxShadow: 'inset 0 2px 4px rgba(255,255,255,0.35)' }}/>
-            <div className="absolute inset-0 flex items-center justify-center overflow-hidden" style={{ paddingBottom: 18 }}>
-              {avatar}
-            </div>
-            <div
-              className="w-full flex flex-col items-center justify-center py-1 relative z-10"
-              style={{ background: 'linear-gradient(180deg, #2a7018, #1e5810)', borderTop: '2px solid #1a4810' }}
-            >
-              <span className="text-white font-black text-[9px] leading-none tracking-widest uppercase">Add</span>
-              <span className="text-white font-black text-[9px] leading-none tracking-widest uppercase">Neighbor</span>
-            </div>
-          </div>
+            {label}
+          </button>
         ))}
-
-        {/* Neighbor portraits */}
-        {state.neighbors?.map((n) => (
-          <NeighborPortrait
-            key={n.id}
-            n={n}
-            onVisit={handleVisit}
-            onHire={handleHire}
-            onHover={setHovered}
-            onLeave={() => setHovered(null)}
-            isHovered={hovered === n.id}
-            ownedCollections={state.collections}
-            dispatch={dispatch}
-            toast={toast}
-          />
-        ))}
-
-        {/* Right arrow */}
-        <button
-          className="w-7 h-20 rounded flex items-center justify-center text-white font-black text-lg shrink-0 active:scale-95 transition-transform border-b-2 ml-2"
-          style={{ background: 'linear-gradient(180deg, #708090, #4a5a6a)', borderColor: '#2a3a4a' }}
-        >
-          ►
-        </button>
       </div>
 
-      {/* ── RIGHT: tool buttons + market ── */}
+      {/* ── RIGHT: MARKET label + grid ── */}
       <div
-        className="flex shrink-0"
+        className="flex flex-col shrink-0"
         style={{
+          background: 'linear-gradient(180deg, #7a6040 0%, #5a4020 100%)',
           borderLeft: '2px solid #5a3a10',
-          background: 'linear-gradient(180deg, #6a5030 0%, #4a3010 100%)',
         }}
       >
-        {/* Tools column */}
-        <div className="flex flex-col items-center justify-center gap-1 px-2 border-r border-[#5a3a10]">
-          {/* Build tray popup */}
-          {activeTool === 'build' && (
-            <div
-              className="absolute bottom-[100px] right-[168px] bg-[#5a3a10] p-2 rounded-xl flex gap-2 border-4 border-[#3a1a00] shadow-2xl z-50"
+        {/* Top row: MARKET label + big button */}
+        <div className="flex items-stretch flex-1">
+          {/* Market big button */}
+          <div className="flex flex-col items-center justify-start pt-1 px-1.5" style={{ width: 90 }}>
+            <span
+              className="text-[10px] font-black text-yellow-200 tracking-widest mb-0.5"
+              style={{ textShadow: '0 1px 2px rgba(0,0,0,0.6)' }}
             >
-              {ownedStructures.length === 0 ? (
-                <span className="text-yellow-200 text-xs font-bold px-2 py-1">Buy in Shop!</span>
-              ) : (
-                ownedStructures.map((item) => (
-                  <button
-                    key={item}
-                    onClick={() => setActiveBuildItem(item as any)}
-                    className="w-12 h-12 rounded-lg border-3 flex items-center justify-center relative active:scale-95"
-                    style={{
-                      background: activeBuildItem === item ? '#f5c842' : '#fff5d7',
-                      border: `3px solid ${activeBuildItem === item ? '#d4a020' : '#c0a070'}`,
-                    }}
-                  >
-                    <span className="text-2xl">{EMOJI_MAP[item]}</span>
-                    <span className="absolute -top-2 -right-2 bg-red-500 text-white text-[9px] font-black px-1 rounded-full border border-white">
-                      {state.inventory[item as ResourceType]}
-                    </span>
-                  </button>
-                ))
-              )}
-            </div>
-          )}
-
-          {[
-            { tool: 'clear' as const,  label: '👆', title: 'Pointer' },
-            { tool: 'plant' as const,  label: '🌱', title: 'Plant'   },
-            { tool: 'build' as const,  label: '🔨', title: 'Build'   },
-          ].map(({ tool, label, title }) => (
+              MARKET
+            </span>
             <button
-              key={tool}
-              title={title}
-              onClick={() => {
-                setActiveTool(tool);
-                if (tool === 'build' && !activeBuildItem && ownedStructures.length > 0) {
-                  setActiveBuildItem(ownedStructures[0] as any);
-                }
-              }}
-              className="w-10 h-10 rounded-lg flex items-center justify-center text-xl active:scale-95 transition-transform border-b-2"
-              style={{
-                background: activeTool === tool
-                  ? 'linear-gradient(180deg, #ffe860, #d4a020)'
-                  : 'linear-gradient(180deg, #b09060, #806040)',
-                borderColor: activeTool === tool ? '#a07010' : '#3a2000',
-                boxShadow: activeTool === tool ? '0 0 8px rgba(255,200,0,0.6)' : 'none',
-              }}
+              onClick={() => setShopOpen(true)}
+              className="w-[78px] h-[56px] rounded-lg overflow-hidden border-2 active:scale-95 transition-transform relative"
+              style={{ borderColor: '#c0901a', background: '#8b6020' }}
+              title="Open Market"
             >
-              {label}
+              <div className="absolute inset-0" style={{ background: 'linear-gradient(180deg, #a8d868 0%, #70a028 50%, #c8a050 100%)' }}/>
+              <div className="absolute top-0 left-0 right-0 h-4 flex items-center justify-center"
+                style={{ background: 'linear-gradient(180deg, #d4a020, #a07010)', borderBottom: '1px solid #604000' }}>
+                <span className="text-[8px] font-black text-yellow-100">🏪 SHOP</span>
+              </div>
+              <div className="absolute bottom-1 left-0 right-0 flex flex-wrap justify-center gap-0.5 px-1">
+                {['🍎','🌽','🥥','🍅','🥚','🫐'].map((e, i) => (
+                  <span key={i} style={{ fontSize: 10 }}>{e}</span>
+                ))}
+              </div>
             </button>
-          ))}
-        </div>
+          </div>
 
-        {/* Market panel */}
-        <div className="flex flex-col items-center justify-between py-1 px-1.5 w-[80px]">
-          <span
-            className="text-[10px] font-black text-yellow-200 tracking-widest"
-            style={{ textShadow: '0 1px 2px rgba(0,0,0,0.6)' }}
-          >
-            MARKET
-          </span>
-          <button
-            onClick={() => setShopOpen(true)}
-            className="w-[72px] h-[62px] rounded-lg overflow-hidden border-2 active:scale-95 transition-transform relative"
-            style={{ borderColor: '#c0901a', background: '#8b6020' }}
-            title="Open Market"
-          >
-            {/* Market stall scene */}
-            <div className="absolute inset-0" style={{ background: 'linear-gradient(180deg, #a0d060 0%, #70a030 50%, #c8a050 100%)' }} />
-            {/* Stall top */}
-            <div className="absolute top-0 left-0 right-0 h-4 flex items-center justify-center text-center"
-              style={{ background: 'linear-gradient(180deg, #d4a020, #a07010)', borderBottom: '1px solid #604000' }}>
-              <span className="text-[8px] font-black text-yellow-100">🏪 SHOP</span>
+          {/* Item grid: 2 columns × 2 rows */}
+          <div className="flex flex-col justify-center gap-1 px-1.5 py-1">
+            <div className="flex gap-1">
+              <MarketCell emoji="🎁" bg="linear-gradient(180deg, #e8c060, #c09030)"/>
+              <MarketCell emoji="🐰" bg="linear-gradient(180deg, #f0e8e0, #d8c8b8)"/>
             </div>
-            {/* Items on shelves */}
-            <div className="absolute bottom-1 left-0 right-0 flex flex-wrap justify-center gap-0.5 px-1">
-              {['🍎','🌽','🥥','🍅','🥚','🫐'].map((e, i) => (
-                <span key={i} style={{ fontSize: 11 }}>{e}</span>
-              ))}
+            <div className="flex gap-1">
+              <MarketCell emoji="💎" bg="linear-gradient(180deg, #a0d8f8, #5090d0)"/>
+              <MarketCell emoji="🌺" bg="linear-gradient(180deg, #f8a0b8, #d06080)"/>
             </div>
-          </button>
+          </div>
         </div>
       </div>
     </div>
