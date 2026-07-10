@@ -436,94 +436,173 @@ const ObjectSVG: React.FC<{ object: string; tileX: number; tileY: number }> = ({
     case 'GARDEN_PATCH': return (
       <svg viewBox="0 0 72 62" width="66" height="57" style={{ display:'block' }}>
         <defs>
+          {/* Soil */}
           <linearGradient id={g('gpf')} x1="0%" y1="0%" x2="0%" y2="100%">
-            <stop offset="0%"   stopColor="#5aa028"/>
-            <stop offset="100%" stopColor="#327010"/>
+            <stop offset="0%"   stopColor="#4e9a20"/>
+            <stop offset="100%" stopColor="#2d6010"/>
           </linearGradient>
-          <linearGradient id={g('gpw')} x1="0%" y1="0%" x2="0%" y2="100%">
-            <stop offset="0%"   stopColor="#dcc070"/>
-            <stop offset="100%" stopColor="#a07830"/>
+          {/* Post wood — side-lit (bright left, dark right) */}
+          <linearGradient id={g('gpw')} x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%"   stopColor="#d8c08a"/>
+            <stop offset="55%"  stopColor="#b09858"/>
+            <stop offset="100%" stopColor="#7a6030"/>
           </linearGradient>
-          <radialGradient id={g('gpb')} cx="36%" cy="30%" r="70%">
-            <stop offset="0%"   stopColor="#6880e8"/>
-            <stop offset="100%" stopColor="#2a40b8"/>
+          {/* Rail wood — top-lit */}
+          <linearGradient id={g('gpr')} x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%"   stopColor="#ccb07a"/>
+            <stop offset="100%" stopColor="#8a6c3c"/>
+          </linearGradient>
+          {/* Blueberry — rich blue-purple */}
+          <radialGradient id={g('gpb')} cx="30%" cy="25%" r="68%">
+            <stop offset="0%"   stopColor="#8898f8"/>
+            <stop offset="50%"  stopColor="#3a50d8"/>
+            <stop offset="100%" stopColor="#162898"/>
           </radialGradient>
-          <radialGradient id={g('gpp')} cx="38%" cy="30%" r="68%">
-            <stop offset="0%"   stopColor="#f0cc28"/>
-            <stop offset="100%" stopColor="#b08010"/>
+          {/* Pineapple body */}
+          <radialGradient id={g('gpp')} cx="30%" cy="22%" r="72%">
+            <stop offset="0%"   stopColor="#ffe250"/>
+            <stop offset="52%"  stopColor="#d89a20"/>
+            <stop offset="100%" stopColor="#8a6008"/>
           </radialGradient>
+          {/* Clip masks for pineapple diamond texture */}
+          <clipPath id={g('cp1')}><ellipse cx="44" cy="46" rx="8"   ry="11"/></clipPath>
+          <clipPath id={g('cp2')}><ellipse cx="58" cy="43" rx="8.5" ry="12"/></clipPath>
         </defs>
-        {/* Ground bed */}
-        <rect x="2" y="26" width="68" height="32" rx="5" fill={`url(#${g('gpf')})`}/>
-        <rect x="2" y="26" width="68" height="7"  rx="3" fill="rgba(255,255,255,0.14)"/>
 
-        {/* ── Picket fence enclosing BLUEBERRY + PINEAPPLE cells (x=2..47) ── */}
-        {/* Corner posts */}
-        <rect x="2"  y="16" width="6" height="44" rx="2" fill={`url(#${g('gpw')})`}/>
-        <rect x="43" y="16" width="6" height="44" rx="2" fill={`url(#${g('gpw')})`}/>
-        {/* Mid post between berry and pineapple cells */}
-        <rect x="22" y="16" width="5" height="44" rx="1.5" fill={`url(#${g('gpw')})`}/>
-        {/* Top rails */}
-        <rect x="2" y="20" width="47" height="4.5" rx="1.5" fill="#d4aa60"/>
-        <rect x="2" y="20" width="47" height="1.5" rx="1"   fill="rgba(255,255,255,0.38)"/>
-        <rect x="2" y="28" width="47" height="3.5" rx="1.5" fill="#b89050"/>
-        {/* Bottom rails */}
-        <rect x="2" y="43" width="47" height="4"   rx="1.5" fill="#d4aa60"/>
-        <rect x="2" y="43" width="47" height="1.5" rx="1"   fill="rgba(255,255,255,0.25)"/>
-        <rect x="2" y="50" width="47" height="3.5" rx="1.5" fill="#b89050"/>
-        {/* Picket boards — left of left post */}
-        {/* Left cell pickets (between x=8 and x=22) */}
-        {[9,13,17].map(x => (
-          <g key={x}>
-            <polygon points={`${x},14 ${x+3},14 ${x+3},13 ${x+1.5},11 ${x},13`} fill="#ddb862"/>
-            <rect x={x} y="14" width="3" height="34" rx="1" fill="#c89a48"/>
-            <rect x={x} y="14" width="1.2" height="34" rx="0.6" fill="rgba(255,255,255,0.22)"/>
-          </g>
-        ))}
-        {/* Right cell pickets (between x=27 and x=43) */}
-        {[28,32,36,40].map(x => (
-          <g key={x}>
-            <polygon points={`${x},14 ${x+3},14 ${x+3},13 ${x+1.5},11 ${x},13`} fill="#ddb862"/>
-            <rect x={x} y="14" width="3" height="34" rx="1" fill="#c89a48"/>
-            <rect x={x} y="14" width="1.2" height="34" rx="0.6" fill="rgba(255,255,255,0.22)"/>
-          </g>
-        ))}
+        {/* ── Soil bed ── */}
+        <rect x="3" y="30" width="66" height="28" rx="4" fill={`url(#${g('gpf')})`}/>
+        <rect x="3" y="30" width="66" height="6"  rx="3" fill="rgba(255,255,255,0.12)"/>
 
-        {/* ── Flower section — simple low border only ── */}
-        <rect x="49" y="20" width="5"  height="38" rx="1.5" fill={`url(#${g('gpw')})`}/>
-        <rect x="63" y="20" width="5"  height="38" rx="1.5" fill={`url(#${g('gpw')})`}/>
-        <rect x="49" y="23" width="19" height="3.5" rx="1.5" fill="#c8a464"/>
-        <rect x="49" y="23" width="19" height="1.2" rx="1"   fill="rgba(255,255,255,0.25)"/>
-        <rect x="49" y="43" width="19" height="3.5" rx="1.5" fill="#b89050"/>
-        {/* Blueberries */}
-        {([{cx:10,cy:31,r:5},{cx:17,cy:33,r:4.5},{cx:9,cy:38,r:4.5},{cx:16,cy:28,r:4},{cx:10,cy:44,r:4.5},{cx:17,cy:42,r:4}] as const).map((b,i) => (
+        {/* ══ BLUEBERRY SECTION  (x 9 – 33) ══ */}
+        {/* Leaf mass */}
+        <ellipse cx="21" cy="40" rx="13" ry="12" fill="#1e8012"/>
+        <ellipse cx="15" cy="44" rx="9"  ry="8"  fill="#187010"/>
+        <ellipse cx="28" cy="43" rx="10" ry="9"  fill="#228818"/>
+        <ellipse cx="19" cy="34" rx="11" ry="8"  fill="#2a9a1e"/>
+        <ellipse cx="27" cy="36" rx="9"  ry="7"  fill="#289818"/>
+        {/* Leaf lobes */}
+        <path d="M13,28 Q18,21 23,28 Q18,35 13,28Z" fill="#32a81e" opacity="0.85"/>
+        <path d="M21,25 Q26,18 31,25 Q26,32 21,25Z" fill="#2c9e1a" opacity="0.85"/>
+        <path d="M10,36 Q14,29 18,36 Q14,43 10,36Z" fill="#28941a" opacity="0.80"/>
+        <path d="M25,29 Q30,22 35,29 Q30,36 25,29Z" fill="#30a01c" opacity="0.75"/>
+        {/* 10-berry cluster — back → front */}
+        {([
+          {cx:14,cy:36,r:4.2},{cx:21,cy:34,r:4.5},{cx:28,cy:36,r:4.0},
+          {cx:11,cy:42,r:4.8},{cx:18,cy:40,r:5.2},{cx:25,cy:41,r:5.0},{cx:32,cy:42,r:4.5},
+          {cx:14,cy:48,r:5.0},{cx:22,cy:49,r:5.4},{cx:29,cy:48,r:4.8},
+        ] as const).map((b,i) => (
           <g key={i}>
             <circle cx={b.cx} cy={b.cy} r={b.r} fill={`url(#${g('gpb')})`}/>
-            <circle cx={b.cx-1} cy={b.cy-1} r={b.r*0.36} fill="rgba(255,255,255,0.52)"/>
+            {/* Crown dimple */}
+            <ellipse cx={b.cx} cy={b.cy-b.r+1.4} rx={b.r*0.40} ry={b.r*0.24} fill="rgba(0,0,0,0.32)"/>
+            {/* Main specular */}
+            <circle cx={b.cx-b.r*0.33} cy={b.cy-b.r*0.38} r={b.r*0.34} fill="rgba(255,255,255,0.58)"/>
+            {/* Tiny secondary highlight */}
+            <circle cx={b.cx+b.r*0.15} cy={b.cy-b.r*0.55} r={b.r*0.16} fill="rgba(255,255,255,0.34)"/>
           </g>
         ))}
-        {/* Pineapples */}
-        {([{cx:30,cy:42},{cx:44,cy:41}] as const).map((p,i) => (
-          <g key={i}>
-            <ellipse cx={p.cx} cy={p.cy}   rx="6"   ry="9"   fill={`url(#${g('gpp')})`}/>
-            <ellipse cx={p.cx} cy={p.cy}   rx="4.5" ry="7"   fill="rgba(255,255,255,0.18)"/>
-            {([35,38,41,44,47] as const).map(y2 => (
-              <line key={y2} x1={p.cx-5.5} y1={y2} x2={p.cx+5.5} y2={y2} stroke="#9a7210" strokeWidth="1.2" opacity="0.7"/>
-            ))}
-            <path d={`M${p.cx},${p.cy-9} L${p.cx-5},${p.cy-18} M${p.cx},${p.cy-9} L${p.cx},${p.cy-19} M${p.cx},${p.cy-9} L${p.cx+5},${p.cy-18}`}
-                  stroke="#2e8020" strokeWidth="2.8" fill="none" strokeLinecap="round"/>
-            <ellipse cx={p.cx-1} cy={p.cy-5} rx="2.5" ry="3.5" fill="rgba(255,255,255,0.42)"/>
-          </g>
-        ))}
-        {/* White flowers */}
-        {([{cx:56,cy:29,r:4.5},{cx:63,cy:32,r:4},{cx:55,cy:36,r:4},{cx:62,cy:38,r:4.5},{cx:56,cy:43,r:4},{cx:63,cy:44,r:3.5}] as const).map((f,i) => (
-          <g key={i}>
-            <circle cx={f.cx} cy={f.cy} r={f.r}        fill="#f0f0ff"/>
-            <circle cx={f.cx} cy={f.cy} r={f.r * 0.38} fill="#f0c820"/>
-            <circle cx={f.cx-1} cy={f.cy-1} r={f.r * 0.20} fill="rgba(255,255,255,0.72)"/>
-          </g>
-        ))}
-        <ellipse cx="59" cy="49" rx="9" ry="3.5" fill="#2a6a18" opacity="0.65"/>
+        {/* Front leaves over berries */}
+        <path d="M9,52  Q14,45 19,52  Q14,59 9,52Z"  fill="#1e8412" opacity="0.75"/>
+        <path d="M26,51 Q31,44 36,51  Q31,58 26,51Z"  fill="#22901a" opacity="0.70"/>
+
+        {/* ══ PINEAPPLE SECTION  (x 39 – 66) ══ */}
+        {/* Base leaf mass */}
+        <ellipse cx="52" cy="44" rx="15" ry="13" fill="#1a7a0e"/>
+        <ellipse cx="44" cy="46" rx="10" ry="9"  fill="#187010"/>
+        <ellipse cx="60" cy="46" rx="10" ry="9"  fill="#1e8014"/>
+
+        {/* ── Pineapple 1 (left, slightly behind) ── */}
+        <ellipse cx="44" cy="46" rx="8"   ry="11" fill={`url(#${g('gpp')})`}/>
+        {/* Diamond grid texture, clipped to body */}
+        <g clipPath={`url(#${g('cp1')})`}>
+          {([36,39,42,45,48,51,54,57] as const).map(y => (
+            <line key={y}   x1="33" y1={y} x2="55" y2={y} stroke="#7a5808" strokeWidth="1.1" opacity="0.60"/>
+          ))}
+          {([-10,-5,0,5,10,15] as const).map(o => (
+            <line key={o}   x1={36+o} y1="35" x2={28+o} y2="57" stroke="#7a5808" strokeWidth="0.9" opacity="0.42"/>
+          ))}
+          {([-10,-5,0,5,10,15] as const).map(o => (
+            <line key={`r${o}`} x1={36+o} y1="35" x2={44+o} y2="57" stroke="#7a5808" strokeWidth="0.9" opacity="0.42"/>
+          ))}
+        </g>
+        {/* Body shine */}
+        <ellipse cx="41" cy="41" rx="3" ry="5.5" fill="rgba(255,255,255,0.34)"/>
+        {/* Crown — 5 main + 2 side leaves */}
+        <path d="M44,35 L37,18" stroke="#1a7a0a" strokeWidth="3.6" fill="none" strokeLinecap="round"/>
+        <path d="M44,35 L40,16" stroke="#228a14" strokeWidth="3.0" fill="none" strokeLinecap="round"/>
+        <path d="M44,35 L44,14" stroke="#1a7a0a" strokeWidth="3.8" fill="none" strokeLinecap="round"/>
+        <path d="M44,35 L48,16" stroke="#228a14" strokeWidth="3.0" fill="none" strokeLinecap="round"/>
+        <path d="M44,35 L51,18" stroke="#1a7a0a" strokeWidth="3.6" fill="none" strokeLinecap="round"/>
+        <path d="M44,35 L36,23" stroke="#2e9a1c" strokeWidth="2.2" fill="none" strokeLinecap="round"/>
+        <path d="M44,35 L52,23" stroke="#2e9a1c" strokeWidth="2.2" fill="none" strokeLinecap="round"/>
+        {/* Leaf tips (lighter) */}
+        <path d="M37,18 L35,15" stroke="#4ab830" strokeWidth="1.8" fill="none" strokeLinecap="round"/>
+        <path d="M44,14 L44,11" stroke="#4ab830" strokeWidth="1.8" fill="none" strokeLinecap="round"/>
+        <path d="M51,18 L53,15" stroke="#4ab830" strokeWidth="1.8" fill="none" strokeLinecap="round"/>
+
+        {/* ── Pineapple 2 (right, front, larger) ── */}
+        <ellipse cx="58" cy="43" rx="8.5" ry="12" fill={`url(#${g('gpp')})`}/>
+        <g clipPath={`url(#${g('cp2')})`}>
+          {([31,34,37,40,43,46,49,52,55] as const).map(y => (
+            <line key={y}   x1="46" y1={y} x2="70" y2={y} stroke="#7a5808" strokeWidth="1.1" opacity="0.60"/>
+          ))}
+          {([-10,-5,0,5,10,15] as const).map(o => (
+            <line key={o}   x1={50+o} y1="31" x2={42+o} y2="55" stroke="#7a5808" strokeWidth="0.9" opacity="0.42"/>
+          ))}
+          {([-10,-5,0,5,10,15] as const).map(o => (
+            <line key={`r${o}`} x1={50+o} y1="31" x2={58+o} y2="55" stroke="#7a5808" strokeWidth="0.9" opacity="0.42"/>
+          ))}
+        </g>
+        <ellipse cx="55" cy="37" rx="3.2" ry="6" fill="rgba(255,255,255,0.36)"/>
+        {/* Crown */}
+        <path d="M58,31 L51,14" stroke="#1a7a0a" strokeWidth="3.8" fill="none" strokeLinecap="round"/>
+        <path d="M58,31 L54,12" stroke="#228a14" strokeWidth="3.2" fill="none" strokeLinecap="round"/>
+        <path d="M58,31 L58,10" stroke="#1a7a0a" strokeWidth="4.0" fill="none" strokeLinecap="round"/>
+        <path d="M58,31 L62,12" stroke="#228a14" strokeWidth="3.2" fill="none" strokeLinecap="round"/>
+        <path d="M58,31 L65,14" stroke="#1a7a0a" strokeWidth="3.8" fill="none" strokeLinecap="round"/>
+        <path d="M58,31 L50,19" stroke="#2e9a1c" strokeWidth="2.4" fill="none" strokeLinecap="round"/>
+        <path d="M58,31 L66,19" stroke="#2e9a1c" strokeWidth="2.4" fill="none" strokeLinecap="round"/>
+        <path d="M51,14 L49,11" stroke="#4ab830" strokeWidth="1.9" fill="none" strokeLinecap="round"/>
+        <path d="M58,10 L58,7"  stroke="#4ab830" strokeWidth="2.0" fill="none" strokeLinecap="round"/>
+        <path d="M65,14 L67,11" stroke="#4ab830" strokeWidth="1.9" fill="none" strokeLinecap="round"/>
+
+        {/* ══ RAIL FENCE (rendered last so it sits in front) ══ */}
+
+        {/* ── Posts — thick, weathered, side-shaded ── */}
+        {/* Left post */}
+        <rect x="2"  y="14" width="7" height="46" rx="2.5" fill={`url(#${g('gpw')})`}/>
+        <rect x="2"  y="14" width="2.2" height="46" rx="1" fill="rgba(255,255,255,0.26)"/>
+        <rect x="7"  y="14" width="2"   height="46" rx="1" fill="rgba(0,0,0,0.24)"/>
+        {/* Center post */}
+        <rect x="33" y="14" width="7" height="46" rx="2.5" fill={`url(#${g('gpw')})`}/>
+        <rect x="33" y="14" width="2.2" height="46" rx="1" fill="rgba(255,255,255,0.26)"/>
+        <rect x="38" y="14" width="2"   height="46" rx="1" fill="rgba(0,0,0,0.24)"/>
+        {/* Right post */}
+        <rect x="63" y="14" width="7" height="46" rx="2.5" fill={`url(#${g('gpw')})`}/>
+        <rect x="63" y="14" width="2.2" height="46" rx="1" fill="rgba(255,255,255,0.26)"/>
+        <rect x="68" y="14" width="2"   height="46" rx="1" fill="rgba(0,0,0,0.24)"/>
+        {/* Post top caps */}
+        <ellipse cx="5.5"  cy="14" rx="4"   ry="2.4" fill="#e4cb90"/>
+        <ellipse cx="36.5" cy="14" rx="4"   ry="2.4" fill="#e4cb90"/>
+        <ellipse cx="66.5" cy="14" rx="4"   ry="2.4" fill="#e4cb90"/>
+
+        {/* ── Rails — 2 per span, top-lit ── */}
+        {/* Left span – top rail */}
+        <rect x="9"  y="21" width="24" height="5.5" rx="2" fill={`url(#${g('gpr')})`}/>
+        <rect x="9"  y="21" width="24" height="2"   rx="1" fill="rgba(255,255,255,0.30)"/>
+        {/* Left span – bottom rail */}
+        <rect x="9"  y="42" width="24" height="5.5" rx="2" fill={`url(#${g('gpr')})`}/>
+        <rect x="9"  y="42" width="24" height="2"   rx="1" fill="rgba(255,255,255,0.22)"/>
+        {/* Right span – top rail */}
+        <rect x="40" y="21" width="23" height="5.5" rx="2" fill={`url(#${g('gpr')})`}/>
+        <rect x="40" y="21" width="23" height="2"   rx="1" fill="rgba(255,255,255,0.30)"/>
+        {/* Right span – bottom rail */}
+        <rect x="40" y="42" width="23" height="5.5" rx="2" fill={`url(#${g('gpr')})`}/>
+        <rect x="40" y="42" width="23" height="2"   rx="1" fill="rgba(255,255,255,0.22)"/>
+        {/* Post ground shadows */}
+        <ellipse cx="5.5"  cy="60" rx="4"   ry="1.8" fill="rgba(0,0,0,0.18)"/>
+        <ellipse cx="36.5" cy="60" rx="4"   ry="1.8" fill="rgba(0,0,0,0.18)"/>
+        <ellipse cx="66.5" cy="60" rx="4"   ry="1.8" fill="rgba(0,0,0,0.18)"/>
       </svg>
     );
 
