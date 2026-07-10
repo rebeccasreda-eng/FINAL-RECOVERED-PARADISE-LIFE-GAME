@@ -239,31 +239,91 @@ const MarketCell = ({ emoji, bg }: { emoji: string; bg: string }) => (
   </div>
 );
 
-/* ─── Top icon button ────────────────────────────────────────────────────── */
-const TopIcon = ({ icon, bg, title }: { icon: string; bg: string; title?: string }) => (
-  <div
-    title={title}
-    className="flex items-center justify-center cursor-pointer active:scale-95 transition-transform"
+/* ─── Quick-action button (big 3×2 grid) ────────────────────────────────── */
+const QuickBtn = ({
+  onClick, active, bg, children,
+}: {
+  onClick: () => void; active?: boolean; bg: string; children: React.ReactNode;
+}) => (
+  <button
+    onClick={onClick}
+    className="flex items-center justify-center rounded-lg overflow-hidden active:scale-95 transition-transform"
     style={{
-      width: 26, height: 24,
-      background: bg,
-      border: '1.5px solid #3a2000',
-      borderBottomWidth: 3,
-      borderRadius: 5,
-      fontSize: 13,
+      width: 50, height: 40,
+      background: active ? 'linear-gradient(180deg,#ffe860,#d4a020)' : bg,
+      border: `2px solid ${active ? '#a07010' : '#8a5808'}`,
+      borderBottom: `3px solid ${active ? '#7a5000' : '#5a3a10'}`,
+      boxShadow: active
+        ? '0 0 8px rgba(255,200,0,0.55), inset 0 1px 0 rgba(255,255,255,0.25)'
+        : 'inset 0 1px 0 rgba(255,255,255,0.18), 0 2px 4px rgba(0,0,0,0.4)',
     }}
   >
-    {icon}
-  </div>
+    {children}
+  </button>
+);
+
+/* SVG micro-icons */
+const IcoSelect = () => (
+  <svg viewBox="0 0 28 28" width="28" height="28">
+    <polygon points="6,4 6,22 11,18 14,26 17,25 14,17 20,17" fill="white" stroke="#aac" strokeWidth="1.2"/>
+  </svg>
+);
+const IcoMarket = () => (
+  <svg viewBox="0 0 32 28" width="32" height="28">
+    <rect x="2" y="14" width="28" height="12" rx="2" fill="#c89a48"/>
+    <rect x="4" y="16" width="24" height="8"  rx="1" fill="#f5e0a0"/>
+    {[8,14,20].map(x => <rect key={x} x={x} y="16" width="2" height="8" fill="#c89048" opacity="0.5"/>)}
+    <path d="M2,14 Q8,4 16,6 Q24,4 30,14Z" fill="#e84040"/>
+    <path d="M2,14 Q8,8 16,10 Q24,8 30,14" stroke="white" strokeWidth="2" fill="none" opacity="0.5"/>
+    <text x="16" y="13" textAnchor="middle" fontSize="5" fontWeight="900" fill="white" opacity="0.9">MARKET</text>
+  </svg>
+);
+const IcoCollect = () => (
+  <svg viewBox="0 0 28 28" width="28" height="28">
+    <polygon points="14,3 17,11 26,11 19,17 22,25 14,20 6,25 9,17 2,11 11,11" fill="#f0c820" stroke="#c09010" strokeWidth="1"/>
+    <polygon points="14,6 16.5,11.5 22.5,11.5 17.5,15.5 19.5,21 14,17.5 8.5,21 10.5,15.5 5.5,11.5 11.5,11.5" fill="#ffe860" opacity="0.6"/>
+  </svg>
+);
+const IcoQuest = () => (
+  <svg viewBox="0 0 28 28" width="28" height="28">
+    <rect x="6" y="4" width="16" height="20" rx="2" fill="#f5e8c0" stroke="#a07830" strokeWidth="1.5"/>
+    <rect x="6" y="4" width="16" height="5"  rx="2" fill="#d4a840"/>
+    {[12,16,20].map(y => <rect key={y} x="9" y={y} width="10" height="1.5" rx="0.7" fill="#c09040" opacity="0.7"/>)}
+    <circle cx="21" cy="21" r="6" fill="#e84040"/>
+    <text x="21" y="25" textAnchor="middle" fontSize="9" fontWeight="900" fill="white">!</text>
+  </svg>
+);
+const IcoPlant = () => (
+  <svg viewBox="0 0 28 28" width="28" height="28">
+    <rect x="11" y="16" width="6" height="10" rx="2" fill="#8a6030"/>
+    <ellipse cx="14" cy="18" rx="8" ry="10" fill="#40b820"/>
+    <ellipse cx="7"  cy="20" rx="6" ry="7"  fill="#32a010"/>
+    <ellipse cx="21" cy="20" rx="6" ry="7"  fill="#36a814"/>
+    <ellipse cx="14" cy="10" rx="7" ry="8"  fill="#4cc428"/>
+    <ellipse cx="11" cy="13" rx="3" ry="4"  fill="rgba(255,255,255,0.18)"/>
+  </svg>
+);
+const IcoBuild = () => (
+  <svg viewBox="0 0 28 28" width="28" height="28">
+    <rect x="3" y="12" width="22" height="14" rx="3" fill="#508048"/>
+    <rect x="3" y="12" width="22" height="5"  rx="2" fill="#60a058"/>
+    <rect x="3" y="14" width="22" height="1.5"    fill="rgba(255,255,255,0.2)"/>
+    {[7,12,17].map(x => <rect key={x} x={x} y="19" width="4" height="6" rx="1" fill="#304028"/>)}
+    <rect x="8" y="4" width="12" height="10" rx="2" fill="#d4a020"/>
+    <rect x="8" y="4" width="12" height="4"  rx="2" fill="#e8c030"/>
+    <rect x="11" y="6" width="6" height="1.5"     fill="rgba(255,255,255,0.35)"/>
+  </svg>
 );
 
 /* ─── Main bottom bar ────────────────────────────────────────────────────── */
 interface NeighborPanelProps {
   playerName?: string;
   playerLevel?: number;
+  onOpenCollections?: () => void;
+  onOpenQuests?: () => void;
 }
 
-export const NeighborPanel = ({ playerName = 'Player', playerLevel = 1 }: NeighborPanelProps) => {
+export const NeighborPanel = ({ playerName = 'Player', playerLevel = 1, onOpenCollections, onOpenQuests }: NeighborPanelProps) => {
   const { state, dispatch, activeTool, setActiveTool, activeBuildItem, setActiveBuildItem, setShopOpen } = useGame();
   const { toast } = useToast();
 
@@ -305,28 +365,52 @@ export const NeighborPanel = ({ playerName = 'Player', playerLevel = 1 }: Neighb
         fontFamily: "'Fredoka', sans-serif",
       }}
     >
-      {/* ── LEFT: island name + ?/chat/⚙ icons ── */}
+      {/* ── LEFT: 3×2 quick-action grid ── */}
       <div
-        className="flex flex-col justify-center px-3 shrink-0"
+        className="flex items-center justify-center shrink-0"
         style={{
-          minWidth: 112,
+          width: 168,
+          padding: '5px 5px',
           borderRight: '2px solid #5a3a10',
           background: 'linear-gradient(180deg, #7a6040 0%, #5a4020 100%)',
         }}
       >
-        <span className="text-white font-black text-sm leading-tight drop-shadow">
-          {playerLevel > 1 ? `Lv${playerLevel}` : ''}
-        </span>
-        <span
-          className="font-black text-xs leading-tight"
-          style={{ color: '#ffd060', textShadow: '0 1px 3px rgba(0,0,0,0.7)' }}
-        >
-          {playerName}'s Island
-        </span>
-        <div className="flex gap-1 mt-1">
-          <TopIcon icon="?" bg="#3070c0" title="Help"/>
-          <TopIcon icon="💬" bg="#30a060" title="Chat"/>
-          <TopIcon icon="⚙️" bg="#806040" title="Settings"/>
+        <div className="grid gap-1" style={{ gridTemplateColumns: 'repeat(3,50px)' }}>
+          <QuickBtn
+            onClick={() => setActiveTool('clear')}
+            active={activeTool === 'clear'}
+            bg="linear-gradient(180deg,#7090b8,#405878)"
+          ><IcoSelect /></QuickBtn>
+
+          <QuickBtn
+            onClick={() => setShopOpen(true)}
+            bg="linear-gradient(180deg,#88c840,#50881c)"
+          ><IcoMarket /></QuickBtn>
+
+          <QuickBtn
+            onClick={() => onOpenCollections?.()}
+            bg="linear-gradient(180deg,#9060c8,#603898)"
+          ><IcoCollect /></QuickBtn>
+
+          <QuickBtn
+            onClick={() => onOpenQuests?.()}
+            bg="linear-gradient(180deg,#c07830,#885020)"
+          ><IcoQuest /></QuickBtn>
+
+          <QuickBtn
+            onClick={() => setActiveTool('plant')}
+            active={activeTool === 'plant'}
+            bg="linear-gradient(180deg,#60c040,#308820)"
+          ><IcoPlant /></QuickBtn>
+
+          <QuickBtn
+            onClick={() => {
+              setActiveTool('build');
+              if (!activeBuildItem && ownedStructures.length > 0) setActiveBuildItem(ownedStructures[0] as any);
+            }}
+            active={activeTool === 'build'}
+            bg="linear-gradient(180deg,#508850,#306030)"
+          ><IcoBuild /></QuickBtn>
         </div>
       </div>
 

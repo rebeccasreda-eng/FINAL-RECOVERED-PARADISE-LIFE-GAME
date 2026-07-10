@@ -397,7 +397,12 @@ const GameInner = ({ profile }: { profile: PlayerProfile }) => {
         onOpenWeather={() => setWeatherOpen(true)}
         playerName={profile.name}
       />
-      <NeighborPanel playerName={profile.name} playerLevel={state.level} />
+      <NeighborPanel
+        playerName={profile.name}
+        playerLevel={state.level}
+        onOpenCollections={() => setCollectionsOpen(true)}
+        onOpenQuests={() => setQuestPanelOpen(true)}
+      />
       <QuestNotifier onOpenPanel={() => setQuestPanelOpen(true)} />
       {questPanelOpen && <QuestPanel onClose={() => setQuestPanelOpen(false)} />}
       <CropPicker />
