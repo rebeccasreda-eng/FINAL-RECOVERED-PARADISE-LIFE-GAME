@@ -180,17 +180,19 @@ export const IslandTile: React.FC<IslandTileProps> = ({
   let badgeText    = '';
   let progressPct  = 0;
   if ((tile.object === 'CROP_GROWING' || tile.object === 'CROP_READY') && tile.placedAt && tile.cropType) {
-    const cc       = CROP_TYPES[tile.cropType];
-    const elapsed  = now - tile.placedAt;
-    const growTime = state.weather === 'RAINY' ? cc.growTime * 0.5 : cc.growTime;
-    if (tile.object === 'CROP_GROWING') {
-      const rem = Math.max(0, growTime - elapsed);
-      badgeText   = `${Math.floor(rem / 60000)}m${Math.floor((rem % 60000) / 1000)}s`;
-      progressPct = Math.min(100, (elapsed / growTime) * 100);
-    } else {
-      const rem = Math.max(0, (growTime + cc.wiltTime) - elapsed);
-      badgeText   = `✓ ${Math.floor(rem / 60000)}m${Math.floor((rem % 60000) / 1000)}s`;
-      progressPct = 100;
+    const cc = CROP_TYPES[tile.cropType];
+    if (cc) {                                           // guard: unknown cropType → skip timer
+      const elapsed  = now - tile.placedAt;
+      const growTime = state.weather === 'RAINY' ? cc.growTime * 0.5 : cc.growTime;
+      if (tile.object === 'CROP_GROWING') {
+        const rem = Math.max(0, growTime - elapsed);
+        badgeText   = `${Math.floor(rem / 60000)}m${Math.floor((rem % 60000) / 1000)}s`;
+        progressPct = Math.min(100, (elapsed / growTime) * 100);
+      } else {
+        const rem = Math.max(0, (growTime + cc.wiltTime) - elapsed);
+        badgeText   = `✓ ${Math.floor(rem / 60000)}m${Math.floor((rem % 60000) / 1000)}s`;
+        progressPct = 100;
+      }
     }
   }
 
@@ -211,8 +213,8 @@ export const IslandTile: React.FC<IslandTileProps> = ({
         position: 'absolute',
         left: screenX,
         top: screenY,
-        width: 64,
-        height: 48,
+        width: 80,
+        height: 38,
         // Centre horizontally on screenX; top of diamond at screenY
         transform: 'translate(-50%, 0)',
         zIndex: tileZIndex,
@@ -226,12 +228,12 @@ export const IslandTile: React.FC<IslandTileProps> = ({
 
       {/* ── SVG diamond ground ──────────────────────────── */}
       <svg
-        viewBox="0 0 64 48"
-        style={{ width: 64, height: 48, display: 'block', overflow: 'visible' }}
+        viewBox="0 0 80 44"
+        style={{ width: 80, height: 44, display: 'block', overflow: 'visible' }}
       >
         {/* Top face */}
         <polygon
-          points="32,0 64,16 32,32 0,16"
+          points="40,0 80,14 40,28 0,14"
           fill={topFill}
           stroke="rgba(0,0,0,0.12)"
           strokeWidth="1"
@@ -241,15 +243,15 @@ export const IslandTile: React.FC<IslandTileProps> = ({
         {/* Side faces (land tiles only) */}
         {!isWater && palette.sideL && (
           <>
-            <polygon points="0,16 32,32 32,42 0,26"   fill={palette.sideL} />
-            <polygon points="64,16 32,32 32,42 64,26"  fill={palette.sideR!} />
+            <polygon points="0,14 40,28 40,38 0,24"   fill={palette.sideL} />
+            <polygon points="80,14 40,28 40,38 80,24"  fill={palette.sideR!} />
           </>
         )}
 
         {/* Water shimmer highlight */}
         {isWater && (
           <polygon
-            points="32,0 64,16 32,32 0,16"
+            points="40,0 80,14 40,28 0,14"
             fill="rgba(255,255,255,0.10)"
             className="water-glint"
           />
@@ -258,7 +260,7 @@ export const IslandTile: React.FC<IslandTileProps> = ({
         {/* Danger zone red pulse */}
         {isDangerZone && (
           <polygon
-            points="32,0 64,16 32,32 0,16"
+            points="40,0 80,14 40,28 0,14"
             fill="rgba(239,68,68,0.28)"
             className="iso-danger-pulse"
           />
@@ -267,7 +269,7 @@ export const IslandTile: React.FC<IslandTileProps> = ({
         {/* Wilted crop brown overlay */}
         {tile.object === 'CROP_WILTED' && (
           <polygon
-            points="32,0 64,16 32,32 0,16"
+            points="40,0 80,14 40,28 0,14"
             fill="rgba(139,90,43,0.55)"
           />
         )}
@@ -279,7 +281,7 @@ export const IslandTile: React.FC<IslandTileProps> = ({
           style={{
             position: 'absolute',
             left: '50%',
-            top: 16,          // diamond vertical centre
+            top: 14,          // diamond vertical centre (TH/2 = 28/2)
             transform: 'translate(-50%, -100%)',
             pointerEvents: 'none',
             userSelect: 'none',
@@ -298,7 +300,7 @@ export const IslandTile: React.FC<IslandTileProps> = ({
           style={{
             position: 'absolute',
             left: '50%',
-            top: 16,
+            top: 14,
             transform: 'translate(-50%, -100%)',
             pointerEvents: 'none',
             userSelect: 'none',

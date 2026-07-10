@@ -220,10 +220,10 @@ const NeighborPortrait = ({
         className="absolute inset-[3px] rounded-[50%_50%_5px_5px] overflow-hidden flex items-center justify-center"
         style={{ background: 'linear-gradient(180deg, #c0e8ff 0%, #70b0e0 50%, #a0d060 100%)' }}
       >
-        {n.avatar.startsWith('/') ? (
-          <img src={n.avatar} alt={n.name} className="w-full h-full object-cover" />
+        {typeof n.avatar === 'string' && n.avatar.startsWith('/') ? (
+          <img src={n.avatar} alt={n.name ?? ''} className="w-full h-full object-cover" />
         ) : (
-          <span className="text-4xl">{n.avatar}</span>
+          <span className="text-4xl">{n.avatar ?? '🧑'}</span>
         )}
       </div>
       {/* Level badge */}
@@ -244,7 +244,7 @@ const NeighborPortrait = ({
       className="mt-2 text-[10px] font-bold text-center leading-tight"
       style={{ color: '#f5e8c0', textShadow: '0 1px 2px rgba(0,0,0,0.6)', maxWidth: 68 }}
     >
-      {n.name.replace('Tropical', '').replace('Coconut', '').replace('Island', '')}
+      {(n.name ?? '?').replace('Tropical', '').replace('Coconut', '').replace('Island', '')}
     </span>
 
     {/* Hire button below name */}

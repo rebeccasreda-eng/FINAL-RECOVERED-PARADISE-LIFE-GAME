@@ -14,7 +14,8 @@ import React from 'react';
 import { CHARACTER_COMPONENTS, ChMia } from './CharacterSprites';
 
 // Half of the tile's diamond height — aligns character feet to diamond centre
-const TH_HALF = 16;
+// Must match TH/2 in IslandGrid.tsx (currently TH=28 → 14)
+const TH_HALF = 14;
 
 interface Props {
   screenX: number;
