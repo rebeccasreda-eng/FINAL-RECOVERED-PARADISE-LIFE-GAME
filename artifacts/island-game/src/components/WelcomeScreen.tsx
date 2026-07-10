@@ -28,46 +28,144 @@ const StageBg = () => (
         <stop offset="100%" stopColor="#ccb878"/>
       </linearGradient>
     </defs>
+
+    {/* ── Sky ── */}
     <rect x="0" y="0" width="380" height="240" fill="url(#skyG)"/>
+
+    {/* ── BACK ROW: 4 tiny palm silhouettes aligned at horizon, every-other of 8 positions (48 px apart) ── */}
+    {/* z-order: above sky, below clouds → appear as a very distant tree-line */}
+    {/* x = 24, 120, 216, 312 */}
+
+    {/* B1 x=24 */}
+    <path d="M24 138 Q24 128 25 115" stroke="#2e4820" strokeWidth="2.5" fill="none" strokeLinecap="round"/>
+    <path d="M25 118 Q14 111 5 114 Q14 117 24 120" fill="#286018"/>
+    <path d="M25 118 Q35 111 43 114 Q35 117 26 120" fill="#286018"/>
+    <path d="M25 117 Q22 107 26 100 Q26 109 26 117" fill="#347020"/>
+
+    {/* B2 x=120 */}
+    <path d="M120 137 Q120 127 121 114" stroke="#2e4820" strokeWidth="2.5" fill="none" strokeLinecap="round"/>
+    <path d="M121 117 Q110 110 101 113 Q110 116 120 119" fill="#286018"/>
+    <path d="M121 117 Q131 110 139 113 Q131 116 122 119" fill="#286018"/>
+    <path d="M121 116 Q118 106 122 99 Q122 108 122 116" fill="#347020"/>
+
+    {/* B3 x=216 */}
+    <path d="M216 138 Q216 128 217 115" stroke="#2e4820" strokeWidth="2.5" fill="none" strokeLinecap="round"/>
+    <path d="M217 118 Q206 111 197 114 Q206 117 216 120" fill="#286018"/>
+    <path d="M217 118 Q227 111 235 114 Q227 117 218 120" fill="#286018"/>
+    <path d="M217 117 Q214 107 218 100 Q218 109 218 117" fill="#347020"/>
+
+    {/* B4 x=312 */}
+    <path d="M312 137 Q312 127 313 114" stroke="#2e4820" strokeWidth="2.5" fill="none" strokeLinecap="round"/>
+    <path d="M313 117 Q302 110 293 113 Q302 116 312 119" fill="#286018"/>
+    <path d="M313 117 Q323 110 331 113 Q323 116 314 119" fill="#286018"/>
+    <path d="M313 116 Q310 106 314 99 Q314 108 314 116" fill="#347020"/>
+
+    {/* ── Clouds ── */}
+    <ellipse cx="75"  cy="55" rx="42" ry="20" fill="white" opacity="0.92"/>
+    <ellipse cx="108" cy="47" rx="32" ry="18" fill="white" opacity="0.92"/>
+    <ellipse cx="48"  cy="60" rx="26" ry="14" fill="white" opacity="0.90"/>
+    <ellipse cx="250" cy="38" rx="32" ry="16" fill="white" opacity="0.85"/>
+    <ellipse cx="278" cy="30" rx="24" ry="13" fill="white" opacity="0.85"/>
+
+    {/* ── MIDDLE-FAR: 2 small palms, spaced wide, appearing at horizon (rendered before sea) ── */}
+    {/* Their bases sit at the waterline; the sea rect will cover the lower trunk */}
+
+    {/* M1 x=155 */}
+    <path d="M155 148 Q155 137 156 123" stroke="#3a4222" strokeWidth="4" fill="none" strokeLinecap="round"/>
+    <path d="M156 126 Q143 117 131 121 Q143 125 155 129" fill="#327a1a"/>
+    <path d="M156 126 Q167 117 177 121 Q167 125 157 129" fill="#3a8a20"/>
+    <path d="M156 125 Q150 111 153 100 Q155 113 157 125" fill="#368420"/>
+    <path d="M156 125 Q162 113 167 104 Q162 115 158 125" fill="#2a7016"/>
+    <circle cx="153" cy="130" r="3"   fill="#6a4818"/>
+    <circle cx="158" cy="128" r="2.5" fill="#7a5820"/>
+
+    {/* M2 x=240 */}
+    <path d="M240 148 Q240 137 241 123" stroke="#3a4222" strokeWidth="4" fill="none" strokeLinecap="round"/>
+    <path d="M241 126 Q228 117 216 121 Q228 125 240 129" fill="#327a1a"/>
+    <path d="M241 126 Q252 117 262 121 Q252 125 242 129" fill="#3a8a20"/>
+    <path d="M241 125 Q235 111 238 100 Q240 113 242 125" fill="#368420"/>
+    <path d="M241 125 Q247 113 252 104 Q247 115 243 125" fill="#2a7016"/>
+    <circle cx="238" cy="130" r="3"   fill="#6a4818"/>
+    <circle cx="243" cy="128" r="2.5" fill="#7a5820"/>
+
+    {/* ── Right horizon island hint ── */}
     <ellipse cx="310" cy="155" rx="55" ry="18" fill="#4a9a5a" opacity="0.5"/>
     <ellipse cx="295" cy="150" rx="35" ry="14" fill="#3a8a4a" opacity="0.6"/>
+
+    {/* ── Sea ── */}
     <rect x="0" y="140" width="380" height="55" fill="url(#seaG)"/>
     <path d="M0 145 Q30 138 60 145 Q90 152 120 145 Q150 138 180 145 Q210 152 240 145 Q270 138 300 145 Q330 152 380 145 L380 195 L0 195Z" fill="#1a7fc0" opacity="0.55"/>
     <path d="M0 155 Q40 149 80 155 Q120 161 160 155 Q200 149 240 155 Q280 161 320 155 Q360 149 380 155" stroke="white" strokeWidth="1.5" fill="none" opacity="0.35"/>
+
+    {/* ── Sand ── */}
     <rect x="0" y="190" width="380" height="50" fill="url(#sandG)"/>
     <ellipse cx="120" cy="208" rx="80" ry="8" fill="#c8a868" opacity="0.3"/>
-    <ellipse cx="75" cy="55" rx="42" ry="20" fill="white" opacity="0.92"/>
-    <ellipse cx="108" cy="47" rx="32" ry="18" fill="white" opacity="0.92"/>
-    <ellipse cx="48" cy="60" rx="26" ry="14" fill="white" opacity="0.9"/>
-    <ellipse cx="250" cy="38" rx="32" ry="16" fill="white" opacity="0.85"/>
-    <ellipse cx="278" cy="30" rx="24" ry="13" fill="white" opacity="0.85"/>
-    <path d="M328 75 Q322 130 318 200" stroke="#7a5a3a" strokeWidth="11" fill="none" strokeLinecap="round"/>
-    <path d="M325 82 Q295 52 258 62 Q285 72 322 88" fill="#4a9a4a"/>
-    <path d="M325 78 Q318 45 338 32 Q336 58 330 78" fill="#3a8a3a"/>
-    <path d="M325 82 Q352 55 375 68 Q355 75 328 90" fill="#4a9a4a"/>
-    <path d="M325 82 Q358 78 372 96 Q350 88 330 92" fill="#5aaa5a"/>
-    <path d="M325 78 Q305 52 320 35 Q322 58 326 78" fill="#3a8a3a"/>
-    <circle cx="320" cy="92" r="7" fill="#7a5a20"/>
-    <circle cx="332" cy="88" r="6" fill="#8a6a28"/>
-    <circle cx="18" cy="218" r="9" fill="#dd2222" opacity="0.95"/>
-    <circle cx="11" cy="217" r="6.5" fill="#ffaa00" opacity="0.9"/>
-    <circle cx="30" cy="213" r="8" fill="#ffdd00" opacity="0.9"/>
-    <circle cx="46" cy="219" r="8.5" fill="#ee3333" opacity="0.9"/>
-    <circle cx="58" cy="215" r="7" fill="#ff8822" opacity="0.85"/>
-    <path d="M18 224 L18 240" stroke="#229922" strokeWidth="2.5"/>
-    <path d="M30 218 L28 238" stroke="#229922" strokeWidth="2.5"/>
-    <path d="M46 225 L44 240" stroke="#229922" strokeWidth="2.5"/>
-    <path d="M58 221 L56 238" stroke="#229922" strokeWidth="2.5"/>
+
+    {/* ── LEFT foreground palm (1 tree, very left, leans right) ── */}
+    {/* trunk bottom (12,237) → top (26,163) */}
+    <path d="M12 237 Q17 200 26 163" stroke="#7a5a3a" strokeWidth="9" fill="none" strokeLinecap="round"/>
+    <path d="M26 169 Q55 159 76 164 Q55 174 28 173" fill="#4a9a4a"/>
+    <path d="M26 166 Q50 146 70 150 Q53 160 28 168" fill="#3a8a3a"/>
+    <path d="M26 169 Q3 160 -9 164 Q1 173 24 174" fill="#4a9a4a"/>
+    <path d="M26 166 Q38 147 56 139 Q46 152 28 163" fill="#3a8a3a"/>
+    <path d="M26 163 Q20 141 25 122 Q28 143 30 163" fill="#5aaa5a"/>
+    <circle cx="29" cy="173" r="6"   fill="#7a5a20"/>
+    <circle cx="23" cy="170" r="5"   fill="#8a6a28"/>
+
+    {/* ── RIGHT foreground: 3 palms spaced across right side ── */}
+
+    {/* R3 (leftmost of 3, x≈290) */}
+    <path d="M286 226 Q288 193 292 160" stroke="#7a5a3a" strokeWidth="8" fill="none" strokeLinecap="round"/>
+    <path d="M292 166 Q263 147 243 153 Q267 163 290 171" fill="#4a9a4a"/>
+    <path d="M292 163 Q285 138 304 126 Q302 148 296 163" fill="#3a8a3a"/>
+    <path d="M292 166 Q317 149 334 157 Q316 167 294 174" fill="#4a9a4a"/>
+    <path d="M292 163 Q322 158 336 175 Q314 170 296 170" fill="#5aaa5a"/>
+    <path d="M292 163 Q275 140 288 126 Q291 148 294 163" fill="#3a8a3a"/>
+    <circle cx="287" cy="172" r="6"   fill="#7a5a20"/>
+    <circle cx="298" cy="169" r="5"   fill="#8a6a28"/>
+
+    {/* R2 (middle of 3, x≈322) */}
+    <path d="M320 229 Q322 192 326 155" stroke="#7a5a3a" strokeWidth="10" fill="none" strokeLinecap="round"/>
+    <path d="M326 161 Q296 142 274 148 Q299 158 324 169" fill="#4a9a4a"/>
+    <path d="M326 158 Q319 130 337 118 Q335 143 330 158" fill="#3a8a3a"/>
+    <path d="M326 161 Q353 143 372 151 Q353 161 328 169" fill="#4a9a4a"/>
+    <path d="M326 161 Q358 157 373 173 Q352 167 329 171" fill="#5aaa5a"/>
+    <path d="M326 158 Q306 135 320 122 Q323 144 328 158" fill="#3a8a3a"/>
+    <circle cx="321" cy="170" r="7"   fill="#7a5a20"/>
+    <circle cx="332" cy="167" r="6"   fill="#8a6a28"/>
+
+    {/* R1 (rightmost of 3, x≈354) */}
+    <path d="M357 234 Q355 197 351 162" stroke="#7a5a3a" strokeWidth="9" fill="none" strokeLinecap="round"/>
+    <path d="M351 168 Q322 149 302 154 Q326 164 349 173" fill="#4a9a4a"/>
+    <path d="M351 165 Q344 138 362 126 Q360 150 355 165" fill="#3a8a3a"/>
+    <path d="M351 168 Q374 150 380 161 Q373 169 353 175" fill="#4a9a4a"/>
+    <path d="M351 165 Q378 162 380 178 Q369 172 355 174" fill="#5aaa5a"/>
+    <path d="M351 165 Q333 141 346 127 Q349 148 353 165" fill="#3a8a3a"/>
+    <circle cx="346" cy="174" r="6.5" fill="#7a5a20"/>
+    <circle cx="357" cy="171" r="5.5" fill="#8a6a28"/>
+
+    {/* ── Flower/plant decorations ── */}
+    <circle cx="18"  cy="218" r="9"   fill="#dd2222" opacity="0.95"/>
+    <circle cx="11"  cy="217" r="6.5" fill="#ffaa00" opacity="0.90"/>
+    <circle cx="30"  cy="213" r="8"   fill="#ffdd00" opacity="0.90"/>
+    <circle cx="46"  cy="219" r="8.5" fill="#ee3333" opacity="0.90"/>
+    <circle cx="58"  cy="215" r="7"   fill="#ff8822" opacity="0.85"/>
+    <path d="M18 224 L18 240"  stroke="#229922" strokeWidth="2.5"/>
+    <path d="M30 218 L28 238"  stroke="#229922" strokeWidth="2.5"/>
+    <path d="M46 225 L44 240"  stroke="#229922" strokeWidth="2.5"/>
+    <path d="M58 221 L56 238"  stroke="#229922" strokeWidth="2.5"/>
     <path d="M18 228 Q10 222 13 216" stroke="#22bb22" strokeWidth="3" fill="none" strokeLinecap="round"/>
     <path d="M30 223 Q22 218 24 212" stroke="#22bb22" strokeWidth="3" fill="none" strokeLinecap="round"/>
-    <circle cx="358" cy="220" r="8" fill="#ff4488" opacity="0.9"/>
-    <circle cx="370" cy="217" r="6.5" fill="#ffcc00" opacity="0.9"/>
+    <circle cx="358" cy="220" r="8"   fill="#ff4488" opacity="0.90"/>
+    <circle cx="370" cy="217" r="6.5" fill="#ffcc00" opacity="0.90"/>
     <path d="M358 226 L356 240" stroke="#229922" strokeWidth="2.5"/>
     <path d="M370 223 L368 238" stroke="#229922" strokeWidth="2.5"/>
-    <ellipse cx="140" cy="175" rx="8" ry="3" fill="#5588cc" opacity="0.75"/>
-    <ellipse cx="132" cy="173" rx="11" ry="5" fill="#88aaee" opacity="0.6" transform="rotate(-25 132 173)"/>
-    <ellipse cx="148" cy="173" rx="11" ry="5" fill="#88aaee" opacity="0.6" transform="rotate(25 148 173)"/>
-    <circle cx="140" cy="175" r="2.5" fill="#223366"/>
+
+    {/* ── Fish/sea creature ── */}
+    <ellipse cx="140" cy="175" rx="8"  ry="3"   fill="#5588cc" opacity="0.75"/>
+    <ellipse cx="132" cy="173" rx="11" ry="5"   fill="#88aaee" opacity="0.60" transform="rotate(-25 132 173)"/>
+    <ellipse cx="148" cy="173" rx="11" ry="5"   fill="#88aaee" opacity="0.60" transform="rotate(25 148 173)"/>
+    <circle  cx="140" cy="175" r="2.5"           fill="#223366"/>
   </svg>
 );
 
