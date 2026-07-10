@@ -1,11 +1,10 @@
 /**
  * CharacterOnIsland — places the player sprite on the isometric grid.
- * Includes a bouncing green arrow above the character's head.
+ * Includes a 3D block arrow that bounces above the character's head.
  */
 import React from 'react';
 import { CHARACTER_COMPONENTS, ChMia } from './CharacterSprites';
 
-// Half of the tile's diamond height — aligns character feet to diamond centre
 const TH_HALF = 14;
 
 type Facing = 'front' | 'back' | 'left' | 'right';
@@ -19,21 +18,31 @@ interface Props {
   facing: Facing;
 }
 
-/** Green downward arrow — symmetric so scaleX flip doesn't matter */
+/**
+ * 3-D block arrow — extrusion layer + right side face + bright top face.
+ * viewBox 32×26, rendered at 26×20 so it reads as compact and chunky.
+ */
 const PlayerArrow = () => (
-  <svg viewBox="0 0 36 28" width="36" height="28" xmlns="http://www.w3.org/2000/svg" style={{ display: 'block' }}>
-    {/* Stem */}
-    <rect x="13" y="0" width="10" height="14" rx="3"
-      fill="#22d022" stroke="#128a12" strokeWidth="1.5"/>
-    {/* Arrowhead */}
-    <polygon points="1,13 35,13 18,27"
-      fill="#22d022" stroke="#128a12" strokeWidth="1.5" strokeLinejoin="round"/>
-    {/* Stem highlight */}
-    <rect x="15" y="2" width="4" height="8" rx="2" fill="rgba(255,255,255,0.42)"/>
-    {/* Arrowhead highlight */}
-    <polygon points="6,14 30,14 18,23" fill="rgba(255,255,255,0.22)"/>
-    {/* Dark outline top of stem */}
-    <rect x="13" y="0" width="10" height="2" rx="1" fill="rgba(0,0,0,0.15)"/>
+  <svg viewBox="0 0 32 26" width="26" height="20" xmlns="http://www.w3.org/2000/svg" style={{ display: 'block' }}>
+    {/* ── Extrusion (depth) layer, offset +3,+3 — darkest green ── */}
+    <rect    x="14" y="3" width="9" height="12" fill="#0a6a0a"/>
+    <polygon points="4,14 32,14 18,26"           fill="#0a6a0a"/>
+    {/* ── Side / connecting faces — medium green ── */}
+    {/* Stem right face */}
+    <path d="M20,0 L23,3 L23,15 L20,12Z"         fill="#1aaa1a"/>
+    {/* Head right face */}
+    <path d="M29,11 L32,14 L18,26 L15,23Z"       fill="#1aaa1a"/>
+    {/* Top face of stem (parallelogram seen from above) */}
+    <path d="M11,0 L14,3 L23,3 L20,0Z"           fill="#28c028"/>
+    {/* ── Front (top) face — bright green ── */}
+    <rect    x="11" y="0" width="9" height="12"  fill="#2ecc2e"/>
+    <polygon points="1,11 29,11 15,23"            fill="#2ecc2e"/>
+    {/* ── Highlights ── */}
+    <rect    x="12.5" y="1.5" width="3" height="7" rx="1" fill="rgba(255,255,255,0.44)"/>
+    <polygon points="3,11 11,11 6,17"             fill="rgba(255,255,255,0.16)"/>
+    {/* ── Edge lines to sharpen faces ── */}
+    <line x1="1"  y1="11" x2="29" y2="11" stroke="#0a6a0a" strokeWidth="0.8"/>
+    <line x1="11" y1="0"  x2="20" y2="0"  stroke="rgba(0,0,0,0.18)" strokeWidth="0.6"/>
   </svg>
 );
 
@@ -62,11 +71,11 @@ export const CharacterOnIsland: React.FC<Props> = ({
         willChange: 'left, top',
       }}
     >
-      {/* Bouncing green arrow — symmetric so the scaleX flip is harmless */}
+      {/* Bouncing 3-D block arrow */}
       <div
         style={{
           position: 'absolute',
-          top: -38,
+          top: -30,
           left: '50%',
           animation: 'charArrowBounce 0.75s ease-in-out infinite',
           pointerEvents: 'none',
@@ -75,9 +84,14 @@ export const CharacterOnIsland: React.FC<Props> = ({
         <PlayerArrow />
       </div>
 
-      {/* Character sprite */}
-      <div style={{ filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.40))' }}>
-        <Char size={SIZE} isWalking={isWalking} facing={facing} />
+      {/* Character sprite — bob wrapper provides squish-stretch */}
+      <div
+        className={isWalking ? 'char-walk-bob' : 'char-idle-bob'}
+        style={{ transformOrigin: 'bottom center' }}
+      >
+        <div style={{ filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.40))' }}>
+          <Char size={SIZE} isWalking={isWalking} facing={facing} />
+        </div>
       </div>
     </div>
   );

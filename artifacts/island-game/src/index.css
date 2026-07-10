@@ -203,36 +203,40 @@
 .floating-coin { color: #ffe040; font-size: 1rem; }
 .floating-energy { color: #60c0ff; font-size: 0.95rem; }
 
-/* ── Character bob animations (2.5-D, translateY only) ─── */
-/* scaleX (facing) is applied on a sibling div so transforms don't conflict */
+/* ── Character bob animations — squish/stretch for 3-D weight ─── */
+/* scaleX (facing) lives on the parent; bob wrapper owns scaleY only */
 @keyframes charIdleBob {
-  0%,100% { transform: translateY(0px); }
-  48%     { transform: translateY(-5px); }
-  52%     { transform: translateY(-5px); }
+  0%, 88%, 100% { transform: translateY(0px)  scaleY(1.00); }
+  44%, 56%      { transform: translateY(-7px) scaleY(1.05); }
+  92%           { transform: translateY(0px)  scaleY(0.97); }
 }
+/* One cycle = one footstep (0.35 s); squish on land, stretch on lift */
 @keyframes charWalkBob {
-  0%,100% { transform: translateY(0px); }
-  50%     { transform: translateY(-4px); }
+  0%   { transform: translateY(0px)  scaleY(0.93); }   /* land  → squish */
+  28%  { transform: translateY(-8px) scaleY(1.07); }   /* apex  → stretch */
+  50%  { transform: translateY(0px)  scaleY(0.93); }   /* land  → squish */
+  78%  { transform: translateY(-8px) scaleY(1.07); }   /* apex  → stretch */
+  100% { transform: translateY(0px)  scaleY(0.93); }
 }
 .char-idle-bob { animation: charIdleBob 2.6s ease-in-out infinite; }
-.char-walk-bob { animation: charWalkBob 0.35s ease-in-out infinite; }
+.char-walk-bob { animation: charWalkBob 0.35s linear     infinite; }
 
 /* ── Walking limb swing (0.7s = two steps, synced with 0.35s body bob) ── */
 @keyframes charLegA {
-  0%, 100% { transform: rotate(-22deg); }
-  50%       { transform: rotate(22deg); }
+  0%, 100% { transform: rotate(-32deg); }
+  50%       { transform: rotate(32deg); }
 }
 @keyframes charLegB {
-  0%, 100% { transform: rotate(22deg); }
-  50%       { transform: rotate(-22deg); }
+  0%, 100% { transform: rotate(32deg); }
+  50%       { transform: rotate(-32deg); }
 }
 @keyframes charArmA {
-  0%, 100% { transform: rotate(-14deg); }
-  50%       { transform: rotate(14deg); }
+  0%, 100% { transform: rotate(-24deg); }
+  50%       { transform: rotate(24deg); }
 }
 @keyframes charArmB {
-  0%, 100% { transform: rotate(14deg); }
-  50%       { transform: rotate(-14deg); }
+  0%, 100% { transform: rotate(24deg); }
+  50%       { transform: rotate(-24deg); }
 }
 .char-leg-a { animation: charLegA 0.7s ease-in-out infinite; }
 .char-leg-b { animation: charLegB 0.7s ease-in-out infinite; }
