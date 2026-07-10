@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import { useGame } from '../game/GameContext';
 import { IslandTile } from './IslandTile';
 import { CharacterOnIsland } from './CharacterOnIsland';
@@ -46,7 +46,33 @@ interface IslandGridProps {
 export const IslandGrid: React.FC<IslandGridProps> = ({
   playerX, playerY, characterId, isWalking, facing, onTileClick,
 }) => {
-  const { state } = useGame();
+  const { state, activeChopTileId, chopCount } = useGame();
+
+  // ── Chop animation pulse ──
+  const [isChopping, setIsChopping] = useState(false);
+  useEffect(() => {
+    if (chopCount === 0) return;
+    setIsChopping(true);
+    const t = setTimeout(() => setIsChopping(false), 380);
+    return () => clearTimeout(t);
+  }, [chopCount]);
+
+  // ── Compute facing toward the tree being chopped ──
+  const chopFacing = useMemo((): 'front' | 'back' | 'left' | 'right' | null => {
+    if (!activeChopTileId) return null;
+    const [tx, ty] = activeChopTileId.split(',').map(Number);
+    const dx = tx - Math.round(playerX);
+    const dy = ty - Math.round(playerY);
+    // Isometric screen-space decomposition
+    const dsx = dx - dy;
+    const dsy = dx + dy;
+    if (Math.abs(dsx) >= Math.abs(dsy)) {
+      return dsx >= 0 ? 'right' : 'left';
+    }
+    return dsy >= 0 ? 'front' : 'back';
+  }, [activeChopTileId, playerX, playerY]);
+
+  const activeFacing: 'front' | 'back' | 'left' | 'right' = chopFacing ?? facing;
 
   const dangerZoneTiles = useMemo(() => {
     const danger = new Set<string>();
@@ -110,7 +136,8 @@ export const IslandGrid: React.FC<IslandGridProps> = ({
           tileZIndex={charZ}
           characterId={characterId}
           isWalking={isWalking}
-          facing={facing}
+          facing={activeFacing}
+          isChopping={isChopping}
         />
       )}
     </div>

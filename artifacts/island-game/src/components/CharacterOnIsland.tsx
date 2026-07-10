@@ -16,6 +16,7 @@ interface Props {
   characterId: string;
   isWalking: boolean;
   facing: Facing;
+  isChopping?: boolean;
 }
 
 /**
@@ -53,6 +54,7 @@ export const CharacterOnIsland: React.FC<Props> = ({
   characterId,
   isWalking,
   facing,
+  isChopping,
 }) => {
   const Char = CHARACTER_COMPONENTS[characterId] ?? ChMia;
   const SIZE = 52;
@@ -84,9 +86,10 @@ export const CharacterOnIsland: React.FC<Props> = ({
         <PlayerArrow />
       </div>
 
-      {/* Character sprite — bob wrapper provides squish-stretch */}
+      {/* Character sprite — chop-swing wrapper */}
       <div
-        className={undefined}
+        key={isChopping ? 'chop' : 'idle'}
+        className={isChopping ? 'char-chop-swing' : undefined}
         style={{ transformOrigin: 'bottom center' }}
       >
         <div style={{ filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.40))' }}>

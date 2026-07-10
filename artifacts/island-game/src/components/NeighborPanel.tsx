@@ -5,10 +5,32 @@ import { ResourceType } from '../game/types';
 import { useToast } from '@/hooks/use-toast';
 
 /* ─── SVG micro-icons (unchanged from previous impl) ──────────────────── */
-const IcoSelect = () => (
-  <svg viewBox="0 0 28 28" width="26" height="26">
-    <polygon points="6,4 6,22 11,18 14,26 17,25 14,17 20,17"
-             fill="white" stroke="rgba(0,0,0,0.3)" strokeWidth="1"/>
+/* ── Axe icon — metallic head + grape cluster (matches reference) ── */
+const IcoAxe = () => (
+  <svg viewBox="0 0 30 30" width="28" height="28">
+    {/* Handle */}
+    <path d="M27,4 Q26,6 21,13 L16,21 Q14,24 13,26" stroke="#7a4e1c" strokeWidth="4.5" fill="none" strokeLinecap="round"/>
+    <path d="M27,4 Q26,6 21,13 L16,21 Q14,24 13,26" stroke="#c08840" strokeWidth="2.5" fill="none" strokeLinecap="round" opacity="0.55"/>
+    {/* Axe head — steel blue-grey */}
+    <path d="M8,3 Q4,5 3,10 Q2,16 5,20 Q8,25 13,21 Q18,23 20,15 Q22,8 16,5 Q12,3 8,3Z" fill="#8898B4"/>
+    <path d="M8,3 Q4,5 3,10 Q2,16 5,20 Q8,25 13,21" stroke="#6070A0" strokeWidth="1.1" fill="none" opacity="0.7"/>
+    {/* Blade shine */}
+    <path d="M9.5,5.5 Q7,9 7,15" stroke="rgba(210,225,255,0.55)" strokeWidth="2.2" fill="none" strokeLinecap="round"/>
+    <ellipse cx="15" cy="8" rx="2.5" ry="4.5" fill="rgba(200,215,255,0.22)" transform="rotate(30 15 8)"/>
+    {/* Grapes — purple cluster on the blade */}
+    <circle cx="10.5" cy="17" r="2.6" fill="#5535A8"/>
+    <circle cx="13.8" cy="16.5" r="2.6" fill="#5535A8"/>
+    <circle cx="12.2" cy="13.2" r="2.6" fill="#6848BB"/>
+    <circle cx="9.2"  cy="13.8" r="2.2" fill="#4828A0"/>
+    {/* Grape highlights */}
+    <circle cx="9.8"  cy="16.2" r="1.0" fill="rgba(255,255,255,0.52)"/>
+    <circle cx="13.0" cy="15.7" r="1.0" fill="rgba(255,255,255,0.52)"/>
+    <circle cx="11.4" cy="12.5" r="0.9" fill="rgba(255,255,255,0.46)"/>
+    {/* Grape stem */}
+    <path d="M12.2,10.5 Q12.8,8.5 14.5,7.5" stroke="#3a7018" strokeWidth="1.4" fill="none" strokeLinecap="round"/>
+    {/* Leaf */}
+    <ellipse cx="15.5" cy="6.8" rx="3.8" ry="2.4" fill="#4aA028" transform="rotate(-25 15.5 6.8)"/>
+    <path d="M14,7.5 Q15,7 16.5,6.5" stroke="#2a7010" strokeWidth="0.8" fill="none" strokeLinecap="round" opacity="0.8"/>
   </svg>
 );
 const IcoMarket = () => (
@@ -241,7 +263,7 @@ export const NeighborPanel = ({
             active={activeTool === 'clear'}
             gradient="linear-gradient(180deg, #7090b8 0%, #405878 100%)"
           >
-            <IcoSelect />
+            <IcoAxe />
           </Tile>
 
           <Tile

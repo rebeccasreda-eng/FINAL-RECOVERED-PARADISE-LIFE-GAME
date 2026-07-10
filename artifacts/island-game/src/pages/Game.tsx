@@ -12,6 +12,7 @@ import { WeatherModal } from '../components/WeatherModal';
 import { CropPicker } from '../components/CropPicker';
 import { NeighborPanel } from '../components/NeighborPanel';
 import { WelcomeScreen, PlayerProfile } from '../components/WelcomeScreen';
+import { ChopProgressBar } from '../components/ChopProgressBar';
 
 const PROFILE_KEY = 'paradise-player-profile';
 
@@ -412,6 +413,9 @@ const GameInner = ({ profile }: { profile: PlayerProfile }) => {
           title="Zoom out"
         >−</button>
       </div>
+
+      {/* ── Chop progress bar (inside viewport overlay) ── */}
+      <ChopProgressBar />
 
       {/* ── Fixed HUD chrome ── */}
       <TopNav

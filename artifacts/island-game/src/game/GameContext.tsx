@@ -8,7 +8,7 @@ import { useToast } from '@/hooks/use-toast';
 
 // Chops required to fell each tree type (shared by reducer + UI)
 const TREE_CHOPS: Record<string, number> = {
-  TREE_PALM: 3, TREE_APPLE: 2, TREE_COCONUT: 2, TREE_MANGO: 2,
+  TREE_PALM: 5, TREE_APPLE: 5, TREE_COCONUT: 5, TREE_MANGO: 5,
 };
 
 export const GameContext = createContext<(GameContextType & { plantingTile: string | null; setPlantingTile: (id: string | null) => void; }) | null>(null);
@@ -669,6 +669,8 @@ export const GameProvider: React.FC<{children: React.ReactNode}> = ({ children }
   
   const [floatingTexts, setFloatingTexts] = useState<{id: string, tileId: string, text: string}[]>([]);
   const [questBanner, setQuestBanner] = useState<string | null>(null);
+  const [activeChopTileId, setActiveChopTileId] = useState<string | null>(null);
+  const [chopCount, setChopCount] = useState(0);
 
   useEffect(() => {
     localStorage.setItem('island-game-state-v13', JSON.stringify(state));
@@ -752,17 +754,26 @@ export const GameProvider: React.FC<{children: React.ReactNode}> = ({ children }
     dispatch({ type: 'INTERACT', tileId, energyCost });
 
     const TREE_CHOPS: Record<string, number> = {
-      TREE_PALM: 3, TREE_APPLE: 2, TREE_COCONUT: 2, TREE_MANGO: 2,
+      TREE_PALM: 5, TREE_APPLE: 5, TREE_COCONUT: 5, TREE_MANGO: 5,
     };
     const isTree = tile.object != null && tile.object in TREE_CHOPS;
     const treeChopsLeft = isTree ? (tile.treeHp ?? TREE_CHOPS[tile.object!]) : 0;
 
+    // Clear any active chop progress when the player switches to a non-tree action
+    if (!isTree) {
+      setActiveChopTileId(null);
+    }
+
     // Intermediate tree chop or non-final enemy hit — no rewards yet
     if (isTree && treeChopsLeft > 1) {
-      const id = Math.random().toString();
-      setFloatingTexts(prev => [...prev, { id, tileId, text: '🪓' }]);
-      setTimeout(() => setFloatingTexts(prev => prev.filter(t => t.id !== id)), 900);
+      setActiveChopTileId(tileId);
+      setChopCount(c => c + 1);
       return;
+    }
+    // Final chop — tree falls
+    if (isTree && treeChopsLeft === 1) {
+      setChopCount(c => c + 1);
+      setActiveChopTileId(null);
     }
     if ((tile.object === 'CRAB' || tile.object === 'BOAR') && (tile.crabHp || (tile.object === 'CRAB' ? 3 : 2)) > 1) {
       const id = Math.random().toString();
@@ -836,7 +847,8 @@ export const GameProvider: React.FC<{children: React.ReactNode}> = ({ children }
       shopOpen, setShopOpen,
       plantingTile, setPlantingTile,
       questBanner, floatingTexts, tutorial,
-      interact, plant, place
+      interact, plant, place,
+      activeChopTileId, chopCount
     }}>
       {children}
     </GameContext.Provider>

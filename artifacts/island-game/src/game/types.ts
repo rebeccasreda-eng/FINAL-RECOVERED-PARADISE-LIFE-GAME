@@ -120,4 +120,6 @@ export interface GameContextType {
   interact: (tileId: string) => void;
   plant: (tileId: string, cropType?: string) => void;
   place: (tileId: string, obj: ObjectType) => void;
+  activeChopTileId: string | null;
+  chopCount: number;
 }
