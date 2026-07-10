@@ -86,24 +86,16 @@ interface Props {
 }
 
 export const WelcomeScreen: React.FC<Props> = ({ onPlay }) => {
-  const [name, setName]           = useState('Player');
-  const [gender, setGender]       = useState<'female'|'male'|null>(null);
-  const [nameError, setNameError] = useState('');
-  const [genderError, setGenderError] = useState('');
+  const [name, setName]             = useState('Player');
+  const [nameError, setNameError]   = useState('');
   const [appearance, setAppearance] = useState<CharAppearance>(DEFAULT_FEMALE);
+  const [gender, setGender]         = useState<'female'|'male'>('female');
   const [showDressingRoom, setShowDressingRoom] = useState(false);
-  const [toast, setToast]         = useState('');
+  const [toast, setToast]           = useState('');
 
   const showToast = (msg: string) => {
     setToast(msg);
     setTimeout(() => setToast(''), 1600);
-  };
-
-  const handleGender = (g: 'female'|'male') => {
-    setGender(g);
-    setGenderError('');
-    // Reset appearance to gender default when switching
-    setAppearance(g === 'female' ? DEFAULT_FEMALE : DEFAULT_MALE);
   };
 
   const handleRandom = useCallback(() => {
@@ -116,7 +108,6 @@ export const WelcomeScreen: React.FC<Props> = ({ onPlay }) => {
     const outfitColors = ['#4466cc','#dd4499','#222233','#f07020','#3a9a6a','#8a5aaa','#cc3322'];
     const hatOpts = ['none','none','none','cap','cowboy','crown','party','santa'];
     setGender(randomGender);
-    setGenderError('');
     setAppearance({
       ...def,
       hairStyle: hairOpts[Math.floor(Math.random() * hairOpts.length)],
@@ -129,16 +120,12 @@ export const WelcomeScreen: React.FC<Props> = ({ onPlay }) => {
 
   const handlePlay = () => {
     const trimmed = name.trim();
-    let ok = true;
-    if (!trimmed || trimmed.length < 2) { setNameError('Enter at least 2 characters'); ok = false; }
-    if (!gender) { setGenderError('Choose a gender to continue'); ok = false; }
-    if (!ok) return;
-    const g = gender!;
+    if (!trimmed || trimmed.length < 2) { setNameError('Enter at least 2 characters'); return; }
     onPlay({
       name: trimmed,
-      gender: g,
+      gender,
       appearance,
-      characterId: pickCharacterId(g, appearance.hairStyle),
+      characterId: pickCharacterId(gender, appearance.hairStyle),
       hasSetup: true,
     });
   };
@@ -151,12 +138,11 @@ export const WelcomeScreen: React.FC<Props> = ({ onPlay }) => {
     setAppearance(newAppearance);
     setName(newName);
     setGender(newGender);
-    setGenderError('');
     setShowDressingRoom(false);
     showToast('Look saved!');
   }, []);
 
-  const currentGender = gender ?? 'female';
+  const currentGender = gender;
 
   return (
     <>
@@ -226,69 +212,22 @@ export const WelcomeScreen: React.FC<Props> = ({ onPlay }) => {
             {nameError && <p style={{ fontSize: 11, fontWeight: 900, marginTop: 3, color: '#a02f2f' }}>{nameError}</p>}
           </div>
 
-          {/* Character stage — girl left, boy right; click to select */}
+          {/* Character stage — single centred character */}
           <div style={{ position: 'relative', height: 260, marginBottom: 12, borderRadius: 12, border: '4px solid #8a5a2b', overflow: 'hidden' }}>
             <StageBg/>
 
-            {/* Girl */}
-            {(['female', 'male'] as const).map((g, i) => {
-              const isSelected = gender === g;
-              const charAppearance = gender === g ? appearance : (g === 'female' ? DEFAULT_FEMALE : DEFAULT_MALE);
-              return (
-                <div
-                  key={g}
-                  onClick={() => handleGender(g)}
-                  style={{
-                    position: 'absolute',
-                    bottom: 18,
-                    left: i === 0 ? '25%' : '75%',
-                    transform: 'translateX(-50%)',
-                    zIndex: 10,
-                    cursor: 'pointer',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                    transition: 'transform 0.15s',
-                  }}
-                >
-                  {/* Green downward arrow above selected character */}
-                  <div style={{ height: 26, display: 'flex', alignItems: 'flex-end', justifyContent: 'center', marginBottom: 2 }}>
-                    {isSelected && (
-                      <svg width="26" height="22" viewBox="0 0 26 22" style={{ display: 'block' }}>
-                        <polygon points="13,22 0,0 26,0" fill="#33dd22" stroke="#1a8810" strokeWidth="1.5" strokeLinejoin="round"/>
-                        <polygon points="13,18 3,3 23,3" fill="#55ff44" opacity="0.5"/>
-                      </svg>
-                    )}
-                  </div>
-
-                  <div
-                    className={isSelected ? 'idle-bob' : undefined}
-                    style={{
-                      filter: isSelected
-                        ? 'drop-shadow(0 4px 10px rgba(0,0,0,0.4))'
-                        : 'drop-shadow(0 2px 4px rgba(0,0,0,0.25)) brightness(0.85)',
-                      transform: isSelected ? 'scale(1.08)' : 'scale(1)',
-                      transition: 'transform 0.15s, filter 0.15s',
-                    }}
-                  >
-                    <CustomizableCharSVG appearance={charAppearance} gender={g} size={118}/>
-                  </div>
-
-                  {/* Label badge */}
-                  <div style={{
-                    marginTop: 4,
-                    background: isSelected ? 'linear-gradient(180deg,#ffe860,#d4a020)' : 'rgba(0,0,0,0.35)',
-                    border: `2px solid ${isSelected ? '#a07010' : 'transparent'}`,
-                    borderRadius: 10, padding: '2px 8px',
-                    fontSize: 10, fontWeight: 900,
-                    color: isSelected ? '#4a2800' : '#f5e8c0',
-                    letterSpacing: 1,
-                  }}>
-                    {g === 'female' ? '♀ GIRL' : '♂ BOY'}
-                  </div>
-                </div>
-              );
-            })}
+            <div style={{
+              position: 'absolute', bottom: 18, left: '50%',
+              transform: 'translateX(-50%)',
+              zIndex: 10, display: 'flex', flexDirection: 'column', alignItems: 'center',
+            }}>
+              <div
+                className="char-idle-bob"
+                style={{ filter: 'drop-shadow(0 4px 10px rgba(0,0,0,0.4))', transformOrigin: 'bottom center' }}
+              >
+                <CustomizableCharSVG appearance={appearance} gender={currentGender} size={130}/>
+              </div>
+            </div>
 
             {toast && (
               <div style={{
@@ -298,16 +237,6 @@ export const WelcomeScreen: React.FC<Props> = ({ onPlay }) => {
                 pointerEvents: 'none', whiteSpace: 'nowrap',
               }}>
                 {toast}
-              </div>
-            )}
-            {genderError && (
-              <div style={{
-                position: 'absolute', top: 8, left: '50%', transform: 'translateX(-50%)',
-                background: '#a02f2f', color: 'white', padding: '4px 12px',
-                borderRadius: 12, fontSize: 11, fontWeight: 900, zIndex: 30,
-                whiteSpace: 'nowrap',
-              }}>
-                {genderError}
               </div>
             )}
           </div>
