@@ -150,6 +150,12 @@
   80%,100% { transform: scale(1.9); opacity: 0;   }
 }
 
+@keyframes axe-pop {
+  0%   { transform: translateX(-50%) scale(0.55); opacity: 0; }
+  70%  { transform: translateX(-50%) scale(1.12); opacity: 1; }
+  100% { transform: translateX(-50%) scale(1.00); opacity: 1; }
+}
+
 /* ── Water: gradient shimmer + wave stroke animations ────────────────── */
 @keyframes waterGlintAnim {
   0%,100% { opacity: 0.18; }

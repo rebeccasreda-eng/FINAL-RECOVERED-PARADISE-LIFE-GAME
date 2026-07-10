@@ -1151,6 +1151,9 @@ const ObjectSVG: React.FC<{ object: string; tileX: number; tileY: number }> = ({
   }
 };
 
+/** Trees that trigger the axe-chop hint on hover */
+const CHOP_TREES = new Set(['TREE_PALM', 'TREE_APPLE', 'TREE_COCONUT', 'TREE_MANGO']);
+
 /** Objects that use SVG art instead of emoji */
 const SVG_OBJECTS = new Set(['TREE_PALM', 'TREE_APPLE', 'ROCK', 'FLOWER_BUSH', 'DRIFTWOOD',
   'TREE_COCONUT', 'TREE_MANGO', 'GARDEN_PATCH', 'WEEDS', 'SUNFLOWER', 'PUDDLE', 'THORNS',
@@ -1600,6 +1603,38 @@ export const IslandTile: React.FC<IslandTileProps> = ({
           >
             <ObjectSVG object={tile.object} tileX={tile.x} tileY={tile.y}/>
           </div>
+        </div>
+      )}
+
+      {/* ── Axe badge: shown when hovering a choppable tree with the clear tool ── */}
+      {hovered && activeTool === 'clear' && tile.object && CHOP_TREES.has(tile.object) && (
+        <div
+          style={{
+            position: 'absolute',
+            left: '68%',
+            top: -42,
+            transform: 'translateX(-50%)',
+            pointerEvents: 'none',
+            background: 'rgba(255,250,240,0.94)',
+            borderRadius: '50%',
+            width: 36,
+            height: 36,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            boxShadow: '0 2px 8px rgba(0,0,0,0.38)',
+            border: '2.5px solid #c08840',
+            animation: 'axe-pop 0.14s ease-out',
+            zIndex: tileZIndex + 10,
+          }}
+        >
+          <svg viewBox="0 0 30 30" width="22" height="22">
+            <path d="M27,4 Q26,6 21,13 L16,21 Q14,24 13,26" stroke="#7a4e1c" strokeWidth="4.5" fill="none" strokeLinecap="round"/>
+            <path d="M27,4 Q26,6 21,13 L16,21 Q14,24 13,26" stroke="#c08840" strokeWidth="2.5" fill="none" strokeLinecap="round" opacity="0.55"/>
+            <path d="M8,3 Q4,5 3,10 Q2,16 5,20 Q8,25 13,21 Q18,23 20,15 Q22,8 16,5 Q12,3 8,3Z" fill="#8898B4"/>
+            <path d="M8,3 Q4,5 3,10 Q2,16 5,20 Q8,25 13,21" stroke="#6070A0" strokeWidth="1.1" fill="none" opacity="0.7"/>
+            <path d="M9.5,5.5 Q7,9 7,15" stroke="rgba(210,225,255,0.55)" strokeWidth="2.2" fill="none" strokeLinecap="round"/>
+          </svg>
         </div>
       )}
 
