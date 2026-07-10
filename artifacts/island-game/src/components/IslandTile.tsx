@@ -619,22 +619,12 @@ export const IslandTile: React.FC<IslandTileProps> = ({
           const cid = `wc-${tile.x}-${tile.y}`;
 
           if (isWater) {
-            return (
-              <defs>
-                <linearGradient id={gid} x1="10%" y1="0%" x2="90%" y2="100%">
-                  <stop offset="0%"   stopColor="#b8eeff" />
-                  <stop offset="38%"  stopColor="#52C8E4" />
-                  <stop offset="100%" stopColor="#1e8ab0" />
-                </linearGradient>
-                <clipPath id={cid}>
-                  <polygon points="40,0 80,14 40,28 0,14" />
-                </clipPath>
-              </defs>
-            );
+            // No per-tile gradient — flat colour prevents seaming between adjacent water tiles
+            return null;
           }
 
-          // Slight per-tile brightness nudge: deterministic, no random
-          const v = ((tile.x * 11 + tile.y * 7) % 5) - 2; // -2 … +2
+          // No per-tile brightness nudge — keeps adjacent tiles blended seamlessly
+          const v = 0;
 
           type RGB = [number, number, number];
           const hx = (r: number, g: number, b: number) =>
@@ -676,60 +666,16 @@ export const IslandTile: React.FC<IslandTileProps> = ({
           );
         })()}
 
-        {/* Top face */}
+        {/* Top face — expanded 1 px beyond nominal edges to seal sub-pixel seams */}
         <polygon
-          points="40,0 80,14 40,28 0,14"
+          points="40,-1 81,14 40,29 -1,14"
           fill={isWater
-            ? `url(#wg-${tile.x}-${tile.y})`
+            ? '#4ec4de'
             : hovered ? topFill : `url(#lg-${tile.x}-${tile.y})`}
           stroke="none"
         />
 
-        {/* Side faces (land tiles only) — gradient for depth */}
-        {!isWater && palette.sideL && (
-          <>
-            <polygon points="0,14 40,28 40,38 0,24"  fill={`url(#sl-${tile.x}-${tile.y})`} />
-            <polygon points="80,14 40,28 40,38 80,24" fill={`url(#sr-${tile.x}-${tile.y})`} />
-          </>
-        )}
 
-        {/* Top ridge highlight — bright edge where light hits the tile crest */}
-        {!isWater && (
-          <polyline points="2,14 40,1 78,14" fill="none" stroke="rgba(255,255,255,0.42)" strokeWidth="0.9" strokeLinecap="round"/>
-        )}
-        {/* Water surface edge glint */}
-        {isWater && (
-          <polyline points="2,14 40,1 78,14" fill="none" stroke="rgba(255,255,255,0.22)" strokeWidth="0.8" strokeLinecap="round"/>
-        )}
-
-        {/* Water: painted wave strokes + shimmer */}
-        {isWater && (() => {
-          const cid   = `wc-${tile.x}-${tile.y}`;
-          const phase = (tile.x * 5 + tile.y * 3) % 8;
-          const y1    = 7  + phase * 0.4;
-          const y2    = 18 + phase * 0.25;
-          const cls1  = (tile.x + tile.y) % 2 === 0 ? 'water-wave-a' : 'water-wave-b';
-          const cls2  = (tile.x + tile.y) % 2 === 0 ? 'water-wave-b' : 'water-wave-a';
-          return (
-            <g clipPath={`url(#${cid})`}>
-              {/* Upper wave stroke */}
-              <path
-                d={`M -5,${y1} Q 20,${y1 - 2.5} 40,${y1} Q 60,${y1 + 2.5} 85,${y1}`}
-                fill="none" stroke="rgba(255,255,255,0.28)" strokeWidth="1.6"
-                strokeLinecap="round" className={cls1}
-              />
-              {/* Lower wave stroke */}
-              <path
-                d={`M -5,${y2} Q 20,${y2 + 2} 40,${y2} Q 60,${y2 - 2} 85,${y2}`}
-                fill="none" stroke="rgba(255,255,255,0.18)" strokeWidth="1.2"
-                strokeLinecap="round" className={cls2}
-              />
-              {/* Subtle centre highlight band — replicates the lighter area in the reference */}
-              <ellipse cx="40" cy="13" rx="18" ry="6"
-                fill="rgba(180,238,255,0.18)" className="water-glint" />
-            </g>
-          );
-        })()}
 
         {/* Danger zone red pulse */}
         {isDangerZone && (
