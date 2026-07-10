@@ -2,8 +2,9 @@
 
 export const DEV_SPEEDUP = 100;
 export const SCALED = (ms: number) => Math.max(1000, ms / DEV_SPEEDUP); // Don't go below 1 second to avoid missing ticks
-export const COCONUT_RIPEN_TIME = SCALED(90000);  // 90 s — unripe → ripe
-export const MANGO_RIPEN_TIME   = SCALED(120000); // 2 min — unripe → ripe
+export const COCONUT_RIPEN_TIME  = SCALED(90000);  // 90 s — unripe → ripe
+export const MANGO_RIPEN_TIME    = SCALED(120000); // 2 min — unripe → ripe
+export const STUMP_REGROW_TIME   = SCALED(150000); // 2.5 min — stump → sapling
 
 export const WEATHER_TYPES: WeatherType[] = ['SUNNY', 'RAINY', 'CLOUDY', 'STORMY', 'WINDY'];
 
@@ -146,10 +147,15 @@ export const OBJECT_CONFIG: Record<string, any> = {
   PINEAPPLE_PLANT:{ action: 'Harvest', energy: 1, coins: 8, xp: 14, respawn: SCALED(90000) },
   BLUEBERRY_BUSH: { action: 'Harvest', energy: 1, coins: 6, xp: 12, respawn: SCALED(75000) },
   DRIFTWOOD: { action: 'Clear', energy: 1, coins: 3, xp: 5, drops: { wood: 1 }, respawn: SCALED(80000) },
-  TREE_COCONUT: { action: 'Harvest', energy: 1, coins: 6, xp: 12, drops: { food: 2 }, respawn: SCALED(70000) },
-  TREE_MANGO:   { action: 'Harvest', energy: 1, coins: 8, xp: 14, drops: { food: 3 }, respawn: SCALED(80000) },
-  TREE_COCONUT_UNRIPE: { action: 'Wait', energy: 0, coins: 0, xp: 0 },
-  TREE_MANGO_UNRIPE:   { action: 'Wait', energy: 0, coins: 0, xp: 0 },
+  // Ripe: harvest fruit only — tree stays, transitions directly to unripe (no respawn queue)
+  TREE_COCONUT: { action: 'Harvest', energy: 1, coins: 6, xp: 12, drops: { food: 2 } },
+  TREE_MANGO:   { action: 'Harvest', energy: 1, coins: 8, xp: 14, drops: { food: 3 } },
+  // Unripe: choppable — 5 hits give wood + leave a stump
+  TREE_COCONUT_UNRIPE: { action: 'Chop', energy: 1, coins: 2, xp: 8,  drops: { wood: 2 } },
+  TREE_MANGO_UNRIPE:   { action: 'Chop', energy: 1, coins: 3, xp: 10, drops: { wood: 3 } },
+  // Stumps: wait quietly until growsAt fires → sapling
+  COCONUT_STUMP: { action: 'Wait', energy: 0, coins: 0, xp: 0 },
+  MANGO_STUMP:   { action: 'Wait', energy: 0, coins: 0, xp: 0 },
   GARDEN_PATCH: { action: 'Harvest', energy: 1, coins: 10, xp: 18, drops: { food: 2 }, respawn: SCALED(50000) },
   CROP_READY: { action: 'Harvest', energy: 1, coins: 10, xp: 20 },
   CROP_WILTED: { action: 'Clear', energy: 1, coins: 0, xp: 2 },
@@ -167,6 +173,7 @@ export const EMOJI_MAP: Record<string, string> = {
   BLUEBELL: '💜', PANSY: '🌼', TULIP: '🌷', PINEAPPLE_PLANT: '🍍', BLUEBERRY_BUSH: '🫐',
   TREE_COCONUT: '🌴', TREE_MANGO: '🥭', GARDEN_PATCH: '🍍',
   TREE_COCONUT_UNRIPE: '🌴', TREE_MANGO_UNRIPE: '🥭',
+  COCONUT_STUMP: '🪵', MANGO_STUMP: '🪵',
   CROP_PLOT: '🟫', CROP_GROWING: '🌱', CROP_READY: '🌽', CROP_WILTED: '🥀',
   FISH_SPOT: '', HUT: '🏚️', DOCK: '⛵', WELL: '💧', 
   FLOWER_POT: '🪴', FENCE: '🚧', LANTERN: '🏮', CRAB: '🦀', BOAR: '🐗', BABY_PARROT: '🦜', TALL_ROCK: '🪨',

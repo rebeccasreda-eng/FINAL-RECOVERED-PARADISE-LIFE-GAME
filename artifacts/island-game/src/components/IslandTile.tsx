@@ -776,6 +776,122 @@ const ObjectSVG: React.FC<{ object: string; tileX: number; tileY: number; tileTy
       </svg>
     );
 
+    /* ── COCONUT STUMP ──────────────────────────────────────────────────── */
+    case 'COCONUT_STUMP': return (
+      <svg viewBox="0 0 70 58" width="86" height="72" style={{ display:'block' }}>
+        <defs>
+          <linearGradient id={g('stk')} x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%"   stopColor="#a87840"/>
+            <stop offset="22%"  stopColor="#6e4620"/>
+            <stop offset="65%"  stopColor="#4a2e10"/>
+            <stop offset="100%" stopColor="#261408"/>
+          </linearGradient>
+          <radialGradient id={g('stt')} cx="35%" cy="35%" r="70%">
+            <stop offset="0%"   stopColor="#c09060"/>
+            <stop offset="50%"  stopColor="#8a5828"/>
+            <stop offset="100%" stopColor="#5a3010"/>
+          </radialGradient>
+        </defs>
+        {/* Grass tufts flanking stump */}
+        <path d="M10,55 Q8,47 12,40"  stroke="#38901a" strokeWidth="2.3" fill="none" strokeLinecap="round"/>
+        <path d="M15,56 Q13,48 17,41" stroke="#2e8012" strokeWidth="2.0" fill="none" strokeLinecap="round"/>
+        <path d="M20,56 Q18,48 22,40" stroke="#3a9820" strokeWidth="1.8" fill="none" strokeLinecap="round"/>
+        <path d="M52,56 Q54,48 50,40" stroke="#3a9820" strokeWidth="1.8" fill="none" strokeLinecap="round"/>
+        <path d="M57,56 Q59,48 55,41" stroke="#2e8012" strokeWidth="2.0" fill="none" strokeLinecap="round"/>
+        <path d="M62,55 Q64,47 60,40" stroke="#38901a" strokeWidth="2.3" fill="none" strokeLinecap="round"/>
+        {/* Stump body */}
+        <path d="M18,53 Q20,41 22,28 L48,28 Q50,41 52,53Z" fill={`url(#${g('stk')})`}/>
+        {/* Left lit edge */}
+        <path d="M20,51 Q22,39 23,30" stroke="rgba(255,255,255,0.22)" strokeWidth="1.8" fill="none" strokeLinecap="round"/>
+        {/* Ring bands */}
+        {[35,41,47].map(y => {
+          const lx = (22 - (y - 28) / 25 * 4).toFixed(1);
+          const rx = (48 + (y - 28) / 25 * 4).toFixed(1);
+          return (
+            <g key={y}>
+              <path d={`M${lx},${y-1} Q35,${y-3} ${rx},${y-1}`} stroke="rgba(255,255,255,0.26)" strokeWidth="1.4" fill="none" strokeLinecap="round"/>
+              <path d={`M${lx},${y+1} Q35,${y-1} ${rx},${y+1}`} stroke="rgba(0,0,0,0.38)" strokeWidth="1.8" fill="none" strokeLinecap="round"/>
+            </g>
+          );
+        })}
+        {/* Cut top — ellipse with growth rings */}
+        <ellipse cx="35" cy="28" rx="13" ry="4.5" fill={`url(#${g('stt')})`}/>
+        <ellipse cx="35" cy="28" rx="9"  ry="3.0" fill="none" stroke="rgba(0,0,0,0.14)" strokeWidth="1.0"/>
+        <ellipse cx="35" cy="28" rx="5"  ry="1.8" fill="none" stroke="rgba(0,0,0,0.18)" strokeWidth="1.0"/>
+        <ellipse cx="35" cy="28" rx="2"  ry="0.8" fill="none" stroke="rgba(0,0,0,0.22)" strokeWidth="0.8"/>
+        <ellipse cx="35" cy="28" rx="0.8" ry="0.4" fill="rgba(80,40,10,0.5)"/>
+        {/* Wood chips */}
+        <ellipse cx="20" cy="52" rx="3.0" ry="1.2" fill="#8a5828" opacity="0.65" transform="rotate(-15 20 52)"/>
+        <ellipse cx="50" cy="53" rx="2.5" ry="1.0" fill="#6e4420" opacity="0.60" transform="rotate(20 50 53)"/>
+        <ellipse cx="35" cy="54" rx="2.2" ry="0.9" fill="#7a4c24" opacity="0.55" transform="rotate(-5 35 54)"/>
+        {/* Tiny palm sprout hint */}
+        <path d="M35,27 Q33,22 28,18" stroke="#2a8010" strokeWidth="1.8" fill="none" strokeLinecap="round"/>
+        <path d="M35,27 Q37,22 42,18" stroke="#2a8010" strokeWidth="1.8" fill="none" strokeLinecap="round"/>
+        <path d="M35,27 Q35,20 35,15" stroke="#34a014" strokeWidth="1.6" fill="none" strokeLinecap="round"/>
+        <ellipse cx="28" cy="17" rx="4" ry="2.5" fill="#2a9810" opacity="0.9" transform="rotate(-20 28 17)"/>
+        <ellipse cx="42" cy="17" rx="4" ry="2.5" fill="#2a9810" opacity="0.9" transform="rotate(20 42 17)"/>
+        <ellipse cx="35" cy="14" rx="4" ry="2.5" fill="#34b018" opacity="0.9"/>
+      </svg>
+    );
+
+    /* ── MANGO STUMP ─────────────────────────────────────────────────────── */
+    case 'MANGO_STUMP': return (
+      <svg viewBox="0 0 70 58" width="86" height="72" style={{ display:'block' }}>
+        <defs>
+          <linearGradient id={g('msk')} x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%"   stopColor="#b88040"/>
+            <stop offset="22%"  stopColor="#7a5020"/>
+            <stop offset="65%"  stopColor="#523010"/>
+            <stop offset="100%" stopColor="#2e1808"/>
+          </linearGradient>
+          <radialGradient id={g('mst')} cx="35%" cy="35%" r="70%">
+            <stop offset="0%"   stopColor="#d0a060"/>
+            <stop offset="50%"  stopColor="#966030"/>
+            <stop offset="100%" stopColor="#603818"/>
+          </radialGradient>
+        </defs>
+        {/* Grass tufts */}
+        <path d="M10,55 Q8,47 12,40"  stroke="#38901a" strokeWidth="2.3" fill="none" strokeLinecap="round"/>
+        <path d="M15,56 Q13,48 17,41" stroke="#2e8012" strokeWidth="2.0" fill="none" strokeLinecap="round"/>
+        <path d="M20,56 Q18,48 22,40" stroke="#3a9820" strokeWidth="1.8" fill="none" strokeLinecap="round"/>
+        <path d="M52,56 Q54,48 50,40" stroke="#3a9820" strokeWidth="1.8" fill="none" strokeLinecap="round"/>
+        <path d="M57,56 Q59,48 55,41" stroke="#2e8012" strokeWidth="2.0" fill="none" strokeLinecap="round"/>
+        <path d="M62,55 Q64,47 60,40" stroke="#38901a" strokeWidth="2.3" fill="none" strokeLinecap="round"/>
+        {/* Stump body */}
+        <path d="M18,53 Q20,41 22,28 L48,28 Q50,41 52,53Z" fill={`url(#${g('msk')})`}/>
+        {/* Left lit edge */}
+        <path d="M20,51 Q22,39 23,30" stroke="rgba(255,255,255,0.22)" strokeWidth="1.8" fill="none" strokeLinecap="round"/>
+        {/* Ring bands */}
+        {[35,41,47].map(y => {
+          const lx = (22 - (y - 28) / 25 * 4).toFixed(1);
+          const rx = (48 + (y - 28) / 25 * 4).toFixed(1);
+          return (
+            <g key={y}>
+              <path d={`M${lx},${y-1} Q35,${y-3} ${rx},${y-1}`} stroke="rgba(255,255,255,0.26)" strokeWidth="1.4" fill="none" strokeLinecap="round"/>
+              <path d={`M${lx},${y+1} Q35,${y-1} ${rx},${y+1}`} stroke="rgba(0,0,0,0.38)" strokeWidth="1.8" fill="none" strokeLinecap="round"/>
+            </g>
+          );
+        })}
+        {/* Cut top */}
+        <ellipse cx="35" cy="28" rx="13" ry="4.5" fill={`url(#${g('mst')})`}/>
+        <ellipse cx="35" cy="28" rx="9"  ry="3.0" fill="none" stroke="rgba(0,0,0,0.14)" strokeWidth="1.0"/>
+        <ellipse cx="35" cy="28" rx="5"  ry="1.8" fill="none" stroke="rgba(0,0,0,0.18)" strokeWidth="1.0"/>
+        <ellipse cx="35" cy="28" rx="2"  ry="0.8" fill="none" stroke="rgba(0,0,0,0.22)" strokeWidth="0.8"/>
+        <ellipse cx="35" cy="28" rx="0.8" ry="0.4" fill="rgba(80,40,10,0.5)"/>
+        {/* Wood chips */}
+        <ellipse cx="20" cy="52" rx="3.0" ry="1.2" fill="#966030" opacity="0.65" transform="rotate(-15 20 52)"/>
+        <ellipse cx="50" cy="53" rx="2.5" ry="1.0" fill="#7a4c20" opacity="0.60" transform="rotate(20 50 53)"/>
+        <ellipse cx="35" cy="54" rx="2.2" ry="0.9" fill="#845428" opacity="0.55" transform="rotate(-5 35 54)"/>
+        {/* Mango leaf sprout hint */}
+        <path d="M35,27 Q35,20 35,14" stroke="#2a9018" strokeWidth="1.8" fill="none" strokeLinecap="round"/>
+        <path d="M35,20 Q30,16 25,17"  stroke="#2a8012" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
+        <path d="M35,20 Q40,16 45,17"  stroke="#2a8012" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
+        <ellipse cx="24" cy="16.5" rx="5" ry="2.2" fill="#309820" opacity="0.9" transform="rotate(-15 24 16.5)"/>
+        <ellipse cx="46" cy="16.5" rx="5" ry="2.2" fill="#309820" opacity="0.9" transform="rotate(15 46 16.5)"/>
+        <ellipse cx="35" cy="13"   rx="4.5" ry="2.0" fill="#38b025" opacity="0.9"/>
+      </svg>
+    );
+
     /* ── MANGO TREE ─────────────────────────────────────────────────────── */
     case 'TREE_MANGO': return (
       <svg viewBox="0 0 76 96" width="94" height="118" style={{ display:'block' }}>
@@ -1821,6 +1937,7 @@ const CHOP_TREES = new Set(['TREE_PALM', 'TREE_APPLE']);
 /** Objects that use SVG art instead of emoji */
 const SVG_OBJECTS = new Set(['TREE_PALM', 'TREE_APPLE', 'ROCK', 'FLOWER_BUSH', 'DRIFTWOOD',
   'TREE_COCONUT', 'TREE_MANGO', 'TREE_COCONUT_UNRIPE', 'TREE_MANGO_UNRIPE',
+  'COCONUT_STUMP', 'MANGO_STUMP',
   'GARDEN_PATCH', 'WEEDS', 'SUNFLOWER', 'PUDDLE', 'THORNS',
   'BLUEBELL', 'PANSY', 'TULIP', 'PINEAPPLE_PLANT', 'BLUEBERRY_BUSH', 'BABY_PARROT', 'TALL_ROCK', 'DOCK',
   'TOXIC_DRUM']);

@@ -11,6 +11,7 @@ export type ObjectType =
   | 'HUT' | 'DOCK' | 'WELL' | 'FLOWER_POT' | 'FENCE' | 'LANTERN'
   | 'CRAB' | 'BOAR' | 'BABY_PARROT' | 'TALL_ROCK'
   | 'TREE_COCONUT_UNRIPE' | 'TREE_MANGO_UNRIPE'
+  | 'COCONUT_STUMP' | 'MANGO_STUMP'
   | 'TOXIC_DRUM';
 
 export type WeatherType = 'SUNNY' | 'RAINY' | 'CLOUDY' | 'STORMY' | 'WINDY';
@@ -26,6 +27,7 @@ export interface TileData {
   crabHp?: number;
   treeHp?: number;        // chops remaining before tree falls
   ripensAt?: number;      // timestamp when unripe fruit tree becomes harvestable
+  growsAt?: number;       // timestamp when a stump regrows into a sapling
   unwitherRequestedAt?: number;
   shoreDepth?: number;   // BFS distance from nearest land tile (GRASS/SAND); water only
 }
