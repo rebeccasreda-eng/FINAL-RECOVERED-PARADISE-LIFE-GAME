@@ -361,8 +361,8 @@ export function generateIsland(): Record<string, TileData> {
   for (let i = 0; i < 4  && outer.length; i++) pick(outer).object = 'TULIP';
   for (let i = 0; i < 6  && inner.length; i++) pick(inner).object = 'PINEAPPLE_PLANT';
   for (let i = 0; i < 4  && outer.length; i++) pick(outer).object = 'PINEAPPLE_PLANT';
-  for (let i = 0; i < 6  && inner.length; i++) pick(inner).object = 'BLUEBERRY_BUSH';
-  for (let i = 0; i < 5  && outer.length; i++) pick(outer).object = 'BLUEBERRY_BUSH';
+  for (let i = 0; i < 2  && inner.length; i++) pick(inner).object = 'BLUEBERRY_BUSH';
+  for (let i = 0; i < 1  && outer.length; i++) pick(outer).object = 'BLUEBERRY_BUSH';
   for (let i = 0; i < 4  && inner.length; i++) pick(inner).object = 'BABY_PARROT';
 
   const waterTiles = Object.values(tiles).filter(t => t.type === 'WATER');
