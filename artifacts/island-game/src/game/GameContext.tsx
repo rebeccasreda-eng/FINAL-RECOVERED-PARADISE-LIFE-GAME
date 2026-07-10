@@ -1,14 +1,15 @@
 import React, { createContext, useContext, useEffect, useReducer, useRef, useState } from 'react';
 import { GameState, GameAction, GameContextType, ResourceType, ObjectType } from './types';
-import { generateIsland, QUESTS, QUEST_GROUPS, OBJECT_CONFIG, SCALED, WEATHER_TYPES, CROP_TYPES, INITIAL_NEIGHBORS, COLLECTIONS, COLLECTION_SETS, PREMIUM_ITEMS } from './gameData';
+import { generateIsland, QUESTS, QUEST_GROUPS, OBJECT_CONFIG, SCALED, WEATHER_TYPES, CROP_TYPES, INITIAL_NEIGHBORS, COLLECTIONS, COLLECTION_SETS, PREMIUM_ITEMS, COCONUT_RIPEN_TIME, MANGO_RIPEN_TIME } from './gameData';
 
 // Quest IDs that require explicit acceptance before progress is tracked
 const GROUPED_QUEST_IDS = new Set(QUEST_GROUPS.flatMap(g => g.quests));
 import { useToast } from '@/hooks/use-toast';
 
 // Chops required to fell each tree type (shared by reducer + UI)
+// Coconut + Mango are single-tap harvests once ripe — not in TREE_CHOPS
 const TREE_CHOPS: Record<string, number> = {
-  TREE_PALM: 5, TREE_APPLE: 5, TREE_COCONUT: 5, TREE_MANGO: 5,
+  TREE_PALM: 5, TREE_APPLE: 5,
 };
 
 export const GameContext = createContext<(GameContextType & { plantingTile: string | null; setPlantingTile: (id: string | null) => void; }) | null>(null);
@@ -199,6 +200,17 @@ function gameReducer(state: GameState, action: GameAction): GameState {
         } else if (tile.object === 'CROP_WILTED' && tile.unwitherRequestedAt && now >= tile.unwitherRequestedAt + SCALED(30000)) {
           if (!tilesChanged) { nextTiles = { ...nextState.tiles }; tilesChanged = true; }
           nextTiles[id] = { ...tile, object: 'CROP_READY', placedAt: now, unwitherRequestedAt: undefined };
+        } else if (tile.object === 'TREE_COCONUT_UNRIPE' || tile.object === 'TREE_MANGO_UNRIPE') {
+          const ripenTime = tile.object === 'TREE_COCONUT_UNRIPE' ? COCONUT_RIPEN_TIME : MANGO_RIPEN_TIME;
+          if (!tile.ripensAt) {
+            // Defensive: tile missing ripensAt (e.g. loaded from old save) — initialize it
+            if (!tilesChanged) { nextTiles = { ...nextState.tiles }; tilesChanged = true; }
+            nextTiles[id] = { ...tile, ripensAt: now + ripenTime };
+          } else if (now >= tile.ripensAt) {
+            if (!tilesChanged) { nextTiles = { ...nextState.tiles }; tilesChanged = true; }
+            const ripeType = (tile.object === 'TREE_COCONUT_UNRIPE' ? 'TREE_COCONUT' : 'TREE_MANGO') as ObjectType;
+            nextTiles[id] = { ...tile, object: ripeType, ripensAt: undefined };
+          }
         }
       }
 
@@ -239,7 +251,10 @@ function gameReducer(state: GameState, action: GameAction): GameState {
       const nextRespawns = nextState.respawns.filter(r => {
         if (now >= r.respawnAt) {
           if (!tilesChanged) { nextTiles = { ...nextState.tiles }; tilesChanged = true; }
-          nextTiles[r.tileId] = { ...nextTiles[r.tileId], object: r.object };
+          const respawnRipensAt = r.object === 'TREE_COCONUT_UNRIPE' ? now + COCONUT_RIPEN_TIME
+                                : r.object === 'TREE_MANGO_UNRIPE'   ? now + MANGO_RIPEN_TIME
+                                : undefined;
+          nextTiles[r.tileId] = { ...nextTiles[r.tileId], object: r.object, ripensAt: respawnRipensAt };
           respawnsChanged = true;
           return false;
         }
@@ -261,6 +276,7 @@ function gameReducer(state: GameState, action: GameAction): GameState {
       const obj = tile.object;
       const config = OBJECT_CONFIG[obj];
       if (!config) return state;
+      if (config.action === 'Wait') return state; // unripe fruit tree — no interaction yet
 
       const nextState = { ...state, tiles: { ...state.tiles }, inventory: { ...state.inventory }, quests: { ...state.quests }, respawns: [...state.respawns], collections: { ...state.collections }, stats: { ...state.stats } };
 
@@ -361,7 +377,11 @@ function gameReducer(state: GameState, action: GameAction): GameState {
       if (obj === 'CRAB') { nextState.collections['crab_claw'] = true; track('collect_item'); track('kill_crab'); }
 
       if (config.respawn) {
-        nextState.respawns.push({ tileId, object: obj, respawnAt: Date.now() + config.respawn });
+        // Ripe fruit trees respawn as unripe — they need time to grow back
+        const respawnObj = (obj === 'TREE_COCONUT' ? 'TREE_COCONUT_UNRIPE'
+                         :  obj === 'TREE_MANGO'   ? 'TREE_MANGO_UNRIPE'
+                         :  obj) as ObjectType;
+        nextState.respawns.push({ tileId, object: respawnObj, respawnAt: Date.now() + config.respawn });
       }
 
       nextState.xp += config.xp || 0;
@@ -623,7 +643,7 @@ export const GameProvider: React.FC<{children: React.ReactNode}> = ({ children }
   const { toast } = useToast();
   
   const [state, dispatch] = useReducer(gameReducer, undefined, () => {
-    const saved = localStorage.getItem('island-game-state-v14');
+    const saved = localStorage.getItem('island-game-state-v15');
     if (saved) {
       try {
         const parsed = JSON.parse(saved);
@@ -676,7 +696,7 @@ export const GameProvider: React.FC<{children: React.ReactNode}> = ({ children }
   const [chopCount, setChopCount] = useState(0);
 
   useEffect(() => {
-    localStorage.setItem('island-game-state-v14', JSON.stringify(state));
+    localStorage.setItem('island-game-state-v15', JSON.stringify(state));
   }, [state]);
 
   useEffect(() => {
@@ -745,6 +765,14 @@ export const GameProvider: React.FC<{children: React.ReactNode}> = ({ children }
       energyCost += 1;
     }
 
+    if (config.action === 'Wait') {
+      const remaining = tile.ripensAt ? Math.max(0, Math.ceil((tile.ripensAt - Date.now()) / 1000)) : 0;
+      const mins = Math.floor(remaining / 60);
+      const secs = remaining % 60;
+      toast({ title: 'Not ripe yet! 🌱', description: mins > 0 ? `Ripens in ${mins}m ${secs}s` : `Ripens in ${secs}s`, duration: 2000 });
+      return;
+    }
+
     if (state.energy < energyCost) {
        toast({ title: 'Out of energy! ⚡', description: 'Wait for energy to recharge.', variant: 'destructive' });
        return;
@@ -757,7 +785,7 @@ export const GameProvider: React.FC<{children: React.ReactNode}> = ({ children }
     dispatch({ type: 'INTERACT', tileId, energyCost });
 
     const TREE_CHOPS: Record<string, number> = {
-      TREE_PALM: 5, TREE_APPLE: 5, TREE_COCONUT: 5, TREE_MANGO: 5,
+      TREE_PALM: 5, TREE_APPLE: 5,
     };
     const isTree = tile.object != null && tile.object in TREE_CHOPS;
     const treeChopsLeft = isTree ? (tile.treeHp ?? TREE_CHOPS[tile.object!]) : 0;

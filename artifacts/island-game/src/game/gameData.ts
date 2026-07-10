@@ -2,6 +2,8 @@
 
 export const DEV_SPEEDUP = 100;
 export const SCALED = (ms: number) => Math.max(1000, ms / DEV_SPEEDUP); // Don't go below 1 second to avoid missing ticks
+export const COCONUT_RIPEN_TIME = SCALED(90000);  // 90 s — unripe → ripe
+export const MANGO_RIPEN_TIME   = SCALED(120000); // 2 min — unripe → ripe
 
 export const WEATHER_TYPES: WeatherType[] = ['SUNNY', 'RAINY', 'CLOUDY', 'STORMY', 'WINDY'];
 
@@ -145,7 +147,9 @@ export const OBJECT_CONFIG: Record<string, any> = {
   BLUEBERRY_BUSH: { action: 'Harvest', energy: 1, coins: 6, xp: 12, respawn: SCALED(75000) },
   DRIFTWOOD: { action: 'Clear', energy: 1, coins: 3, xp: 5, drops: { wood: 1 }, respawn: SCALED(80000) },
   TREE_COCONUT: { action: 'Harvest', energy: 1, coins: 6, xp: 12, drops: { food: 2 }, respawn: SCALED(70000) },
-  TREE_MANGO: { action: 'Harvest', energy: 1, coins: 8, xp: 14, drops: { food: 3 }, respawn: SCALED(80000) },
+  TREE_MANGO:   { action: 'Harvest', energy: 1, coins: 8, xp: 14, drops: { food: 3 }, respawn: SCALED(80000) },
+  TREE_COCONUT_UNRIPE: { action: 'Wait', energy: 0, coins: 0, xp: 0 },
+  TREE_MANGO_UNRIPE:   { action: 'Wait', energy: 0, coins: 0, xp: 0 },
   GARDEN_PATCH: { action: 'Harvest', energy: 1, coins: 10, xp: 18, drops: { food: 2 }, respawn: SCALED(50000) },
   CROP_READY: { action: 'Harvest', energy: 1, coins: 10, xp: 20 },
   CROP_WILTED: { action: 'Clear', energy: 1, coins: 0, xp: 2 },
@@ -161,6 +165,7 @@ export const EMOJI_MAP: Record<string, string> = {
   TREE_PALM: '🌴', TREE_APPLE: '🍎', ROCK: '🪨', FLOWER_BUSH: '🌸', DRIFTWOOD: '🪵', SUNFLOWER: '🌻', PUDDLE: '💧', THORNS: '🌵',
   BLUEBELL: '💜', PANSY: '🌼', TULIP: '🌷', PINEAPPLE_PLANT: '🍍', BLUEBERRY_BUSH: '🫐',
   TREE_COCONUT: '🌴', TREE_MANGO: '🥭', GARDEN_PATCH: '🍍',
+  TREE_COCONUT_UNRIPE: '🌴', TREE_MANGO_UNRIPE: '🥭',
   CROP_PLOT: '🟫', CROP_GROWING: '🌱', CROP_READY: '🌽', CROP_WILTED: '🥀',
   FISH_SPOT: '', HUT: '🏚️', DOCK: '⛵', WELL: '💧', 
   FLOWER_POT: '🪴', FENCE: '🚧', LANTERN: '🏮', CRAB: '🦀', BOAR: '🐗', BABY_PARROT: '🦜', TALL_ROCK: '🪨'
@@ -237,9 +242,10 @@ export function generateIsland(): Record<string, TileData> {
   const tooClose = (x: number, y: number, minDist: number) =>
     treePos.some(([tx, ty]) => Math.abs(tx - x) <= minDist && Math.abs(ty - y) <= minDist);
 
-  const placeTree = (tile: TileData, type: string, minDist: number) => {
+  const placeTree = (tile: TileData, type: string, minDist: number, extras?: Partial<TileData>) => {
     if (tooClose(tile.x, tile.y, minDist)) return false;
     tile.object = type as any;
+    if (extras) Object.assign(tile, extras);
     treePos.push([tile.x, tile.y]);
     return true;
   };
@@ -271,11 +277,14 @@ export function generateIsland(): Record<string, TileData> {
           const treePct = 0.45 + ff * 0.17;
           if (r < treePct) {
             const tr = rand();
-            const type = tr < 0.25 ? 'TREE_COCONUT'
-                       : tr < 0.55 ? 'TREE_MANGO'
+            const type = tr < 0.25 ? 'TREE_COCONUT_UNRIPE'
+                       : tr < 0.55 ? 'TREE_MANGO_UNRIPE'
                        : tr < 0.80 ? 'TREE_APPLE'
-                       :             'TREE_COCONUT';
-            placeTree(tile, type, 1); // minDist=1: at least 1 gap between any two trees
+                       :             'TREE_COCONUT_UNRIPE';
+            const ripenOffset = type === 'TREE_COCONUT_UNRIPE' ? COCONUT_RIPEN_TIME
+                             : type === 'TREE_MANGO_UNRIPE'   ? MANGO_RIPEN_TIME : 0;
+            const extras = ripenOffset > 0 ? { ripensAt: Date.now() + Math.floor(rand() * ripenOffset) } : undefined;
+            placeTree(tile, type, 1, extras); // minDist=1
           } else if (r < treePct + 0.04) {
             tile.object = 'FLOWER_BUSH';
           }
@@ -285,8 +294,9 @@ export function generateIsland(): Record<string, TileData> {
           const treePct = 0.16 + ff * 0.10;
           if (r < treePct) {
             const tr = rand();
-            const type = tr < 0.40 ? 'TREE_MANGO' : 'TREE_COCONUT';
-            placeTree(tile, type, 2); // minDist=2: trees well separated
+            const type = tr < 0.40 ? 'TREE_MANGO_UNRIPE' : 'TREE_COCONUT_UNRIPE';
+            const ripenOffset2 = type === 'TREE_COCONUT_UNRIPE' ? COCONUT_RIPEN_TIME : MANGO_RIPEN_TIME;
+            placeTree(tile, type, 2, { ripensAt: Date.now() + Math.floor(rand() * ripenOffset2) }); // minDist=2
           } else if (r < treePct + 0.04) {
             tile.object = 'FLOWER_BUSH';
           }
@@ -296,9 +306,9 @@ export function generateIsland(): Record<string, TileData> {
           const palmChance  = adjToWater ? 0.10 : 0;
           const mangoChance = 0.03;
           if (r < palmChance) {
-            placeTree(tile, 'TREE_COCONUT', 3); // minDist=3: very spread out
+            placeTree(tile, 'TREE_COCONUT_UNRIPE', 3, { ripensAt: Date.now() + Math.floor(rand() * COCONUT_RIPEN_TIME) }); // minDist=3
           } else if (r < palmChance + mangoChance) {
-            placeTree(tile, 'TREE_MANGO', 3);
+            placeTree(tile, 'TREE_MANGO_UNRIPE', 3, { ripensAt: Date.now() + Math.floor(rand() * MANGO_RIPEN_TIME) });
           } else if (r < palmChance + mangoChance + 0.04) {
             tile.object = 'FLOWER_BUSH';
           }
@@ -362,7 +372,7 @@ export function generateIsland(): Record<string, TileData> {
   for (let i = 0; i < 5 && fishCandidates.length; i++) pick(fishCandidates).object = 'FISH_SPOT';
 
   // ── Puddles near trees — small water pools under the canopy ─────────────
-  const ALL_TREE_TYPES: ObjectType[] = ['TREE_COCONUT', 'TREE_MANGO', 'TREE_APPLE', 'TREE_PALM'];
+  const ALL_TREE_TYPES: ObjectType[] = ['TREE_COCONUT', 'TREE_MANGO', 'TREE_APPLE', 'TREE_PALM', 'TREE_COCONUT_UNRIPE', 'TREE_MANGO_UNRIPE'];
   const treeTiles = Object.values(tiles).filter(t => t.object && ALL_TREE_TYPES.includes(t.object as ObjectType));
   const TREE_NEIGHBORS = [[-1,0],[1,0],[0,-1],[0,1],[-1,-1],[1,-1],[-1,1],[1,1]] as const;
   for (const tree of treeTiles) {
@@ -412,7 +422,7 @@ export function generateIsland(): Record<string, TileData> {
   // In isometric view, trees on any neighboring tile can visually overlap a
   // GARDEN_PATCH or ROCK.  After all objects are placed, remove any tree from
   // the 8-directional neighborhood of every protected tile so they stay visible.
-  const TREE_TYPES: ObjectType[] = ['TREE_PALM', 'TREE_APPLE', 'TREE_COCONUT', 'TREE_MANGO'];
+  const TREE_TYPES: ObjectType[] = ['TREE_PALM', 'TREE_APPLE', 'TREE_COCONUT', 'TREE_MANGO', 'TREE_COCONUT_UNRIPE', 'TREE_MANGO_UNRIPE'];
   const PROTECTED: ObjectType[]  = ['GARDEN_PATCH', 'ROCK'];
   const NEIGHBORS = [[-1,-1],[-1,0],[-1,1],[0,-1],[0,1],[1,-1],[1,0],[1,1]] as const;
 

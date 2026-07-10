@@ -9,7 +9,8 @@ export type ObjectType =
   | 'CLEARED_LAND' | 'FISH_SPOT' | 'SUNFLOWER' | 'PUDDLE' | 'THORNS'
   | 'BLUEBELL' | 'PANSY' | 'TULIP' | 'PINEAPPLE_PLANT' | 'BLUEBERRY_BUSH'
   | 'HUT' | 'DOCK' | 'WELL' | 'FLOWER_POT' | 'FENCE' | 'LANTERN'
-  | 'CRAB' | 'BOAR' | 'BABY_PARROT' | 'TALL_ROCK';
+  | 'CRAB' | 'BOAR' | 'BABY_PARROT' | 'TALL_ROCK'
+  | 'TREE_COCONUT_UNRIPE' | 'TREE_MANGO_UNRIPE';
 
 export type WeatherType = 'SUNNY' | 'RAINY' | 'CLOUDY' | 'STORMY' | 'WINDY';
 
@@ -23,6 +24,7 @@ export interface TileData {
   cropType?: string;
   crabHp?: number;
   treeHp?: number;        // chops remaining before tree falls
+  ripensAt?: number;      // timestamp when unripe fruit tree becomes harvestable
   unwitherRequestedAt?: number;
 }
 

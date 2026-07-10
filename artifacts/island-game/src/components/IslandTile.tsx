@@ -462,6 +462,81 @@ const ObjectSVG: React.FC<{ object: string; tileX: number; tileY: number; tileTy
     );
 
     /* ── COCONUT TREE ───────────────────────────────────────────────────── */
+    /* ── UNRIPE COCONUT TREE ─────────────────────────────────────────────── */
+    case 'TREE_COCONUT_UNRIPE': return (
+      <svg viewBox="0 0 72 112" width="88" height="138" style={{ display:'block' }}>
+        <defs>
+          <linearGradient id={g('cot')} x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%"   stopColor="#f2ca72"/>
+            <stop offset="28%"  stopColor="#c89038"/>
+            <stop offset="70%"  stopColor="#8a5820"/>
+            <stop offset="100%" stopColor="#503408"/>
+          </linearGradient>
+          <radialGradient id={g('coc')} cx="34%" cy="26%" r="70%">
+            <stop offset="0%"   stopColor="#bcf874"/>
+            <stop offset="40%"  stopColor="#44c428"/>
+            <stop offset="76%"  stopColor="#1e8014"/>
+            <stop offset="100%" stopColor="#0c5008"/>
+          </radialGradient>
+          {/* Unripe coconut — green sphere */}
+          <radialGradient id={g('conut')} cx="30%" cy="26%" r="70%">
+            <stop offset="0%"   stopColor="#b8e860"/>
+            <stop offset="50%"  stopColor="#52a818"/>
+            <stop offset="100%" stopColor="#1e5808"/>
+          </radialGradient>
+        </defs>
+        <ellipse cx="36" cy="110" rx="17" ry="4.5" fill="rgba(60,40,10,0.32)"/>
+        <path d="M22,108 Q26,84 30,62 L40,62 Q44,84 48,108Z" fill={`url(#${g('cot')})`}/>
+        <path d="M24.5,106 Q28,82 32,64" stroke="rgba(255,255,255,0.46)" strokeWidth="3.5" fill="none" strokeLinecap="round"/>
+        <path d="M44,106 Q45.5,82 43.5,64" stroke="rgba(0,0,0,0.24)" strokeWidth="3" fill="none" strokeLinecap="round"/>
+        {[70,78,87,96,104].map(y => (
+          <path key={y} d={`M24,${y} Q36,${y-3} 47,${y}`} stroke="rgba(0,0,0,0.20)" strokeWidth="2.0" fill="none" strokeLinecap="round"/>
+        ))}
+        <ellipse cx="29" cy="82" rx="3.2" ry="1.8" fill="rgba(0,0,0,0.16)" transform="rotate(-8 29 82)"/>
+        <ellipse cx="41" cy="94" rx="2.8" ry="1.6" fill="rgba(0,0,0,0.13)" transform="rotate(7 41 94)"/>
+        <path d="M35,58 Q13,65 1,72"  stroke="#186416" strokeWidth="13" fill="none" strokeLinecap="round" opacity="0.88"/>
+        <path d="M35,58 Q57,65 69,72" stroke="#186416" strokeWidth="13" fill="none" strokeLinecap="round" opacity="0.88"/>
+        <path d="M35,58 Q13,65 1,72"  stroke="#58d83c" strokeWidth="3.5" fill="none" strokeLinecap="round" opacity="0.40"/>
+        <path d="M35,58 Q57,65 69,72" stroke="#58d83c" strokeWidth="3.5" fill="none" strokeLinecap="round" opacity="0.40"/>
+        <path d="M35,56 Q10,48 1,35"   stroke="#228a20" strokeWidth="13" fill="none" strokeLinecap="round"/>
+        <path d="M35,56 Q60,48 69,35"  stroke="#228a20" strokeWidth="13" fill="none" strokeLinecap="round"/>
+        <path d="M35,56 Q10,48 1,35"   stroke="#6ae44a" strokeWidth="4"   fill="none" strokeLinecap="round" opacity="0.45"/>
+        <path d="M35,56 Q60,48 69,35"  stroke="#6ae44a" strokeWidth="4"   fill="none" strokeLinecap="round" opacity="0.45"/>
+        <path d="M35,54 Q16,38 9,17"   stroke="#2eaa2c" strokeWidth="12"  fill="none" strokeLinecap="round"/>
+        <path d="M35,54 Q54,38 61,17"  stroke="#2eaa2c" strokeWidth="12"  fill="none" strokeLinecap="round"/>
+        <path d="M35,54 Q16,38 9,17"   stroke="#74ee54" strokeWidth="3.8" fill="none" strokeLinecap="round" opacity="0.50"/>
+        <path d="M35,54 Q54,38 61,17"  stroke="#74ee54" strokeWidth="3.8" fill="none" strokeLinecap="round" opacity="0.50"/>
+        <path d="M35,52 Q23,30 17,7"   stroke="#3ec03a" strokeWidth="11"  fill="none" strokeLinecap="round"/>
+        <path d="M35,52 Q47,30 53,7"   stroke="#3ec03a" strokeWidth="11"  fill="none" strokeLinecap="round"/>
+        <path d="M35,50 Q35,27 34,5"   stroke="#52d448" strokeWidth="10.5" fill="none" strokeLinecap="round"/>
+        <path d="M35,52 Q23,30 17,7"   stroke="#8af86a" strokeWidth="3.5" fill="none" strokeLinecap="round" opacity="0.55"/>
+        <path d="M35,52 Q47,30 53,7"   stroke="#8af86a" strokeWidth="3.5" fill="none" strokeLinecap="round" opacity="0.55"/>
+        <path d="M35,50 Q35,27 34,5"   stroke="#8af86a" strokeWidth="3"   fill="none" strokeLinecap="round" opacity="0.55"/>
+        <path d="M22,62 L16,56" stroke="#38b028" strokeWidth="2.5" fill="none" strokeLinecap="round"/>
+        <path d="M22,62 L17,68" stroke="#226e12" strokeWidth="2.5" fill="none" strokeLinecap="round"/>
+        <path d="M9,68  L3,62"  stroke="#38b028" strokeWidth="2.2" fill="none" strokeLinecap="round"/>
+        <path d="M9,68  L4,74"  stroke="#226e12" strokeWidth="2.2" fill="none" strokeLinecap="round"/>
+        <path d="M48,62 L54,56" stroke="#38b028" strokeWidth="2.5" fill="none" strokeLinecap="round"/>
+        <path d="M48,62 L53,68" stroke="#226e12" strokeWidth="2.5" fill="none" strokeLinecap="round"/>
+        <path d="M61,68 L67,62" stroke="#38b028" strokeWidth="2.2" fill="none" strokeLinecap="round"/>
+        <path d="M61,68 L66,74" stroke="#226e12" strokeWidth="2.2" fill="none" strokeLinecap="round"/>
+        <path d="M21,44 L15,38" stroke="#4ccc38" strokeWidth="2.2" fill="none" strokeLinecap="round"/>
+        <path d="M49,44 L55,38" stroke="#4ccc38" strokeWidth="2.2" fill="none" strokeLinecap="round"/>
+        <circle cx="35" cy="56" r="19" fill="#0b4808" opacity="0.62"/>
+        <circle cx="35" cy="54" r="16" fill={`url(#${g('coc')})`}/>
+        <circle cx="35" cy="54" r="16" fill="none" stroke="rgba(140,250,90,0.24)" strokeWidth="3.5"/>
+        <ellipse cx="27" cy="44" rx="8.5" ry="5.2" fill="rgba(255,255,255,0.48)" transform="rotate(-18 27 44)"/>
+        <ellipse cx="29" cy="46" rx="4.2" ry="2.6" fill="rgba(255,255,255,0.30)" transform="rotate(-18 29 46)"/>
+        {/* ── Unripe coconuts — small green spheres ── */}
+        <circle cx="25" cy="62" r="5.5" fill={`url(#${g('conut')})`}/>
+        <circle cx="42" cy="63" r="5"   fill={`url(#${g('conut')})`}/>
+        <circle cx="35" cy="67" r="4.5" fill={`url(#${g('conut')})`}/>
+        <circle cx="21.5" cy="59.5" r="1.8" fill="rgba(255,255,255,0.42)"/>
+        <circle cx="39.5" cy="60.5" r="1.6" fill="rgba(255,255,255,0.36)"/>
+        <circle cx="33"   cy="64.5" r="1.4" fill="rgba(255,255,255,0.30)"/>
+      </svg>
+    );
+
     case 'TREE_COCONUT': return (
       <svg viewBox="0 0 72 112" width="88" height="138" style={{ display:'block' }}>
         <defs>
@@ -563,6 +638,68 @@ const ObjectSVG: React.FC<{ object: string; tileX: number; tileY: number; tileTy
         {/* Ridge marks */}
         <path d="M21,59 Q25,65 29,63" stroke="rgba(0,0,0,0.26)" strokeWidth="1.2" fill="none" strokeLinecap="round"/>
         <path d="M38,60 Q42,67 46,64" stroke="rgba(0,0,0,0.22)" strokeWidth="1.2" fill="none" strokeLinecap="round"/>
+      </svg>
+    );
+
+    /* ── UNRIPE MANGO TREE ───────────────────────────────────────────────── */
+    case 'TREE_MANGO_UNRIPE': return (
+      <svg viewBox="0 0 76 96" width="94" height="118" style={{ display:'block' }}>
+        <defs>
+          <linearGradient id={g('mgt')} x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%"   stopColor="#f0b870"/>
+            <stop offset="30%"  stopColor="#c08040"/>
+            <stop offset="72%"  stopColor="#885020"/>
+            <stop offset="100%" stopColor="#543010"/>
+          </linearGradient>
+          <radialGradient id={g('mgc')} cx="30%" cy="22%" r="76%">
+            <stop offset="0%"   stopColor="#bcf060"/>
+            <stop offset="38%"  stopColor="#52c02a"/>
+            <stop offset="70%"  stopColor="#206e10"/>
+            <stop offset="100%" stopColor="#0e4808"/>
+          </radialGradient>
+          {/* Unripe mango — green teardrop */}
+          <radialGradient id={g('mgm')} cx="34%" cy="26%" r="68%">
+            <stop offset="0%"   stopColor="#cef070"/>
+            <stop offset="42%"  stopColor="#6ac020"/>
+            <stop offset="80%"  stopColor="#2a7808"/>
+            <stop offset="100%" stopColor="#184808"/>
+          </radialGradient>
+        </defs>
+        <ellipse cx="38" cy="93" rx="18" ry="5" fill="rgba(80,50,10,0.32)"/>
+        <path d="M30,91 Q32,72 33,56 L41,56 Q42,72 44,91Z" fill={`url(#${g('mgt')})`}/>
+        <path d="M31.5,89 Q33.5,70 34.5,58" stroke="rgba(255,255,255,0.44)" strokeWidth="2.5" fill="none" strokeLinecap="round"/>
+        <path d="M42.5,89 Q43.5,70 43,58" stroke="rgba(0,0,0,0.22)" strokeWidth="2.2" fill="none" strokeLinecap="round"/>
+        {[65,73,82].map(y => (
+          <path key={y} d={`M31,${y} Q37,${y-2} 43,${y}`} stroke="rgba(0,0,0,0.18)" strokeWidth="1.6" fill="none" strokeLinecap="round"/>
+        ))}
+        <ellipse cx="38" cy="40" rx="36" ry="29" fill="#0c4006" opacity="0.70"/>
+        <circle cx="6"  cy="50" r="22" fill="#164e0c"/>
+        <circle cx="70" cy="50" r="22" fill="#1a560e"/>
+        <ellipse cx="38" cy="35" rx="33" ry="28" fill="#1e6e10"/>
+        <circle cx="8"  cy="40" r="21" fill="#267a14"/>
+        <circle cx="68" cy="40" r="21" fill="#2a8418"/>
+        <ellipse cx="38" cy="32" rx="30" ry="26" fill={`url(#${g('mgc')})`}/>
+        <circle cx="20" cy="24" r="18" fill="#38a81e"/>
+        <circle cx="56" cy="22" r="17" fill="#3cae22"/>
+        <circle cx="38" cy="14" r="20" fill="#4ec02a"/>
+        <circle cx="38" cy="8"  r="13" fill="#64d43a"/>
+        <ellipse cx="64" cy="32" rx="8" ry="14" fill="rgba(100,220,60,0.22)"/>
+        <ellipse cx="22" cy="12" rx="15" ry="9" fill="rgba(255,255,255,0.44)" transform="rotate(-14 22 12)"/>
+        <ellipse cx="25" cy="15" rx="7"  ry="4" fill="rgba(255,255,255,0.28)" transform="rotate(-14 25 15)"/>
+        {/* ── Unripe mangoes — small green teardrops, no red blush ── */}
+        <ellipse cx="10" cy="52" rx="6"   ry="8"   fill={`url(#${g('mgm')})`} transform="rotate(-20 10 52)"/>
+        <ellipse cx="7.5" cy="49" rx="2.4" ry="3.2" fill="rgba(255,255,255,0.48)" transform="rotate(-20 7.5 49)"/>
+        <ellipse cx="24" cy="47" rx="5.5" ry="7"   fill={`url(#${g('mgm')})`} transform="rotate(-12 24 47)"/>
+        <ellipse cx="22" cy="44" rx="2.2" ry="2.8" fill="rgba(255,255,255,0.44)" transform="rotate(-12 22 44)"/>
+        <ellipse cx="38" cy="58" rx="6"   ry="8"   fill={`url(#${g('mgm')})`} transform="rotate(6 38 58)"/>
+        <ellipse cx="35.5" cy="55" rx="2.4" ry="3.2" fill="rgba(255,255,255,0.46)" transform="rotate(6 35.5 55)"/>
+        <ellipse cx="52" cy="47" rx="5.5" ry="7"   fill={`url(#${g('mgm')})`} transform="rotate(14 52 47)"/>
+        <ellipse cx="49.5" cy="44" rx="2.2" ry="2.8" fill="rgba(255,255,255,0.42)" transform="rotate(14 49.5 44)"/>
+        <ellipse cx="66" cy="52" rx="6"   ry="8"   fill={`url(#${g('mgm')})`} transform="rotate(20 66 52)"/>
+        <ellipse cx="63.5" cy="49" rx="2.4" ry="3.2" fill="rgba(255,255,255,0.44)" transform="rotate(20 63.5 49)"/>
+        <path d="M10,43  Q10,38 14,36" stroke="#4a8020" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
+        <path d="M38,48  Q37,43 40,40" stroke="#4a8020" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
+        <path d="M66,43  Q67,38 62,36" stroke="#4a8020" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
       </svg>
     );
 
@@ -1535,14 +1672,15 @@ const ObjectSVG: React.FC<{ object: string; tileX: number; tileY: number; tileTy
 };
 
 /** Trees that trigger the axe-chop hint on hover */
-const CHOP_TREES = new Set(['TREE_PALM', 'TREE_APPLE', 'TREE_COCONUT', 'TREE_MANGO']);
+const CHOP_TREES = new Set(['TREE_PALM', 'TREE_APPLE']);
 
 /** Objects that use SVG art instead of emoji */
 const SVG_OBJECTS = new Set(['TREE_PALM', 'TREE_APPLE', 'ROCK', 'FLOWER_BUSH', 'DRIFTWOOD',
-  'TREE_COCONUT', 'TREE_MANGO', 'GARDEN_PATCH', 'WEEDS', 'SUNFLOWER', 'PUDDLE', 'THORNS',
+  'TREE_COCONUT', 'TREE_MANGO', 'TREE_COCONUT_UNRIPE', 'TREE_MANGO_UNRIPE',
+  'GARDEN_PATCH', 'WEEDS', 'SUNFLOWER', 'PUDDLE', 'THORNS',
   'BLUEBELL', 'PANSY', 'TULIP', 'PINEAPPLE_PLANT', 'BLUEBERRY_BUSH', 'BABY_PARROT', 'TALL_ROCK', 'DOCK']);
 /** Objects that sway in the breeze */
-const SWAY_OBJECTS = new Set(['TREE_PALM', 'TREE_APPLE', 'TREE_COCONUT', 'TREE_MANGO']);
+const SWAY_OBJECTS = new Set(['TREE_PALM', 'TREE_APPLE', 'TREE_COCONUT', 'TREE_MANGO', 'TREE_COCONUT_UNRIPE', 'TREE_MANGO_UNRIPE']);
 
 /* ── Shore scatter helper ────────────────────────────────────────────────
    Deterministic per-tile RNG — no Math.random(), stable across renders.    */
