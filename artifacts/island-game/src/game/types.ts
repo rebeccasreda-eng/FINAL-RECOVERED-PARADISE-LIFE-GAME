@@ -7,7 +7,7 @@ export type ObjectType =
   | 'CROP_PLOT' | 'CROP_GROWING' | 'CROP_READY' | 'CROP_WILTED'
   | 'CLEARED_LAND' | 'FISH_SPOT' 
   | 'HUT' | 'DOCK' | 'WELL' | 'FLOWER_POT' | 'FENCE' | 'LANTERN'
-  | 'CRAB';
+  | 'CRAB' | 'BOAR';
 
 export type WeatherType = 'SUNNY' | 'RAINY' | 'CLOUDY' | 'STORMY' | 'WINDY';
 
@@ -20,6 +20,7 @@ export interface TileData {
   placedAt?: number;
   cropType?: string;
   crabHp?: number;
+  unwitherRequestedAt?: number;
 }
 
 export interface QuestDef {
@@ -33,6 +34,16 @@ export interface QuestDef {
   rewardItem?: { type: ResourceType; count: number };
   icon: string; 
   unlockLevel: number;
+  prereqs?: string[];
+}
+
+export interface Neighbor {
+  id: string;
+  name: string;
+  avatar: string;
+  level: number;
+  favorPoints: number;
+  wishlist: string[];
 }
 
 export interface GameState {
@@ -48,13 +59,19 @@ export interface GameState {
   weather: WeatherType;
   nextWeatherAt: number;
   lastCrabSpawn: number;
+  lastBoarSpawn: number;
   collections: Record<string, boolean>;
+  tradedSets: string[];
   stats: Record<string, number>;
   wishlist: string[];
-  neighbors: { id: string; name: string; avatar: string; level: number; favorPoints: number }[];
+  neighbors: Neighbor[];
   favorBar: number;
   lastNeighborHire: number;
   neighborsHiredToday: number;
+  visitingNeighbor: { neighborId: string; tileId: string; expiresAt: number } | null;
+  lastNeighborVisit: number;
+  pendingResourceRequests: { resource: ResourceType; amount: number; arrivesAt: number }[];
+  premiumBoosts: Record<string, number>;
 }
 
 export type GameAction = 
@@ -69,7 +86,14 @@ export type GameAction =
   | { type: 'ADD_WISHLIST', itemId: string }
   | { type: 'REMOVE_WISHLIST', itemId: string }
   | { type: 'VISIT_NEIGHBOR', neighborId: string }
-  | { type: 'HIRE_NEIGHBOR', neighborId: string };
+  | { type: 'HIRE_NEIGHBOR', neighborId: string }
+  | { type: 'TRADE_COLLECTION', setId: string }
+  | { type: 'ACCEPT_NEIGHBOR_VISIT' }
+  | { type: 'DECLINE_NEIGHBOR_VISIT' }
+  | { type: 'GIFT_ITEM', itemId: string, neighborId: string }
+  | { type: 'REQUEST_UNWITHER', tileId: string }
+  | { type: 'REQUEST_RESOURCE', resource: ResourceType, amount: number }
+  | { type: 'BUY_PREMIUM', itemId: string, shellCost: number };
 
 export interface GameContextType {
   state: GameState;
@@ -86,4 +110,6 @@ export interface GameContextType {
   interact: (tileId: string) => void;
   plant: (tileId: string, cropType?: string) => void;
   place: (tileId: string, obj: ObjectType) => void;
+  neighborVisitPrompt: boolean;
+  setNeighborVisitPrompt: (v: boolean) => void;
 }

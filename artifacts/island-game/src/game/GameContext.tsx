@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useEffect, useReducer, useRef, useState } from 'react';
 import { GameState, GameAction, GameContextType, ResourceType, ObjectType } from './types';
-import { generateIsland, QUESTS, OBJECT_CONFIG, SCALED, WEATHER_TYPES, CROP_TYPES, INITIAL_NEIGHBORS, COLLECTIONS } from './gameData';
+import { generateIsland, QUESTS, OBJECT_CONFIG, SCALED, WEATHER_TYPES, CROP_TYPES, INITIAL_NEIGHBORS, COLLECTIONS, COLLECTION_SETS, PREMIUM_ITEMS } from './gameData';
 import { useToast } from '@/hooks/use-toast';
 
 export const GameContext = createContext<(GameContextType & { plantingTile: string | null; setPlantingTile: (id: string | null) => void; }) | null>(null);
@@ -24,13 +24,19 @@ const getInitialState = (): GameState => ({
   weather: 'SUNNY',
   nextWeatherAt: Date.now() + SCALED(120000),
   lastCrabSpawn: Date.now(),
+  lastBoarSpawn: Date.now(),
   collections: {},
-  stats: { crabsKilled: 0 },
+  tradedSets: [],
+  stats: { crabsKilled: 0, boarsShooD: 0 },
   wishlist: [],
   neighbors: INITIAL_NEIGHBORS,
   favorBar: 0,
   lastNeighborHire: 0,
-  neighborsHiredToday: 0
+  neighborsHiredToday: 0,
+  visitingNeighbor: null,
+  lastNeighborVisit: Date.now(),
+  pendingResourceRequests: [],
+  premiumBoosts: {}
 });
 
 function checkQuestCompletions(state: GameState): GameState {
@@ -39,6 +45,7 @@ function checkQuestCompletions(state: GameState): GameState {
   
   for (const q of QUESTS) {
     if (state.level < q.unlockLevel) continue;
+    if (q.prereqs && q.prereqs.some(pid => !nextQuests[pid]?.completed)) continue;
     const p = nextQuests[q.id] || { progress: 0, completed: false };
     if (p.completed) continue;
 
@@ -136,7 +143,22 @@ function gameReducer(state: GameState, action: GameAction): GameState {
         changed = true;
       }
 
-      // Crops Wilting & Growing
+      // Boar Spawning
+      if (now - nextState.lastBoarSpawn >= SCALED(240000)) {
+        const boars = Object.values(nextTiles).filter(t => t.object === 'BOAR').length;
+        if (boars < 1) {
+          const emptyGrass = Object.values(nextTiles).filter(t => t.type === 'GRASS' && !t.object);
+          if (emptyGrass.length > 0) {
+            const spawnTile = emptyGrass[Math.floor(Math.random() * emptyGrass.length)];
+            if (!tilesChanged) { nextTiles = { ...nextState.tiles }; tilesChanged = true; }
+            nextTiles[spawnTile.id] = { ...spawnTile, object: 'BOAR', crabHp: 2 };
+          }
+        }
+        nextState = { ...nextState, lastBoarSpawn: now };
+        changed = true;
+      }
+
+      // Crops Wilting & Growing & Unwithering
       for (const [id, tile] of Object.entries(nextState.tiles)) {
         if ((tile.object === 'CROP_GROWING' || tile.object === 'CROP_READY') && tile.placedAt && tile.cropType) {
           const cropConfig = CROP_TYPES[tile.cropType];
@@ -154,11 +176,59 @@ function gameReducer(state: GameState, action: GameAction): GameState {
               }
             }
           }
+        } else if (tile.object === 'CROP_WILTED' && tile.unwitherRequestedAt && now >= tile.unwitherRequestedAt + SCALED(30000)) {
+          if (!tilesChanged) { nextTiles = { ...nextState.tiles }; tilesChanged = true; }
+          nextTiles[id] = { ...tile, object: 'CROP_READY', placedAt: now, unwitherRequestedAt: undefined };
         }
       }
 
       if (tilesChanged) {
         nextState = { ...nextState, tiles: nextTiles };
+        changed = true;
+      }
+
+      // Visiting Neighbor
+      if (!nextState.visitingNeighbor && now - nextState.lastNeighborVisit >= SCALED(300000)) {
+        const emptyGrass = Object.values(nextTiles).filter(t => t.type === 'GRASS' && !t.object);
+        if (emptyGrass.length > 0) {
+          const spawnTile = emptyGrass[Math.floor(Math.random() * emptyGrass.length)];
+          const neighbor = nextState.neighbors[Math.floor(Math.random() * nextState.neighbors.length)];
+          nextState = { 
+            ...nextState, 
+            visitingNeighbor: { neighborId: neighbor.id, tileId: spawnTile.id, expiresAt: now + SCALED(60000) },
+            lastNeighborVisit: now
+          };
+          changed = true;
+        }
+      } else if (nextState.visitingNeighbor && now > nextState.visitingNeighbor.expiresAt) {
+        nextState = { ...nextState, visitingNeighbor: null };
+        changed = true;
+      }
+
+      // Pending Resource Requests
+      if (nextState.pendingResourceRequests.length > 0) {
+        const arrived = nextState.pendingResourceRequests.filter(r => now >= r.arrivesAt);
+        const pending = nextState.pendingResourceRequests.filter(r => now < r.arrivesAt);
+        if (arrived.length > 0) {
+          nextState = { ...nextState, pendingResourceRequests: pending, inventory: { ...nextState.inventory } };
+          for (const req of arrived) {
+            nextState.inventory[req.resource] = (nextState.inventory[req.resource] || 0) + req.amount;
+          }
+          changed = true;
+        }
+      }
+
+      // Expired Premium Boosts
+      let boostsChanged = false;
+      const nextBoosts = { ...nextState.premiumBoosts };
+      for (const [k, v] of Object.entries(nextBoosts)) {
+        if (v > 1 && now > v) {
+          delete nextBoosts[k];
+          boostsChanged = true;
+        }
+      }
+      if (boostsChanged) {
+        nextState = { ...nextState, premiumBoosts: nextBoosts };
         changed = true;
       }
 
@@ -226,32 +296,46 @@ function gameReducer(state: GameState, action: GameAction): GameState {
       };
 
       // Collection drops
+      let dropChance = 1;
+      if (nextState.premiumBoosts.lucky_charm && nextState.premiumBoosts.lucky_charm > Date.now()) {
+        dropChance = 2;
+      }
+
       const rand = Math.random();
-      if (rand < 0.05) { nextState.collections['starfish'] = true; track('collect_item'); }
-      else if (rand < 0.1) { nextState.collections['conch'] = true; track('collect_item'); }
+      if (rand < 0.05 * dropChance) { nextState.collections['starfish'] = true; track('collect_item'); }
+      else if (rand < 0.1 * dropChance) { nextState.collections['conch'] = true; track('collect_item'); }
       
-      if (obj === 'FISH_SPOT' && Math.random() < 0.3) {
+      if (obj === 'FISH_SPOT' && Math.random() < 0.3 * dropChance) {
          nextState.collections['pearl'] = true; track('collect_item');
       }
 
-      if (obj === 'CRAB') {
-        const hp = (tile.crabHp || 3) - 1;
+      if (obj === 'CRAB' || obj === 'BOAR') {
+        const hp = (tile.crabHp || (obj === 'CRAB' ? 3 : 2)) - 1;
         if (hp > 0) {
           nextState.tiles[tileId] = { ...tile, crabHp: hp };
           return nextState; // Don't do XP or respawn yet
         } else {
           nextState.tiles[tileId] = { ...tile, object: undefined, crabHp: undefined };
-          nextState.stats.crabsKilled = (nextState.stats.crabsKilled || 0) + 1;
-          nextState.inventory.food = (nextState.inventory.food || 0) + 1;
-          nextState.collections['crab_claw'] = true; track('collect_item');
-          track('kill_crab');
+          if (obj === 'CRAB') {
+            nextState.stats.crabsKilled = (nextState.stats.crabsKilled || 0) + 1;
+            nextState.inventory.food = (nextState.inventory.food || 0) + 1;
+            nextState.collections['crab_claw'] = true; track('collect_item');
+            track('kill_crab');
+          } else {
+            nextState.stats.boarsShooD = (nextState.stats.boarsShooD || 0) + 1;
+          }
         }
       } else if (obj === 'CROP_READY') {
         nextState.tiles[tileId] = { ...tile, object: 'CLEARED_LAND' };
+        let yieldMult = 1;
+        if (nextState.premiumBoosts.golden_crop > 0) {
+          yieldMult = 3;
+          nextState.premiumBoosts.golden_crop = 0;
+        }
         if (tile.cropType && CROP_TYPES[tile.cropType]) {
-          nextState.inventory.produce += CROP_TYPES[tile.cropType].yield;
+          nextState.inventory.produce += (CROP_TYPES[tile.cropType].yield * yieldMult);
         } else {
-          nextState.inventory.produce += 1;
+          nextState.inventory.produce += (1 * yieldMult);
         }
       } else if (obj === 'CROP_WILTED') {
         nextState.tiles[tileId] = { ...tile, object: 'CLEARED_LAND', cropType: undefined };
@@ -411,6 +495,89 @@ function gameReducer(state: GameState, action: GameAction): GameState {
       return checkQuestCompletions(nextState);
     }
 
+    case 'TRADE_COLLECTION': {
+      const set = COLLECTION_SETS.find(s => s.id === action.setId);
+      if (!set) return state;
+      const hasAll = set.items.every(itemId => state.collections[itemId]);
+      if (!hasAll) return state;
+
+      const nextState = { ...state, collections: { ...state.collections }, inventory: { ...state.inventory }, tradedSets: [...state.tradedSets, set.id], xp: state.xp };
+      for (const itemId of set.items) {
+        nextState.collections[itemId] = false;
+      }
+      nextState.inventory.coins += set.reward.coins || 0;
+      nextState.xp += set.reward.xp || 0;
+      if (set.reward.wood) nextState.inventory.wood += set.reward.wood;
+      if (set.reward.shells) nextState.inventory.shells += set.reward.shells;
+      return checkQuestCompletions(nextState);
+    }
+
+    case 'ACCEPT_NEIGHBOR_VISIT': {
+      if (!state.visitingNeighbor) return state;
+      const nextState = { ...state, visitingNeighbor: null, inventory: { ...state.inventory } };
+      nextState.inventory.coins += 10;
+      nextState.energy = Math.min(state.maxEnergy, state.energy + 5);
+      nextState.favorBar = Math.min(100, state.favorBar + 5);
+      return checkQuestCompletions(nextState);
+    }
+
+    case 'DECLINE_NEIGHBOR_VISIT': {
+      return { ...state, visitingNeighbor: null };
+    }
+
+    case 'GIFT_ITEM': {
+      if (!state.collections[action.itemId]) return state;
+      const neighborIndex = state.neighbors.findIndex(n => n.id === action.neighborId);
+      if (neighborIndex === -1) return state;
+
+      const nextState = { ...state, collections: { ...state.collections }, neighbors: [...state.neighbors] };
+      nextState.collections[action.itemId] = false;
+      
+      const n = nextState.neighbors[neighborIndex];
+      nextState.neighbors[neighborIndex] = { ...n, favorPoints: n.favorPoints + 5 };
+      nextState.favorBar = Math.min(100, state.favorBar + 5);
+      
+      return checkQuestCompletions(nextState);
+    }
+
+    case 'REQUEST_UNWITHER': {
+      const tile = state.tiles[action.tileId];
+      if (!tile || tile.object !== 'CROP_WILTED') return state;
+      return {
+        ...state,
+        tiles: {
+          ...state.tiles,
+          [action.tileId]: { ...tile, unwitherRequestedAt: Date.now() }
+        }
+      };
+    }
+
+    case 'REQUEST_RESOURCE': {
+      return {
+        ...state,
+        pendingResourceRequests: [
+          ...state.pendingResourceRequests,
+          { resource: action.resource, amount: action.amount, arrivesAt: Date.now() + SCALED(60000) }
+        ]
+      };
+    }
+
+    case 'BUY_PREMIUM': {
+      if (state.inventory.shells < action.shellCost) return state;
+      const nextState = { ...state, inventory: { ...state.inventory }, premiumBoosts: { ...state.premiumBoosts } };
+      nextState.inventory.shells -= action.shellCost;
+      
+      if (action.itemId === 'energy_boost') {
+        nextState.maxEnergy += 10;
+        nextState.energy += 10;
+      } else if (action.itemId === 'lucky_charm') {
+        nextState.premiumBoosts.lucky_charm = Date.now() + SCALED(300000);
+      } else if (action.itemId === 'golden_crop') {
+        nextState.premiumBoosts.golden_crop = 1;
+      }
+      return checkQuestCompletions(nextState);
+    }
+
     default:
       return state;
   }
@@ -420,7 +587,7 @@ export const GameProvider: React.FC<{children: React.ReactNode}> = ({ children }
   const { toast } = useToast();
   
   const [state, dispatch] = useReducer(gameReducer, undefined, () => {
-    const saved = localStorage.getItem('island-game-state-v4');
+    const saved = localStorage.getItem('island-game-state-v5');
     if (saved) {
       try {
         const parsed = JSON.parse(saved);
@@ -433,7 +600,8 @@ export const GameProvider: React.FC<{children: React.ReactNode}> = ({ children }
             quests: parsed.quests || {},
             respawns: Array.isArray(parsed.respawns) ? parsed.respawns : [],
             collections: parsed.collections || {},
-            stats: parsed.stats || { crabsKilled: 0 },
+            tradedSets: Array.isArray(parsed.tradedSets) ? parsed.tradedSets : [],
+            stats: parsed.stats || { crabsKilled: 0, boarsShooD: 0 },
             energy: typeof parsed.energy === 'number' ? parsed.energy : defaults.energy,
             maxEnergy: typeof parsed.maxEnergy === 'number' ? parsed.maxEnergy : defaults.maxEnergy,
             lastEnergyTick: typeof parsed.lastEnergyTick === 'number' ? parsed.lastEnergyTick : Date.now(),
@@ -442,11 +610,16 @@ export const GameProvider: React.FC<{children: React.ReactNode}> = ({ children }
             weather: parsed.weather || defaults.weather,
             nextWeatherAt: parsed.nextWeatherAt || defaults.nextWeatherAt,
             lastCrabSpawn: parsed.lastCrabSpawn || defaults.lastCrabSpawn,
+            lastBoarSpawn: parsed.lastBoarSpawn || defaults.lastBoarSpawn,
             wishlist: parsed.wishlist || defaults.wishlist,
             neighbors: parsed.neighbors || defaults.neighbors,
             favorBar: typeof parsed.favorBar === 'number' ? parsed.favorBar : defaults.favorBar,
             lastNeighborHire: typeof parsed.lastNeighborHire === 'number' ? parsed.lastNeighborHire : defaults.lastNeighborHire,
             neighborsHiredToday: typeof parsed.neighborsHiredToday === 'number' ? parsed.neighborsHiredToday : defaults.neighborsHiredToday,
+            visitingNeighbor: parsed.visitingNeighbor || defaults.visitingNeighbor,
+            lastNeighborVisit: parsed.lastNeighborVisit || defaults.lastNeighborVisit,
+            pendingResourceRequests: Array.isArray(parsed.pendingResourceRequests) ? parsed.pendingResourceRequests : [],
+            premiumBoosts: parsed.premiumBoosts || {}
           };
         }
       } catch (e) {}
@@ -459,18 +632,26 @@ export const GameProvider: React.FC<{children: React.ReactNode}> = ({ children }
   const [activeBuildItem, setActiveBuildItem] = useState<ObjectType | null>(null);
   const [shopOpen, setShopOpen] = useState(false);
   const [plantingTile, setPlantingTile] = useState<string | null>(null);
+  const [neighborVisitPrompt, setNeighborVisitPrompt] = useState(false);
   
   const [floatingTexts, setFloatingTexts] = useState<{id: string, tileId: string, text: string}[]>([]);
   const [questBanner, setQuestBanner] = useState<string | null>(null);
 
   useEffect(() => {
-    localStorage.setItem('island-game-state-v4', JSON.stringify(state));
+    localStorage.setItem('island-game-state-v5', JSON.stringify(state));
   }, [state]);
 
   useEffect(() => {
     const timer = setInterval(() => dispatch({ type: 'TICK', now: Date.now() }), 1000);
     return () => clearInterval(timer);
   }, []);
+
+  useEffect(() => {
+    const arrivedIds = state.pendingResourceRequests.filter((r: { resource: ResourceType; amount: number; arrivesAt: number }) => Date.now() >= r.arrivesAt).map((r: { resource: ResourceType; amount: number; arrivesAt: number }) => r.resource);
+    if (arrivedIds.length > 0) {
+      toast({ title: 'Resource Arrived! 📦', description: `Your ${arrivedIds.join(', ')} arrived from a friend.` });
+    }
+  }, [state.pendingResourceRequests, toast]);
 
   const prevQuests = useRef(state.quests);
   useEffect(() => {
@@ -513,7 +694,7 @@ export const GameProvider: React.FC<{children: React.ReactNode}> = ({ children }
     const [tx, ty] = tileId.split(',').map(Number);
     let inDangerZone = false;
     for (const [id, t] of Object.entries(state.tiles) as [string, import('./types').TileData][]) {
-      if (t.object === 'CRAB' && t.crabHp && t.crabHp > 0) {
+      if ((t.object === 'CRAB' || t.object === 'BOAR') && t.crabHp && t.crabHp > 0) {
         const [cx, cy] = id.split(',').map(Number);
         if (Math.abs(tx - cx) <= 1 && Math.abs(ty - cy) <= 1 && id !== tileId) {
           inDangerZone = true;
@@ -537,7 +718,7 @@ export const GameProvider: React.FC<{children: React.ReactNode}> = ({ children }
 
     dispatch({ type: 'INTERACT', tileId, energyCost });
     
-    if (tile.object === 'CRAB' && (tile.crabHp || 3) > 1) {
+    if ((tile.object === 'CRAB' || tile.object === 'BOAR') && (tile.crabHp || (tile.object === 'CRAB' ? 3 : 2)) > 1) {
        const id = Math.random().toString();
        setFloatingTexts(prev => [...prev, { id, tileId, text: `-${energyCost}⚡` }]);
        setTimeout(() => setFloatingTexts(prev => prev.filter(t => t.id !== id)), 1500);
@@ -604,6 +785,7 @@ export const GameProvider: React.FC<{children: React.ReactNode}> = ({ children }
       activeBuildItem, setActiveBuildItem,
       shopOpen, setShopOpen,
       plantingTile, setPlantingTile,
+      neighborVisitPrompt, setNeighborVisitPrompt,
       questBanner, floatingTexts, tutorial,
       interact, plant, place
     }}>

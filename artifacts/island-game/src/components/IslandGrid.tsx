@@ -7,13 +7,13 @@ export const IslandGrid = () => {
   
   const dangerZoneTiles = useMemo(() => {
     const danger = new Set<string>();
-    const crabs = Object.values(state.tiles).filter(t => t.object === 'CRAB' && t.crabHp && t.crabHp > 0);
+    const enemies = Object.values(state.tiles).filter(t => (t.object === 'CRAB' || t.object === 'BOAR') && t.crabHp && t.crabHp > 0);
     
-    for (const crab of crabs) {
+    for (const enemy of enemies) {
       for (let dx = -1; dx <= 1; dx++) {
         for (let dy = -1; dy <= 1; dy++) {
           if (dx === 0 && dy === 0) continue;
-          danger.add(`${crab.x + dx},${crab.y + dy}`);
+          danger.add(`${enemy.x + dx},${enemy.y + dy}`);
         }
       }
     }

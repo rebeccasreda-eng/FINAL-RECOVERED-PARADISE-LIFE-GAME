@@ -18,19 +18,30 @@ export const COLLECTIONS = [
   { id: 'crab_claw', name: 'Crab Claw', emoji: '🦞', description: 'Dropped by crabs' },
 ];
 
+export const COLLECTION_SETS = [
+  { id: 'weeds', name: 'Weeds', emoji: '🌿', items: ['starfish', 'conch'], reward: { wood: 25, coins: 50, xp: 100 }, rewardLabel: '25 wood + 50 coins + 100 XP' },
+  { id: 'ocean', name: 'Ocean Treasures', emoji: '🌊', items: ['pearl', 'crab_claw'], reward: { shells: 2, coins: 100, xp: 200 }, rewardLabel: '2 shells + 100 coins + 200 XP' }
+];
+
+export const PREMIUM_ITEMS = [
+  { id: 'energy_boost', name: 'Energy Boost', emoji: '⚡', desc: '+10 max energy permanently', shellCost: 2 },
+  { id: 'lucky_charm', name: 'Lucky Charm', emoji: '🍀', desc: '2x collection drops for 5 min', shellCost: 3 },
+  { id: 'golden_crop', name: 'Golden Crop', emoji: '🌟', desc: 'Next harvest gives 3x yield', shellCost: 5 }
+];
+
 export const QUESTS: QuestDef[] = [
   { id: 'q1', title: 'First Steps', description: 'Clear 3 grass patches', targetType: 'clear_grass', targetCount: 3, rewardCoins: 20, rewardXP: 10, icon: '🌿', unlockLevel: 1 },
   { id: 'q2', title: 'Lumberjack', description: 'Chop 5 trees', targetType: 'chop_tree', targetCount: 5, rewardCoins: 50, rewardXP: 20, rewardItem: { type: 'wood', count: 2 }, icon: '🌴', unlockLevel: 1 },
-  { id: 'q3', title: 'Green Thumb', description: 'Plant 3 crops', targetType: 'plant_crop', targetCount: 3, rewardCoins: 30, rewardXP: 15, icon: '🌱', unlockLevel: 2 },
-  { id: 'q4', title: 'Harvest Time', description: 'Harvest 5 crops', targetType: 'harvest_crop', targetCount: 5, rewardCoins: 80, rewardXP: 40, icon: '🌽', unlockLevel: 2 },
-  { id: 'q5', title: 'Miner\'s Luck', description: 'Mine 3 rocks', targetType: 'mine_rock', targetCount: 3, rewardCoins: 60, rewardXP: 30, rewardItem: { type: 'stone', count: 1 }, icon: '🪨', unlockLevel: 3 },
-  { id: 'q6', title: 'Gone Fishin\'', description: 'Fish 5 times', targetType: 'fish', targetCount: 5, rewardCoins: 100, rewardXP: 50, icon: '🎣', unlockLevel: 4 },
+  { id: 'q3', title: 'Green Thumb', description: 'Plant 3 crops', targetType: 'plant_crop', targetCount: 3, rewardCoins: 30, rewardXP: 15, icon: '🌱', unlockLevel: 2, prereqs: ['q1'] },
+  { id: 'q4', title: 'Harvest Time', description: 'Harvest 5 crops', targetType: 'harvest_crop', targetCount: 5, rewardCoins: 80, rewardXP: 40, icon: '🌽', unlockLevel: 2, prereqs: ['q3'] },
+  { id: 'q5', title: 'Miner\'s Luck', description: 'Mine 3 rocks', targetType: 'mine_rock', targetCount: 3, rewardCoins: 60, rewardXP: 30, rewardItem: { type: 'stone', count: 1 }, icon: '🪨', unlockLevel: 3, prereqs: ['q1'] },
+  { id: 'q6', title: 'Gone Fishin\'', description: 'Fish 5 times', targetType: 'fish', targetCount: 5, rewardCoins: 100, rewardXP: 50, icon: '🎣', unlockLevel: 4, prereqs: ['q2'] },
   { id: 'q7', title: 'Energy Hoarder', description: 'Reach max energy', targetType: 'reach_energy', targetCount: 20, rewardCoins: 40, rewardXP: 20, icon: '⚡', unlockLevel: 5 },
   { id: 'q8', title: 'Island Wealth', description: 'Accumulate 500 coins', targetType: 'accumulate_coins', targetCount: 500, rewardCoins: 150, rewardXP: 50, icon: '🪙', unlockLevel: 6 },
-  { id: 'q9', title: 'Builder\'s Dream', description: 'Place a structure', targetType: 'place_structure', targetCount: 1, rewardCoins: 200, rewardXP: 100, icon: '🏚️', unlockLevel: 7 },
-  { id: 'q10', title: 'Paradise Found', description: 'Reach level 10', targetType: 'reach_level', targetCount: 10, rewardCoins: 500, rewardXP: 200, icon: '⭐', unlockLevel: 8 },
-  { id: 'q11', title: 'Crab Slayer', description: 'Defeat 3 crabs', targetType: 'kill_crab', targetCount: 3, rewardCoins: 100, rewardXP: 50, icon: '🦀', unlockLevel: 2 },
-  { id: 'q12', title: 'Collector', description: 'Find a collection item', targetType: 'collect_item', targetCount: 1, rewardCoins: 200, rewardXP: 100, icon: '🐚', unlockLevel: 3 },
+  { id: 'q9', title: 'Builder\'s Dream', description: 'Place a structure', targetType: 'place_structure', targetCount: 1, rewardCoins: 200, rewardXP: 100, icon: '🏚️', unlockLevel: 7, prereqs: ['q5'] },
+  { id: 'q10', title: 'Paradise Found', description: 'Reach level 10', targetType: 'reach_level', targetCount: 10, rewardCoins: 500, rewardXP: 200, icon: '⭐', unlockLevel: 8, prereqs: ['q9'] },
+  { id: 'q11', title: 'Crab Slayer', description: 'Defeat 3 crabs', targetType: 'kill_crab', targetCount: 3, rewardCoins: 100, rewardXP: 50, icon: '🦀', unlockLevel: 2, prereqs: ['q1'] },
+  { id: 'q12', title: 'Collector', description: 'Find a collection item', targetType: 'collect_item', targetCount: 1, rewardCoins: 200, rewardXP: 100, icon: '🐚', unlockLevel: 3, prereqs: ['q11'] },
   { id: 'q13', title: 'Forecast Fan', description: 'Check the weather', targetType: 'check_weather', targetCount: 1, rewardCoins: 20, rewardXP: 10, icon: '🌤️', unlockLevel: 2 },
 ];
 
@@ -43,20 +54,21 @@ export const OBJECT_CONFIG: Record<string, any> = {
   CROP_READY: { action: 'Harvest', energy: 1, coins: 10, xp: 20 },
   CROP_WILTED: { action: 'Clear', energy: 1, coins: 0, xp: 2 },
   FISH_SPOT: { action: 'Fish', energy: 1, coins: 12, xp: 15, respawn: SCALED(120000) },
-  CRAB: { action: 'Attack', energy: 1, coins: 5, xp: 10 }
+  CRAB: { action: 'Attack', energy: 1, coins: 5, xp: 10 },
+  BOAR: { action: 'Shoo', energy: 1, coins: 8, xp: 12 }
 };
 
 export const EMOJI_MAP: Record<string, string> = {
   TREE_PALM: '🌴', TREE_APPLE: '🍎', ROCK: '🪨', FLOWER_BUSH: '🌸', 
   CROP_PLOT: '🟫', CROP_GROWING: '🌱', CROP_READY: '🌽', CROP_WILTED: '🥀',
   FISH_SPOT: '✨', HUT: '🏚️', DOCK: '⛵', WELL: '💧', 
-  FLOWER_POT: '🪴', FENCE: '🚧', LANTERN: '🏮', CRAB: '🦀'
+  FLOWER_POT: '🪴', FENCE: '🚧', LANTERN: '🏮', CRAB: '🦀', BOAR: '🐗'
 };
 
 export const INITIAL_NEIGHBORS = [
-  { id: 'n1', name: 'TropicalTina', avatar: '👩‍🌾', level: 3, favorPoints: 0 },
-  { id: 'n2', name: 'IslandIan', avatar: '👨‍🌾', level: 5, favorPoints: 0 },
-  { id: 'n3', name: 'CoconutCara', avatar: '🧑‍🌾', level: 7, favorPoints: 0 }
+  { id: 'n1', name: 'TropicalTina', avatar: '👩‍🌾', level: 3, favorPoints: 0, wishlist: ['starfish'] },
+  { id: 'n2', name: 'IslandIan', avatar: '👨‍🌾', level: 5, favorPoints: 0, wishlist: ['pearl'] },
+  { id: 'n3', name: 'CoconutCara', avatar: '🧑‍🌾', level: 7, favorPoints: 0, wishlist: ['conch', 'crab_claw'] }
 ];
 
 export function generateIsland(): Record<string, TileData> {

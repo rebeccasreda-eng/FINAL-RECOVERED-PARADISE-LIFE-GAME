@@ -5,15 +5,41 @@ import { QUESTS } from '../game/gameData';
 export const QuestPanel = () => {
   const { state } = useGame();
   
-  const unlockedQuests = QUESTS.filter(q => state.level >= q.unlockLevel);
-
   return (
     <div className="absolute right-6 top-24 bottom-32 w-80 bg-[#fff5d7] border-8 border-[#8b5a2b] rounded-3xl shadow-2xl flex flex-col overflow-hidden z-10 select-none">
       <div className="bg-[#8b5a2b] text-white p-4 text-center font-black text-2xl uppercase tracking-widest border-b-4 border-[#5c3a21] shadow-md">
         📋 Quests
       </div>
-      <div className="flex-1 overflow-y-auto p-4 space-y-4">
-        {unlockedQuests.map(q => {
+      <div className="flex-1 overflow-y-auto p-4 space-y-4 custom-scrollbar">
+        {QUESTS.map(q => {
+          if (state.level < q.unlockLevel) return null;
+          
+          let lockedByPrereq = false;
+          let prereqTitle = '';
+          if (q.prereqs && q.prereqs.length > 0) {
+            for (const pid of q.prereqs) {
+              if (!state.quests[pid]?.completed) {
+                lockedByPrereq = true;
+                prereqTitle = QUESTS.find(x => x.id === pid)?.title || 'Previous Quest';
+                break;
+              }
+            }
+          }
+
+          if (lockedByPrereq) {
+            return (
+              <div key={q.id} className="p-4 rounded-2xl border-4 bg-gray-200 border-gray-300 shadow-sm opacity-60">
+                <div className="flex items-start gap-3">
+                   <div className="text-4xl drop-shadow-sm grayscale">🔒</div>
+                   <div className="flex-1">
+                     <h4 className="font-bold text-gray-500 text-lg leading-tight">{q.title}</h4>
+                     <p className="text-sm text-gray-400 leading-snug mt-1 font-medium">Complete [{prereqTitle}] first</p>
+                   </div>
+                </div>
+              </div>
+            );
+          }
+
           const progress = state.quests[q.id]?.progress || 0;
           const completed = state.quests[q.id]?.completed;
           return (
