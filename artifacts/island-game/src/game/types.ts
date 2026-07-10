@@ -26,6 +26,7 @@ export interface TileData {
   treeHp?: number;        // chops remaining before tree falls
   ripensAt?: number;      // timestamp when unripe fruit tree becomes harvestable
   unwitherRequestedAt?: number;
+  shoreDepth?: number;   // BFS distance from nearest land tile (GRASS/SAND); water only
 }
 
 export interface QuestObjective {

@@ -2069,8 +2069,16 @@ export const IslandTile: React.FC<IslandTileProps> = ({
 
       {/* ── Fish swimming in water ──────────────────────────────────────────
            FISH_SPOT tiles always show a larger, clearly visible fish.
-           Other water tiles show a small ambient fish on ~1-in-5 tiles.   */}
-      {isWater && (tile.object === 'FISH_SPOT' || (tile.x * 7 + tile.y * 11) % 10 === 0) && (() => {
+           Near shore (shoreDepth ≤ 4): ambient fish on ~1-in-10 tiles.
+           Deep water (shoreDepth > 4 / undefined): one fish total via high modulo. */}
+      {isWater && (() => {
+        const depth = tile.shoreDepth ?? 999;
+        const hash  = (tile.x * 7 + tile.y * 11);
+        const show  = tile.object === 'FISH_SPOT'
+                   || (depth <= 4 && hash % 10 === 0)
+                   || (depth > 4  && hash % 700 === 0);
+        return show;
+      })() && (() => {
         const isFishSpot = tile.object === 'FISH_SPOT';
         const delay  = (tile.x * 5 + tile.y * 7) % 16;
         const goRight = (tile.x + tile.y) % 2 === 0;

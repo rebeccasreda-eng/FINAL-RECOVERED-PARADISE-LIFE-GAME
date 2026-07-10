@@ -463,5 +463,32 @@ export function generateIsland(): Record<string, TileData> {
     }
   }
 
+  // ── Shore-depth BFS — stamp every WATER tile with distance to nearest land ─
+  // Seed: water tiles directly adjacent to a non-water tile get depth 1
+  const bfsQueue: Array<{ id: string; depth: number }> = [];
+  for (const tile of Object.values(tiles)) {
+    if (tile.type === 'WATER') continue;
+    for (const [dx, dy] of [[-1,0],[1,0],[0,-1],[0,1]] as const) {
+      const nb = tiles[`${tile.x + dx},${tile.y + dy}`];
+      if (nb?.type === 'WATER' && nb.shoreDepth === undefined) {
+        nb.shoreDepth = 1;
+        bfsQueue.push({ id: nb.id, depth: 1 });
+      }
+    }
+  }
+  // Propagate outward
+  let qi = 0;
+  while (qi < bfsQueue.length) {
+    const { id, depth } = bfsQueue[qi++];
+    const [tx, ty] = id.split(',').map(Number);
+    for (const [dx, dy] of [[-1,0],[1,0],[0,-1],[0,1]] as const) {
+      const nb = tiles[`${tx + dx},${ty + dy}`];
+      if (nb?.type === 'WATER' && nb.shoreDepth === undefined) {
+        nb.shoreDepth = depth + 1;
+        bfsQueue.push({ id: nb.id, depth: depth + 1 });
+      }
+    }
+  }
+
   return tiles;
 }
