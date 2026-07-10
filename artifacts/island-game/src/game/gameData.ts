@@ -159,6 +159,7 @@ export const OBJECT_CONFIG: Record<string, any> = {
   BABY_PARROT: { action: 'Feed',  energy: 0, coins: 2, xp: 5  },
   TALL_ROCK:   { action: 'Mine', energy: 1, coins: 10, xp: 18, drops: { stone: 2 }, respawn: SCALED(120000) },
   DOCK:        { action: 'Visit', energy: 0, coins: 0, xp: 0 },
+  TOXIC_DRUM:  { action: 'Inspect', energy: 0, coins: 0, xp: 5 },
 };
 
 export const EMOJI_MAP: Record<string, string> = {
@@ -168,7 +169,8 @@ export const EMOJI_MAP: Record<string, string> = {
   TREE_COCONUT_UNRIPE: '🌴', TREE_MANGO_UNRIPE: '🥭',
   CROP_PLOT: '🟫', CROP_GROWING: '🌱', CROP_READY: '🌽', CROP_WILTED: '🥀',
   FISH_SPOT: '', HUT: '🏚️', DOCK: '⛵', WELL: '💧', 
-  FLOWER_POT: '🪴', FENCE: '🚧', LANTERN: '🏮', CRAB: '🦀', BOAR: '🐗', BABY_PARROT: '🦜', TALL_ROCK: '🪨'
+  FLOWER_POT: '🪴', FENCE: '🚧', LANTERN: '🏮', CRAB: '🦀', BOAR: '🐗', BABY_PARROT: '🦜', TALL_ROCK: '🪨',
+  TOXIC_DRUM: '☣️'
 };
 
 export const INITIAL_NEIGHBORS = [
@@ -412,6 +414,22 @@ export function generateIsland(): Record<string, TileData> {
   // ── Fish spots — on water tiles that don't already have an object ──────
   const fishCandidates = waterTiles.filter(t => !t.object);
   for (let i = 0; i < 5 && fishCandidates.length; i++) pick(fishCandidates).object = 'FISH_SPOT';
+
+  // ── Toxic drums — bobbing in mid-depth water (shoreDepth 2-5) ────────────
+  const drumWater = waterTiles.filter(t =>
+    !t.object && t.shoreDepth !== undefined && t.shoreDepth >= 2 && t.shoreDepth <= 5
+  );
+  for (let i = 0; i < 2 && drumWater.length; i++) pick(drumWater).object = 'TOXIC_DRUM';
+
+  // ── Driftwood logs on left-side shore tiles adjacent to water ────────────
+  const leftShore = Object.values(tiles).filter(t =>
+    t.type === 'SAND' && !t.object && t.x < CX - 2 &&
+    ([[-1,0],[1,0],[0,-1],[0,1]] as const).some(([dx,dy]) => {
+      const nb = tiles[`${t.x+dx},${t.y+dy}`];
+      return nb?.type === 'WATER';
+    })
+  );
+  for (let i = 0; i < 3 && leftShore.length; i++) pick(leftShore).object = 'DRIFTWOOD';
 
   // ── Puddles near trees — small water pools under the canopy ─────────────
   const ALL_TREE_TYPES: ObjectType[] = ['TREE_COCONUT', 'TREE_MANGO', 'TREE_APPLE', 'TREE_PALM', 'TREE_COCONUT_UNRIPE', 'TREE_MANGO_UNRIPE'];

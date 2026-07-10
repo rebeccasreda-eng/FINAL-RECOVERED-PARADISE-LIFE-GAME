@@ -10,7 +10,8 @@ export type ObjectType =
   | 'BLUEBELL' | 'PANSY' | 'TULIP' | 'PINEAPPLE_PLANT' | 'BLUEBERRY_BUSH'
   | 'HUT' | 'DOCK' | 'WELL' | 'FLOWER_POT' | 'FENCE' | 'LANTERN'
   | 'CRAB' | 'BOAR' | 'BABY_PARROT' | 'TALL_ROCK'
-  | 'TREE_COCONUT_UNRIPE' | 'TREE_MANGO_UNRIPE';
+  | 'TREE_COCONUT_UNRIPE' | 'TREE_MANGO_UNRIPE'
+  | 'TOXIC_DRUM';
 
 export type WeatherType = 'SUNNY' | 'RAINY' | 'CLOUDY' | 'STORMY' | 'WINDY';
 

@@ -448,6 +448,65 @@ const ObjectSVG: React.FC<{ object: string; tileX: number; tileY: number; tileTy
       </svg>
     );
 
+    /* ── TOXIC DRUM ─────────────────────────────────────────────────────── */
+    case 'TOXIC_DRUM': return (
+      <svg viewBox="0 0 44 62" width="40" height="58" style={{ display:'block' }}>
+        <defs>
+          <linearGradient id={g('tdm')} x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%"   stopColor="#707080"/>
+            <stop offset="18%"  stopColor="#b8b8cc"/>
+            <stop offset="58%"  stopColor="#484858"/>
+            <stop offset="100%" stopColor="#1c1c2c"/>
+          </linearGradient>
+          <linearGradient id={g('tdy')} x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%"   stopColor="#6a6200"/>
+            <stop offset="22%"  stopColor="#dcca00"/>
+            <stop offset="68%"  stopColor="#6a6200"/>
+            <stop offset="100%" stopColor="#343200"/>
+          </linearGradient>
+        </defs>
+        {/* Toxic glow puddle */}
+        <ellipse cx="22" cy="57" rx="17" ry="4" fill="rgba(20,200,60,0.32)"/>
+        {/* Bottom cap */}
+        <ellipse cx="22" cy="52" rx="13" ry="5" fill="#28283a"/>
+        {/* Barrel body */}
+        <rect x="9" y="14" width="26" height="38" fill={`url(#${g('tdm')})`}/>
+        {/* Hazard stripe — yellow band */}
+        <rect x="9" y="33" width="26" height="9" fill={`url(#${g('tdy')})`}/>
+        {/* Black diagonal chevrons on hazard band */}
+        <path d="M9,33 L15,33 L9,42 Z"                       fill="#0a0a0a" opacity="0.85"/>
+        <path d="M20,33 L26,33 L15,42 L9,42 Z"               fill="#0a0a0a" opacity="0.42"/>
+        <path d="M31,33 L35,33 L35,36 L26,42 L20,42 Z"       fill="#0a0a0a" opacity="0.85"/>
+        {/* Metal ring bands */}
+        <path d="M9,23 Q22,25 35,23" stroke="#c4c4d8" strokeWidth="2.5" fill="none" strokeLinecap="round"/>
+        <path d="M9,49 Q22,51 35,49" stroke="#909098" strokeWidth="2.5" fill="none" strokeLinecap="round"/>
+        {/* Left shade strip for depth */}
+        <rect x="9" y="14" width="5" height="38" fill="rgba(0,0,0,0.18)"/>
+        {/* Top cap — back ellipse */}
+        <ellipse cx="22" cy="14" rx="13" ry="5.5" fill="#5c5c70"/>
+        {/* Top cap — face */}
+        <ellipse cx="22" cy="13" rx="13" ry="5"   fill="#8e8ea4"/>
+        {/* Top cap — highlight */}
+        <ellipse cx="22" cy="12" rx="10" ry="3.5" fill="#aeaec2"/>
+        {/* Biohazard symbol — outer ring */}
+        <circle cx="22" cy="26" r="7.5" fill="none" stroke="#0d0d0d" strokeWidth="1.4" opacity="0.88"/>
+        {/* Three petal arcs */}
+        <circle cx="22" cy="20" r="3.8" fill="none" stroke="#0d0d0d" strokeWidth="2.4" opacity="0.88"/>
+        <circle cx="17" cy="29" r="3.8" fill="none" stroke="#0d0d0d" strokeWidth="2.4" opacity="0.88"/>
+        <circle cx="27" cy="29" r="3.8" fill="none" stroke="#0d0d0d" strokeWidth="2.4" opacity="0.88"/>
+        {/* Centre disc */}
+        <circle cx="22" cy="26" r="2.2" fill="#0d0d0d" opacity="0.9"/>
+        {/* Toxic green drips */}
+        <path d="M14,12 Q13,18 14,24" stroke="#1ecc44" strokeWidth="2.2" fill="none" strokeLinecap="round"/>
+        <ellipse cx="14" cy="25" rx="2.2" ry="1.8" fill="#1ecc44" opacity="0.85"/>
+        <path d="M31,11 Q32,16 31,21" stroke="#1ecc44" strokeWidth="1.6" fill="none" strokeLinecap="round"/>
+        <ellipse cx="31" cy="22" rx="1.6" ry="1.4" fill="#1ecc44" opacity="0.75"/>
+        {/* Rust patches */}
+        <ellipse cx="11" cy="44" rx="3.5" ry="2" fill="#8a3818" opacity="0.55" transform="rotate(-20 11 44)"/>
+        <ellipse cx="33" cy="38" rx="2.5" ry="1.8" fill="#8a3818" opacity="0.45" transform="rotate(12 33 38)"/>
+      </svg>
+    );
+
     /* ── COCONUT TREE ───────────────────────────────────────────────────── */
     /* ── UNRIPE COCONUT TREE ─────────────────────────────────────────────── */
     case 'TREE_COCONUT_UNRIPE': return (
@@ -1673,7 +1732,8 @@ const CHOP_TREES = new Set(['TREE_PALM', 'TREE_APPLE']);
 const SVG_OBJECTS = new Set(['TREE_PALM', 'TREE_APPLE', 'ROCK', 'FLOWER_BUSH', 'DRIFTWOOD',
   'TREE_COCONUT', 'TREE_MANGO', 'TREE_COCONUT_UNRIPE', 'TREE_MANGO_UNRIPE',
   'GARDEN_PATCH', 'WEEDS', 'SUNFLOWER', 'PUDDLE', 'THORNS',
-  'BLUEBELL', 'PANSY', 'TULIP', 'PINEAPPLE_PLANT', 'BLUEBERRY_BUSH', 'BABY_PARROT', 'TALL_ROCK', 'DOCK']);
+  'BLUEBELL', 'PANSY', 'TULIP', 'PINEAPPLE_PLANT', 'BLUEBERRY_BUSH', 'BABY_PARROT', 'TALL_ROCK', 'DOCK',
+  'TOXIC_DRUM']);
 /** Objects that sway in the breeze */
 const SWAY_OBJECTS = new Set(['TREE_PALM', 'TREE_APPLE', 'TREE_COCONUT', 'TREE_MANGO', 'TREE_COCONUT_UNRIPE', 'TREE_MANGO_UNRIPE']);
 
