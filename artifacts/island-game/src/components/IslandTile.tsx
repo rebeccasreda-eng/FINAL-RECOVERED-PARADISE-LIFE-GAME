@@ -199,7 +199,7 @@ const ObjectSVG: React.FC<{ object: string; tileX: number; tileY: number; tileTy
             </radialGradient>
             <radialGradient id={rg2} cx="30%" cy="26%" r="72%">
               <stop offset="0%"   stopColor="#d8d8d0"/>
-              <stop offset="50%"  stopColor="#9898908"/>
+              <stop offset="50%"  stopColor="#989890"/>
               <stop offset="100%" stopColor="#585850"/>
             </radialGradient>
             <radialGradient id={rg3} cx="32%" cy="22%" r="70%">

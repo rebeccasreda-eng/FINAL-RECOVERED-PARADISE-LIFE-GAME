@@ -669,6 +669,8 @@ export const GameProvider: React.FC<{children: React.ReactNode}> = ({ children }
   
   const [floatingTexts, setFloatingTexts] = useState<{id: string, tileId: string, text: string}[]>([]);
   const [coolBanners, setCoolBanners]     = useState<{id: string, label: string}[]>([]);
+  const bannerTimers = useRef<ReturnType<typeof setTimeout>[]>([]);
+  useEffect(() => () => { bannerTimers.current.forEach(clearTimeout); }, []);
   const [questBanner, setQuestBanner] = useState<string | null>(null);
   const [activeChopTileId, setActiveChopTileId] = useState<string | null>(null);
   const [chopCount, setChopCount] = useState(0);
@@ -803,7 +805,8 @@ export const GameProvider: React.FC<{children: React.ReactNode}> = ({ children }
     if (coolParts.length > 0) {
       const bid = Math.random().toString();
       setCoolBanners(prev => [...prev, { id: bid, label: coolParts.join('  ') }]);
-      setTimeout(() => setCoolBanners(prev => prev.filter(b => b.id !== bid)), 2200);
+      const t = setTimeout(() => setCoolBanners(prev => prev.filter(b => b.id !== bid)), 2200);
+      bannerTimers.current.push(t);
     }
   };
 

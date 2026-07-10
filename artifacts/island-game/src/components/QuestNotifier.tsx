@@ -207,67 +207,53 @@ const FishNPC = () => (
 const AxeNPC = () => (
   <svg viewBox="0 0 84 84" xmlns="http://www.w3.org/2000/svg" width="46" height="46">
     <ellipse cx="42" cy="80" rx="30" ry="5" fill="rgba(0,0,0,0.18)"/>
-    {/* Grass */}
-    <ellipse cx="42" cy="74" rx="34" ry="11" fill="#3ab028"/>
-    <ellipse cx="28" cy="72" rx="20" ry="8" fill="#44c030"/>
-    <ellipse cx="56" cy="72" rx="18" ry="7" fill="#40bc2c"/>
-    {/* Small grass blades */}
-    <path d="M18,68 Q14,60 16,54" stroke="#4ccc34" strokeWidth="3" fill="none" strokeLinecap="round"/>
-    <path d="M64,68 Q68,58 66,52" stroke="#4ccc34" strokeWidth="3" fill="none" strokeLinecap="round"/>
-    {/* Coconut tree — upright, left side, behind stump */}
-    {/* Trunk: straight up from grass to crown */}
-    <path d="M13,73 Q12,55 13,38 Q14,22 13,8" stroke="#7a5020" strokeWidth="6"   fill="none" strokeLinecap="round"/>
-    <path d="M13,73 Q12,55 13,38 Q14,22 13,8" stroke="#c09040" strokeWidth="3.5" fill="none" strokeLinecap="round" opacity="0.55"/>
-    {/* Trunk ring marks */}
-    <path d="M11,60 Q13,59 15,60" stroke="#5a3810" strokeWidth="1.2" fill="none" opacity="0.45"/>
-    <path d="M11,50 Q13,49 15,50" stroke="#5a3810" strokeWidth="1.2" fill="none" opacity="0.45"/>
-    <path d="M11,40 Q13,39 15,40" stroke="#5a3810" strokeWidth="1.2" fill="none" opacity="0.45"/>
-    {/* Palm fronds fanning symmetrically from the crown */}
-    <ellipse cx="13" cy="8" rx="18" ry="5"   fill="#28a818" transform="rotate(0   13 8)"/>
-    <ellipse cx="13" cy="8" rx="17" ry="4.5" fill="#38c020" transform="rotate(-38 13 8)" opacity="0.92"/>
-    <ellipse cx="13" cy="8" rx="17" ry="4.5" fill="#38c020" transform="rotate(38  13 8)" opacity="0.88"/>
-    <ellipse cx="13" cy="8" rx="15" ry="4"   fill="#48d028" transform="rotate(-72 13 8)" opacity="0.82"/>
-    <ellipse cx="13" cy="8" rx="15" ry="4"   fill="#48d028" transform="rotate(72  13 8)" opacity="0.78"/>
-    <ellipse cx="13" cy="8" rx="13" ry="3.5" fill="#30b818" transform="rotate(-105 13 8)" opacity="0.70"/>
-    {/* Coconuts clustered at crown base */}
-    <circle cx="13" cy="11" r="3.5" fill="#c88820"/>
-    <circle cx="17" cy="10" r="3.2" fill="#b87818"/>
-    <circle cx="9"  cy="10" r="3"   fill="#d09028"/>
-    {/* Stump body */}
-    <rect x="18" y="40" width="48" height="32" rx="5" fill="#8a5020"/>
-    {/* Stump top ring face */}
-    <ellipse cx="42" cy="40" rx="24" ry="9" fill="#9a5a22"/>
-    <ellipse cx="42" cy="40" rx="18" ry="6.5" fill="#a86428" opacity="0.85"/>
-    <ellipse cx="42" cy="40" rx="11" ry="4" fill="#b87030" opacity="0.7"/>
-    <ellipse cx="42" cy="40" rx="5.5" ry="2" fill="#c87838" opacity="0.6"/>
-    {/* Stump side wood grain lines */}
-    <path d="M26,44 Q25,56 26,64" stroke="#6a3a18" strokeWidth="1.5" fill="none" opacity="0.5"/>
-    <path d="M56,44 Q57,56 56,64" stroke="#6a3a18" strokeWidth="1.5" fill="none" opacity="0.5"/>
-    <path d="M35,43 Q34,57 35,66" stroke="#7a4820" strokeWidth="1" fill="none" opacity="0.35"/>
-    {/* Flying wood chip left */}
-    <path d="M18,42 Q12,36 14,28" stroke="#a06028" strokeWidth="3" fill="none" strokeLinecap="round"/>
-    <ellipse cx="14" cy="27" rx="5" ry="3" fill="#b87030" transform="rotate(-35 14 27)"/>
-    {/* Flying wood chip right */}
-    <path d="M64,40 Q72,34 70,26" stroke="#8a5020" strokeWidth="2.5" fill="none" strokeLinecap="round"/>
-    <ellipse cx="70" cy="25" rx="4" ry="2.5" fill="#a06028" transform="rotate(25 70 25)"/>
-    {/* Axe handle — diagonal, embedded in stump */}
-    <path d="M60,4 Q58,14 54,26 Q51,34 48,42" stroke="#7a4e1c" strokeWidth="7" fill="none" strokeLinecap="round"/>
-    <path d="M60,4 Q58,14 54,26 Q51,34 48,42" stroke="#c08840" strokeWidth="4" fill="none" strokeLinecap="round" opacity="0.55"/>
-    {/* Axe head — steel blue-grey */}
-    <path d="M36,4 Q30,6 28,13 Q26,21 30,27 Q34,33 40,29 Q46,31 50,23 Q54,15 48,9 Q44,5 36,4Z" fill="#8898B4"/>
-    <path d="M36,4 Q30,6 28,13 Q26,21 30,27" stroke="#6070A0" strokeWidth="1.2" fill="none" opacity="0.7"/>
-    {/* Blade shine */}
-    <path d="M34,6 Q30,11 30,18" stroke="rgba(210,225,255,0.55)" strokeWidth="2.5" fill="none" strokeLinecap="round"/>
-    {/* Grape cluster on blade */}
-    <circle cx="40" cy="20" r="3"   fill="#5535A8"/>
-    <circle cx="44" cy="19" r="3"   fill="#5535A8"/>
-    <circle cx="42" cy="16" r="3"   fill="#6848BB"/>
-    <circle cx="38.5" cy="16.5" r="2.5" fill="#4828A0"/>
-    <circle cx="39.5" cy="19.3" r="1.2" fill="rgba(255,255,255,0.55)"/>
-    <circle cx="43.2" cy="18.3" r="1.2" fill="rgba(255,255,255,0.55)"/>
-    {/* Grape stem + leaf */}
-    <path d="M42,13.5 Q43,11 46,10" stroke="#3a7018" strokeWidth="1.4" fill="none" strokeLinecap="round"/>
-    <ellipse cx="47" cy="9" rx="4.5" ry="2.8" fill="#4aA028" transform="rotate(-25 47 9)"/>
+    {/* Dirt mound */}
+    <ellipse cx="42" cy="74" rx="34" ry="11" fill="#8B5E2A"/>
+    <ellipse cx="28" cy="72" rx="20" ry="8"  fill="#9A6830"/>
+    <ellipse cx="56" cy="72" rx="18" ry="7"  fill="#9A6830"/>
+    {/* Loose soil clumps */}
+    <ellipse cx="22" cy="68" rx="5"  ry="2.5" fill="#6a4018" opacity="0.7" transform="rotate(-15 22 68)"/>
+    <ellipse cx="62" cy="67" rx="4"  ry="2"   fill="#6a4018" opacity="0.65" transform="rotate(12 62 67)"/>
+    <ellipse cx="42" cy="66" rx="6"  ry="2.5" fill="#7a4c20" opacity="0.6"/>
+    {/* Flying soil flecks */}
+    <circle cx="18" cy="58" r="2.5" fill="#7a4c1c" opacity="0.75"/>
+    <circle cx="13" cy="52" r="2"   fill="#8a5822" opacity="0.65"/>
+    <circle cx="68" cy="55" r="2.2" fill="#7a4c1c" opacity="0.70"/>
+    <circle cx="72" cy="48" r="1.8" fill="#8a5822" opacity="0.60"/>
+    {/* ── Shovel handle — angled upper-left to lower-right ── */}
+    {/* Shadow stroke */}
+    <path d="M20,6 Q30,22 40,42 Q44,52 46,64"
+      stroke="#3a2008" strokeWidth="11" fill="none" strokeLinecap="round" opacity="0.22"/>
+    {/* Main handle */}
+    <path d="M20,6 Q30,22 40,42 Q44,52 46,64"
+      stroke="#7a4e1c" strokeWidth="8" fill="none" strokeLinecap="round"/>
+    {/* Handle highlight */}
+    <path d="M20,6 Q30,22 40,42 Q44,52 46,64"
+      stroke="#c08840" strokeWidth="4" fill="none" strokeLinecap="round" opacity="0.50"/>
+    {/* Handle grip wrap bands */}
+    <path d="M35,30 Q38,29 40,31" stroke="#5a3810" strokeWidth="2.5" fill="none" strokeLinecap="round" opacity="0.55"/>
+    <path d="M38,37 Q41,36 43,38" stroke="#5a3810" strokeWidth="2.5" fill="none" strokeLinecap="round" opacity="0.55"/>
+    {/* T-grip at top of handle */}
+    <rect x="10" y="3" width="22" height="7" rx="3.5" fill="#6a3e14"/>
+    <rect x="10" y="3" width="22" height="7" rx="3.5" fill="none" stroke="#3a2008" strokeWidth="1" opacity="0.4"/>
+    <path d="M13,5 Q21,4 29,5" stroke="rgba(255,255,255,0.20)" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
+    {/* ── Shovel blade ── */}
+    {/* Blade body — rounded spade shape */}
+    <path d="M34,58 Q28,62 28,70 Q28,78 42,79 Q56,78 56,70 Q56,62 50,58 Z"
+      fill="#8898b8"/>
+    {/* Blade face gradient sheen */}
+    <path d="M34,58 Q28,62 28,70 Q28,78 42,79 Q56,78 56,70 Q56,62 50,58 Z"
+      fill="none" stroke="#6070a0" strokeWidth="1.2" opacity="0.6"/>
+    {/* Blade top collar / socket */}
+    <rect x="38" y="54" width="8" height="8" rx="2" fill="#7080a0"/>
+    <rect x="38" y="54" width="8" height="4" rx="2" fill="#9aabe0" opacity="0.6"/>
+    {/* Blade centre ridge */}
+    <path d="M42,60 Q42,68 42,77" stroke="rgba(255,255,255,0.28)" strokeWidth="1.8" fill="none" strokeLinecap="round"/>
+    {/* Blade left bevel */}
+    <path d="M34,58 Q31,65 30,72" stroke="rgba(180,200,240,0.40)" strokeWidth="1.4" fill="none" strokeLinecap="round"/>
+    {/* Soil on blade */}
+    <ellipse cx="42" cy="74" rx="8" ry="2.5" fill="#7a4c1c" opacity="0.55"/>
+    <ellipse cx="38" cy="72" rx="3" ry="1.5" fill="#6a3e14" opacity="0.5" transform="rotate(-10 38 72)"/>
   </svg>
 );
 
