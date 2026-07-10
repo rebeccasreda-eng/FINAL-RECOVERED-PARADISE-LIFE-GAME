@@ -35,7 +35,7 @@ const BOT_H = 96;
 
 // Player start tile — centre of the 21×21 elliptical island
 const PLAYER_START = { x: 10, y: 10 };
-const MS_PER_TILE  = 420; // walk speed in milliseconds per tile (matches reference)
+const MOVE_SPEED = 6.0; // tiles per second (free movement)
 
 // World centre (used to offset the world container so island is centred on load)
 const WORLD_CX = WORLD_W / 2;
@@ -51,77 +51,143 @@ const GameInner = ({ profile }: { profile: PlayerProfile }) => {
   const [questPanelOpen,   setQuestPanelOpen]   = useState(false);
   const { muted: bgmMuted, toggle: toggleBgm } = useBgm('/bgm.mp3');
 
-  /* ── Player movement — tile-by-tile step walk (matches reference HTML) ── */
-  // Current integer tile the player occupies
-  const playerTileRef = useRef({ x: PLAYER_START.x, y: PLAYER_START.y });
-  // Blocks new moves while walking (ref avoids stale closures in setTimeout chain)
-  const movingRef = useRef(false);
+  /* ── Player movement — free analog movement (WASD / arrows + click-to-glide) ── */
 
-  const [playerTile, setPlayerTile] = useState(playerTileRef.current);
-  const [isWalking,  setIsWalking]  = useState(false);
-  const [facing,     setFacing]     = useState<'left' | 'right'>('right');
+  // Float tile-space position (supports sub-tile interpolation)
+  const playerPosRef = useRef<{ x: number; y: number }>({ x: PLAYER_START.x, y: PLAYER_START.y });
+  const [playerPos, setPlayerPos] = useState(playerPosRef.current);
+  const [isWalking, setIsWalking] = useState(false);
+  const [facing,    setFacing]    = useState<'left' | 'right'>('right');
 
-  // Keep a layout-synchronous snapshot of tiles so the setTimeout chain always
-  // sees the most recent tile state without stale-closure risk.
+  // Click-to-glide destination; null = no pending target
+  const targetRef = useRef<{ x: number; y: number } | null>(null);
+
+  // Currently held direction keys
+  const keysRef = useRef({ up: false, down: false, left: false, right: false });
+
+  // rAF bookkeeping
+  const rafRef       = useRef<number | null>(null);
+  const lastTimeRef  = useRef<number | null>(null);
+  const wasWalkRef   = useRef(false);
+  const facingRef    = useRef<'left' | 'right'>('right');
+
+  // Stale-closure-safe tiles access
   const tilesRef = useRef(state.tiles);
   useLayoutEffect(() => { tilesRef.current = state.tiles; }, [state.tiles]);
 
-  // Stores the pending walk-step timer so it can be cancelled on unmount.
-  const walkTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  // Cancel any in-flight walk when the component unmounts.
-  useEffect(() => () => {
-    if (walkTimerRef.current !== null) clearTimeout(walkTimerRef.current);
+  /** True if the tile nearest (x, y) exists and is not water */
+  const canWalk = useCallback((x: number, y: number): boolean => {
+    const t = tilesRef.current[`${Math.round(x)},${Math.round(y)}`];
+    return !!t && t.type !== 'WATER';
   }, []);
 
-  const moveTo = useCallback((tx: number, ty: number) => {
-    if (movingRef.current) return;                           // ignore clicks mid-walk
-    const dest = tilesRef.current[`${tx},${ty}`];
-    if (!dest || dest.type === 'WATER') return;
+  // Main game loop — runs every animation frame
+  const tick = useCallback((now: number) => {
+    if (lastTimeRef.current === null) lastTimeRef.current = now;
+    const dt = Math.min((now - lastTimeRef.current) / 1000, 0.05); // cap at 50 ms
+    lastTimeRef.current = now;
 
-    // Build a Chebyshev (8-directional) straight-line path to the target.
-    // Stop at the first blocked tile so the character never hops over water.
-    const path: { x: number; y: number }[] = [];
-    const { x: ox, y: oy } = playerTileRef.current;
-    const steps = Math.max(Math.abs(tx - ox), Math.abs(ty - oy));
-    for (let i = 1; i <= steps; i++) {
-      const nx = Math.round(ox + (tx - ox) * i / steps);
-      const ny = Math.round(oy + (ty - oy) * i / steps);
-      const t  = tilesRef.current[`${nx},${ny}`];
-      if (!t || t.type === 'WATER') break;                  // stop, don't skip
-      path.push({ x: nx, y: ny });
-    }
-    if (!path.length) return;
+    const keys = keysRef.current;
+    const pos  = playerPosRef.current;
 
-    movingRef.current = true;
-    setIsWalking(true);
+    // ── Build velocity in tile-space ──────────────────────────────────────
+    // Iso projection: screenX = (tx−ty)*TW/2, screenY = (tx+ty)*TH/2
+    //   W/↑ → tile (−1,−1) → pure screen-up
+    //   S/↓ → tile (+1,+1) → pure screen-down
+    //   D/→ → tile (+1,−1) → pure screen-right
+    //   A/← → tile (−1,+1) → pure screen-left
+    let vx = 0, vy = 0;
+    if (keys.up)    { vx -= 1; vy -= 1; }
+    if (keys.down)  { vx += 1; vy += 1; }
+    if (keys.right) { vx += 1; vy -= 1; }
+    if (keys.left)  { vx -= 1; vy += 1; }
 
-    // Set initial facing direction
-    const firstDx = path[0].x - playerTileRef.current.x;
-    if (firstDx !== 0) setFacing(firstDx > 0 ? 'right' : 'left');
+    const hasKeys = vx !== 0 || vy !== 0;
 
-    let idx = 0;
-    function step() {
-      const p    = path[idx];
-      const prev = playerTileRef.current;
-
-      // Update facing per step so diagonal paths look natural
-      const dx = p.x - prev.x;
-      if (dx !== 0) setFacing(dx > 0 ? 'right' : 'left');
-
-      playerTileRef.current = p;
-      setPlayerTile({ ...p });                              // triggers CSS transition
-
-      idx++;
-      if (idx < path.length) {
-        walkTimerRef.current = setTimeout(step, MS_PER_TILE);
+    if (hasKeys) {
+      targetRef.current = null;           // keyboard overrides click target
+      const len = Math.hypot(vx, vy);
+      vx /= len; vy /= len;
+    } else if (targetRef.current) {
+      const ddx = targetRef.current.x - pos.x;
+      const ddy = targetRef.current.y - pos.y;
+      const dist = Math.hypot(ddx, ddy);
+      if (dist < 0.06) {
+        targetRef.current = null;         // arrived
       } else {
-        walkTimerRef.current = null;
-        movingRef.current = false;
-        setIsWalking(false);
+        vx = ddx / dist; vy = ddy / dist;
       }
     }
-    step();
+
+    // ── Apply movement with slide collision ───────────────────────────────
+    let moved = false;
+    if (vx !== 0 || vy !== 0) {
+      const step = MOVE_SPEED * dt;
+      const nx = pos.x + vx * step;
+      const ny = pos.y + vy * step;
+
+      let fx = pos.x, fy = pos.y;
+      if (canWalk(nx, pos.y)) fx = nx;   // try X axis
+      if (canWalk(fx, ny))    fy = ny;   // try Y axis
+
+      if (fx !== pos.x || fy !== pos.y) {
+        playerPosRef.current = { x: fx, y: fy };
+        setPlayerPos({ x: fx, y: fy });
+        moved = true;
+
+        // Facing = screen-horizontal direction of movement (vx − vy = screen-dx sign)
+        const screenDx = vx - vy;
+        if (screenDx !== 0) {
+          const nf = screenDx > 0 ? 'right' : 'left';
+          if (nf !== facingRef.current) { facingRef.current = nf; setFacing(nf); }
+        }
+      }
+    }
+
+    // Only update walk animation state when it changes
+    if (moved !== wasWalkRef.current) {
+      wasWalkRef.current = moved;
+      setIsWalking(moved);
+    }
+
+    rafRef.current = requestAnimationFrame(tick);
+  }, [canWalk]);
+
+  // Start loop on mount, cancel on unmount
+  useEffect(() => {
+    rafRef.current = requestAnimationFrame(tick);
+    return () => { if (rafRef.current !== null) cancelAnimationFrame(rafRef.current); };
+  }, [tick]);
+
+  // WASD / arrow key listeners
+  useEffect(() => {
+    const down = (e: KeyboardEvent) => {
+      if ((e.target as HTMLElement)?.closest('input,textarea')) return;
+      switch (e.code) {
+        case 'KeyW': case 'ArrowUp':    keysRef.current.up    = true; e.preventDefault(); break;
+        case 'KeyS': case 'ArrowDown':  keysRef.current.down  = true; e.preventDefault(); break;
+        case 'KeyD': case 'ArrowRight': keysRef.current.right = true; e.preventDefault(); break;
+        case 'KeyA': case 'ArrowLeft':  keysRef.current.left  = true; e.preventDefault(); break;
+      }
+    };
+    const up = (e: KeyboardEvent) => {
+      switch (e.code) {
+        case 'KeyW': case 'ArrowUp':    keysRef.current.up    = false; break;
+        case 'KeyS': case 'ArrowDown':  keysRef.current.down  = false; break;
+        case 'KeyD': case 'ArrowRight': keysRef.current.right = false; break;
+        case 'KeyA': case 'ArrowLeft':  keysRef.current.left  = false; break;
+      }
+    };
+    window.addEventListener('keydown', down);
+    window.addEventListener('keyup',   up);
+    return () => { window.removeEventListener('keydown', down); window.removeEventListener('keyup', up); };
+  }, []);
+
+  // Click-to-glide: just set the target, loop does the rest
+  const moveTo = useCallback((tx: number, ty: number) => {
+    const dest = tilesRef.current[`${tx},${ty}`];
+    if (!dest || dest.type === 'WATER') return;
+    targetRef.current = { x: tx, y: ty };
   }, []);
 
   /* ── Pan + zoom (imperative DOM for 60fps drag perf) ── */
@@ -253,8 +319,8 @@ const GameInner = ({ profile }: { profile: PlayerProfile }) => {
           }}
         >
           <IslandGrid
-            playerX={playerTile.x}
-            playerY={playerTile.y}
+            playerX={playerPos.x}
+            playerY={playerPos.y}
             characterId={profile.characterId || 'mia'}
             isWalking={isWalking}
             facing={facing}
@@ -317,7 +383,7 @@ const GameInner = ({ profile }: { profile: PlayerProfile }) => {
           className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 px-8 py-4 rounded-3xl shadow-2xl border-4 font-black text-2xl animate-pulse z-40 pointer-events-none text-center"
           style={{ background: '#fde047', color: '#713f12', borderColor: '#ca8a04' }}
         >
-          👆 Click any glowing tile to start!
+          👆 WASD / arrows to move · click tiles to interact
         </div>
       )}
 
