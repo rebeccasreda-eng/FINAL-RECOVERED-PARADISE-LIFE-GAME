@@ -13,6 +13,7 @@ import { CropPicker } from '../components/CropPicker';
 import { NeighborPanel } from '../components/NeighborPanel';
 import { WelcomeScreen, PlayerProfile } from '../components/WelcomeScreen';
 import { ChopProgressBar } from '../components/ChopProgressBar';
+import { CoolBanner } from '../components/CoolBanner';
 
 const PROFILE_KEY = 'paradise-player-profile';
 
@@ -426,6 +427,7 @@ const GameInner = ({ profile }: { profile: PlayerProfile }) => {
 
       {/* ── Chop progress bar (inside viewport overlay) ── */}
       <ChopProgressBar />
+      <CoolBanner />
 
       {/* ── Fixed HUD chrome ── */}
       <TopNav

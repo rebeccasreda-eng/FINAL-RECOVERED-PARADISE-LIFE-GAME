@@ -117,6 +117,7 @@ export interface GameContextType {
   setShopOpen: (v: boolean) => void;
   questBanner: string | null;
   floatingTexts: { id: string; tileId: string; text: string }[];
+  coolBanners: { id: string; label: string }[];
   tutorial: boolean;
   interact: (tileId: string) => void;
   plant: (tileId: string, cropType?: string) => void;

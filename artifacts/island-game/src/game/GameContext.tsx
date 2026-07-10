@@ -668,6 +668,7 @@ export const GameProvider: React.FC<{children: React.ReactNode}> = ({ children }
   const [plantingTile, setPlantingTile] = useState<string | null>(null);
   
   const [floatingTexts, setFloatingTexts] = useState<{id: string, tileId: string, text: string}[]>([]);
+  const [coolBanners, setCoolBanners]     = useState<{id: string, label: string}[]>([]);
   const [questBanner, setQuestBanner] = useState<string | null>(null);
   const [activeChopTileId, setActiveChopTileId] = useState<string | null>(null);
   const [chopCount, setChopCount] = useState(0);
@@ -794,6 +795,16 @@ export const GameProvider: React.FC<{children: React.ReactNode}> = ({ children }
       setFloatingTexts(prev => [...prev, { id, tileId, text: rewardParts.join(' ') }]);
       setTimeout(() => setFloatingTexts(prev => prev.filter(t => t.id !== id)), 1500);
     }
+
+    // COOL! banner
+    const coolParts: string[] = [];
+    if (coinDrop > 0) coolParts.push(`+ ${coinDrop} Coin${coinDrop !== 1 ? 's' : ''}`);
+    if (config.xp)    coolParts.push(`+ ${config.xp} XP`);
+    if (coolParts.length > 0) {
+      const bid = Math.random().toString();
+      setCoolBanners(prev => [...prev, { id: bid, label: coolParts.join('  ') }]);
+      setTimeout(() => setCoolBanners(prev => prev.filter(b => b.id !== bid)), 2200);
+    }
   };
 
   const plant = (tileId: string, cropType?: string) => {
@@ -846,7 +857,7 @@ export const GameProvider: React.FC<{children: React.ReactNode}> = ({ children }
       activeBuildItem, setActiveBuildItem,
       shopOpen, setShopOpen,
       plantingTile, setPlantingTile,
-      questBanner, floatingTexts, tutorial,
+      questBanner, floatingTexts, coolBanners, tutorial,
       interact, plant, place,
       activeChopTileId, chopCount
     }}>
