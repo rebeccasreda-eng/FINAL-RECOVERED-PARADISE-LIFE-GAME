@@ -333,19 +333,26 @@ export function generateIsland(): Record<string, TileData> {
   const inner = emptyGrass.filter(t => forestFactor(t.x, t.y) < 0.40);
   const outer = emptyGrass.filter(t => forestFactor(t.x, t.y) >= 0.40);
 
-  // GARDEN_PATCH only near mango (yellow fruit) trees
+  // ── Near-mango section: GARDEN_PATCH, PINEAPPLE_PLANT, BLUEBERRY_BUSH ──
+  // All three only spawn within 5 tiles of a mango (yellow fruit) tree
   const mangoTiles = Object.values(tiles).filter(t =>
     t.object === 'TREE_MANGO' || t.object === 'TREE_MANGO_UNRIPE'
   );
-  const nearMango = inner.filter(t =>
-    mangoTiles.some(m => Math.abs(m.x - t.x) + Math.abs(m.y - t.y) <= 3)
-  );
-  for (let i = 0; i < 5 && nearMango.length; i++) {
-    const tile = pick(nearMango);
-    tile.object = 'GARDEN_PATCH';
-    const idx = inner.indexOf(tile);
-    if (idx >= 0) inner.splice(idx, 1);
-  }
+  const placeNearMango = (obj: typeof inner[0]['object'], count: number) => {
+    const pool = inner.filter(t =>
+      !t.object && mangoTiles.some(m => Math.abs(m.x - t.x) + Math.abs(m.y - t.y) <= 5)
+    );
+    for (let i = 0; i < count && pool.length; i++) {
+      const tile = pick(pool);
+      tile.object = obj;
+      const idx = inner.indexOf(tile);
+      if (idx >= 0) inner.splice(idx, 1);
+    }
+  };
+  placeNearMango('GARDEN_PATCH',    4);
+  placeNearMango('PINEAPPLE_PLANT', 4);
+  placeNearMango('BLUEBERRY_BUSH',  3);
+
   for (let i = 0; i < 3 && inner.length; i++) pick(inner).object = 'CROP_PLOT';
   for (let i = 0; i < 5  && outer.length; i++) pick(outer).object = 'GRASS_PATCH';
   // Overgrown weed clumps — kept sparse so the island feels tidier
@@ -359,10 +366,6 @@ export function generateIsland(): Record<string, TileData> {
   for (let i = 0; i < 4  && outer.length; i++) pick(outer).object = 'PANSY';
   for (let i = 0; i < 5  && inner.length; i++) pick(inner).object = 'TULIP';
   for (let i = 0; i < 4  && outer.length; i++) pick(outer).object = 'TULIP';
-  for (let i = 0; i < 6  && inner.length; i++) pick(inner).object = 'PINEAPPLE_PLANT';
-  for (let i = 0; i < 4  && outer.length; i++) pick(outer).object = 'PINEAPPLE_PLANT';
-  for (let i = 0; i < 2  && inner.length; i++) pick(inner).object = 'BLUEBERRY_BUSH';
-  for (let i = 0; i < 1  && outer.length; i++) pick(outer).object = 'BLUEBERRY_BUSH';
   for (let i = 0; i < 4  && inner.length; i++) pick(inner).object = 'BABY_PARROT';
 
   const waterTiles = Object.values(tiles).filter(t => t.type === 'WATER');
