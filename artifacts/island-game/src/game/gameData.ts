@@ -96,19 +96,25 @@ export function generateIsland(): Record<string, TileData> {
   const CX = 15, CY = 15; // island centre tile
 
   // ── Terrain value ───────────────────────────────────────────────────────
-  // radial: 1 at centre → 0 at ellipse edge → negative outside.
-  // Sinusoidal waves (amplitude grows toward the edge) carve water channels
-  // inward from the coastline, replicating the reference's fjord-like inlets.
+  // Two explicit Gaussian channels carve clear river gaps through the island:
+  //   • Horizontal channel:  runs left→right at y ≈ CY-2  (upper third)
+  //   • Vertical channel:    runs top→bottom at x ≈ CX+3  (right third)
+  // Together they form a ⌐ shape, splitting the island into three sections.
+  const G = (v: number, sigma: number) => Math.exp(-(v * v) / (2 * sigma * sigma));
+
   const terrainVal = (x: number, y: number): number => {
     const dx = x - CX, dy = y - CY;
     const distSq = (dx * dx) / (13.5 * 13.5) + (dy * dy) / (11.5 * 11.5);
     const radial  = 1.0 - distSq;
-    // Edge factor: 0 at centre, 1 at & beyond the ellipse boundary
-    const ef = Math.max(0, Math.min(1.0, 1.0 - radial));
-    const w1 = Math.sin((dx - dy) * Math.PI / 5.2)                   * 0.70 * ef;
-    const w2 = Math.cos((dx + dy + 1.5) * Math.PI / 6.8)             * 0.65 * ef;
-    const w3 = Math.sin((dx * 1.2 - dy * 0.8 + 2.0) * Math.PI / 4.5) * 0.40 * ef;
-    return radial + w1 + w2 + w3;
+
+    // Horizontal channel — centred at dy = -2, sigma 1.35 → ~3 tile gap
+    const hRiver = G(dy + 2, 1.35) * 2.8;
+
+    // Vertical channel — centred at dx = +3, sigma 1.15 → ~2.5 tile gap
+    // Only carved below the horizontal channel (dy > -5) to keep the top-left intact
+    const vRiver = dy > -5 ? G(dx - 3, 1.15) * 2.5 : 0;
+
+    return radial - Math.max(hRiver, vRiver);
   };
 
   // ── Classify terrain ────────────────────────────────────────────────────
@@ -116,12 +122,12 @@ export function generateIsland(): Record<string, TileData> {
     const dx = x - CX, dy = y - CY;
     const distSq = (dx * dx) / (13.5 * 13.5) + (dy * dy) / (11.5 * 11.5);
     const radial  = 1.0 - distSq;
-    if (radial < -0.38) return null;   // too far outside — skip entirely
-    if (radial <= 0)    return 'WATER'; // outside base ellipse → open ocean
+    if (radial < -0.38) return null;    // outside render range
+    if (radial <= 0)    return 'WATER'; // outer ocean
     const tv = terrainVal(x, y);
-    if (tv > 0.52) return 'GRASS';
-    if (tv > 0.15) return 'SAND';
-    return 'WATER'; // inland channel carved by wave trough
+    if (tv > 0.55) return 'GRASS';
+    if (tv > 0.18) return 'SAND';
+    return 'WATER'; // river/channel carved by Gaussian trough
   };
 
   // ── Build tile map ──────────────────────────────────────────────────────
