@@ -183,6 +183,12 @@ const ObjectSVG: React.FC<{ object: string; tileX: number; tileY: number; tileTy
     /* ── ROCK ───────────────────────────────────────────────────────────── */
     case 'ROCK': {
       const rg1 = g('rg1'), rg2 = g('rg2'), rg3 = g('rg3');
+      // Deterministic grass lean per tile
+      const rlv = (tx * 7 + ty * 13) % 3;
+      const rGrass = '#1e6c0c', rGrassMid = '#2a8a12', rGrassFront = '#38a818';
+      // Helper: single grass blade as a thick rounded stroke
+      const rb = (cx: number, by: number, h: number, lean: number) =>
+        `M ${cx},${by} Q ${cx + lean * 0.5},${by - h * 0.55} ${cx + lean},${by - h}`;
       return (
         <svg viewBox="0 0 72 60" width="68" height="56" style={{ display:'block' }}>
           <defs>
@@ -206,6 +212,14 @@ const ObjectSVG: React.FC<{ object: string; tileX: number; tileY: number; tileTy
           {/* Ground shadow */}
           <ellipse cx="36" cy="58" rx="30" ry="4" fill="rgba(0,0,0,0.22)"/>
 
+          {/* ── Back grass blades (behind rocks) ── */}
+          <path d={rb(8,  54, 44, -3 + rlv)} stroke={rGrass} strokeWidth="3.2" fill="none" strokeLinecap="round"/>
+          <path d={rb(16, 54, 48, -1 + rlv)} stroke={rGrass} strokeWidth="3.4" fill="none" strokeLinecap="round"/>
+          <path d={rb(28, 54, 46,  0 + rlv)} stroke={rGrass} strokeWidth="3.6" fill="none" strokeLinecap="round"/>
+          <path d={rb(52, 54, 42, -2 + rlv)} stroke={rGrass} strokeWidth="3.0" fill="none" strokeLinecap="round"/>
+          <path d={rb(62, 54, 40,  2 + rlv)} stroke={rGrass} strokeWidth="2.8" fill="none" strokeLinecap="round"/>
+          <path d={rb(70, 54, 36,  3 + rlv)} stroke={rGrass} strokeWidth="2.6" fill="none" strokeLinecap="round"/>
+
           {/* ── Back-right small rock ── */}
           <path d="M50,28 Q58,20 68,24 Q74,28 70,38 Q66,44 56,42 Q46,40 46,34 Q46,30 50,28Z" fill={`url(#${rg2})`}/>
           <ellipse cx="56" cy="24" rx="9" ry="3" fill="rgba(255,255,255,0.38)" transform="rotate(-12 56 24)"/>
@@ -216,11 +230,23 @@ const ObjectSVG: React.FC<{ object: string; tileX: number; tileY: number; tileTy
           <ellipse cx="12" cy="21" rx="8" ry="3" fill="rgba(255,255,255,0.36)" transform="rotate(-10 12 21)"/>
           <path d="M14,26 Q16,32 15,38" stroke="rgba(0,0,0,0.09)" strokeWidth="1.2" fill="none"/>
 
+          {/* ── Mid grass blades (between rocks) ── */}
+          <path d={rb(36, 54, 32,  0)} stroke={rGrassMid} strokeWidth="3.0" fill="none" strokeLinecap="round"/>
+          <path d={rb(44, 54, 28,  2)} stroke={rGrassMid} strokeWidth="2.6" fill="none" strokeLinecap="round"/>
+
           {/* ── Main centre boulder ── */}
           <path d="M8,46 Q6,34 14,26 Q22,18 36,16 Q50,14 58,22 Q66,28 64,40 Q60,50 44,54 Q26,58 16,54 Q9,50 8,46Z" fill={`url(#${rg1})`}/>
           <ellipse cx="22" cy="22" rx="14" ry="4.5" fill="rgba(255,255,255,0.44)" transform="rotate(-14 22 22)"/>
           <ellipse cx="12" cy="30" rx="5"  ry="2"   fill="rgba(255,255,255,0.22)" transform="rotate(-6 12 30)"/>
           <path d="M34,22 Q36,32 35,44" stroke="rgba(0,0,0,0.09)" strokeWidth="1.4" fill="none"/>
+          <ellipse cx="46" cy="50" rx="8" ry="2.5" fill="#4a8818" opacity="0.30"/>
+          <ellipse cx="18" cy="50" rx="5" ry="2"   fill="#3e7814" opacity="0.24"/>
+
+          {/* ── Front grass blades (in front of rocks) ── */}
+          <path d={rb(10, 54, 26, -3 + rlv)} stroke={rGrassFront} strokeWidth="2.8" fill="none" strokeLinecap="round"/>
+          <path d={rb(20, 54, 24, -1 + rlv)} stroke={rGrassFront} strokeWidth="3.0" fill="none" strokeLinecap="round"/>
+          <path d={rb(50, 54, 24,  1 + rlv)} stroke={rGrassFront} strokeWidth="2.8" fill="none" strokeLinecap="round"/>
+          <path d={rb(60, 54, 22,  3 + rlv)} stroke={rGrassFront} strokeWidth="2.6" fill="none" strokeLinecap="round"/>
         </svg>
       );
     }
@@ -1359,6 +1385,10 @@ const ObjectSVG: React.FC<{ object: string; tileX: number; tileY: number; tileTy
       const tw = tlv === 0 ? 26 : tlv === 1 ? 22 : 24;
       const th = tlv === 0 ? 48 : tlv === 1 ? 54 : 50;
       const lean = tlv === 0 ? -2 : tlv === 1 ? 2 : 0;
+      // Grass colours
+      const tgDark = '#1a6408', tgMid = '#268c10', tgFront = '#34aa18';
+      const trb = (cx: number, by: number, h: number, l: number) =>
+        `M ${cx},${by} Q ${cx + l * 0.5},${by - h * 0.55} ${cx + l},${by - h}`;
       // Stone centred at x=28, base at y=64
       const sx = 28 + lean, sy = 64 - th;
       return (
@@ -1377,6 +1407,12 @@ const ObjectSVG: React.FC<{ object: string; tileX: number; tileY: number; tileTy
 
           {/* Ground shadow */}
           <ellipse cx="28" cy="67" rx="18" ry="4" fill="rgba(0,0,0,0.24)"/>
+
+          {/* Back grass blades */}
+          <path d={trb(14, 64, 38, -3)} stroke={tgDark} strokeWidth="3.2" fill="none" strokeLinecap="round"/>
+          <path d={trb(20, 64, 36, -1)} stroke={tgDark} strokeWidth="3.0" fill="none" strokeLinecap="round"/>
+          <path d={trb(36, 64, 36,  2)} stroke={tgDark} strokeWidth="3.0" fill="none" strokeLinecap="round"/>
+          <path d={trb(42, 64, 34,  3)} stroke={tgDark} strokeWidth="2.8" fill="none" strokeLinecap="round"/>
 
           {/* ── Standing stone body ── */}
           {/* Main face — rounded-rectangle shape */}
@@ -1409,6 +1445,14 @@ const ObjectSVG: React.FC<{ object: string; tileX: number; tileY: number; tileTy
             d={`M ${sx + 5},${sy + 28} Q ${sx + 6},${sy + 38} ${sx + 4},${sy + 46}`}
             stroke="rgba(0,0,0,0.09)" strokeWidth="1.0" fill="none"
           />
+          {/* Mossy band at base */}
+          <ellipse cx={sx} cy="63" rx={tw / 2 - 1} ry="3" fill="#3a7e12" opacity="0.36"/>
+
+          {/* Front grass blades (flanking the stone) */}
+          <path d={trb(10, 64, 30, -4)} stroke={tgMid}   strokeWidth="2.8" fill="none" strokeLinecap="round"/>
+          <path d={trb(16, 64, 28, -2)} stroke={tgFront} strokeWidth="2.6" fill="none" strokeLinecap="round"/>
+          <path d={trb(38, 64, 28,  2)} stroke={tgFront} strokeWidth="2.6" fill="none" strokeLinecap="round"/>
+          <path d={trb(44, 64, 26,  4)} stroke={tgMid}   strokeWidth="2.4" fill="none" strokeLinecap="round"/>
         </svg>
       );
     }
