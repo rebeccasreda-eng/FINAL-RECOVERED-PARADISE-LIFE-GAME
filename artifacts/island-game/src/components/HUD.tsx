@@ -1,164 +1,166 @@
 import React, { useEffect, useState } from 'react';
 import { useGame } from '../game/GameContext';
-import { ResourceType } from '../game/types';
-import { EMOJI_MAP, SCALED } from '../game/gameData';
+import { SCALED } from '../game/gameData';
 import { useToast } from '@/hooks/use-toast';
 
-export const HUD = ({ onOpenCollections, onOpenWeather, playerName = 'Player' }: { onOpenCollections: () => void, onOpenWeather: () => void, playerName?: string }) => {
-  const { state, dispatch, setShopOpen, activeTool, setActiveTool, activeBuildItem, setActiveBuildItem } = useGame();
+interface HUDProps {
+  onOpenCollections: () => void;
+  onOpenWeather: () => void;
+  playerName?: string;
+}
+
+export const HUD: React.FC<HUDProps> = ({ onOpenCollections, onOpenWeather, playerName = 'Player' }) => {
+  const { state, dispatch } = useGame();
   const { level, xp, inventory, energy, maxEnergy } = state;
   const nextLevelXp = Math.floor(100 * Math.pow(level, 1.5));
   const { toast } = useToast();
 
-  const [timeToNextEnergy, setTimeToNextEnergy] = useState<number>(0);
-
+  const [timeToNextEnergy, setTimeToNextEnergy] = useState(0);
   useEffect(() => {
-    const timer = setInterval(() => {
-      const now = Date.now();
-      const diff = SCALED(300000) - (now - state.lastEnergyTick);
+    const t = setInterval(() => {
+      const diff = SCALED(300000) - (Date.now() - state.lastEnergyTick);
       setTimeToNextEnergy(Math.max(0, diff));
     }, 1000);
-    return () => clearInterval(timer);
+    return () => clearInterval(t);
   }, [state.lastEnergyTick]);
 
-  const formatTime = (ms: number) => {
-    const totalSeconds = Math.floor(ms / 1000);
-    const m = Math.floor(totalSeconds / 60);
-    const s = totalSeconds % 60;
-    return `${m}:${s.toString().padStart(2, '0')}`;
+  const fmtTime = (ms: number) => {
+    const s = Math.floor(ms / 1000);
+    return `${Math.floor(s / 60)}:${(s % 60).toString().padStart(2, '0')}`;
   };
 
   const handleBuyEnergy = () => {
     if (state.inventory.food < 1) {
-      toast({ title: 'No food!', description: 'Harvest crops or fruit trees first.', variant: 'destructive' });
+      toast({ title: 'No food!', description: 'Harvest crops first.', variant: 'destructive' });
       return;
     }
     dispatch({ type: 'BUY_ENERGY', foodCost: 1 });
-    toast({ title: 'Energy restored!', description: '+5 ⚡', duration: 2000 });
+    toast({ title: '+5 ⚡', duration: 1500 });
   };
 
-  const ownedStructures = ['HUT', 'DOCK', 'WELL', 'FLOWER_POT', 'FENCE', 'LANTERN'].filter(i => (inventory[i as ResourceType] || 0) > 0);
+  const statBox = 'flex items-center gap-1 text-white font-bold text-sm';
+  const iconBox = 'w-7 h-7 rounded-full flex items-center justify-center text-base border border-black/30 shadow-sm shrink-0';
 
   return (
-    <>
-      {/* TOP BAR */}
-      <div className="absolute top-0 left-0 right-0 h-16 bg-[#8b5a2b] border-b-4 border-[#5c3a21] flex items-center justify-between px-6 z-30 shadow-lg text-white font-bold select-none whitespace-nowrap">
-        {/* Left: Level */}
-        <div className="flex items-center gap-3">
-          <div className="relative flex items-center justify-center w-12 h-12 bg-yellow-400 rounded-full border-2 border-yellow-600 shadow-md transform -translate-y-1">
-             <span className="text-xl">⭐</span>
-             <span className="absolute text-lg text-yellow-900 drop-shadow-sm font-black">{level}</span>
+    /* Resource bar — sits directly below TopNav */
+    <div
+      className="absolute left-0 right-0 z-30 flex flex-col select-none"
+      style={{
+        top: 36,
+        background: 'linear-gradient(180deg, #9a7028 0%, #7a5010 100%)',
+        borderBottom: '3px solid #4a2e08',
+        boxShadow: '0 3px 8px rgba(0,0,0,0.4)',
+        fontFamily: "'Fredoka', sans-serif",
+      }}
+    >
+      {/* Row 1 */}
+      <div className="flex items-center gap-3 px-3 py-1 h-7">
+        {/* Coins */}
+        <div className={statBox}>
+          <div className={iconBox} style={{ background: 'radial-gradient(circle at 35% 35%, #ffe87a, #d4a820)' }}>💰</div>
+          <span className="tabular-nums min-w-[36px]">{inventory.coins}</span>
+        </div>
+
+        {/* Wood */}
+        <div className={statBox}>
+          <div className={iconBox} style={{ background: 'radial-gradient(circle at 35% 35%, #c8904a, #8b5a2b)' }}>🥥</div>
+          <span className="tabular-nums min-w-[28px]">{inventory.wood}</span>
+        </div>
+
+        {/* Food */}
+        <div className={statBox}>
+          <div className={iconBox} style={{ background: 'radial-gradient(circle at 35% 35%, #f4a040, #c87020)' }}>🍔</div>
+          <span className="tabular-nums min-w-[28px]">{inventory.food}</span>
+        </div>
+
+        {/* Energy bar */}
+        <div className="flex items-center gap-1.5">
+          <div className={iconBox} style={{ background: 'radial-gradient(circle at 35% 35%, #60c0ff, #1880c0)' }}>⚡</div>
+          <div className="relative w-28 h-4 rounded-full overflow-hidden border border-black/40 shadow-inner"
+            style={{ background: '#1a3050' }}>
+            <div className="h-full transition-all duration-500 rounded-full"
+              style={{
+                width: `${(energy / maxEnergy) * 100}%`,
+                background: 'linear-gradient(90deg, #40a0ff 0%, #80d0ff 100%)',
+                boxShadow: '0 0 6px rgba(80,180,255,0.8)',
+              }} />
+            <span className="absolute inset-0 flex items-center justify-center text-[10px] font-black text-white">
+              {energy}/{maxEnergy}
+            </span>
           </div>
-          <div className="w-32 bg-black/30 h-5 rounded-full overflow-hidden border-2 border-[#5c3a21] shadow-inner relative">
-            <div className="bg-blue-400 h-full transition-all duration-300" style={{ width: `${(xp / nextLevelXp) * 100}%` }} />
-            <div className="absolute inset-0 flex items-center justify-center text-[10px] text-white/80 font-black tracking-widest">{xp} / {nextLevelXp}</div>
+          {energy < maxEnergy && (
+            <span className="text-[10px] text-blue-200 font-bold whitespace-nowrap">{fmtTime(timeToNextEnergy)}</span>
+          )}
+        </div>
+
+        {/* XP / Level bar */}
+        <div className="flex items-center gap-1.5">
+          <div className={iconBox} style={{ background: 'radial-gradient(circle at 35% 35%, #ffe860, #d4a000)' }}>
+            <span className="text-xs font-black text-amber-800">{level}</span>
+          </div>
+          <div className="relative w-28 h-4 rounded-full overflow-hidden border border-black/40 shadow-inner"
+            style={{ background: '#302010' }}>
+            <div className="h-full transition-all duration-500 rounded-full"
+              style={{
+                width: `${(xp / nextLevelXp) * 100}%`,
+                background: 'linear-gradient(90deg, #ffc030 0%, #ffe870 100%)',
+                boxShadow: '0 0 6px rgba(255,200,0,0.8)',
+              }} />
+            <span className="absolute inset-0 flex items-center justify-center text-[10px] font-black text-amber-900">
+              {xp}/{nextLevelXp}
+            </span>
           </div>
         </div>
 
-        {/* Middle: Resources */}
-        <div className="flex items-center gap-4 bg-black/20 px-4 py-2 rounded-2xl border border-black/30 shadow-inner">
-           <div className="flex items-center gap-1" title="Coins"><span className="text-2xl">🪙</span> <span className="text-lg w-8">{inventory.coins}</span></div>
-           <div className="flex items-center gap-1" title="Wood"><span className="text-2xl">🪵</span> <span className="text-lg w-6">{inventory.wood}</span></div>
-           <div className="flex items-center gap-1" title="Stone"><span className="text-2xl">🪨</span> <span className="text-lg w-6">{inventory.stone}</span></div>
-           <div className="flex items-center gap-1" title="Food"><span className="text-2xl">🍎</span> <span className="text-lg w-6">{inventory.food}</span></div>
-           <div className="flex items-center gap-1" title="Shells"><span className="text-2xl">🐚</span> <span className="text-lg w-6">{inventory.shells}</span></div>
+        {/* Shells */}
+        <div className={statBox}>
+          <div className={iconBox} style={{ background: 'radial-gradient(circle at 35% 35%, #ffdd80, #c8a030)' }}>🐚</div>
+          <span className="tabular-nums min-w-[28px]">{inventory.shells}</span>
         </div>
 
-        {/* Right: Energy & Menus */}
-        <div className="flex items-center gap-3">
-          <div className="flex items-center gap-2 bg-black/20 pl-4 pr-2 py-1.5 rounded-2xl border border-black/30 shadow-inner mr-2">
-             <span className="text-2xl">⚡</span>
-             <div className="flex flex-col">
-               <div className="text-xs leading-tight text-blue-200">ENERGY</div>
-               <div className="w-24 bg-black/50 h-3 rounded-full overflow-hidden mt-0.5 relative shadow-inner">
-                 <div className="bg-blue-500 h-full absolute top-0 left-0 transition-all duration-300 shadow-[0_0_8px_rgba(59,130,246,0.8)]" style={{ width: `${(energy / maxEnergy) * 100}%` }} />
-               </div>
-             </div>
-             <div className="ml-2 font-mono text-lg">{energy}/{maxEnergy}</div>
-             
-             {/* Energy Status / Exchange */}
-             <div className="flex flex-col items-center gap-1 min-w-[80px] border-l border-white/20 pl-2 ml-1">
-               {energy < maxEnergy ? (
-                 <div className="text-[10px] font-bold text-yellow-200 leading-none">
-                   Next ⚡ in {formatTime(timeToNextEnergy)}
-                 </div>
-               ) : (
-                 <div className="text-[10px] font-bold text-green-300 leading-none">
-                   Full!
-                 </div>
-               )}
-               
-               {energy < maxEnergy ? (
-                 <button onClick={handleBuyEnergy} className={`text-[10px] px-2 py-0.5 rounded border font-bold whitespace-nowrap shadow-sm active:scale-95 transition-transform ${state.inventory.food > 0 ? 'bg-green-500 hover:bg-green-400 border-green-700 text-white' : 'bg-gray-400 border-gray-600 text-gray-200 cursor-not-allowed'}`}>
-                   🍎 +5 Energy
-                 </button>
-               ) : (
-                 <div className="h-[18px]"></div> /* Placeholder */
-               )}
-             </div>
-          </div>
-          
-          <button onClick={onOpenCollections} className="bg-purple-500 hover:bg-purple-400 active:scale-95 transition-transform px-3 py-2 rounded-xl border-b-4 border-purple-700 shadow-md text-white font-bold flex items-center gap-2 text-lg" title="Collections">
+        {/* Produce */}
+        <div className={statBox}>
+          <div className={iconBox} style={{ background: 'radial-gradient(circle at 35% 35%, #80e080, #308030)' }}>🌽</div>
+          <span className="tabular-nums min-w-[20px]">{inventory.produce}</span>
+        </div>
+      </div>
+
+      {/* Row 2 */}
+      <div className="flex items-center gap-2 px-3 pb-1 h-6">
+        <div className="flex items-center gap-1 text-xs text-yellow-100 font-bold">
+          <span>🐚</span> <span className="tabular-nums">0</span>
+        </div>
+        <button
+          onClick={handleBuyEnergy}
+          className="px-2 py-0.5 rounded text-[10px] font-black border active:scale-95 transition-transform"
+          style={{
+            background: 'linear-gradient(180deg, #60d040, #30a010)',
+            borderColor: '#187010',
+            borderBottomWidth: 2,
+            color: 'white',
+            textShadow: '0 1px 2px rgba(0,0,0,0.4)',
+          }}
+        >
+          GET SHELLS
+        </button>
+        {/* Space for collections / weather quick access */}
+        <div className="ml-auto flex items-center gap-1">
+          <button
+            onClick={onOpenCollections}
+            className="text-xs px-2 py-0.5 rounded border active:scale-95 transition-transform font-bold"
+            style={{ background: '#9040c0', borderColor: '#602090', borderBottomWidth: 2, color: 'white' }}
+          >
             🗃️
           </button>
-          
-          <button onClick={onOpenWeather} className="bg-blue-400 hover:bg-blue-300 active:scale-95 transition-transform px-3 py-2 rounded-xl border-b-4 border-blue-600 shadow-md text-white font-bold flex items-center gap-2 text-lg" title="Weather">
+          <button
+            onClick={onOpenWeather}
+            className="text-xs px-2 py-0.5 rounded border active:scale-95 transition-transform font-bold"
+            style={{ background: '#3080d0', borderColor: '#105090', borderBottomWidth: 2, color: 'white' }}
+          >
             🌤️
           </button>
-          
-          <button onClick={() => setShopOpen(true)} className="bg-green-500 hover:bg-green-400 active:scale-95 transition-transform px-4 py-2 rounded-xl border-b-4 border-green-700 shadow-md text-white font-bold flex items-center gap-2 text-lg">
-            🏪 Shop
-          </button>
         </div>
       </div>
-
-      {/* BOTTOM BAR */}
-      <div className="absolute bottom-0 left-0 right-0 h-24 bg-[#8b5a2b] border-t-4 border-[#5c3a21] flex items-center justify-between px-8 z-30 text-white font-bold select-none shadow-[0_-10px_20px_rgba(0,0,0,0.2)]">
-        {/* Inventory items */}
-        <div className="flex items-center gap-4">
-           <div className="bg-black/20 px-5 py-3 rounded-xl flex items-center gap-3 border border-black/30 shadow-inner">
-             <span className="text-3xl">🌽</span> <span className="text-xl">{inventory.produce} Produce</span>
-           </div>
-        </div>
-
-        {/* Tools */}
-        <div className="flex items-center gap-4 relative">
-           
-           {activeTool === 'build' && (
-             <div className="absolute bottom-[110%] right-0 mb-2 bg-[#8b5a2b] p-3 rounded-2xl flex gap-3 border-4 border-[#5c3a21] shadow-2xl animate-in slide-in-from-bottom-4">
-                {ownedStructures.length === 0 ? (
-                  <span className="text-yellow-200 text-sm font-bold whitespace-nowrap px-4 py-2">Buy structures in Shop!</span>
-                ) : (
-                  ownedStructures.map(item => {
-                    const count = inventory[item as ResourceType] || 0;
-                    return (
-                      <button 
-                        key={item} 
-                        onClick={() => setActiveBuildItem(item as any)} 
-                        className={`w-14 h-14 rounded-xl border-4 flex items-center justify-center transition-transform ${activeBuildItem === item ? 'bg-yellow-400 border-yellow-600 scale-110' : 'bg-[#fff5d7] border-[#d2b48c] hover:bg-white'} relative`}
-                      >
-                         <span className="text-3xl">{EMOJI_MAP[item]}</span>
-                         <span className="absolute -top-3 -right-3 bg-red-500 text-white text-xs font-black px-2 py-0.5 rounded-full border-2 border-white">{count}</span>
-                      </button>
-                    )
-                  })
-                )}
-             </div>
-           )}
-
-           <button onClick={() => setActiveTool('clear')} className={`px-8 py-4 rounded-2xl border-b-4 font-black text-xl transition-all ${activeTool === 'clear' ? 'bg-yellow-400 border-yellow-600 text-yellow-900 scale-105 shadow-lg' : 'bg-gray-400 border-gray-600 text-gray-800 hover:bg-gray-300'}`}>
-             👆 Pointer
-           </button>
-           
-           <button onClick={() => setActiveTool('plant')} className={`px-8 py-4 rounded-2xl border-b-4 font-black text-xl transition-all ${activeTool === 'plant' ? 'bg-green-400 border-green-600 text-green-900 scale-105 shadow-lg' : 'bg-gray-400 border-gray-600 text-gray-800 hover:bg-gray-300'}`}>
-             🌱 Plant
-           </button>
-
-           <button onClick={() => { setActiveTool('build'); if(!activeBuildItem && ownedStructures.length > 0) setActiveBuildItem(ownedStructures[0] as any); }} className={`px-8 py-4 rounded-2xl border-b-4 font-black text-xl transition-all ${activeTool === 'build' ? 'bg-blue-400 border-blue-600 text-blue-900 scale-105 shadow-lg' : 'bg-gray-400 border-gray-600 text-gray-800 hover:bg-gray-300'}`}>
-             🔨 Build
-           </button>
-        </div>
-      </div>
-    </>
-  )
-}
+    </div>
+  );
+};
