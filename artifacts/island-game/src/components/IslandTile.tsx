@@ -6,7 +6,7 @@ import { useToast } from '@/hooks/use-toast';
 
 /* ── Diamond colour palette — matches HTML reference ────────────────────── */
 const COLORS = {
-  GRASS:   { top: '#58c030', sideL: '#3aaa1c', sideR: '#44b826' },
+  GRASS:   { top: '#7ccc18', sideL: '#52a00c', sideR: '#60b010' },
   SAND:    { top: '#e8d29a', sideL: '#cdb277', sideR: '#d4b97f' },
   WATER:   { top: '#52C8E4', sideL: null,       sideR: null      },
   CLEARED: { top: '#8b5a2b', sideL: '#5a3a18',  sideR: '#6a4420' },
@@ -904,9 +904,9 @@ export const IslandTile: React.FC<IslandTileProps> = ({
             hi = [0xf4, 0xe0, 0xb0]; lo = [0xd8, 0xbc, 0x84];
             sL = '#cdb277'; sR = '#d4b97f';
           } else {
-            // GRASS (default) — bright saturated lime-green matching reference
-            hi = [0x8a, 0xde, 0x48]; lo = [0x54, 0xb2, 0x22];
-            sL = '#3aaa1c'; sR = '#44b826';
+            // GRASS — bright lime-green matching reference image
+            hi = [0xa8, 0xe4, 0x22]; lo = [0x6c, 0xb4, 0x0c];
+            sL = '#52a00c'; sR = '#60b010';
           }
 
           const isGrass = !isCleared && tile.type === 'GRASS';
@@ -953,10 +953,10 @@ export const IslandTile: React.FC<IslandTileProps> = ({
               {/* Grass blade texture pattern */}
               {isGrass && (
                 <pattern id={gpid} x="0" y="0" width="10" height="8" patternUnits="userSpaceOnUse">
-                  <line x1="1.5" y1="7.5" x2="3"   y2="4.5" stroke="#28901a" strokeWidth="1.1" opacity="0.50"/>
-                  <line x1="5.5" y1="7"   x2="7"   y2="3.8" stroke="#28901a" strokeWidth="1"   opacity="0.42"/>
-                  <line x1="8.5" y1="7.5" x2="9.5" y2="5"   stroke="#349c22" strokeWidth="0.9" opacity="0.32"/>
-                  <line x1="3.5" y1="7.8" x2="4.5" y2="5.5" stroke="#1e7c10" strokeWidth="0.8" opacity="0.28"/>
+                  <line x1="1.5" y1="7.5" x2="3"   y2="4.5" stroke="#4a9010" strokeWidth="1.1" opacity="0.50"/>
+                  <line x1="5.5" y1="7"   x2="7"   y2="3.8" stroke="#4a9010" strokeWidth="1"   opacity="0.42"/>
+                  <line x1="8.5" y1="7.5" x2="9.5" y2="5"   stroke="#5aaa14" strokeWidth="0.9" opacity="0.32"/>
+                  <line x1="3.5" y1="7.8" x2="4.5" y2="5.5" stroke="#3a7a08" strokeWidth="0.8" opacity="0.28"/>
                 </pattern>
               )}
             </defs>
