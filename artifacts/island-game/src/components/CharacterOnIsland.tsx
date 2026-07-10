@@ -57,7 +57,7 @@ export const CharacterOnIsland: React.FC<Props> = ({
         className={isWalking ? 'char-walk-bob' : 'char-idle-bob'}
         style={{ filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.40))' }}
       >
-        <Char size={SIZE} />
+        <Char size={SIZE} isWalking={isWalking} />
       </div>
     </div>
   );

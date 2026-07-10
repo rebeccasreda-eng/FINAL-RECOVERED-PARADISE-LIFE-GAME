@@ -271,7 +271,8 @@ export const CustomizableCharSVG: React.FC<{
   appearance: CharAppearance;
   gender: 'female' | 'male';
   size?: number;
-}> = ({ appearance, gender, size = 120 }) => {
+  isWalking?: boolean;
+}> = ({ appearance, gender, size = 120, isWalking }) => {
   const {
     skinTone: sk, hairStyle, hairColor, outfitStyle, outfitColor,
     hatStyle, eyeColor, mouthStyle, eyebrowStyle, makeupStyle, facialHairStyle,
@@ -308,21 +309,27 @@ export const CustomizableCharSVG: React.FC<{
       <ellipse cx="50" cy="137" rx="22" ry="4" fill="#00000025"/>
 
       {/* Legs */}
-      <rect x="34" y="108" width="12" height="25" rx="5" fill={legColor}/>
-      <rect x="54" y="108" width="12" height="25" rx="5" fill={legColor}/>
-
-      {/* Shoes */}
-      <ellipse cx="40" cy="133" rx="10" ry="5.5" fill={shoeColor}/>
-      <ellipse cx="60" cy="133" rx="10" ry="5.5" fill={shoeColor}/>
+      <g className={isWalking ? 'char-leg-a' : undefined} style={{ transformOrigin: '40px 108px' }}>
+        <rect x="34" y="108" width="12" height="25" rx="5" fill={legColor}/>
+        <ellipse cx="40" cy="133" rx="10" ry="5.5" fill={shoeColor}/>
+      </g>
+      <g className={isWalking ? 'char-leg-b' : undefined} style={{ transformOrigin: '60px 108px' }}>
+        <rect x="54" y="108" width="12" height="25" rx="5" fill={legColor}/>
+        <ellipse cx="60" cy="133" rx="10" ry="5.5" fill={shoeColor}/>
+      </g>
 
       {/* Outfit body */}
       <OutfitLayer style={outfitStyle} color={outfitColor}/>
 
-      {/* Arms (skin) */}
-      <path d="M28 68 Q16 76 18 88" stroke={sk} strokeWidth="11" fill="none" strokeLinecap="round"/>
-      <path d="M72 68 Q84 76 82 88" stroke={sk} strokeWidth="11" fill="none" strokeLinecap="round"/>
-      <circle cx="17" cy="89" r="6.5" fill={sk}/>
-      <circle cx="83" cy="89" r="6.5" fill={sk}/>
+      {/* Arms (skin) — opposite phase to same-side leg = natural gait */}
+      <g className={isWalking ? 'char-arm-b' : undefined} style={{ transformOrigin: '28px 68px' }}>
+        <path d="M28 68 Q16 76 18 88" stroke={sk} strokeWidth="11" fill="none" strokeLinecap="round"/>
+        <circle cx="17" cy="89" r="6.5" fill={sk}/>
+      </g>
+      <g className={isWalking ? 'char-arm-a' : undefined} style={{ transformOrigin: '72px 68px' }}>
+        <path d="M72 68 Q84 76 82 88" stroke={sk} strokeWidth="11" fill="none" strokeLinecap="round"/>
+        <circle cx="83" cy="89" r="6.5" fill={sk}/>
+      </g>
 
       {/* Neck */}
       <rect x="43" y="56" width="14" height="11" rx="3" fill={sk}/>
