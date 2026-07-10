@@ -39,7 +39,7 @@ interface IslandGridProps {
   characterId: string;
   isWalking: boolean;
   facing: 'front' | 'back' | 'left' | 'right';
-  onTileClick: (x: number, y: number) => void;
+  onTileClick: (x: number, y: number, interactTileId?: string) => void;
 }
 
 /* ── IslandGrid ─────────────────────────────────────────────────────────── */
@@ -122,6 +122,8 @@ export const IslandGrid: React.FC<IslandGridProps> = ({
           tileZIndex={(tile.x + tile.y) * 2}
           isDangerZone={dangerZoneTiles.has(tile.id)}
           onTileClick={onTileClick}
+          playerX={playerX}
+          playerY={playerY}
           nbN={state.tiles[`${tile.x - 1},${tile.y}`]?.type}
           nbE={state.tiles[`${tile.x},${tile.y - 1}`]?.type}
           nbS={state.tiles[`${tile.x + 1},${tile.y}`]?.type}

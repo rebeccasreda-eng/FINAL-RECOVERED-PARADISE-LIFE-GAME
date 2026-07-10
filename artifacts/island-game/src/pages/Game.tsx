@@ -46,7 +46,7 @@ const WORLD_CY = WORLD_H / 2;
 
 /* ── GameInner ─────────────────────────────────────────────────────────── */
 const GameInner = ({ profile }: { profile: PlayerProfile }) => {
-  const { shopOpen, tutorial, state, dispatch } = useGame();
+  const { shopOpen, tutorial, state, dispatch, interact } = useGame();
   const [collectionsOpen,  setCollectionsOpen]  = useState(false);
   const [weatherOpen,      setWeatherOpen]      = useState(false);
   const [questPanelOpen,   setQuestPanelOpen]   = useState(false);
@@ -72,6 +72,12 @@ const GameInner = ({ profile }: { profile: PlayerProfile }) => {
   const lastTimeRef  = useRef<number | null>(null);
   const wasWalkRef   = useRef(false);
   const facingRef    = useRef<'front' | 'back' | 'left' | 'right'>('front');
+
+  // Pending interact — tileId to interact with when the player arrives
+  const pendingInteractTileRef = useRef<string | null>(null);
+  // Stable ref to interact so the rAF loop can call it without stale closure
+  const interactRef = useRef(interact);
+  useLayoutEffect(() => { interactRef.current = interact; }, [interact]);
 
   // Stale-closure-safe tiles access
   const tilesRef = useRef(state.tiles);
@@ -108,6 +114,7 @@ const GameInner = ({ profile }: { profile: PlayerProfile }) => {
 
     if (hasKeys) {
       targetRef.current = null;           // keyboard overrides click target
+      pendingInteractTileRef.current = null; // cancel queued action
       const len = Math.hypot(vx, vy);
       vx /= len; vy /= len;
     } else if (targetRef.current) {
@@ -116,6 +123,11 @@ const GameInner = ({ profile }: { profile: PlayerProfile }) => {
       const dist = Math.hypot(ddx, ddy);
       if (dist < 0.06) {
         targetRef.current = null;         // arrived
+        if (pendingInteractTileRef.current) {
+          const tid = pendingInteractTileRef.current;
+          pendingInteractTileRef.current = null;
+          interactRef.current(tid);
+        }
       } else {
         vx = ddx / dist; vy = ddy / dist;
       }
@@ -191,11 +203,16 @@ const GameInner = ({ profile }: { profile: PlayerProfile }) => {
     return () => { window.removeEventListener('keydown', down); window.removeEventListener('keyup', up); };
   }, []);
 
-  // Click-to-glide: just set the target, loop does the rest
-  const moveTo = useCallback((tx: number, ty: number) => {
+  // Click-to-glide: set target; optionally queue an interact on arrival
+  const moveTo = useCallback((tx: number, ty: number, interactTileId?: string) => {
     const dest = tilesRef.current[`${tx},${ty}`];
-    if (!dest || dest.type === 'WATER') return;
+    if (!dest || dest.type === 'WATER') {
+      // Invalid destination — always cancel any stale queued action
+      pendingInteractTileRef.current = null;
+      return;
+    }
     targetRef.current = { x: tx, y: ty };
+    pendingInteractTileRef.current = interactTileId ?? null;
   }, []);
 
   /* ── Pan + zoom (imperative DOM for 60fps drag perf) ── */

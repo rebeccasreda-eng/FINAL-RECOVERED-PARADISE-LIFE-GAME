@@ -1097,6 +1097,8 @@ function shoreScatter(
 
 /* ── Props ──────────────────────────────────────────────────────────────── */
 interface IslandTileProps {
+  playerX?: number;
+  playerY?: number;
   tile: TileData;
   /** Pixel X of tile top-point in world space */
   screenX: number;
@@ -1105,7 +1107,7 @@ interface IslandTileProps {
   /** CSS z-index (= (tile.x + tile.y) * 2) */
   tileZIndex: number;
   isDangerZone?: boolean;
-  onTileClick?: (x: number, y: number) => void;
+  onTileClick?: (x: number, y: number, interactTileId?: string) => void;
   /** Tile types of the 4 cardinal neighbours (undefined = outside map = water) */
   nbN?: string; nbE?: string; nbS?: string; nbW?: string;
 }
@@ -1114,6 +1116,7 @@ interface IslandTileProps {
 export const IslandTile: React.FC<IslandTileProps> = ({
   tile, screenX, screenY, tileZIndex, isDangerZone, onTileClick,
   nbN, nbE, nbS, nbW,
+  playerX = 0, playerY = 0,
 }) => {
   const {
     state, dispatch, interact, plant, place,
@@ -1135,13 +1138,24 @@ export const IslandTile: React.FC<IslandTileProps> = ({
 
   /* ── Interaction ── */
   const handleClick = () => {
-    onTileClick?.(tile.x, tile.y);
     if (activeTool === 'plant') {
+      onTileClick?.(tile.x, tile.y);
       plant(tile.id);
     } else if (activeTool === 'build' && activeBuildItem) {
+      onTileClick?.(tile.x, tile.y);
       place(tile.id, activeBuildItem);
     } else {
-      interact(tile.id);
+      // Clear / harvest: require the player to be adjacent before interacting.
+      const chebyshev = Math.max(Math.abs(tile.x - playerX), Math.abs(tile.y - playerY));
+      const hasInteractable = !!(tile.object && OBJECT_CONFIG[tile.object]);
+      if (chebyshev <= 1.5) {
+        // Already next to the tile — interact right away (walk nudge optional)
+        onTileClick?.(tile.x, tile.y);
+        interact(tile.id);
+      } else {
+        // Too far — walk there first; the game loop fires interact on arrival
+        onTileClick?.(tile.x, tile.y, hasInteractable ? tile.id : undefined);
+      }
     }
   };
 
