@@ -171,26 +171,48 @@ const GameInner = ({ profile }: { profile: PlayerProfile }) => {
     pendingInteractTileRef.current = interactTileId ?? null;
   }, []);
 
-  /* ── Pan + zoom (imperative DOM for 60fps drag perf) ── */
-  const worldRef = useRef<HTMLDivElement>(null);
-  const FIXED_ZOOM = 2.0;
+  /* ── Discrete zoom — island always centred, no panning ── */
+  const worldRef  = useRef<HTMLDivElement>(null);
+  const viewRef   = useRef<HTMLDivElement>(null);
+  // Four levels: start fully zoomed in, scroll out up to 3 steps
+  const ZOOM_LEVELS = [2.0, 1.4, 0.9, 0.62] as const;
+  const zoomIdxRef = useRef(0);
 
-  // Lock the world to a fixed centred transform — island centre always at viewport centre.
-  // translate(-WORLD_CX*z, -WORLD_CY*z) shifts the world so its centre lands on
-  // the CSS left:50% top:50% anchor point. scale(z) grows from that origin.
-  useEffect(() => {
+  // Formula: left/top 50% puts origin at viewport centre; translate(-CX*z,-CY*z)
+  // then puts the world's own centre back at that point for every z value.
+  const applyZoom = useCallback((idx: number) => {
+    const z = ZOOM_LEVELS[idx];
     if (worldRef.current) {
       worldRef.current.style.transform =
-        `translate(${-WORLD_CX * FIXED_ZOOM}px, ${-WORLD_CY * FIXED_ZOOM}px) scale(${FIXED_ZOOM})`;
+        `translate(${-WORLD_CX * z}px, ${-WORLD_CY * z}px) scale(${z})`;
     }
   }, []);
+
+  useEffect(() => { applyZoom(0); }, [applyZoom]);
+
+  useEffect(() => {
+    const el = viewRef.current;
+    if (!el) return;
+    const onWheel = (e: WheelEvent) => {
+      if (e.ctrlKey || e.metaKey) return;
+      e.preventDefault();
+      const dir = e.deltaY > 0 ? 1 : -1; // down = zoom out (+1)
+      const next = Math.max(0, Math.min(ZOOM_LEVELS.length - 1, zoomIdxRef.current + dir));
+      if (next === zoomIdxRef.current) return;
+      zoomIdxRef.current = next;
+      applyZoom(next);
+    };
+    el.addEventListener('wheel', onWheel, { passive: false });
+    return () => el.removeEventListener('wheel', onWheel);
+  }, [applyZoom]);
 
   return (
     <div className="w-full h-[100dvh] overflow-hidden relative" style={{ fontFamily: "'Fredoka', sans-serif" }}>
 
 
-      {/* ── Viewport — fixed, no pan/zoom ── */}
+      {/* ── Viewport — scroll to zoom, island always centred ── */}
       <div
+        ref={viewRef}
         className="absolute"
         style={{
           top: TOP_H, bottom: BOT_H, left: 0, right: 0,
@@ -198,8 +220,8 @@ const GameInner = ({ profile }: { profile: PlayerProfile }) => {
           background: '#1fa8e8',
         }}
       >
-        {/* World: left/top 50% puts the origin at viewport centre;
-            transform shifts so the world's own centre lands there. */}
+        {/* World: left/top 50% pins origin to viewport centre;
+            imperative transform keeps island centre there at every zoom. */}
         <div
           ref={worldRef}
           style={{
@@ -207,6 +229,7 @@ const GameInner = ({ profile }: { profile: PlayerProfile }) => {
             left: '50%',
             top: '50%',
             transformOrigin: '0 0',
+            transition: 'transform 0.22s cubic-bezier(0.25,0.46,0.45,0.94)',
           }}
         >
           <IslandGrid
