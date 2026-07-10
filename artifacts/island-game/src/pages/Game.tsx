@@ -37,7 +37,7 @@ const BOT_H = 96;
 
 // Player start tile — centre of the 31×31 elliptical island
 const PLAYER_START = { x: 15, y: 15 };
-const MOVE_SPEED = 4.2; // tiles per second (free movement)
+const MOVE_SPEED = 8.5; // tiles per second (free movement)
 
 // World centre (used to offset the world container so island is centred on load)
 const WORLD_CX = WORLD_W / 2;
