@@ -3,7 +3,6 @@
  * Includes a 3D block arrow that bounces above the character's head.
  */
 import React from 'react';
-import { CHARACTER_COMPONENTS, ChMia } from './CharacterSprites';
 
 const TH_HALF = 14;
 
@@ -51,13 +50,11 @@ export const CharacterOnIsland: React.FC<Props> = ({
   screenX,
   screenY,
   tileZIndex,
-  characterId,
   isWalking,
   facing,
   isChopping,
 }) => {
-  const Char = CHARACTER_COMPONENTS[characterId] ?? ChMia;
-  const SIZE = 52;
+  const SIZE = 58;
   const scaleX = facing === 'left' ? -1 : 1;
 
   return (
@@ -93,9 +90,19 @@ export const CharacterOnIsland: React.FC<Props> = ({
         className={isChopping ? 'char-chop-swing' : undefined}
         style={{ transformOrigin: 'bottom center' }}
       >
-        <div style={{ filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.40))' }}>
-          <Char size={SIZE} isWalking={isWalking} facing={facing} />
-        </div>
+        <img
+          src={`${import.meta.env.BASE_URL}player-sprite.jpg`}
+          width={SIZE}
+          height={SIZE}
+          style={{
+            display: 'block',
+            imageRendering: 'auto',
+            filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.40))',
+            animation: isWalking ? 'charWalk 0.35s steps(1) infinite' : 'none',
+            borderRadius: '50%',
+          }}
+          alt="player"
+        />
       </div>
     </div>
   );
