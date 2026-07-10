@@ -8,6 +8,7 @@ import { ShopModal } from '../components/ShopModal';
 import { CollectionsModal } from '../components/CollectionsModal';
 import { WeatherModal } from '../components/WeatherModal';
 import { CropPicker } from '../components/CropPicker';
+import { NeighborPanel } from '../components/NeighborPanel';
 
 const GameInner = () => {
   const { shopOpen, tutorial, state } = useGame();
@@ -29,6 +30,7 @@ const GameInner = () => {
       </div>
       
       <HUD onOpenCollections={() => setCollectionsOpen(true)} onOpenWeather={() => setWeatherOpen(true)} />
+      <NeighborPanel />
       <QuestPanel />
       <QuestBanner />
       <CropPicker />

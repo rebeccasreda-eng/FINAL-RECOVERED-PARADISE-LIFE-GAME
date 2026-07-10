@@ -9,7 +9,7 @@ export type ObjectType =
   | 'HUT' | 'DOCK' | 'WELL' | 'FLOWER_POT' | 'FENCE' | 'LANTERN'
   | 'CRAB';
 
-export type WeatherType = 'SUNNY' | 'RAINY' | 'CLOUDY' | 'STORMY';
+export type WeatherType = 'SUNNY' | 'RAINY' | 'CLOUDY' | 'STORMY' | 'WINDY';
 
 export interface TileData {
   id: string; 
@@ -50,16 +50,26 @@ export interface GameState {
   lastCrabSpawn: number;
   collections: Record<string, boolean>;
   stats: Record<string, number>;
+  wishlist: string[];
+  neighbors: { id: string; name: string; avatar: string; level: number; favorPoints: number }[];
+  favorBar: number;
+  lastNeighborHire: number;
+  neighborsHiredToday: number;
 }
 
 export type GameAction = 
   | { type: 'TICK', now: number }
-  | { type: 'INTERACT', tileId: string }
+  | { type: 'INTERACT', tileId: string, energyCost?: number }
   | { type: 'PLANT', tileId: string, cropType: string }
   | { type: 'BUY', itemType: string, cost: number, count?: number }
   | { type: 'PLACE', tileId: string, object: ObjectType }
   | { type: 'SELL_PRODUCE' }
-  | { type: 'CHECK_WEATHER' };
+  | { type: 'CHECK_WEATHER' }
+  | { type: 'BUY_ENERGY', foodCost: number }
+  | { type: 'ADD_WISHLIST', itemId: string }
+  | { type: 'REMOVE_WISHLIST', itemId: string }
+  | { type: 'VISIT_NEIGHBOR', neighborId: string }
+  | { type: 'HIRE_NEIGHBOR', neighborId: string };
 
 export interface GameContextType {
   state: GameState;

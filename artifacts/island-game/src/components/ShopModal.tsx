@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useGame } from '../game/GameContext';
 import { ResourceType } from '../game/types';
-import { EMOJI_MAP } from '../game/gameData';
+import { EMOJI_MAP, CROP_TYPES } from '../game/gameData';
 
 const STRUCTURES: { id: ResourceType, name: string, cost: number, desc: string }[] = [
   { id: 'HUT', name: 'Wooden Hut', cost: 200, desc: 'A cozy place to rest.' },
@@ -14,7 +14,7 @@ const STRUCTURES: { id: ResourceType, name: string, cost: number, desc: string }
 
 export const ShopModal = () => {
   const { state, dispatch, setShopOpen } = useGame();
-  const [tab, setTab] = useState<'BUY' | 'SELL'>('BUY');
+  const [tab, setTab] = useState<'BUY' | 'SEEDS' | 'SELL'>('BUY');
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-md animate-in fade-in" onClick={() => setShopOpen(false)}>
@@ -33,7 +33,8 @@ export const ShopModal = () => {
 
         {/* Tabs */}
         <div className="flex bg-[#d2b48c] p-2 gap-2 shadow-inner border-b-4 border-[#5c3a21]">
-          <button onClick={() => setTab('BUY')} className={`flex-1 py-3 text-xl font-black rounded-xl transition-all ${tab === 'BUY' ? 'bg-white text-[#5c3a21] shadow-md scale-[1.02]' : 'text-[#8b5a2b] hover:bg-[#e6d0a7]'}`}>🛒 Buy Structures</button>
+          <button onClick={() => setTab('BUY')} className={`flex-1 py-3 text-xl font-black rounded-xl transition-all ${tab === 'BUY' ? 'bg-white text-[#5c3a21] shadow-md scale-[1.02]' : 'text-[#8b5a2b] hover:bg-[#e6d0a7]'}`}>🛒 Structures</button>
+          <button onClick={() => setTab('SEEDS')} className={`flex-1 py-3 text-xl font-black rounded-xl transition-all ${tab === 'SEEDS' ? 'bg-white text-[#5c3a21] shadow-md scale-[1.02]' : 'text-[#8b5a2b] hover:bg-[#e6d0a7]'}`}>🌱 Seeds Info</button>
           <button onClick={() => setTab('SELL')} className={`flex-1 py-3 text-xl font-black rounded-xl transition-all ${tab === 'SELL' ? 'bg-white text-[#5c3a21] shadow-md scale-[1.02]' : 'text-[#8b5a2b] hover:bg-[#e6d0a7]'}`}>💰 Sell Produce</button>
         </div>
 
@@ -62,6 +63,33 @@ export const ShopModal = () => {
                    </div>
                 </div>
               ))}
+            </div>
+          )}
+
+          {tab === 'SEEDS' && (
+            <div className="grid grid-cols-2 gap-6">
+              {Object.entries(CROP_TYPES).map(([id, crop]) => {
+                 const harvestCoins = crop.yield * 5;
+                 const profit = harvestCoins - crop.cost;
+                 return (
+                  <div key={id} className="bg-white border-4 border-[#d2b48c] rounded-2xl p-4 flex gap-4 items-center shadow-sm">
+                     <div className="w-24 h-24 bg-green-100 rounded-xl border-2 border-green-200 flex items-center justify-center text-6xl drop-shadow-md">
+                       {crop.emoji}
+                     </div>
+                     <div className="flex-1 flex flex-col justify-center">
+                       <h3 className="text-xl font-black text-[#5c3a21]">{crop.name}</h3>
+                       <div className="text-sm font-bold flex flex-col mt-1">
+                         <span className="text-red-600">Cost: {crop.cost} 🪙</span>
+                         <span className="text-blue-600">Harvest: +{harvestCoins} 🪙</span>
+                         <span className={profit >= 0 ? "text-green-600" : "text-red-600"}>
+                           Profit: {profit >= 0 ? '+' : ''}{profit} 🪙
+                         </span>
+                       </div>
+                       <p className="text-[10px] text-gray-500 mt-2 font-bold uppercase tracking-wider bg-gray-100 px-2 py-1 rounded inline-block text-center border border-gray-200">Use Plant Tool to grow</p>
+                     </div>
+                  </div>
+                 )
+              })}
             </div>
           )}
 

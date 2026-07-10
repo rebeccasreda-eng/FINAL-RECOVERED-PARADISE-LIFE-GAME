@@ -3,7 +3,7 @@ import { useGame } from '../game/GameContext';
 import { TileData } from '../game/types';
 import { OBJECT_CONFIG, EMOJI_MAP, CROP_TYPES } from '../game/gameData';
 
-export const IslandTile = ({ tile }: { tile: TileData }) => {
+export const IslandTile = ({ tile, isDangerZone }: { tile: TileData, isDangerZone?: boolean }) => {
   const { interact, plant, place, activeTool, activeBuildItem, floatingTexts } = useGame();
   
   const handleInteraction = () => {
@@ -24,14 +24,23 @@ export const IslandTile = ({ tile }: { tile: TileData }) => {
   if (activeTool === 'build' && isCleared) hoverClass = "hover:bg-blue-400";
   else if (activeTool === 'plant' && isCleared) hoverClass = "hover:bg-green-400";
 
+  let titleText = config ? `${config.action} (⚡${config.energy + (isDangerZone && activeTool === 'clear' ? 1 : 0)})` : isCleared ? `Ready for ${activeTool === 'build' ? 'building' : 'planting'}` : '';
+  if (tile.object === 'CROP_READY' && tile.cropType && CROP_TYPES[tile.cropType]) {
+    titleText += ` - Expected Yield: ${CROP_TYPES[tile.cropType].yield * 5} 🪙`;
+  }
+
   return (
     <div 
       className={`relative w-full h-full cursor-pointer transition-all group ${hoverClass} ${tile.type === 'WATER' ? 'water-wave' : tile.type === 'GRASS' ? 'bg-[#7ec850]' : 'bg-[#f6d365]'}`}
       onClick={handleInteraction}
-      title={config ? `${config.action} (⚡${config.energy})` : isCleared ? `Ready for ${activeTool === 'build' ? 'building' : 'planting'}` : ''}
+      title={titleText}
     >
       <div className="absolute inset-0 border border-black/5" />
       {isCleared && <div className="absolute inset-0 bg-[#8b5a2b] opacity-80" />}
+      
+      {isDangerZone && (
+         <div className="absolute inset-0 bg-red-500/30 animate-pulse pointer-events-none z-10 shadow-[inset_0_0_15px_rgba(239,68,68,0.5)]"></div>
+      )}
 
       {tile.object && tile.object !== 'CLEARED_LAND' && tile.object !== 'CROP_PLOT' && (
         <div className={`isometric-object text-5xl select-none group-hover:scale-110 transition-transform ${tile.object === 'CROP_WILTED' ? 'wilt-grayscale' : ''}`}>

@@ -3,7 +3,7 @@ import { QuestDef, TileData, TileType, ObjectType, WeatherType } from './types';
 export const DEV_SPEEDUP = 100;
 export const SCALED = (ms: number) => Math.max(1000, ms / DEV_SPEEDUP); // Don't go below 1 second to avoid missing ticks
 
-export const WEATHER_TYPES: WeatherType[] = ['SUNNY', 'RAINY', 'CLOUDY', 'STORMY'];
+export const WEATHER_TYPES: WeatherType[] = ['SUNNY', 'RAINY', 'CLOUDY', 'STORMY', 'WINDY'];
 
 export const CROP_TYPES: Record<string, { name: string, emoji: string, cost: number, growTime: number, wiltTime: number, yield: number }> = {
   CORN: { name: 'Corn', emoji: '🌽', cost: 5, growTime: SCALED(30000), wiltTime: SCALED(60000), yield: 2 },
@@ -36,13 +36,13 @@ export const QUESTS: QuestDef[] = [
 
 export const OBJECT_CONFIG: Record<string, any> = {
   GRASS_PATCH: { action: 'Clear', energy: 1, coins: 2, xp: 5 },
-  TREE_PALM: { action: 'Chop', energy: 2, coins: 5, xp: 10, drops: { wood: 2 }, respawn: SCALED(60000) },
-  TREE_APPLE: { action: 'Harvest', energy: 2, coins: 5, xp: 10, drops: { wood: 1, food: 2 }, respawn: SCALED(60000) },
-  ROCK: { action: 'Mine', energy: 3, coins: 8, xp: 15, drops: { stone: 1 }, respawn: SCALED(90000) },
+  TREE_PALM: { action: 'Chop', energy: 1, coins: 5, xp: 10, drops: { wood: 2 }, respawn: SCALED(60000) },
+  TREE_APPLE: { action: 'Harvest', energy: 1, coins: 5, xp: 10, drops: { wood: 1, food: 2 }, respawn: SCALED(60000) },
+  ROCK: { action: 'Mine', energy: 1, coins: 8, xp: 15, drops: { stone: 1 }, respawn: SCALED(90000) },
   FLOWER_BUSH: { action: 'Harvest', energy: 1, coins: 3, xp: 8, respawn: SCALED(45000) },
   CROP_READY: { action: 'Harvest', energy: 1, coins: 10, xp: 20 },
   CROP_WILTED: { action: 'Clear', energy: 1, coins: 0, xp: 2 },
-  FISH_SPOT: { action: 'Fish', energy: 2, coins: 8, xp: 15, respawn: SCALED(120000), drops: { food: 1 } },
+  FISH_SPOT: { action: 'Fish', energy: 1, coins: 12, xp: 15, respawn: SCALED(120000) },
   CRAB: { action: 'Attack', energy: 1, coins: 5, xp: 10 }
 };
 
@@ -52,6 +52,12 @@ export const EMOJI_MAP: Record<string, string> = {
   FISH_SPOT: '✨', HUT: '🏚️', DOCK: '⛵', WELL: '💧', 
   FLOWER_POT: '🪴', FENCE: '🚧', LANTERN: '🏮', CRAB: '🦀'
 };
+
+export const INITIAL_NEIGHBORS = [
+  { id: 'n1', name: 'TropicalTina', avatar: '👩‍🌾', level: 3, favorPoints: 0 },
+  { id: 'n2', name: 'IslandIan', avatar: '👨‍🌾', level: 5, favorPoints: 0 },
+  { id: 'n3', name: 'CoconutCara', avatar: '🧑‍🌾', level: 7, favorPoints: 0 }
+];
 
 export function generateIsland(): Record<string, TileData> {
   const tiles: Record<string, TileData> = {};

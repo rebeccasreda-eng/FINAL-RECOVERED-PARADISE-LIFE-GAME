@@ -1,12 +1,41 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useGame } from '../game/GameContext';
 import { ResourceType } from '../game/types';
-import { EMOJI_MAP } from '../game/gameData';
+import { EMOJI_MAP, SCALED } from '../game/gameData';
+import { useToast } from '@/hooks/use-toast';
 
 export const HUD = ({ onOpenCollections, onOpenWeather }: { onOpenCollections: () => void, onOpenWeather: () => void }) => {
-  const { state, setShopOpen, activeTool, setActiveTool, activeBuildItem, setActiveBuildItem } = useGame();
+  const { state, dispatch, setShopOpen, activeTool, setActiveTool, activeBuildItem, setActiveBuildItem } = useGame();
   const { level, xp, inventory, energy, maxEnergy } = state;
   const nextLevelXp = Math.floor(100 * Math.pow(level, 1.5));
+  const { toast } = useToast();
+
+  const [timeToNextEnergy, setTimeToNextEnergy] = useState<number>(0);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      const now = Date.now();
+      const diff = SCALED(300000) - (now - state.lastEnergyTick);
+      setTimeToNextEnergy(Math.max(0, diff));
+    }, 1000);
+    return () => clearInterval(timer);
+  }, [state.lastEnergyTick]);
+
+  const formatTime = (ms: number) => {
+    const totalSeconds = Math.floor(ms / 1000);
+    const m = Math.floor(totalSeconds / 60);
+    const s = totalSeconds % 60;
+    return `${m}:${s.toString().padStart(2, '0')}`;
+  };
+
+  const handleBuyEnergy = () => {
+    if (state.inventory.food < 1) {
+      toast({ title: 'No food!', description: 'Harvest crops or fruit trees first.', variant: 'destructive' });
+      return;
+    }
+    dispatch({ type: 'BUY_ENERGY', foodCost: 1 });
+    toast({ title: 'Energy restored!', description: '+5 ⚡', duration: 2000 });
+  };
 
   const ownedStructures = ['HUT', 'DOCK', 'WELL', 'FLOWER_POT', 'FENCE', 'LANTERN'].filter(i => (inventory[i as ResourceType] || 0) > 0);
 
@@ -37,7 +66,7 @@ export const HUD = ({ onOpenCollections, onOpenWeather }: { onOpenCollections: (
 
         {/* Right: Energy & Menus */}
         <div className="flex items-center gap-3">
-          <div className="flex items-center gap-2 bg-black/20 px-4 py-2 rounded-2xl border border-black/30 shadow-inner mr-2">
+          <div className="flex items-center gap-2 bg-black/20 pl-4 pr-2 py-1.5 rounded-2xl border border-black/30 shadow-inner mr-2">
              <span className="text-2xl">⚡</span>
              <div className="flex flex-col">
                <div className="text-xs leading-tight text-blue-200">ENERGY</div>
@@ -46,6 +75,27 @@ export const HUD = ({ onOpenCollections, onOpenWeather }: { onOpenCollections: (
                </div>
              </div>
              <div className="ml-2 font-mono text-lg">{energy}/{maxEnergy}</div>
+             
+             {/* Energy Status / Exchange */}
+             <div className="flex flex-col items-center gap-1 min-w-[80px] border-l border-white/20 pl-2 ml-1">
+               {energy < maxEnergy ? (
+                 <div className="text-[10px] font-bold text-yellow-200 leading-none">
+                   Next ⚡ in {formatTime(timeToNextEnergy)}
+                 </div>
+               ) : (
+                 <div className="text-[10px] font-bold text-green-300 leading-none">
+                   Full!
+                 </div>
+               )}
+               
+               {energy < maxEnergy ? (
+                 <button onClick={handleBuyEnergy} className={`text-[10px] px-2 py-0.5 rounded border font-bold whitespace-nowrap shadow-sm active:scale-95 transition-transform ${state.inventory.food > 0 ? 'bg-green-500 hover:bg-green-400 border-green-700 text-white' : 'bg-gray-400 border-gray-600 text-gray-200 cursor-not-allowed'}`}>
+                   🍎 +5 Energy
+                 </button>
+               ) : (
+                 <div className="h-[18px]"></div> /* Placeholder */
+               )}
+             </div>
           </div>
           
           <button onClick={onOpenCollections} className="bg-purple-500 hover:bg-purple-400 active:scale-95 transition-transform px-3 py-2 rounded-xl border-b-4 border-purple-700 shadow-md text-white font-bold flex items-center gap-2 text-lg" title="Collections">

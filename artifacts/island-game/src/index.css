@@ -1,6 +1,6 @@
+@import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap');
 @import 'tailwindcss';
 @import 'tw-animate-css';
-@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&display=swap');
 @plugin "@tailwindcss/typography";
 
 @custom-variant dark (&:is(.dark *));
@@ -25,7 +25,7 @@
   --color-accent-foreground: hsl(var(--accent-foreground));
   --color-destructive: hsl(var(--destructive));
   --color-destructive-foreground: hsl(var(--destructive-foreground));
-  --font-sans: 'Nunito', sans-serif;
+  --font-sans: 'Fredoka', sans-serif;
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
@@ -60,7 +60,7 @@
   --input: 35 40% 70%;
   --ring: 142 70% 40%;
   --radius: 0.5rem;
-  --app-font-sans: 'Nunito', sans-serif;
+  --app-font-sans: 'Fredoka', sans-serif;
   --app-font-serif: Georgia, serif;
   --app-font-mono: Menlo, monospace;
 }
@@ -132,6 +132,7 @@
 .weather-overlay.RAINY { background-color: rgba(0, 0, 100, 0.25); }
 .weather-overlay.CLOUDY { background-color: rgba(100, 100, 100, 0.35); }
 .weather-overlay.STORMY { background-color: rgba(0, 0, 50, 0.55); }
+.weather-overlay.WINDY { background-color: rgba(200, 200, 200, 0.2); }
 
 @keyframes slide {
   0% { background-position: 0 0; }

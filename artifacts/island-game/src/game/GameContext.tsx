@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useEffect, useReducer, useRef, useState } from 'react';
 import { GameState, GameAction, GameContextType, ResourceType, ObjectType } from './types';
-import { generateIsland, QUESTS, OBJECT_CONFIG, SCALED, WEATHER_TYPES, CROP_TYPES } from './gameData';
+import { generateIsland, QUESTS, OBJECT_CONFIG, SCALED, WEATHER_TYPES, CROP_TYPES, INITIAL_NEIGHBORS, COLLECTIONS } from './gameData';
 import { useToast } from '@/hooks/use-toast';
 
 export const GameContext = createContext<(GameContextType & { plantingTile: string | null; setPlantingTile: (id: string | null) => void; }) | null>(null);
@@ -25,7 +25,12 @@ const getInitialState = (): GameState => ({
   nextWeatherAt: Date.now() + SCALED(120000),
   lastCrabSpawn: Date.now(),
   collections: {},
-  stats: { crabsKilled: 0 }
+  stats: { crabsKilled: 0 },
+  wishlist: [],
+  neighbors: INITIAL_NEIGHBORS,
+  favorBar: 0,
+  lastNeighborHire: 0,
+  neighborsHiredToday: 0
 });
 
 function checkQuestCompletions(state: GameState): GameState {
@@ -91,14 +96,14 @@ function gameReducer(state: GameState, action: GameAction): GameState {
       let nextState = state;
       let changed = false;
 
-      // Energy
-      if (now - state.lastEnergyTick >= SCALED(60000)) {
-        const ticks = Math.floor((now - state.lastEnergyTick) / SCALED(60000));
+      // Energy 5 min interval
+      if (now - state.lastEnergyTick >= SCALED(300000)) {
+        const ticks = Math.floor((now - state.lastEnergyTick) / SCALED(300000));
         if (state.energy < state.maxEnergy) {
-          nextState = { ...nextState, energy: Math.min(state.maxEnergy, state.energy + ticks), lastEnergyTick: state.lastEnergyTick + ticks * SCALED(60000) };
+          nextState = { ...nextState, energy: Math.min(state.maxEnergy, state.energy + ticks), lastEnergyTick: state.lastEnergyTick + ticks * SCALED(300000) };
           changed = true;
         } else {
-          nextState = { ...nextState, lastEnergyTick: state.lastEnergyTick + ticks * SCALED(60000) };
+          nextState = { ...nextState, lastEnergyTick: state.lastEnergyTick + ticks * SCALED(300000) };
           changed = true;
         }
       }
@@ -114,7 +119,10 @@ function gameReducer(state: GameState, action: GameAction): GameState {
       }
 
       // Crab Spawning
-      if (now - nextState.lastCrabSpawn >= SCALED(180000)) {
+      let crabSpawnInterval = SCALED(180000);
+      if (nextState.weather === 'STORMY') crabSpawnInterval = SCALED(90000);
+      
+      if (now - nextState.lastCrabSpawn >= crabSpawnInterval) {
         const crabs = Object.values(nextTiles).filter(t => t.object === 'CRAB').length;
         if (crabs < 2) {
           const emptyGrass = Object.values(nextTiles).filter(t => t.type === 'GRASS' && !t.object);
@@ -134,11 +142,12 @@ function gameReducer(state: GameState, action: GameAction): GameState {
           const cropConfig = CROP_TYPES[tile.cropType];
           if (cropConfig) {
             const timeElapsed = now - tile.placedAt;
-            if (timeElapsed >= cropConfig.growTime + cropConfig.wiltTime) {
-              // Tile is guaranteed CROP_GROWING or CROP_READY here; mark it wilted
+            const growTime = nextState.weather === 'RAINY' ? cropConfig.growTime * 0.5 : cropConfig.growTime;
+            
+            if (timeElapsed >= growTime + cropConfig.wiltTime) {
               if (!tilesChanged) { nextTiles = { ...nextState.tiles }; tilesChanged = true; }
               nextTiles[id] = { ...tile, object: 'CROP_WILTED' };
-            } else if (timeElapsed >= cropConfig.growTime) {
+            } else if (timeElapsed >= growTime) {
               if (tile.object === 'CROP_GROWING') {
                 if (!tilesChanged) { nextTiles = { ...nextState.tiles }; tilesChanged = true; }
                 nextTiles[id] = { ...tile, object: 'CROP_READY' };
@@ -174,23 +183,36 @@ function gameReducer(state: GameState, action: GameAction): GameState {
     }
 
     case 'INTERACT': {
-      const { tileId } = action;
+      const { tileId, energyCost = 1 } = action;
       const tile = state.tiles[tileId];
       if (!tile || !tile.object) return state;
       const obj = tile.object;
       const config = OBJECT_CONFIG[obj];
       if (!config) return state;
 
-      if (state.energy < config.energy) return state;
-
       const nextState = { ...state, tiles: { ...state.tiles }, inventory: { ...state.inventory }, quests: { ...state.quests }, respawns: [...state.respawns], collections: { ...state.collections }, stats: { ...state.stats } };
       
-      nextState.energy -= config.energy;
-      nextState.inventory.coins += config.coins || 0;
+      nextState.energy -= energyCost;
+      
+      let coinsDrop = config.coins || 0;
+      if (obj === 'FISH_SPOT' && nextState.weather === 'STORMY') {
+        coinsDrop *= 2;
+      }
+      nextState.inventory.coins += coinsDrop;
       
       if (config.drops) {
         for (const [k, v] of Object.entries(config.drops)) {
-          nextState.inventory[k as ResourceType] = (nextState.inventory[k as ResourceType] || 0) + (v as number);
+          let dropAmount = v as number;
+          if (k === 'food' && obj === 'TREE_APPLE' && nextState.weather === 'CLOUDY') {
+             dropAmount += 1;
+          }
+          nextState.inventory[k as ResourceType] = (nextState.inventory[k as ResourceType] || 0) + dropAmount;
+        }
+      }
+
+      if (obj === 'GRASS_PATCH' && nextState.weather === 'WINDY') {
+        if (Math.random() < 0.25) {
+          nextState.energy = Math.min(nextState.maxEnergy, nextState.energy + 1);
         }
       }
 
@@ -220,7 +242,6 @@ function gameReducer(state: GameState, action: GameAction): GameState {
         } else {
           nextState.tiles[tileId] = { ...tile, object: undefined, crabHp: undefined };
           nextState.stats.crabsKilled = (nextState.stats.crabsKilled || 0) + 1;
-          nextState.inventory.shells = (nextState.inventory.shells || 0) + 2;
           nextState.inventory.food = (nextState.inventory.food || 0) + 1;
           nextState.collections['crab_claw'] = true; track('collect_item');
           track('kill_crab');
@@ -249,6 +270,7 @@ function gameReducer(state: GameState, action: GameAction): GameState {
       const nextLevelXp = Math.floor(100 * Math.pow(nextState.level, 1.5));
       if (nextState.xp >= nextLevelXp) {
         nextState.level += 1;
+        nextState.inventory.shells = (nextState.inventory.shells || 0) + 1;
         nextState.maxEnergy = 20 + Math.floor((nextState.level - 1) / 5) * 5;
         nextState.energy = nextState.maxEnergy;
       }
@@ -331,6 +353,64 @@ function gameReducer(state: GameState, action: GameAction): GameState {
       return checkQuestCompletions(nextState);
     }
 
+    case 'BUY_ENERGY': {
+      if (state.inventory.food < action.foodCost || state.energy >= state.maxEnergy) return state;
+      const nextState = { ...state, inventory: { ...state.inventory } };
+      nextState.inventory.food -= action.foodCost;
+      nextState.energy = Math.min(state.maxEnergy, state.energy + 5);
+      return checkQuestCompletions(nextState);
+    }
+
+    case 'ADD_WISHLIST': {
+      if (state.wishlist.includes(action.itemId) || state.wishlist.length >= 5) return state;
+      return { ...state, wishlist: [...state.wishlist, action.itemId] };
+    }
+
+    case 'REMOVE_WISHLIST': {
+      return { ...state, wishlist: state.wishlist.filter(id => id !== action.itemId) };
+    }
+
+    case 'VISIT_NEIGHBOR': {
+      const neighbor = state.neighbors.find(n => n.id === action.neighborId);
+      if (!neighbor) return state;
+      
+      const nextState = { 
+        ...state, 
+        inventory: { ...state.inventory }, 
+        neighbors: state.neighbors.map(n => n.id === action.neighborId ? { ...n, favorPoints: n.favorPoints + 10 } : n)
+      };
+      
+      nextState.inventory.coins += 5;
+      nextState.xp += 5;
+      nextState.favorBar = Math.min(100, nextState.favorBar + 10);
+      
+      const randColl = COLLECTIONS[Math.floor(Math.random() * COLLECTIONS.length)];
+      if (randColl) {
+         nextState.collections = { ...state.collections, [randColl.id]: true };
+      }
+      
+      return checkQuestCompletions(nextState);
+    }
+
+    case 'HIRE_NEIGHBOR': {
+      const neighbor = state.neighbors.find(n => n.id === action.neighborId);
+      if (!neighbor || state.inventory.coins < 50) return state;
+      
+      const now = Date.now();
+      const isNewDay = now - state.lastNeighborHire > 86400000;
+      const hiredToday = isNewDay ? 0 : state.neighborsHiredToday;
+      
+      if (hiredToday >= 2) return state;
+      
+      const nextState = { ...state, inventory: { ...state.inventory } };
+      nextState.inventory.coins -= 50;
+      nextState.energy = Math.min(state.maxEnergy, state.energy + 3);
+      nextState.lastNeighborHire = now;
+      nextState.neighborsHiredToday = hiredToday + 1;
+      
+      return checkQuestCompletions(nextState);
+    }
+
     default:
       return state;
   }
@@ -340,7 +420,7 @@ export const GameProvider: React.FC<{children: React.ReactNode}> = ({ children }
   const { toast } = useToast();
   
   const [state, dispatch] = useReducer(gameReducer, undefined, () => {
-    const saved = localStorage.getItem('island-game-state-v3');
+    const saved = localStorage.getItem('island-game-state-v4');
     if (saved) {
       try {
         const parsed = JSON.parse(saved);
@@ -361,7 +441,12 @@ export const GameProvider: React.FC<{children: React.ReactNode}> = ({ children }
             level: typeof parsed.level === 'number' ? parsed.level : 1,
             weather: parsed.weather || defaults.weather,
             nextWeatherAt: parsed.nextWeatherAt || defaults.nextWeatherAt,
-            lastCrabSpawn: parsed.lastCrabSpawn || defaults.lastCrabSpawn
+            lastCrabSpawn: parsed.lastCrabSpawn || defaults.lastCrabSpawn,
+            wishlist: parsed.wishlist || defaults.wishlist,
+            neighbors: parsed.neighbors || defaults.neighbors,
+            favorBar: typeof parsed.favorBar === 'number' ? parsed.favorBar : defaults.favorBar,
+            lastNeighborHire: typeof parsed.lastNeighborHire === 'number' ? parsed.lastNeighborHire : defaults.lastNeighborHire,
+            neighborsHiredToday: typeof parsed.neighborsHiredToday === 'number' ? parsed.neighborsHiredToday : defaults.neighborsHiredToday,
           };
         }
       } catch (e) {}
@@ -379,7 +464,7 @@ export const GameProvider: React.FC<{children: React.ReactNode}> = ({ children }
   const [questBanner, setQuestBanner] = useState<string | null>(null);
 
   useEffect(() => {
-    localStorage.setItem('island-game-state-v3', JSON.stringify(state));
+    localStorage.setItem('island-game-state-v4', JSON.stringify(state));
   }, [state]);
 
   useEffect(() => {
@@ -404,9 +489,10 @@ export const GameProvider: React.FC<{children: React.ReactNode}> = ({ children }
     if (state.level > prevLevel.current) {
       setQuestBanner(`LEVEL ${state.level}! AMAZING!`);
       setTimeout(() => setQuestBanner(null), 3000);
+      toast({ title: "Level Up! +1 🐚", description: `You reached level ${state.level}! Earned a shell.` });
     }
     prevLevel.current = state.level;
-  }, [state.level]);
+  }, [state.level, toast]);
 
   const dismissTutorial = () => {
     if (tutorial) {
@@ -421,22 +507,48 @@ export const GameProvider: React.FC<{children: React.ReactNode}> = ({ children }
     if (!tile || !tile.object) return;
     const config = OBJECT_CONFIG[tile.object];
     if (!config) return;
-    if (state.energy < config.energy) {
+
+    let energyCost = config.energy;
+
+    const [tx, ty] = tileId.split(',').map(Number);
+    let inDangerZone = false;
+    for (const [id, t] of Object.entries(state.tiles) as [string, import('./types').TileData][]) {
+      if (t.object === 'CRAB' && t.crabHp && t.crabHp > 0) {
+        const [cx, cy] = id.split(',').map(Number);
+        if (Math.abs(tx - cx) <= 1 && Math.abs(ty - cy) <= 1 && id !== tileId) {
+          inDangerZone = true;
+          break;
+        }
+      }
+    }
+    
+    if (inDangerZone) {
+      energyCost += 1;
+    }
+
+    if (state.energy < energyCost) {
        toast({ title: 'Out of energy! ⚡', description: 'Wait for energy to recharge.', variant: 'destructive' });
        return;
     }
-    dispatch({ type: 'INTERACT', tileId });
+
+    if (inDangerZone) {
+       toast({ title: 'Careful! 🦀', description: "You're in an animal's territory. -2 energy!", variant: 'destructive' });
+    }
+
+    dispatch({ type: 'INTERACT', tileId, energyCost });
     
-    // Crab hit but not dead check
     if (tile.object === 'CRAB' && (tile.crabHp || 3) > 1) {
        const id = Math.random().toString();
-       setFloatingTexts(prev => [...prev, { id, tileId, text: `-1⚡` }]);
+       setFloatingTexts(prev => [...prev, { id, tileId, text: `-${energyCost}⚡` }]);
        setTimeout(() => setFloatingTexts(prev => prev.filter(t => t.id !== id)), 1500);
        return;
     }
 
+    let coinDrop = config.coins || 0;
+    if (tile.object === 'FISH_SPOT' && state.weather === 'STORMY') coinDrop *= 2;
+
     const id = Math.random().toString();
-    setFloatingTexts(prev => [...prev, { id, tileId, text: `+${config.coins || 0}🪙 +${config.xp || 0}⭐` }]);
+    setFloatingTexts(prev => [...prev, { id, tileId, text: `+${coinDrop}🪙 +${config.xp || 0}⭐` }]);
     setTimeout(() => {
       setFloatingTexts(prev => prev.filter(t => t.id !== id));
     }, 1500);
