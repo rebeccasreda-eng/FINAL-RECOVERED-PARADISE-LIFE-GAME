@@ -46,7 +46,7 @@ const ObjectSVG: React.FC<{ object: string; tileX: number; tileY: number }> = ({
 
     /* ── PALM TREE ─────────────────────────────────────────────────────── */
     case 'TREE_PALM': return (
-      <svg viewBox="0 0 60 92" width="58" height="88" style={{ display:'block' }}>
+      <svg viewBox="0 0 60 92" width="78" height="118" style={{ display:'block' }}>
         <defs>
           <linearGradient id={g('plt')} x1="0%" y1="0%" x2="100%" y2="0%">
             <stop offset="0%"   stopColor="#e8b85a"/>
@@ -117,7 +117,7 @@ const ObjectSVG: React.FC<{ object: string; tileX: number; tileY: number }> = ({
 
     /* ── APPLE TREE ─────────────────────────────────────────────────────── */
     case 'TREE_APPLE': return (
-      <svg viewBox="0 0 62 90" width="60" height="86" style={{ display:'block' }}>
+      <svg viewBox="0 0 62 90" width="81" height="116" style={{ display:'block' }}>
         <defs>
           <linearGradient id={g('apt')} x1="0%" y1="0%" x2="100%" y2="0%">
             <stop offset="0%"   stopColor="#e0a060"/>
@@ -428,7 +428,7 @@ const ObjectSVG: React.FC<{ object: string; tileX: number; tileY: number }> = ({
 
     /* ── COCONUT TREE ───────────────────────────────────────────────────── */
     case 'TREE_COCONUT': return (
-      <svg viewBox="0 0 72 112" width="66" height="103" style={{ display:'block' }}>
+      <svg viewBox="0 0 72 112" width="88" height="138" style={{ display:'block' }}>
         <defs>
           {/* Trunk — cylindrical, left edge lit */}
           <linearGradient id={g('cot')} x1="0%" y1="0%" x2="100%" y2="0%">
@@ -533,7 +533,7 @@ const ObjectSVG: React.FC<{ object: string; tileX: number; tileY: number }> = ({
 
     /* ── MANGO TREE ─────────────────────────────────────────────────────── */
     case 'TREE_MANGO': return (
-      <svg viewBox="0 0 76 96" width="70" height="88" style={{ display:'block' }}>
+      <svg viewBox="0 0 76 96" width="94" height="118" style={{ display:'block' }}>
         <defs>
           {/* Trunk — cylindrical left-lit */}
           <linearGradient id={g('mgt')} x1="0%" y1="0%" x2="100%" y2="0%">
