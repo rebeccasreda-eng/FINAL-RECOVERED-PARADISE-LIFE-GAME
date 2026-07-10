@@ -766,7 +766,7 @@ export const IslandTile: React.FC<IslandTileProps> = ({
           <div
             style={{
               filter: 'drop-shadow(0 3px 5px rgba(0,0,0,0.38))',
-              animation: doSway ? 'treeSway 2.8s ease-in-out infinite alternate' : undefined,
+              animation: undefined,
               transformOrigin: 'bottom center',
             }}
           >
