@@ -293,18 +293,18 @@ export const CustomizableCharSVG: React.FC<{
   const legColor  = gender === 'female' ? sk : darkenHex(outfitColor, 20);
 
   const mouthPaths: Record<string, string> = {
-    smile: 'M44 49 Q50 53 56 49',   // gentle relaxed curve (was wider + taller arc)
-    grin:  'M40 49 Q50 57 60 49',
-    pout:  'M44 50 Q50 47 56 50',
-    smirk: 'M43 49 Q47 53 50 52 Q53 51 57 49',
+    smile: 'M46 48 Q50 51 54 48',   // small natural curve
+    grin:  'M41 48 Q50 55 59 48',
+    pout:  'M45 49 Q50 46 55 49',
+    smirk: 'M44 48 Q47 51 50 50 Q53 49 56 47',
   };
   const mouthD = mouthPaths[mouthStyle] ?? mouthPaths.smile;
 
   const browPaths: Record<string, [string, string]> = {
-    natural:  ['M34 31 Q40 28 46 30', 'M54 30 Q60 28 66 31'],  // lowered, flatter → relaxed
-    thin:     ['M35 30 Q40 27 45 29', 'M55 29 Q60 27 65 30'],
-    thick:    ['M33 32 Q40 27 47 31', 'M53 31 Q60 27 67 32'],
-    arched:   ['M34 30 Q40 22 46 28', 'M54 28 Q60 22 66 30'],
+    natural:  ['M34 27 Q40 24 46 26', 'M54 26 Q60 24 66 27'],
+    thin:     ['M35 26 Q40 23 45 25', 'M55 25 Q60 23 65 26'],
+    thick:    ['M33 28 Q40 23 47 27', 'M53 27 Q60 23 67 28'],
+    arched:   ['M34 26 Q40 18 46 24', 'M54 24 Q60 18 66 26'],
   };
   const [lb, rb] = browPaths[eyebrowStyle] ?? browPaths.natural;
   const browW = eyebrowStyle === 'thick' ? 2.8 : 1.8;
@@ -394,84 +394,104 @@ export const CustomizableCharSVG: React.FC<{
       </g>
 
       {/* ── Neck ── */}
-      <rect x="43" y="56" width="14" height="11" rx="3" fill={sk}/>
+      <rect x="43" y="59" width="14" height="8" rx="3" fill={sk}/>
       {/* Neck right-side shadow */}
-      <path d="M51 56 Q58 59 57 65" stroke="rgba(0,0,0,0.14)" strokeWidth="6" fill="none" strokeLinecap="round"/>
+      <path d="M51 59 Q58 62 57 67" stroke="rgba(0,0,0,0.14)" strokeWidth="6" fill="none" strokeLinecap="round"/>
 
       {/* ── Fro (behind head) ── */}
       {hairStyle === 'fro' && <HairLayer style="fro" color={hairColor}/>}
 
-      {/* ── Head — spherical skin gradient ── */}
-      {faceShape === 'oval'   ? <ellipse cx="50" cy="37" rx="24" ry="30" fill={`url(#cfs${gp})`}/> :
-       faceShape === 'wide'   ? <ellipse cx="50" cy="36" rx="32" ry="24" fill={`url(#cfs${gp})`}/> :
-       faceShape === 'narrow' ? <ellipse cx="50" cy="37" rx="20" ry="30" fill={`url(#cfs${gp})`}/> :
-       faceShape === 'heart'  ? <path d="M50 64 Q26 50 24 30 Q22 12 36 8 Q50 4 50 20 Q50 4 64 8 Q78 12 76 30 Q74 50 50 64Z" fill={`url(#cfs${gp})`}/> :
-       faceShape === 'soft'   ? <ellipse cx="50" cy="37" rx="26" ry="28" fill={`url(#cfs${gp})`}/> :
-       <circle cx="50" cy="36" r="28" fill={`url(#cfs${gp})`}/>}
+      {/* ── Head — spherical skin gradient (bigger than body) ── */}
+      {faceShape === 'oval'   ? <ellipse cx="50" cy="33" rx="26" ry="33" fill={`url(#cfs${gp})`}/> :
+       faceShape === 'wide'   ? <ellipse cx="50" cy="32" rx="35" ry="26" fill={`url(#cfs${gp})`}/> :
+       faceShape === 'narrow' ? <ellipse cx="50" cy="33" rx="22" ry="33" fill={`url(#cfs${gp})`}/> :
+       faceShape === 'heart'  ? <path d="M50 66 Q24 50 22 28 Q20 8 36 4 Q50 0 50 16 Q50 0 64 4 Q80 8 78 28 Q76 50 50 66Z" fill={`url(#cfs${gp})`}/> :
+       faceShape === 'soft'   ? <ellipse cx="50" cy="33" rx="29" ry="32" fill={`url(#cfs${gp})`}/> :
+       <circle cx="50" cy="33" r="32" fill={`url(#cfs${gp})`}/>}
       {/* Chin shadow — reinforces sphere volume */}
-      <ellipse cx="50" cy="59" rx="20" ry="7" fill="rgba(0,0,0,0.09)"/>
+      <ellipse cx="50" cy="61" rx="22" ry="7" fill="rgba(0,0,0,0.09)"/>
       {/* Cheek specular — lit from upper-left */}
-      <ellipse cx="33" cy="33" rx="5.5" ry="3.5" fill="rgba(255,255,255,0.18)" transform="rotate(-16 33 33)"/>
+      <ellipse cx="32" cy="28" rx="5.5" ry="3.5" fill="rgba(255,255,255,0.18)" transform="rotate(-16 32 28)"/>
+
+      {/* ── Face texture lines — subtle contour detail ── */}
+      {/* Nasolabial folds — left & right */}
+      <path d="M38 36 Q36 40 37 45" stroke={darkenHex(sk, 22)} strokeWidth="0.9" fill="none" strokeLinecap="round" opacity="0.13"/>
+      <path d="M62 36 Q64 40 63 45" stroke={darkenHex(sk, 22)} strokeWidth="0.9" fill="none" strokeLinecap="round" opacity="0.13"/>
+      {/* Under-eye hollows */}
+      <path d="M33 35 Q37 37 41 35" stroke={darkenHex(sk, 18)} strokeWidth="0.8" fill="none" strokeLinecap="round" opacity="0.11"/>
+      <path d="M59 35 Q63 37 67 35" stroke={darkenHex(sk, 18)} strokeWidth="0.8" fill="none" strokeLinecap="round" opacity="0.11"/>
+      {/* Chin cleft hint — kept above wide-face lower bound (y≈58) */}
+      <path d="M47 55 Q50 57 53 55" stroke={darkenHex(sk, 16)} strokeWidth="0.9" fill="none" strokeLinecap="round" opacity="0.10"/>
+      {/* Forehead faint line */}
+      <path d="M40 14 Q50 11 60 14" stroke={darkenHex(sk, 12)} strokeWidth="0.7" fill="none" strokeLinecap="round" opacity="0.08"/>
+      {/* Philtrum groove */}
+      <path d="M49 43 Q50 46 51 43" stroke={darkenHex(sk, 20)} strokeWidth="0.8" fill="none" strokeLinecap="round" opacity="0.11"/>
 
       {/* ── Hair (on top of head) ── */}
       {hairStyle !== 'fro' && <HairLayer style={hairStyle} color={hairColor}/>}
 
       {/* ── Eyes — layered for 3D depth ── */}
       {/* Eyelid shadow (skin colour, above eye socket) */}
-      <ellipse cx="40" cy="32.5" rx="8" ry="4.5" fill={darkenHex(sk, 16)} opacity="0.36"/>
-      <ellipse cx="60" cy="32.5" rx="8" ry="4.5" fill={darkenHex(sk, 16)} opacity="0.36"/>
+      <ellipse cx="40" cy="29.5" rx="8" ry="4.5" fill={darkenHex(sk, 16)} opacity="0.36"/>
+      <ellipse cx="60" cy="29.5" rx="8" ry="4.5" fill={darkenHex(sk, 16)} opacity="0.36"/>
       {/* Relaxed upper eyelid droop — soft half-lid overlay */}
-      <ellipse cx="40" cy="29.5" rx="7.2" ry="4.8" fill={sk} opacity="0.58"/>
-      <ellipse cx="60" cy="29.5" rx="7.2" ry="4.8" fill={sk} opacity="0.58"/>
+      <ellipse cx="40" cy="26.5" rx="7.2" ry="4.8" fill={sk} opacity="0.58"/>
+      <ellipse cx="60" cy="26.5" rx="7.2" ry="4.8" fill={sk} opacity="0.58"/>
       {/* Whites */}
-      <ellipse cx="40" cy="36" rx="7" ry="8" fill="white"/>
-      <ellipse cx="60" cy="36" rx="7" ry="8" fill="white"/>
+      <ellipse cx="40" cy="33" rx="7" ry="8" fill="white"/>
+      <ellipse cx="60" cy="33" rx="7" ry="8" fill="white"/>
       {/* Upper-lid inner shadow on white */}
-      <ellipse cx="40" cy="30" rx="7" ry="3.5" fill="rgba(0,0,0,0.11)"/>
-      <ellipse cx="60" cy="30" rx="7" ry="3.5" fill="rgba(0,0,0,0.11)"/>
+      <ellipse cx="40" cy="27" rx="7" ry="3.5" fill="rgba(0,0,0,0.11)"/>
+      <ellipse cx="60" cy="27" rx="7" ry="3.5" fill="rgba(0,0,0,0.11)"/>
       {/* Iris */}
-      <ellipse cx="40" cy="38" rx="5" ry="6" fill={eyeColor || '#88551a'}/>
-      <ellipse cx="60" cy="38" rx="5" ry="6" fill={eyeColor || '#88551a'}/>
+      <ellipse cx="40" cy="35" rx="5" ry="6" fill={eyeColor || '#88551a'}/>
+      <ellipse cx="60" cy="35" rx="5" ry="6" fill={eyeColor || '#88551a'}/>
       {/* Iris rim darkening */}
-      <ellipse cx="40" cy="38" rx="5" ry="6" fill="none" stroke={darkenHex(eyeColor || '#88551a', 35)} strokeWidth="1.0" opacity="0.55"/>
-      <ellipse cx="60" cy="38" rx="5" ry="6" fill="none" stroke={darkenHex(eyeColor || '#88551a', 35)} strokeWidth="1.0" opacity="0.55"/>
+      <ellipse cx="40" cy="35" rx="5" ry="6" fill="none" stroke={darkenHex(eyeColor || '#88551a', 35)} strokeWidth="1.0" opacity="0.55"/>
+      <ellipse cx="60" cy="35" rx="5" ry="6" fill="none" stroke={darkenHex(eyeColor || '#88551a', 35)} strokeWidth="1.0" opacity="0.55"/>
       {/* Pupils */}
-      <circle cx="40.8" cy="39" r="3" fill="#1a0a00"/>
-      <circle cx="60.8" cy="39" r="3" fill="#1a0a00"/>
+      <circle cx="40.8" cy="36" r="3" fill="#1a0a00"/>
+      <circle cx="60.8" cy="36" r="3" fill="#1a0a00"/>
       {/* Primary specular (large) */}
-      <circle cx="42.5" cy="36.5" r="1.8" fill="white"/>
-      <circle cx="62.5" cy="36.5" r="1.8" fill="white"/>
+      <circle cx="42.5" cy="33.5" r="1.8" fill="white"/>
+      <circle cx="62.5" cy="33.5" r="1.8" fill="white"/>
       {/* Secondary micro-highlight */}
-      <circle cx="39.2" cy="41" r="0.9" fill="rgba(255,255,255,0.62)"/>
-      <circle cx="59.2" cy="41" r="0.9" fill="rgba(255,255,255,0.62)"/>
+      <circle cx="39.2" cy="38" r="0.9" fill="rgba(255,255,255,0.62)"/>
+      <circle cx="59.2" cy="38" r="0.9" fill="rgba(255,255,255,0.62)"/>
       {/* Lash line */}
-      <path d="M33 30.5 Q40 27.5 47 30.5" stroke={darkenHex(hairColor, 8)} strokeWidth="2.0" fill="none" strokeLinecap="round" opacity="0.88"/>
-      <path d="M53 30.5 Q60 27.5 67 30.5" stroke={darkenHex(hairColor, 8)} strokeWidth="2.0" fill="none" strokeLinecap="round" opacity="0.88"/>
+      <path d="M33 27.5 Q40 24.5 47 27.5" stroke={darkenHex(hairColor, 8)} strokeWidth="2.0" fill="none" strokeLinecap="round" opacity="0.88"/>
+      <path d="M53 27.5 Q60 24.5 67 27.5" stroke={darkenHex(hairColor, 8)} strokeWidth="2.0" fill="none" strokeLinecap="round" opacity="0.88"/>
 
       {/* ── Eyebrows ── */}
       <path d={lb} stroke={browColor} strokeWidth={browW} fill="none" strokeLinecap="round"/>
       <path d={rb} stroke={browColor} strokeWidth={browW} fill="none" strokeLinecap="round"/>
 
       {/* ── Blush ── */}
-      <ellipse cx="30" cy="42" rx="7" ry="4" fill="#ff8888" opacity={blushOp}/>
-      <ellipse cx="70" cy="42" rx="7" ry="4" fill="#ff8888" opacity={blushOp}/>
+      <ellipse cx="30" cy="39" rx="7" ry="4" fill="#ff8888" opacity={blushOp}/>
+      <ellipse cx="70" cy="39" rx="7" ry="4" fill="#ff8888" opacity={blushOp}/>
       {makeupStyle === 'shimmer' && <>
-        <ellipse cx="30" cy="41" rx="6" ry="3" fill="#e8d060" opacity="0.4"/>
-        <ellipse cx="70" cy="41" rx="6" ry="3" fill="#e8d060" opacity="0.4"/>
+        <ellipse cx="30" cy="38" rx="6" ry="3" fill="#e8d060" opacity="0.4"/>
+        <ellipse cx="70" cy="38" rx="6" ry="3" fill="#e8d060" opacity="0.4"/>
       </>}
       {makeupStyle === 'pink_glow' && <>
-        <ellipse cx="30" cy="42" rx="9" ry="5" fill="#ff88cc" opacity="0.3"/>
-        <ellipse cx="70" cy="42" rx="9" ry="5" fill="#ff88cc" opacity="0.3"/>
+        <ellipse cx="30" cy="39" rx="9" ry="5" fill="#ff88cc" opacity="0.3"/>
+        <ellipse cx="70" cy="39" rx="9" ry="5" fill="#ff88cc" opacity="0.3"/>
       </>}
 
       {/* ── Nose ── */}
-      {noseStyle === 'dot'   ? <circle cx="50" cy="43" r="1.5" fill="#e0a880" opacity="0.7"/> :
-       noseStyle === 'round' ? <ellipse cx="50" cy="43" rx="3.5" ry="2.2" fill="#e0a880" opacity="0.6"/> :
-       noseStyle === 'snub'  ? <path d="M47 42 Q50 44 53 42 Q51 46 50 46 Q49 46 47 42Z" fill="#e0a880" opacity="0.55"/> :
-       <ellipse cx="50" cy="43" rx="2" ry="1.2" fill="#e0a880" opacity="0.6"/>}
+      {noseStyle === 'dot'   ? <circle cx="50" cy="41" r="1.5" fill="#e0a880" opacity="0.7"/> :
+       noseStyle === 'round' ? <ellipse cx="50" cy="41" rx="3.5" ry="2.2" fill="#e0a880" opacity="0.6"/> :
+       noseStyle === 'snub'  ? <path d="M47 40 Q50 42 53 40 Q51 44 50 44 Q49 44 47 40Z" fill="#e0a880" opacity="0.55"/> :
+       <ellipse cx="50" cy="41" rx="2" ry="1.2" fill="#e0a880" opacity="0.6"/>}
 
-      {/* ── Mouth ── */}
-      <path d={mouthD} stroke={mouthColor} strokeWidth="2" fill="none" strokeLinecap="round"/>
+      {/* ── Mouth — upper lip fill + stroke curve ── */}
+      {/* Upper lip shape */}
+      <path d="M45 47 Q47 45 50 46 Q53 45 55 47 Q52 49 50 49 Q48 49 45 47Z"
+        fill={mouthColor} opacity="0.55"/>
+      {/* Smile stroke */}
+      <path d={mouthD} stroke={mouthColor} strokeWidth="1.6" fill="none" strokeLinecap="round"/>
+      {/* Lower lip highlight */}
+      <ellipse cx="50" cy="51" rx="4" ry="1.4" fill={lightenHex(mouthColor, 20)} opacity="0.28"/>
 
       {/* ── Facial hair ── */}
       {facialHairStyle === 'stubble' && (

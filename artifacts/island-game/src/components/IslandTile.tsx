@@ -1707,10 +1707,10 @@ export const IslandTile: React.FC<IslandTileProps> = ({
         // Centre horizontally on screenX; top of diamond at screenY
         transform: 'translate(-50%, 0)',
         zIndex: tileZIndex,
-        cursor: isWater ? 'default' : 'pointer',
+        cursor: (isWater && tile.object !== 'DOCK') ? 'default' : 'pointer',
       }}
-      onClick={isWater ? undefined : handleClick}
-      onMouseEnter={() => !isWater && setHovered(true)}
+      onClick={(isWater && tile.object !== 'DOCK') ? undefined : handleClick}
+      onMouseEnter={() => !(isWater && tile.object !== 'DOCK') && setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       title={tooltip}
     >

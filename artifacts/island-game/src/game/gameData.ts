@@ -357,6 +357,10 @@ export function generateIsland(): Record<string, TileData> {
     interiorWater[0].object = 'DOCK';
   }
 
+  // ── Fish spots — on water tiles that don't already have an object ──────
+  const fishCandidates = waterTiles.filter(t => !t.object);
+  for (let i = 0; i < 5 && fishCandidates.length; i++) pick(fishCandidates).object = 'FISH_SPOT';
+
   // ── Puddles near trees — small water pools under the canopy ─────────────
   const ALL_TREE_TYPES: ObjectType[] = ['TREE_COCONUT', 'TREE_MANGO', 'TREE_APPLE', 'TREE_PALM'];
   const treeTiles = Object.values(tiles).filter(t => t.object && ALL_TREE_TYPES.includes(t.object as ObjectType));
