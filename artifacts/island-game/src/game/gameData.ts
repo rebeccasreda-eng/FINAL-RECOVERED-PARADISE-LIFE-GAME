@@ -320,7 +320,7 @@ export function generateIsland(): Record<string, TileData> {
 
       } else if (tile.type === 'SAND') {
         const r = rand();
-        if (r < 0.13) tile.object = 'ROCK';
+        if (r < 0.065) tile.object = 'ROCK';   // half the original 0.13
         // DRIFTWOOD only appears when a coconut tree is chopped — not in world gen
       }
     }
@@ -415,7 +415,7 @@ export function generateIsland(): Record<string, TileData> {
   for (const tree of treeTiles) {
     for (const [dx, dy] of TREE_NEIGHBORS) {
       const nb = tiles[`${tree.x + dx},${tree.y + dy}`];
-      if (nb && nb.type === 'GRASS' && !nb.object && rand() < 0.14) {
+      if (nb && nb.type === 'GRASS' && !nb.object && rand() < 0.07) {
         nb.object = 'TALL_ROCK';
       }
     }

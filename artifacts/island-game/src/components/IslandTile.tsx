@@ -362,6 +362,16 @@ const ObjectSVG: React.FC<{ object: string; tileX: number; tileY: number; tileTy
               <stop offset="65%"  stopColor={petal} stopOpacity="0.85"/>
               <stop offset="100%" stopColor={dark}/>
             </radialGradient>
+            {/* Fence wood gradients */}
+            <linearGradient id={g('fbw')} x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%"   stopColor="#d8c08a"/>
+              <stop offset="55%"  stopColor="#b09858"/>
+              <stop offset="100%" stopColor="#7a6030"/>
+            </linearGradient>
+            <linearGradient id={g('fbr')} x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%"   stopColor="#ccb07a"/>
+              <stop offset="100%" stopColor="#8a6c3c"/>
+            </linearGradient>
           </defs>
           {/* Shadow */}
           <ellipse cx="22" cy="51" rx="16" ry="4" fill="rgba(0,0,0,0.22)"/>
@@ -379,6 +389,25 @@ const ObjectSVG: React.FC<{ object: string; tileX: number; tileY: number; tileTy
           {Bloom(32, 30, 6, 4.2, 7.5, 0.90, 3.2)}
           {/* ── Front-centre bloom (main, larger) ── */}
           {Bloom(22, 18, 8.5, 5.8, 10, 1.0, 4.5)}
+
+          {/* ── Crooked fence around the bush ── */}
+          {/* Left post — leans left */}
+          <g transform="rotate(-3 4 51)">
+            <rect x="1.5" y="24" width="5" height="27" rx="1.5" fill={`url(#${g('fbw')})`}/>
+            <rect x="1.5" y="24" width="1.6" height="27" rx="1" fill="rgba(255,255,255,0.24)"/>
+            <ellipse cx="4"  cy="24" rx="3" ry="1.6" fill="#e4cb90"/>
+            <ellipse cx="4"  cy="51" rx="3" ry="1.2" fill="rgba(0,0,0,0.15)"/>
+          </g>
+          {/* Right post — leans right */}
+          <g transform="rotate(3 40 51)">
+            <rect x="37.5" y="24" width="5" height="27" rx="1.5" fill={`url(#${g('fbw')})`}/>
+            <rect x="37.5" y="24" width="1.6" height="27" rx="1" fill="rgba(255,255,255,0.24)"/>
+            <ellipse cx="40" cy="24" rx="3" ry="1.6" fill="#e4cb90"/>
+            <ellipse cx="40" cy="51" rx="3" ry="1.2" fill="rgba(0,0,0,0.15)"/>
+          </g>
+          {/* Rail — slightly angled, dips in the middle */}
+          <path d="M6.5,33 Q22,36 37.5,32 L37.5,37 Q22,41 6.5,38 Z" fill={`url(#${g('fbr')})`}/>
+          <path d="M6.5,33 Q22,36 37.5,32 L37.5,33.5 Q22,37.5 6.5,34.5 Z" fill="rgba(255,255,255,0.28)"/>
         </svg>
       );
     }
@@ -896,43 +925,46 @@ const ObjectSVG: React.FC<{ object: string; tileX: number; tileY: number; tileTy
         <path d="M58,10 L58,7"  stroke="#4ab830" strokeWidth="2.0" fill="none" strokeLinecap="round"/>
         <path d="M65,14 L67,11" stroke="#4ab830" strokeWidth="1.9" fill="none" strokeLinecap="round"/>
 
-        {/* ══ RAIL FENCE (rendered last so it sits in front) ══ */}
+        {/* ══ CROOKED RAIL FENCE (rendered last — sits in front) ══ */}
 
-        {/* ── Posts — thick, weathered, side-shaded ── */}
-        {/* Left post */}
-        <rect x="2"  y="14" width="7" height="46" rx="2.5" fill={`url(#${g('gpw')})`}/>
-        <rect x="2"  y="14" width="2.2" height="46" rx="1" fill="rgba(255,255,255,0.26)"/>
-        <rect x="7"  y="14" width="2"   height="46" rx="1" fill="rgba(0,0,0,0.24)"/>
-        {/* Center post */}
-        <rect x="33" y="14" width="7" height="46" rx="2.5" fill={`url(#${g('gpw')})`}/>
-        <rect x="33" y="14" width="2.2" height="46" rx="1" fill="rgba(255,255,255,0.26)"/>
-        <rect x="38" y="14" width="2"   height="46" rx="1" fill="rgba(0,0,0,0.24)"/>
-        {/* Right post */}
-        <rect x="63" y="14" width="7" height="46" rx="2.5" fill={`url(#${g('gpw')})`}/>
-        <rect x="63" y="14" width="2.2" height="46" rx="1" fill="rgba(255,255,255,0.26)"/>
-        <rect x="68" y="14" width="2"   height="46" rx="1" fill="rgba(0,0,0,0.24)"/>
-        {/* Post top caps */}
-        <ellipse cx="5.5"  cy="14" rx="4"   ry="2.4" fill="#e4cb90"/>
-        <ellipse cx="36.5" cy="14" rx="4"   ry="2.4" fill="#e4cb90"/>
-        <ellipse cx="66.5" cy="14" rx="4"   ry="2.4" fill="#e4cb90"/>
+        {/* ── Left post — leans left ── */}
+        <g transform="rotate(-3 5.5 60)">
+          <rect x="2"  y="13" width="7" height="47" rx="2.5" fill={`url(#${g('gpw')})`}/>
+          <rect x="2"  y="13" width="2.2" height="47" rx="1" fill="rgba(255,255,255,0.26)"/>
+          <rect x="7"  y="13" width="2"   height="47" rx="1" fill="rgba(0,0,0,0.24)"/>
+          <ellipse cx="5.5"  cy="13" rx="4"   ry="2.4" fill="#e4cb90"/>
+          <ellipse cx="5.5"  cy="60" rx="4"   ry="1.8" fill="rgba(0,0,0,0.18)"/>
+        </g>
+        {/* ── Center post — leans right ── */}
+        <g transform="rotate(2.5 36.5 60)">
+          <rect x="33" y="15" width="7" height="45" rx="2.5" fill={`url(#${g('gpw')})`}/>
+          <rect x="33" y="15" width="2.2" height="45" rx="1" fill="rgba(255,255,255,0.26)"/>
+          <rect x="38" y="15" width="2"   height="45" rx="1" fill="rgba(0,0,0,0.24)"/>
+          <ellipse cx="36.5" cy="15" rx="4"   ry="2.4" fill="#e4cb90"/>
+          <ellipse cx="36.5" cy="60" rx="4"   ry="1.8" fill="rgba(0,0,0,0.18)"/>
+        </g>
+        {/* ── Right post — leans left ── */}
+        <g transform="rotate(-2 66.5 60)">
+          <rect x="63" y="14" width="7" height="46" rx="2.5" fill={`url(#${g('gpw')})`}/>
+          <rect x="63" y="14" width="2.2" height="46" rx="1" fill="rgba(255,255,255,0.26)"/>
+          <rect x="68" y="14" width="2"   height="46" rx="1" fill="rgba(0,0,0,0.24)"/>
+          <ellipse cx="66.5" cy="14" rx="4"   ry="2.4" fill="#e4cb90"/>
+          <ellipse cx="66.5" cy="60" rx="4"   ry="1.8" fill="rgba(0,0,0,0.18)"/>
+        </g>
 
-        {/* ── Rails — 2 per span, top-lit ── */}
-        {/* Left span – top rail */}
-        <rect x="9"  y="21" width="24" height="5.5" rx="2" fill={`url(#${g('gpr')})`}/>
-        <rect x="9"  y="21" width="24" height="2"   rx="1" fill="rgba(255,255,255,0.30)"/>
-        {/* Left span – bottom rail */}
-        <rect x="9"  y="42" width="24" height="5.5" rx="2" fill={`url(#${g('gpr')})`}/>
-        <rect x="9"  y="42" width="24" height="2"   rx="1" fill="rgba(255,255,255,0.22)"/>
-        {/* Right span – top rail */}
-        <rect x="40" y="21" width="23" height="5.5" rx="2" fill={`url(#${g('gpr')})`}/>
-        <rect x="40" y="21" width="23" height="2"   rx="1" fill="rgba(255,255,255,0.30)"/>
-        {/* Right span – bottom rail */}
-        <rect x="40" y="42" width="23" height="5.5" rx="2" fill={`url(#${g('gpr')})`}/>
-        <rect x="40" y="42" width="23" height="2"   rx="1" fill="rgba(255,255,255,0.22)"/>
-        {/* Post ground shadows */}
-        <ellipse cx="5.5"  cy="60" rx="4"   ry="1.8" fill="rgba(0,0,0,0.18)"/>
-        <ellipse cx="36.5" cy="60" rx="4"   ry="1.8" fill="rgba(0,0,0,0.18)"/>
-        <ellipse cx="66.5" cy="60" rx="4"   ry="1.8" fill="rgba(0,0,0,0.18)"/>
+        {/* ── Rails — angled for crooked look ── */}
+        {/* Left span – top rail slopes down toward centre */}
+        <path d="M9,20 L33,23 L33,28 L9,25 Z"    fill={`url(#${g('gpr')})`}/>
+        <path d="M9,20 L33,23 L33,24.5 L9,21.5 Z" fill="rgba(255,255,255,0.30)"/>
+        {/* Left span – bottom rail slopes up toward centre */}
+        <path d="M9,45 L33,42 L33,47 L9,50 Z"    fill={`url(#${g('gpr')})`}/>
+        <path d="M9,45 L33,42 L33,43.5 L9,46.5 Z" fill="rgba(255,255,255,0.22)"/>
+        {/* Right span – top rail slopes up toward right */}
+        <path d="M40,23 L63,20 L63,25 L40,28 Z"   fill={`url(#${g('gpr')})`}/>
+        <path d="M40,23 L63,20 L63,21.5 L40,24.5 Z" fill="rgba(255,255,255,0.30)"/>
+        {/* Right span – bottom rail slopes down toward right */}
+        <path d="M40,42 L63,45 L63,50 L40,47 Z"   fill={`url(#${g('gpr')})`}/>
+        <path d="M40,42 L63,45 L63,46.5 L40,43.5 Z" fill="rgba(255,255,255,0.22)"/>
       </svg>
     );
 
