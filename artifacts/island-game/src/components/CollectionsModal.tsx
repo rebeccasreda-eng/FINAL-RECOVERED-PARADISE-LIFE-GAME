@@ -106,7 +106,11 @@ export const CollectionsModal = ({ onClose }: { onClose: () => void }) => {
                                  }}
                                  className="flex items-center gap-2 p-1.5 rounded-lg hover:bg-pink-50 text-left text-sm"
                                >
-                                 <span className="text-lg">{n.avatar}</span>
+                                 {n.avatar.startsWith('/') ? (
+                                   <img src={n.avatar} alt={n.name} className="w-7 h-7 rounded-full object-cover shrink-0" />
+                                 ) : (
+                                   <span className="text-lg">{n.avatar}</span>
+                                 )}
                                  <span className="font-bold flex-1 truncate">{n.name}</span>
                                  {n.wishlist.includes(c.id) && <span className="text-red-500 text-xs animate-bounce">❤️</span>}
                                </button>

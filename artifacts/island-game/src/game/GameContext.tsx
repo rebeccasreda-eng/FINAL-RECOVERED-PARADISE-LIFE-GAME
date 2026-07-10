@@ -33,8 +33,6 @@ const getInitialState = (): GameState => ({
   favorBar: 0,
   lastNeighborHire: 0,
   neighborsHiredToday: 0,
-  visitingNeighbor: null,
-  lastNeighborVisit: Date.now(),
   pendingResourceRequests: [],
   premiumBoosts: {}
 });
@@ -184,24 +182,6 @@ function gameReducer(state: GameState, action: GameAction): GameState {
 
       if (tilesChanged) {
         nextState = { ...nextState, tiles: nextTiles };
-        changed = true;
-      }
-
-      // Visiting Neighbor
-      if (!nextState.visitingNeighbor && now - nextState.lastNeighborVisit >= SCALED(300000)) {
-        const emptyGrass = Object.values(nextTiles).filter(t => t.type === 'GRASS' && !t.object);
-        if (emptyGrass.length > 0) {
-          const spawnTile = emptyGrass[Math.floor(Math.random() * emptyGrass.length)];
-          const neighbor = nextState.neighbors[Math.floor(Math.random() * nextState.neighbors.length)];
-          nextState = { 
-            ...nextState, 
-            visitingNeighbor: { neighborId: neighbor.id, tileId: spawnTile.id, expiresAt: now + SCALED(60000) },
-            lastNeighborVisit: now
-          };
-          changed = true;
-        }
-      } else if (nextState.visitingNeighbor && now > nextState.visitingNeighbor.expiresAt) {
-        nextState = { ...nextState, visitingNeighbor: null };
         changed = true;
       }
 
@@ -512,19 +492,6 @@ function gameReducer(state: GameState, action: GameAction): GameState {
       return checkQuestCompletions(nextState);
     }
 
-    case 'ACCEPT_NEIGHBOR_VISIT': {
-      if (!state.visitingNeighbor) return state;
-      const nextState = { ...state, visitingNeighbor: null, inventory: { ...state.inventory } };
-      nextState.inventory.coins += 10;
-      nextState.energy = Math.min(state.maxEnergy, state.energy + 5);
-      nextState.favorBar = Math.min(100, state.favorBar + 5);
-      return checkQuestCompletions(nextState);
-    }
-
-    case 'DECLINE_NEIGHBOR_VISIT': {
-      return { ...state, visitingNeighbor: null };
-    }
-
     case 'GIFT_ITEM': {
       if (!state.collections[action.itemId]) return state;
       const neighborIndex = state.neighbors.findIndex(n => n.id === action.neighborId);
@@ -616,8 +583,6 @@ export const GameProvider: React.FC<{children: React.ReactNode}> = ({ children }
             favorBar: typeof parsed.favorBar === 'number' ? parsed.favorBar : defaults.favorBar,
             lastNeighborHire: typeof parsed.lastNeighborHire === 'number' ? parsed.lastNeighborHire : defaults.lastNeighborHire,
             neighborsHiredToday: typeof parsed.neighborsHiredToday === 'number' ? parsed.neighborsHiredToday : defaults.neighborsHiredToday,
-            visitingNeighbor: parsed.visitingNeighbor || defaults.visitingNeighbor,
-            lastNeighborVisit: parsed.lastNeighborVisit || defaults.lastNeighborVisit,
             pendingResourceRequests: Array.isArray(parsed.pendingResourceRequests) ? parsed.pendingResourceRequests : [],
             premiumBoosts: parsed.premiumBoosts || {}
           };
@@ -632,7 +597,6 @@ export const GameProvider: React.FC<{children: React.ReactNode}> = ({ children }
   const [activeBuildItem, setActiveBuildItem] = useState<ObjectType | null>(null);
   const [shopOpen, setShopOpen] = useState(false);
   const [plantingTile, setPlantingTile] = useState<string | null>(null);
-  const [neighborVisitPrompt, setNeighborVisitPrompt] = useState(false);
   
   const [floatingTexts, setFloatingTexts] = useState<{id: string, tileId: string, text: string}[]>([]);
   const [questBanner, setQuestBanner] = useState<string | null>(null);
@@ -785,7 +749,6 @@ export const GameProvider: React.FC<{children: React.ReactNode}> = ({ children }
       activeBuildItem, setActiveBuildItem,
       shopOpen, setShopOpen,
       plantingTile, setPlantingTile,
-      neighborVisitPrompt, setNeighborVisitPrompt,
       questBanner, floatingTexts, tutorial,
       interact, plant, place
     }}>

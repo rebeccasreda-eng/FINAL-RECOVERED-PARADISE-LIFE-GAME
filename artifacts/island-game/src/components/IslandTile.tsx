@@ -122,7 +122,7 @@ export const IslandTile: React.FC<IslandTileProps> = ({
   const {
     state, dispatch, interact, plant, place,
     activeTool, activeBuildItem,
-    floatingTexts, setNeighborVisitPrompt,
+    floatingTexts,
   } = useGame();
   const { toast } = useToast();
 
@@ -150,12 +150,8 @@ export const IslandTile: React.FC<IslandTileProps> = ({
   };
 
   /* ── Derived state ── */
-  const isWater    = tile.type === 'WATER';
-  const isCleared  = tile.object === 'CLEARED_LAND' || tile.object === 'CROP_PLOT';
-  const isNeighbor = !!(state.visitingNeighbor && state.visitingNeighbor.tileId === tile.id);
-  const neighbor   = isNeighbor
-    ? state.neighbors.find(n => n.id === state.visitingNeighbor!.neighborId)
-    : null;
+  const isWater   = tile.type === 'WATER';
+  const isCleared = tile.object === 'CLEARED_LAND' || tile.object === 'CROP_PLOT';
 
   /* ── Diamond colours ── */
   const palette = isCleared ? COLORS.CLEARED : (COLORS[tile.type] ?? COLORS.GRASS);
@@ -168,8 +164,8 @@ export const IslandTile: React.FC<IslandTileProps> = ({
   }
 
   /* ── Object rendering — SVG art or emoji ── */
-  const hasSvg  = !isCleared && !isNeighbor && tile.object && SVG_OBJECTS.has(tile.object);
-  const doSway  = hasSvg && tile.object && SWAY_OBJECTS.has(tile.object);
+  const hasSvg = !isCleared && tile.object && SVG_OBJECTS.has(tile.object);
+  const doSway = hasSvg && tile.object && SWAY_OBJECTS.has(tile.object);
 
   let emoji = '';
   if (!hasSvg && tile.object && !isCleared) {
@@ -179,7 +175,6 @@ export const IslandTile: React.FC<IslandTileProps> = ({
       emoji = EMOJI_MAP[tile.object] || '';
     }
   }
-  if (isNeighbor && neighbor) emoji = neighbor.avatar;
 
   /* ── Crop timer ── */
   let badgeText    = '';
@@ -223,7 +218,7 @@ export const IslandTile: React.FC<IslandTileProps> = ({
         zIndex: tileZIndex,
         cursor: isWater ? 'default' : 'pointer',
       }}
-      onClick={isWater ? undefined : isNeighbor ? () => setNeighborVisitPrompt(true) : handleClick}
+      onClick={isWater ? undefined : handleClick}
       onMouseEnter={() => !isWater && setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       title={tooltip}
@@ -266,15 +261,6 @@ export const IslandTile: React.FC<IslandTileProps> = ({
             points="32,0 64,16 32,32 0,16"
             fill="rgba(239,68,68,0.28)"
             className="iso-danger-pulse"
-          />
-        )}
-
-        {/* Neighbour visit green pulse */}
-        {isNeighbor && (
-          <polygon
-            points="32,0 64,16 32,32 0,16"
-            fill="rgba(34,197,94,0.42)"
-            className="iso-visit-pulse"
           />
         )}
 

@@ -68,8 +68,6 @@ export interface GameState {
   favorBar: number;
   lastNeighborHire: number;
   neighborsHiredToday: number;
-  visitingNeighbor: { neighborId: string; tileId: string; expiresAt: number } | null;
-  lastNeighborVisit: number;
   pendingResourceRequests: { resource: ResourceType; amount: number; arrivesAt: number }[];
   premiumBoosts: Record<string, number>;
 }
@@ -88,8 +86,6 @@ export type GameAction =
   | { type: 'VISIT_NEIGHBOR', neighborId: string }
   | { type: 'HIRE_NEIGHBOR', neighborId: string }
   | { type: 'TRADE_COLLECTION', setId: string }
-  | { type: 'ACCEPT_NEIGHBOR_VISIT' }
-  | { type: 'DECLINE_NEIGHBOR_VISIT' }
   | { type: 'GIFT_ITEM', itemId: string, neighborId: string }
   | { type: 'REQUEST_UNWITHER', tileId: string }
   | { type: 'REQUEST_RESOURCE', resource: ResourceType, amount: number }
@@ -110,6 +106,4 @@ export interface GameContextType {
   interact: (tileId: string) => void;
   plant: (tileId: string, cropType?: string) => void;
   place: (tileId: string, obj: ObjectType) => void;
-  neighborVisitPrompt: boolean;
-  setNeighborVisitPrompt: (v: boolean) => void;
 }

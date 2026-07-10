@@ -67,7 +67,7 @@ export const EMOJI_MAP: Record<string, string> = {
 };
 
 export const INITIAL_NEIGHBORS = [
-  { id: 'n1', name: 'TropicalTina', avatar: '👩‍🌾', level: 3, favorPoints: 0, wishlist: ['starfish'] },
+  { id: 'n1', name: 'Marina', avatar: '/marina.jpg', level: 1, favorPoints: 0, wishlist: ['starfish'] },
   { id: 'n2', name: 'IslandIan', avatar: '👨‍🌾', level: 5, favorPoints: 0, wishlist: ['pearl'] },
   { id: 'n3', name: 'CoconutCara', avatar: '🧑‍🌾', level: 7, favorPoints: 0, wishlist: ['conch', 'crab_claw'] }
 ];

@@ -212,7 +212,11 @@ const NeighborPortrait = ({
         className="absolute inset-[3px] rounded-[50%_50%_5px_5px] overflow-hidden flex items-center justify-center"
         style={{ background: 'linear-gradient(180deg, #c0e8ff 0%, #70b0e0 50%, #a0d060 100%)' }}
       >
-        <span className="text-4xl">{n.avatar}</span>
+        {n.avatar.startsWith('/') ? (
+          <img src={n.avatar} alt={n.name} className="w-full h-full object-cover" />
+        ) : (
+          <span className="text-4xl">{n.avatar}</span>
+        )}
       </div>
       {/* Level badge */}
       <div
