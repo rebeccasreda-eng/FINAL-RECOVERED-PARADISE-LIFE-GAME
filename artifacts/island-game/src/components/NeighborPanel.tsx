@@ -3,7 +3,7 @@ import { useGame } from '../game/GameContext';
 import { EMOJI_MAP } from '../game/gameData';
 import { ResourceType } from '../game/types';
 
-type QuickTab = 'player' | 'market' | null;
+type QuickTab = 'player' | 'market' | 'marina' | null;
 
 /* ─── Tiny SVG icons ──────────────────────────────────────────────────────── */
 const IcoAxe = () => (
@@ -773,69 +773,34 @@ export const NeighborPanel = ({
             {/* 5 Add-Neighbor cards — flex-fill */}
             {Array.from({ length: 5 }, (_, i) => <AddNeighborCard key={i} />)}
 
-            {/* Thin divider before market */}
+            {/* Thin divider before tabs */}
             <div style={{ width: 2, background: 'rgba(0,0,0,0.28)', borderRadius: 1, flexShrink: 0, margin: '2px 4px' }} />
 
-            {/* Market grid — far right */}
-            <InlineMarketGrid
-              onOpenShop={() => setShopOpen(true)}
-              onOpenQuests={onOpenQuests}
-              onOpenCollections={onOpenCollections}
-            />
+            {/* PLAYER / MARKET / MARINA tabs */}
+            <QuickTabBtn label="PLAYER" emoji="🧑" active={quickTab === 'player'} onClick={() => toggleTab('player')} />
+            <QuickTabBtn label="MARKET" emoji="🛒" active={quickTab === 'market'} onClick={() => toggleTab('market')} />
+            <QuickTabBtn label="MARINA" emoji="⚓" active={quickTab === 'marina'} onClick={() => toggleTab('marina')} />
           </div>
         </div>
 
         {/* ── Separator ──────────────────────────────────────────────────── */}
         <div style={{ width: 2, background: 'rgba(0,0,0,0.30)', alignSelf: 'stretch', margin: '4px 0' }}/>
 
-        {/* ── Right dock — tool tiles only ───────────────────────────────── */}
+        {/* ── Right dock — market grid ────────────────────────────────────── */}
         <div
           style={{
-            width: 210, flexShrink: 0,
+            flexShrink: 0,
             background: 'linear-gradient(180deg, #7a5c30 0%, #4a3010 100%)',
             borderLeft: '2px solid #3a2008',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
-            padding: '0 8px',
+            padding: '0 10px',
           }}
         >
-          <div style={{ display: 'flex', gap: 5 }}>
-            <ToolTile
-              onClick={() => setActiveTool('clear')}
-              active={activeTool === 'clear'}
-              bg="linear-gradient(180deg, #7090b8 0%, #405878 100%)"
-              label="Clear"
-            ><IcoAxe /></ToolTile>
-
-            <ToolTile
-              onClick={() => setActiveTool('plant')}
-              active={activeTool === 'plant'}
-              bg="linear-gradient(180deg, #60c038 0%, #308818 100%)"
-              label="Plant"
-            ><IcoPlant /></ToolTile>
-
-            <ToolTile
-              onClick={() => {
-                setActiveTool('build');
-                if (!activeBuildItem && ownedStructures.length > 0)
-                  setActiveBuildItem(ownedStructures[0] as any);
-              }}
-              active={activeTool === 'build'}
-              bg="linear-gradient(180deg, #608858 0%, #385038 100%)"
-              label="Build"
-            ><IcoBuild /></ToolTile>
-
-            <ToolTile
-              onClick={() => onOpenQuests?.()}
-              bg="linear-gradient(180deg, #c07830 0%, #885020 100%)"
-              label="Quests"
-            ><IcoQuest /></ToolTile>
-
-            <ToolTile
-              onClick={() => onOpenCollections?.()}
-              bg="linear-gradient(180deg, #9060c8 0%, #603898 100%)"
-              label="Collections"
-            ><IcoCollect /></ToolTile>
-          </div>
+          <InlineMarketGrid
+            onOpenShop={() => setShopOpen(true)}
+            onOpenQuests={onOpenQuests}
+            onOpenCollections={onOpenCollections}
+          />
         </div>
       </div>
 
