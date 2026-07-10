@@ -101,10 +101,7 @@ const NeighbourCard = ({ portrait, name, hearts, stars, onClick }: NeighbourCard
       {/* Portrait inset */}
       <div
         className="absolute overflow-hidden flex items-center justify-center"
-        style={{
-          inset: 3,
-          borderRadius: '50% 50% 7px 7px',
-        }}
+        style={{ inset: 3, borderRadius: '50% 50% 7px 7px' }}
       >
         {portrait}
       </div>
@@ -127,28 +124,82 @@ const NeighbourCard = ({ portrait, name, hearts, stars, onClick }: NeighbourCard
       {name}
     </span>
 
-    {/* Heart badges row */}
-    <div className="flex items-center gap-0.5 mt-0.5">
-      {Array.from({ length: Math.min(hearts, 3) }).map((_, i) => (
-        <div
-          key={i}
-          className="flex items-center justify-center"
-          style={{
-            width: 16, height: 16,
-            background: 'linear-gradient(180deg, #e84444, #a81818)',
-            borderRadius: '50% 50% 48% 48%',
-            border: '1.5px solid #7a1010',
-            boxShadow: '0 2px 4px rgba(0,0,0,0.35)',
-          }}
-        >
-          <span style={{ fontSize: 8, color: 'white', fontWeight: 900, lineHeight: 1 }}>{i + 1}</span>
-        </div>
-      ))}
-      {/* Stars */}
-      {Array.from({ length: Math.min(stars, 3) }).map((_, i) => (
-        <span key={`s${i}`} style={{ fontSize: 9 }}>⭐</span>
-      ))}
+    {/* Heart + Star count badges — matching reference layout */}
+    <div className="flex items-center gap-1 mt-0.5">
+      {/* Heart badge */}
+      <div
+        className="flex items-center gap-0.5"
+        style={{
+          background: 'linear-gradient(180deg, #e84444, #a81818)',
+          borderRadius: 8,
+          border: '1.5px solid #7a1010',
+          padding: '1px 4px',
+          boxShadow: '0 2px 4px rgba(0,0,0,0.40)',
+        }}
+      >
+        <span style={{ fontSize: 7, lineHeight: 1 }}>❤️</span>
+        <span style={{ fontSize: 8, color: 'white', fontWeight: 900, lineHeight: 1 }}>{hearts}</span>
+      </div>
+      {/* Star badge */}
+      <div
+        className="flex items-center gap-0.5"
+        style={{
+          background: 'linear-gradient(180deg, #ffe860, #c89000)',
+          borderRadius: 8,
+          border: '1.5px solid #9a6800',
+          padding: '1px 4px',
+          boxShadow: '0 2px 4px rgba(0,0,0,0.35)',
+        }}
+      >
+        <span style={{ fontSize: 7, lineHeight: 1 }}>⭐</span>
+        <span style={{ fontSize: 8, color: '#4a2800', fontWeight: 900, lineHeight: 1 }}>{stars}</span>
+      </div>
     </div>
+  </div>
+);
+
+/* ─── Add Neighbor empty slot ─────────────────────────────────────────────── */
+const AddNeighborCard = () => (
+  <div className="flex flex-col items-center shrink-0" style={{ width: 68 }}>
+    <button
+      aria-label="Add Neighbor"
+      style={{
+        width: 64,
+        height: 72,
+        borderRadius: 10,
+        background: 'linear-gradient(180deg, #e2d9c8 0%, #cec4b0 100%)',
+        border: '2.5px solid #a08868',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: 4,
+        boxShadow: '0 2px 6px rgba(0,0,0,0.28), inset 0 1px 3px rgba(255,255,255,0.55)',
+        cursor: 'pointer',
+        padding: 0,
+      }}
+    >
+      {/* Big "?" */}
+      <span
+        style={{
+          fontSize: 28,
+          fontWeight: 900,
+          color: '#b0a090',
+          lineHeight: 1,
+          textShadow: '0 1px 2px rgba(0,0,0,0.18)',
+        }}
+      >?</span>
+      {/* Label */}
+      <span
+        style={{
+          fontSize: 8,
+          fontWeight: 900,
+          color: '#6a5030',
+          textAlign: 'center',
+          lineHeight: 1.2,
+        }}
+      >Add<br/>Neighbor</span>
+    </button>
   </div>
 );
 
@@ -279,12 +330,17 @@ export const NeighborPanel = ({ playerName = 'Player', playerLevel = 1 }: Neighb
         </div>
       </div>
 
-      {/* ── NEIGHBOUR CARDS: Player + Marina ── */}
+      {/* ── NEIGHBOUR CARDS: Player + Marina + 5 empty slots ── */}
       <div
-        className="flex items-center gap-2 px-3 shrink-0"
-        style={{ borderRight: '2px solid #5a3a10' }}
+        className="flex items-center gap-2 px-3 overflow-x-auto"
+        style={{
+          borderRight: '2px solid #5a3a10',
+          maxWidth: 380,
+          minWidth: 0,
+          flexShrink: 1,
+        }}
       >
-        {/* Player card */}
+        {/* Player card — no photo, keeps exact layout */}
         <NeighbourCard
           portrait={<PlayerPortrait />}
           name={playerName}
@@ -292,14 +348,14 @@ export const NeighborPanel = ({ playerName = 'Player', playerLevel = 1 }: Neighb
           stars={1}
         />
 
-        {/* Marina card */}
+        {/* Marina card — ❤️1 ⭐5 matching reference */}
         {marina && (
           <div className="flex flex-col items-center gap-1">
             <NeighbourCard
               portrait={<MarinaPortrait />}
               name="Marina"
-              hearts={3}
-              stars={2}
+              hearts={1}
+              stars={5}
               onClick={() => handleVisit(marina)}
             />
             {/* Hire button */}
@@ -318,6 +374,11 @@ export const NeighborPanel = ({ playerName = 'Player', playerLevel = 1 }: Neighb
             </button>
           </div>
         )}
+
+        {/* 5 empty Add Neighbor slots */}
+        {Array.from({ length: 5 }).map((_, i) => (
+          <AddNeighborCard key={i} />
+        ))}
       </div>
 
       {/* ── NAV ARROWS (4 stacked) ── */}
