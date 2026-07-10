@@ -1229,6 +1229,128 @@ const ObjectSVG: React.FC<{ object: string; tileX: number; tileY: number; tileTy
       );
     }
 
+    /* ── DOCK — wooden pier with moored rowboat ─────────────────────────── */
+    case 'DOCK': {
+      const dg = g('dg'), dpst = g('dpst'), dbt = g('dbt');
+      return (
+        <svg viewBox="0 0 98 88" width="94" height="84" style={{ display: 'block' }}>
+          <defs>
+            <linearGradient id={dg} x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%"   stopColor="#ddb468"/>
+              <stop offset="100%" stopColor="#a07830"/>
+            </linearGradient>
+            <linearGradient id={dpst} x1="0" y1="0" x2="1" y2="0">
+              <stop offset="0%"   stopColor="#cc9c48"/>
+              <stop offset="100%" stopColor="#6a3c10"/>
+            </linearGradient>
+            <linearGradient id={dbt} x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%"   stopColor="#e4c472"/>
+              <stop offset="100%" stopColor="#96601c"/>
+            </linearGradient>
+          </defs>
+
+          {/* Ground shadow */}
+          <ellipse cx="49" cy="86" rx="44" ry="5" fill="rgba(0,0,0,0.20)"/>
+
+          {/* ── Water ── */}
+          <rect x="2" y="68" width="94" height="18" rx="3" fill="#1ab4e8"/>
+          <path d="M4,73 Q14,70 26,73 Q38,76 50,73 Q62,70 74,73 Q86,76 94,73"
+            stroke="rgba(160,235,255,0.55)" strokeWidth="1.6" fill="none"/>
+          <path d="M2,79 Q16,76 30,79 Q44,82 58,79 Q72,76 92,79"
+            stroke="rgba(160,235,255,0.38)" strokeWidth="1.3" fill="none"/>
+
+          {/* ── Pilings (4 posts) ── */}
+          <rect x="11" y="46" width="8" height="40" rx="3" fill={`url(#${dpst})`}/>
+          <ellipse cx="15" cy="46" rx="4" ry="2" fill="#cc9c48"/>
+          <rect x="79" y="46" width="8" height="40" rx="3" fill={`url(#${dpst})`}/>
+          <ellipse cx="83" cy="46" rx="4" ry="2" fill="#cc9c48"/>
+          <rect x="13" y="60" width="6" height="26" rx="2" fill="#7a4820"/>
+          <rect x="79" y="60" width="6" height="26" rx="2" fill="#7a4820"/>
+
+          {/* ── Deck planks ── */}
+          {([46,51,56,61,66] as number[]).map((y, i) => (
+            <rect key={i} x="11" y={y} width="76" height="5.5" rx="0.5"
+              fill={i % 2 === 0 ? '#d2a050' : '#c49038'}
+              stroke="#8a5820" strokeWidth="0.55"/>
+          ))}
+          {/* Deck side rails */}
+          <rect x="11" y="46" width="3" height="25" fill="#7a4820"/>
+          <rect x="84" y="46" width="3" height="25" fill="#7a4820"/>
+          {/* Vertical plank joints */}
+          {([30, 49, 67] as number[]).map(x => (
+            <line key={x} x1={x} y1="46" x2={x} y2="70"
+              stroke="#7a4820" strokeWidth="0.65" opacity="0.45"/>
+          ))}
+
+          {/* ── Flag pole (back-left) ── */}
+          <rect x="14" y="5" width="4" height="43" rx="1.5" fill="#8a5e20"/>
+          <path d="M14,5 L14,45" stroke="rgba(255,255,255,0.18)" strokeWidth="1.2" fill="none"/>
+          {/* Pennant flag */}
+          <path d="M18,6 L42,13 L18,22 Z" fill="#1d66d4"/>
+          <path d="M20,12 Q28,10 38,14" stroke="rgba(160,220,255,0.70)" strokeWidth="1.4" fill="none"/>
+          <path d="M20,17 Q26,15 32,18"  stroke="rgba(160,220,255,0.50)" strokeWidth="1.1" fill="none"/>
+          {/* Sheen on flag */}
+          <path d="M18,6 L24,8 L24,22 L18,22 Z" fill="rgba(255,255,255,0.10)"/>
+
+          {/* ── Barrel (back-right) ── */}
+          <ellipse cx="70" cy="45" rx="9.5" ry="3.5" fill="#8a5c28"/>
+          <rect x="60.5" y="45" width="19" height="18" fill="#9e6c30"/>
+          <ellipse cx="70" cy="63" rx="9.5" ry="3.5" fill="#7a4c1c"/>
+          {([49.5, 55.5, 61] as number[]).map(y => (
+            <ellipse key={y} cx="70" cy={y} rx="9.5" ry="3.5"
+              fill="none" stroke="#2e1808" strokeWidth="2.0"/>
+          ))}
+          <path d="M63,46 Q62,54 63,63" stroke="rgba(255,255,255,0.22)"
+            strokeWidth="2.5" fill="none" strokeLinecap="round"/>
+
+          {/* ── Crate / storage box (centre-left deck) ── */}
+          <rect x="30" y="48" width="18" height="15" rx="2" fill="#e0c468"/>
+          <rect x="30" y="48" width="18" height="15" rx="2" fill="none"
+            stroke="#9a7828" strokeWidth="1.2"/>
+          <line x1="39" y1="48" x2="39" y2="63" stroke="#9a7828" strokeWidth="0.9"/>
+          <line x1="30" y1="55" x2="48" y2="55" stroke="#9a7828" strokeWidth="0.9"/>
+          <rect x="36" y="46.5" width="6" height="2.5" rx="1.2" fill="#c8a040"/>
+
+          {/* ── Life preserver (right front post) ── */}
+          <circle cx="83" cy="44" r="7.5" fill="white"/>
+          <circle cx="83" cy="44" r="7.5" fill="none" stroke="#dd2020" strokeWidth="3.5"
+            strokeDasharray="11.7 11.7"/>
+          <circle cx="83" cy="44" r="3.2" fill="white"/>
+
+          {/* ── Rowboat moored at front ── */}
+          <ellipse cx="49" cy="82" rx="33" ry="5" fill="rgba(0,0,0,0.18)"/>
+          {/* Hull */}
+          <path d="M17,77 Q22,63 49,60 Q76,63 81,77 Q68,83 49,84 Q30,83 17,77Z"
+            fill={`url(#${dbt})`}/>
+          <path d="M17,77 Q22,63 49,60 Q76,63 81,77"
+            stroke="#7a3e10" strokeWidth="1.8" fill="none"/>
+          {/* Interior */}
+          <path d="M22,76 Q27,66 49,64 Q71,66 76,76 Q65,79 49,80 Q33,79 22,76Z"
+            fill="#d0a858"/>
+          {/* Interior side shadow */}
+          <path d="M22,76 Q24,68 29,65" stroke="rgba(0,0,0,0.14)" strokeWidth="2.5"
+            fill="none" strokeLinecap="round"/>
+          <path d="M76,76 Q74,68 69,65" stroke="rgba(0,0,0,0.14)" strokeWidth="2.5"
+            fill="none" strokeLinecap="round"/>
+          {/* Seat planks */}
+          <rect x="36" y="66" width="26" height="3.5" rx="1" fill="#b89040"/>
+          <rect x="33" y="71" width="32" height="3.5" rx="1" fill="#b89040"/>
+          {/* Oars */}
+          <path d="M21,77 Q10,74 3,70" stroke="#9a6830" strokeWidth="3.5"
+            fill="none" strokeLinecap="round"/>
+          <ellipse cx="2.5" cy="70" rx="5.5" ry="2.5" fill="#b88038"
+            transform="rotate(-22 2.5 70)"/>
+          <path d="M77,77 Q88,74 95,70" stroke="#9a6830" strokeWidth="3.5"
+            fill="none" strokeLinecap="round"/>
+          <ellipse cx="95.5" cy="70" rx="5.5" ry="2.5" fill="#b88038"
+            transform="rotate(22 95.5 70)"/>
+          {/* Mooring rope to dock */}
+          <path d="M49,60 Q30,60 15,62" stroke="#c8a050" strokeWidth="1.3"
+            fill="none" strokeLinecap="round" strokeDasharray="3 2"/>
+        </svg>
+      );
+    }
+
     /* ── TALL ROCK — standing stone with weeds at the base ──────────────── */
     case 'TALL_ROCK': {
       const trg = g('trg'), trs = g('trs');
@@ -1374,7 +1496,7 @@ const CHOP_TREES = new Set(['TREE_PALM', 'TREE_APPLE', 'TREE_COCONUT', 'TREE_MAN
 /** Objects that use SVG art instead of emoji */
 const SVG_OBJECTS = new Set(['TREE_PALM', 'TREE_APPLE', 'ROCK', 'FLOWER_BUSH', 'DRIFTWOOD',
   'TREE_COCONUT', 'TREE_MANGO', 'GARDEN_PATCH', 'WEEDS', 'SUNFLOWER', 'PUDDLE', 'THORNS',
-  'BLUEBELL', 'PANSY', 'TULIP', 'PINEAPPLE_PLANT', 'BLUEBERRY_BUSH', 'BABY_PARROT', 'TALL_ROCK']);
+  'BLUEBELL', 'PANSY', 'TULIP', 'PINEAPPLE_PLANT', 'BLUEBERRY_BUSH', 'BABY_PARROT', 'TALL_ROCK', 'DOCK']);
 /** Objects that sway in the breeze */
 const SWAY_OBJECTS = new Set(['TREE_PALM', 'TREE_APPLE', 'TREE_COCONUT', 'TREE_MANGO']);
 

@@ -154,6 +154,7 @@ export const OBJECT_CONFIG: Record<string, any> = {
   BOAR:        { action: 'Shoo',  energy: 1, coins: 8, xp: 12 },
   BABY_PARROT: { action: 'Feed',  energy: 0, coins: 2, xp: 5  },
   TALL_ROCK:   { action: 'Mine', energy: 1, coins: 10, xp: 18, drops: { stone: 2 }, respawn: SCALED(120000) },
+  DOCK:        { action: 'Visit', energy: 0, coins: 0, xp: 0 },
 };
 
 export const EMOJI_MAP: Record<string, string> = {
@@ -339,7 +340,22 @@ export function generateIsland(): Record<string, TileData> {
   for (let i = 0; i < 4  && inner.length; i++) pick(inner).object = 'BABY_PARROT';
 
   const waterTiles = Object.values(tiles).filter(t => t.type === 'WATER');
-  for (let i = 0; i < 6 && waterTiles.length; i++) pick(waterTiles).object = 'FISH_SPOT';
+
+  // ── Marina dock — place on the interior channel water tile closest to centre ─
+  const interiorWater = waterTiles.filter(t => {
+    const dirs = [[-1,0],[1,0],[0,-1],[0,1]] as const;
+    return dirs.some(([dx,dy]) => {
+      const nb = tiles[`${t.x+dx},${t.y+dy}`];
+      return nb && (nb.type === 'SAND' || nb.type === 'GRASS');
+    });
+  }).sort((a, b) => {
+    const da = (a.x - CX) ** 2 + (a.y - CY) ** 2;
+    const db = (b.x - CX) ** 2 + (b.y - CY) ** 2;
+    return da - db;
+  });
+  if (interiorWater.length && !interiorWater[0].object) {
+    interiorWater[0].object = 'DOCK';
+  }
 
   // ── Puddles near trees — small water pools under the canopy ─────────────
   const ALL_TREE_TYPES: ObjectType[] = ['TREE_COCONUT', 'TREE_MANGO', 'TREE_APPLE', 'TREE_PALM'];
