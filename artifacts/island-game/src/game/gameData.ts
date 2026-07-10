@@ -93,79 +93,103 @@ export const INITIAL_NEIGHBORS = [
 
 export function generateIsland(): Record<string, TileData> {
   const GRID = 31;
-  const TW = 64, TH = 32;
-  // Center tile is (15,15); all iso coords are relative to it
-  const originX = 0;   // (cx-cy)*(TW/2) = 0 since cx=cy=15
-  const originY = 480; // (cx+cy)*(TH/2) = 30*16
+  const CX = 15, CY = 15; // island centre tile
 
-  // Iso coords of tile (x,y) relative to center
-  const isoX = (x: number, y: number) => (x - y) * (TW / 2) - originX;
-  const isoY = (x: number, y: number) => (x + y) * (TH / 2) - originY;
+  // ── Terrain value ───────────────────────────────────────────────────────
+  // radial: 1 at centre → 0 at ellipse edge → negative outside.
+  // Sinusoidal waves (amplitude grows toward the edge) carve water channels
+  // inward from the coastline, replicating the reference's fjord-like inlets.
+  const terrainVal = (x: number, y: number): number => {
+    const dx = x - CX, dy = y - CY;
+    const distSq = (dx * dx) / (13.5 * 13.5) + (dy * dy) / (11.5 * 11.5);
+    const radial  = 1.0 - distSq;
+    // Edge factor: 0 at centre, 1 at & beyond the ellipse boundary
+    const ef = Math.max(0, Math.min(1.0, 1.0 - radial));
+    const w1 = Math.sin((dx - dy) * Math.PI / 5.2)                   * 0.70 * ef;
+    const w2 = Math.cos((dx + dy + 1.5) * Math.PI / 6.8)             * 0.65 * ef;
+    const w3 = Math.sin((dx * 1.2 - dy * 0.8 + 2.0) * Math.PI / 4.5) * 0.40 * ef;
+    return radial + w1 + w2 + w3;
+  };
 
-  // Build type map for all 31×31 tiles
-  const tmap: number[][] = [];
-  for (let y = 0; y < GRID; y++) {
-    tmap[y] = [];
-    for (let x = 0; x < GRID; x++) {
-      const sx = isoX(x, y), sy = isoY(x, y);
-      const e = (sx * sx) / (500 * 500) + (sy * sy) / (160 * 160);
-      tmap[y][x] = e < 1 ? 2 : (e < 1.35 ? 1 : 0);
-    }
-  }
+  // ── Classify terrain ────────────────────────────────────────────────────
+  const classifyTile = (x: number, y: number): TileType | null => {
+    const dx = x - CX, dy = y - CY;
+    const distSq = (dx * dx) / (13.5 * 13.5) + (dy * dy) / (11.5 * 11.5);
+    const radial  = 1.0 - distSq;
+    if (radial < -0.38) return null;   // too far outside — skip entirely
+    if (radial <= 0)    return 'WATER'; // outside base ellipse → open ocean
+    const tv = terrainVal(x, y);
+    if (tv > 0.52) return 'GRASS';
+    if (tv > 0.15) return 'SAND';
+    return 'WATER'; // inland channel carved by wave trough
+  };
 
-  // Create tile data only for tiles within the rendered ellipse (e ≤ 1.8)
+  // ── Build tile map ──────────────────────────────────────────────────────
   const tiles: Record<string, TileData> = {};
   for (let y = 0; y < GRID; y++) {
     for (let x = 0; x < GRID; x++) {
-      const sx = isoX(x, y), sy = isoY(x, y);
-      const e = (sx * sx) / (500 * 500) + (sy * sy) / (160 * 160);
-      if (e > 1.8) continue;
-      let type: TileType = 'WATER';
-      if (e < 1) type = 'GRASS';
-      else if (e < 1.35) type = 'SAND';
-      tiles[`${x},${y}`] = { id: `${x},${y}`, x, y, type };
+      const type = classifyTile(x, y);
+      if (!type) continue;
+      const id = `${x},${y}`;
+      tiles[id] = { id, x, y, type };
     }
   }
 
-  // Seeded PRNG — identical LCG to the HTML reference for deterministic layout
-  let seed = 7;
+  // ── Seeded PRNG ─────────────────────────────────────────────────────────
+  let seed = 42;
   const rand = () => { seed = (seed * 9301 + 49297) % 233280; return seed / 233280; };
 
-  // Place natural decorations
+  // ── Forest intensity: high near island edge, low at centre ──────────────
+  // Clusters trees toward the coastal/periphery areas like the reference.
+  const forestFactor = (x: number, y: number): number => {
+    const dx = x - CX, dy = y - CY;
+    const r = Math.sqrt(dx * dx + dy * dy);
+    return Math.max(0, Math.min(1, (r - 3) / 8)); // 0 within r=3, reaches 1 at r=11
+  };
+
+  // ── Object placement ────────────────────────────────────────────────────
   for (let y = 0; y < GRID; y++) {
     for (let x = 0; x < GRID; x++) {
+      if (x === CX && y === CY) continue; // keep player-start tile clear
       const tile = tiles[`${x},${y}`];
-      const t = tmap[y][x];
-      if (t === 2) {           // grass
-        if (rand() < 0.1) {
-          if (tile && !tile.object) tile.object = 'TREE_PALM';
-        } else if (rand() < 0.08) {
-          if (tile && !tile.object) tile.object = 'FLOWER_BUSH';
+      if (!tile) continue;
+      const ff = forestFactor(x, y);
+
+      if (tile.type === 'GRASS') {
+        const r = rand();
+        const treePct   = 0.05 + ff * 0.26; // 5% at centre → 31% at edge
+        const floralPct = treePct + 0.09;    // additional 9% flowers / ground cover
+
+        if (r < treePct) {
+          const tr = rand();
+          if      (tr < 0.42 + ff * 0.16) tile.object = 'TREE_PALM';
+          else if (tr < 0.68)              tile.object = 'TREE_COCONUT';
+          else if (tr < 0.84)              tile.object = 'TREE_MANGO';
+          else                             tile.object = 'TREE_APPLE';
+        } else if (r < floralPct) {
+          tile.object = rand() < 0.58 ? 'FLOWER_BUSH' : 'GRASS_PATCH';
         }
-      } else if (t === 1) {   // sand
-        if (rand() < 0.08) {
-          if (tile && !tile.object) tile.object = 'ROCK';
-        } else if (rand() < 0.05) {
-          if (tile && !tile.object) tile.object = 'DRIFTWOOD';
-        }
+      } else if (tile.type === 'SAND') {
+        const r = rand();
+        if      (r < 0.13) tile.object = 'ROCK';
+        else if (r < 0.20) tile.object = 'DRIFTWOOD';
       }
-      // water (t=0): no rand() calls — matches HTML
     }
   }
 
-  // Additional game-specific objects placed after the main seeded loop
-  const emptyGrass = Object.values(tiles).filter(t => t.type === 'GRASS' && !t.object);
+  // ── Special game objects ────────────────────────────────────────────────
   const pick = (arr: TileData[]) => arr.splice(Math.floor(rand() * arr.length), 1)[0];
 
-  for (let i = 0; i < 6  && emptyGrass.length; i++) pick(emptyGrass).object = 'TREE_APPLE';
-  for (let i = 0; i < 8  && emptyGrass.length; i++) pick(emptyGrass).object = 'TREE_COCONUT';
-  for (let i = 0; i < 6  && emptyGrass.length; i++) pick(emptyGrass).object = 'TREE_MANGO';
-  for (let i = 0; i < 4  && emptyGrass.length; i++) pick(emptyGrass).object = 'GARDEN_PATCH';
-  for (let i = 0; i < 12 && emptyGrass.length; i++) pick(emptyGrass).object = 'GRASS_PATCH';
-  for (let i = 0; i < 3  && emptyGrass.length; i++) pick(emptyGrass).object = 'CROP_PLOT';
+  const emptyGrass = Object.values(tiles).filter(t => t.type === 'GRASS' && !t.object);
+  const inner = emptyGrass.filter(t => forestFactor(t.x, t.y) < 0.40);
+  const outer = emptyGrass.filter(t => forestFactor(t.x, t.y) >= 0.40);
+
+  for (let i = 0; i < 3 && inner.length; i++) pick(inner).object = 'GARDEN_PATCH';
+  for (let i = 0; i < 3 && inner.length; i++) pick(inner).object = 'CROP_PLOT';
+  for (let i = 0; i < 5 && outer.length;  i++) pick(outer).object  = 'GRASS_PATCH';
 
   const waterTiles = Object.values(tiles).filter(t => t.type === 'WATER');
-  for (let i = 0; i < 4 && waterTiles.length; i++) pick(waterTiles).object = 'FISH_SPOT';
+  for (let i = 0; i < 6 && waterTiles.length; i++) pick(waterTiles).object = 'FISH_SPOT';
 
   return tiles;
 }

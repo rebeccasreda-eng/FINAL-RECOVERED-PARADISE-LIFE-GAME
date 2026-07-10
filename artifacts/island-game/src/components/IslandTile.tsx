@@ -547,7 +547,7 @@ export const IslandTile: React.FC<IslandTileProps> = ({
 
   /* ── Object rendering — SVG art or emoji ── */
   const hasSvg = !isCleared && tile.object && SVG_OBJECTS.has(tile.object);
-  const doSway = hasSvg && tile.object && SWAY_OBJECTS.has(tile.object);
+  // (sway intentionally disabled — keeping SWAY_OBJECTS for future use)
 
   let emoji = '';
   if (!hasSvg && tile.object && !isCleared) {
@@ -749,10 +749,8 @@ export const IslandTile: React.FC<IslandTileProps> = ({
         )}
       </svg>
 
-      {/* ── Fish jumping in water ── */}
-      {isWater && (() => {
-        const hash1 = (tile.x * 7 + tile.y * 11) % 5;
-        const hash2 = (tile.x * 3 + tile.y * 13) % 5;
+      {/* ── Fish jumping in water — ~1 in 5 water tiles ── */}
+      {isWater && (tile.x * 7 + tile.y * 11) % 5 === 0 && (() => {
         const fish: React.ReactNode[] = [];
 
         const makeFish = (key: string, delay: number, offsetX: number, orange: boolean) => {
@@ -788,18 +786,12 @@ export const IslandTile: React.FC<IslandTileProps> = ({
           );
         };
 
-        // Primary fish — 1 in 5 water tiles
-        if (hash1 === 0) {
-          const delay = (tile.x * 5 + tile.y * 7) % 13;
-          fish.push(makeFish('f1', delay, -4, (tile.x + tile.y) % 2 === 0));
-        }
-        // Secondary fish — different 1-in-5 subset, slightly offset & different timing
-        if (hash2 === 0 && hash1 !== 0) {
-          const delay = (tile.x * 11 + tile.y * 3) % 13 + 6;
-          fish.push(makeFish('f2', delay, 5, (tile.x + tile.y) % 2 !== 0));
-        }
+        // Deterministic delay and colour variant — independent of spawn predicate
+        const delay   = (tile.x * 5 + tile.y * 7) % 13;
+        const orange  = (tile.x + tile.y) % 2 === 0;
+        fish.push(makeFish('f1', delay, -4, orange));
 
-        return fish.length > 0 ? <>{fish}</> : null;
+        return <>{fish}</>;
       })()}
 
       {/* ── SVG art object (trees, rocks, flowers, driftwood) ── */}

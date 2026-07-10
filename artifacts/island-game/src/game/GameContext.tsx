@@ -608,7 +608,7 @@ export const GameProvider: React.FC<{children: React.ReactNode}> = ({ children }
   const { toast } = useToast();
   
   const [state, dispatch] = useReducer(gameReducer, undefined, () => {
-    const saved = localStorage.getItem('island-game-state-v8');
+    const saved = localStorage.getItem('island-game-state-v9');
     if (saved) {
       try {
         const parsed = JSON.parse(saved);
@@ -656,7 +656,7 @@ export const GameProvider: React.FC<{children: React.ReactNode}> = ({ children }
   const [questBanner, setQuestBanner] = useState<string | null>(null);
 
   useEffect(() => {
-    localStorage.setItem('island-game-state-v8', JSON.stringify(state));
+    localStorage.setItem('island-game-state-v9', JSON.stringify(state));
   }, [state]);
 
   useEffect(() => {

@@ -1,4 +1,4 @@
 - [Island game character system](char-system.md) — CustomizableCharSVG uses CharAppearance; fro hair must render before the head circle (SVG paint order); all 12 dressing room tabs are now functional.
 - [Island game WelcomeScreen profile](welcome-profile.md) — PlayerProfile uses CharAppearance (not raw skinTone/hairColor strings); characterId derived via pickCharacterId(gender, hairStyle).
-- [Island game world layout](island-layout.md) — 21×21 ellipse; TW=80,TH=28; WORLD_W=1200,WORLD_H=560; all four (TW,TH,SVG,TH_HALF) must change together; localStorage key v6.
+- [Island game world layout](island-layout.md) — 31×31 grid; sinusoidal terrain channels; WORLD_W=2200,WORLD_H=1000; localStorage key v9.
 - [Island game crop-timer crash](crop-timer-crash.md) — IslandTile crop-timer path crashes if cropType from localStorage isn't in CROP_TYPES; always guard cc existence before accessing cc.growTime/wiltTime.
