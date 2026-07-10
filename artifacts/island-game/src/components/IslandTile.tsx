@@ -501,10 +501,10 @@ const ObjectSVG: React.FC<{ object: string; tileX: number; tileY: number; tileTy
       <svg viewBox="0 0 72 112" width="88" height="138" style={{ display:'block' }}>
         <defs>
           <linearGradient id={g('cot')} x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%"   stopColor="#c05030"/>
-            <stop offset="24%"  stopColor="#8a2c10"/>
-            <stop offset="65%"  stopColor="#5a1806"/>
-            <stop offset="100%" stopColor="#300802"/>
+            <stop offset="0%"   stopColor="#a87840"/>
+            <stop offset="22%"  stopColor="#6e4620"/>
+            <stop offset="65%"  stopColor="#4a2e10"/>
+            <stop offset="100%" stopColor="#261408"/>
           </linearGradient>
           <radialGradient id={g('coc')} cx="34%" cy="26%" r="70%">
             <stop offset="0%"   stopColor="#bcf874"/>
@@ -526,24 +526,28 @@ const ObjectSVG: React.FC<{ object: string; tileX: number; tileY: number; tileTy
         <path d="M48,112 Q50,104 46,95"  stroke="#3a9820" strokeWidth="2.2" fill="none" strokeLinecap="round"/>
         <path d="M54,112 Q56,104 51,96"  stroke="#2e8012" strokeWidth="2.0" fill="none" strokeLinecap="round"/>
         <path d="M59,112 Q61,105 57,98"  stroke="#38901a" strokeWidth="2.4" fill="none" strokeLinecap="round"/>
-        {/* ── Trunk — dark reddish-brown with vertical stripe texture ── */}
+        {/* ── Trunk — dark grayish-brown with ring-band texture ── */}
         <path d="M22,108 Q26,84 30,62 L40,62 Q44,84 48,108Z" fill={`url(#${g('cot')})`}/>
+        {/* Subtle vertical fiber grain */}
+        {([0.25,0.5,0.75] as const).map((t, i) => {
+          const tx = (30 + t * 10).toFixed(1);
+          const bx = (22 + t * 26).toFixed(1);
+          const mx = ((30 + t * 10) * 0.4 + (22 + t * 26) * 0.6).toFixed(1);
+          return <path key={i} d={`M${tx},62 Q${mx},84 ${bx},108`} stroke="rgba(0,0,0,0.12)" strokeWidth="0.7" fill="none"/>;
+        })}
+        {/* Ring segments — raised ridges: highlight above, shadow below */}
+        {[68,76,84,92,100].map(y => {
+          const lx = (30 - (y - 62) / 46 * 8).toFixed(1);
+          const rx = (40 + (y - 62) / 46 * 8).toFixed(1);
+          return (
+            <g key={y}>
+              <path d={`M${lx},${y - 1} Q35,${y - 4} ${rx},${y - 1}`} stroke="rgba(255,255,255,0.30)" strokeWidth="1.6" fill="none" strokeLinecap="round"/>
+              <path d={`M${lx},${y + 1} Q35,${y - 2} ${rx},${y + 1}`} stroke="rgba(0,0,0,0.42)" strokeWidth="2.0" fill="none" strokeLinecap="round"/>
+            </g>
+          );
+        })}
         {/* Left lit edge */}
-        <path d="M24.5,106 Q28,82 32,64" stroke="rgba(255,255,255,0.26)" strokeWidth="2.0" fill="none" strokeLinecap="round"/>
-        {/* Dark vertical stripe lines */}
-        {([0.12,0.28,0.44,0.60,0.76,0.91] as const).map((t, i) => {
-          const tx = (30 + t * 10).toFixed(1);
-          const bx = (22 + t * 26).toFixed(1);
-          const mx = ((30 + t * 10) * 0.4 + (22 + t * 26) * 0.6).toFixed(1);
-          return <path key={i} d={`M${tx},62 Q${mx},84 ${bx},108`} stroke="rgba(0,0,0,0.30)" strokeWidth="1.2" fill="none"/>;
-        })}
-        {/* Light highlight stripes between dark ones */}
-        {([0.05,0.20,0.36,0.52,0.68,0.84] as const).map((t, i) => {
-          const tx = (30 + t * 10).toFixed(1);
-          const bx = (22 + t * 26).toFixed(1);
-          const mx = ((30 + t * 10) * 0.4 + (22 + t * 26) * 0.6).toFixed(1);
-          return <path key={i} d={`M${tx},62 Q${mx},84 ${bx},108`} stroke="rgba(255,255,255,0.13)" strokeWidth="0.8" fill="none"/>;
-        })}
+        <path d="M24.5,106 Q28,82 32,64" stroke="rgba(255,255,255,0.22)" strokeWidth="1.8" fill="none" strokeLinecap="round"/>
 
         {/* ── BACK LAYER — darkest, drooping wide fronds ── */}
         <path d="M36,52 Q12,58 0,80 Q24,74 36,52Z" fill="#0a3506"/>
@@ -600,12 +604,12 @@ const ObjectSVG: React.FC<{ object: string; tileX: number; tileY: number; tileTy
     case 'TREE_COCONUT': return (
       <svg viewBox="0 0 72 112" width="88" height="138" style={{ display:'block' }}>
         <defs>
-          {/* Trunk — dark reddish-brown, vertical stripe texture */}
+          {/* Trunk — dark grayish-brown, ring-band texture */}
           <linearGradient id={g('cot')} x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%"   stopColor="#c05030"/>
-            <stop offset="24%"  stopColor="#8a2c10"/>
-            <stop offset="65%"  stopColor="#5a1806"/>
-            <stop offset="100%" stopColor="#300802"/>
+            <stop offset="0%"   stopColor="#a87840"/>
+            <stop offset="22%"  stopColor="#6e4620"/>
+            <stop offset="65%"  stopColor="#4a2e10"/>
+            <stop offset="100%" stopColor="#261408"/>
           </linearGradient>
           {/* Crown — radial sphere, lit upper-left */}
           <radialGradient id={g('coc')} cx="34%" cy="26%" r="70%">
@@ -629,24 +633,28 @@ const ObjectSVG: React.FC<{ object: string; tileX: number; tileY: number; tileTy
         <path d="M48,112 Q50,104 46,95"  stroke="#3a9820" strokeWidth="2.2" fill="none" strokeLinecap="round"/>
         <path d="M54,112 Q56,104 51,96"  stroke="#2e8012" strokeWidth="2.0" fill="none" strokeLinecap="round"/>
         <path d="M59,112 Q61,105 57,98"  stroke="#38901a" strokeWidth="2.4" fill="none" strokeLinecap="round"/>
-        {/* ── Trunk — dark reddish-brown with vertical stripe texture ── */}
+        {/* ── Trunk — dark grayish-brown with ring-band texture ── */}
         <path d="M22,108 Q26,84 30,62 L40,62 Q44,84 48,108Z" fill={`url(#${g('cot')})`}/>
+        {/* Subtle vertical fiber grain */}
+        {([0.25,0.5,0.75] as const).map((t, i) => {
+          const tx = (30 + t * 10).toFixed(1);
+          const bx = (22 + t * 26).toFixed(1);
+          const mx = ((30 + t * 10) * 0.4 + (22 + t * 26) * 0.6).toFixed(1);
+          return <path key={i} d={`M${tx},62 Q${mx},84 ${bx},108`} stroke="rgba(0,0,0,0.12)" strokeWidth="0.7" fill="none"/>;
+        })}
+        {/* Ring segments — raised ridges: highlight above, shadow below */}
+        {[68,76,84,92,100].map(y => {
+          const lx = (30 - (y - 62) / 46 * 8).toFixed(1);
+          const rx = (40 + (y - 62) / 46 * 8).toFixed(1);
+          return (
+            <g key={y}>
+              <path d={`M${lx},${y - 1} Q35,${y - 4} ${rx},${y - 1}`} stroke="rgba(255,255,255,0.30)" strokeWidth="1.6" fill="none" strokeLinecap="round"/>
+              <path d={`M${lx},${y + 1} Q35,${y - 2} ${rx},${y + 1}`} stroke="rgba(0,0,0,0.42)" strokeWidth="2.0" fill="none" strokeLinecap="round"/>
+            </g>
+          );
+        })}
         {/* Left lit edge */}
-        <path d="M24.5,106 Q28,82 32,64" stroke="rgba(255,255,255,0.26)" strokeWidth="2.0" fill="none" strokeLinecap="round"/>
-        {/* Dark vertical stripe lines */}
-        {([0.12,0.28,0.44,0.60,0.76,0.91] as const).map((t, i) => {
-          const tx = (30 + t * 10).toFixed(1);
-          const bx = (22 + t * 26).toFixed(1);
-          const mx = ((30 + t * 10) * 0.4 + (22 + t * 26) * 0.6).toFixed(1);
-          return <path key={i} d={`M${tx},62 Q${mx},84 ${bx},108`} stroke="rgba(0,0,0,0.30)" strokeWidth="1.2" fill="none"/>;
-        })}
-        {/* Light highlight stripes between dark ones */}
-        {([0.05,0.20,0.36,0.52,0.68,0.84] as const).map((t, i) => {
-          const tx = (30 + t * 10).toFixed(1);
-          const bx = (22 + t * 26).toFixed(1);
-          const mx = ((30 + t * 10) * 0.4 + (22 + t * 26) * 0.6).toFixed(1);
-          return <path key={i} d={`M${tx},62 Q${mx},84 ${bx},108`} stroke="rgba(255,255,255,0.13)" strokeWidth="0.8" fill="none"/>;
-        })}
+        <path d="M24.5,106 Q28,82 32,64" stroke="rgba(255,255,255,0.22)" strokeWidth="1.8" fill="none" strokeLinecap="round"/>
 
 
 
