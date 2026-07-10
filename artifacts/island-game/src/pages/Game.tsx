@@ -174,12 +174,13 @@ const GameInner = ({ profile }: { profile: PlayerProfile }) => {
   /* ── Pan + zoom (imperative DOM for 60fps drag perf) ── */
   const viewportRef  = useRef<HTMLDivElement>(null);
   const worldRef     = useRef<HTMLDivElement>(null);
-  const panRef       = useRef({ x: 0, y: 0 });
-  const INITIAL_ZOOM = 2.0;
-  const MAX_ZOOM     = 3.2;
-  // Exactly 3 scroll-steps out from the initial zoom, always island-centred.
+  const INITIAL_ZOOM    = 2.0;
+  const MAX_ZOOM        = 3.2;
   const ZOOM_OUT_LEVELS = [INITIAL_ZOOM, 1.35, 0.85, 0.55];
-  const MIN_ZOOM = ZOOM_OUT_LEVELS[ZOOM_OUT_LEVELS.length - 1];
+  const MIN_ZOOM        = ZOOM_OUT_LEVELS[ZOOM_OUT_LEVELS.length - 1];
+  // Centre the island on load: world-centre should map to viewport-centre.
+  // screen_x = vp_cx + (px - WORLD_CX) + wx*z  →  for wx=WORLD_CX: px = WORLD_CX*(1-z)
+  const panRef = useRef({ x: WORLD_CX * (1 - INITIAL_ZOOM), y: WORLD_CY * (1 - INITIAL_ZOOM) });
 
   /** Clamp pan so the world div always covers the full viewport (no void showing). */
   const clampPan = useCallback((px: number, py: number, z: number) => {
@@ -215,8 +216,10 @@ const GameInner = ({ profile }: { profile: PlayerProfile }) => {
     }
   }, []);
 
-  // Initial position: island visually centred on load, zoomed in
-  useEffect(() => { applyTransform(0, 0, INITIAL_ZOOM); }, [applyTransform]); // eslint-disable-line react-hooks/exhaustive-deps
+  // Apply centred initial transform on mount
+  useEffect(() => {
+    applyTransform(panRef.current.x, panRef.current.y, INITIAL_ZOOM);
+  }, [applyTransform]); // eslint-disable-line react-hooks/exhaustive-deps
 
   /* Mouse-wheel zoom — centre-anchored; scroll-out snaps discrete levels, scroll-in is smooth. */
   useEffect(() => {
@@ -229,23 +232,22 @@ const GameInner = ({ profile }: { profile: PlayerProfile }) => {
       const oldZ = zoomRef.current;
 
       if (e.deltaY > 0) {
-        // ── ZOOM OUT — discrete snap, always re-centred on island ──────────
+        // ── ZOOM OUT — discrete snap, island always centred ─────────────────
         const nextZ = [...ZOOM_OUT_LEVELS].sort((a, b) => b - a)
           .find(l => l < oldZ - 0.02);
         if (nextZ == null) return;
-        const { x, y } = clampPan(0, 0, nextZ);
+        const { x, y } = clampPan(WORLD_CX * (1 - nextZ), WORLD_CY * (1 - nextZ), nextZ);
         panRef.current  = { x, y };
         zoomRef.current = nextZ;
         applyTransform(x, y, nextZ);
         setZoom(nextZ);
       } else {
-        // ── ZOOM IN — smooth, anchored on viewport centre (not cursor) ─────
+        // ── ZOOM IN — island centre stays fixed: newPan = CX*(1-r) + oldPan*r
         const newZ = Math.min(MAX_ZOOM, oldZ * 1.18);
         if (newZ === oldZ) return;
         const ratio = newZ / oldZ;
-        // cx = 0, cy = 0  →  viewport centre anchor
-        const rawPX = panRef.current.x + WORLD_CX * (1 - ratio);
-        const rawPY = panRef.current.y + WORLD_CY * (1 - ratio);
+        const rawPX = WORLD_CX * (1 - ratio) + panRef.current.x * ratio;
+        const rawPY = WORLD_CY * (1 - ratio) + panRef.current.y * ratio;
         const { x, y } = clampPan(rawPX, rawPY, newZ);
         panRef.current  = { x, y };
         zoomRef.current = newZ;
@@ -297,18 +299,19 @@ const GameInner = ({ profile }: { profile: PlayerProfile }) => {
       const nextZ = [...ZOOM_OUT_LEVELS].sort((a, b) => b - a)
         .find(l => l < zoomRef.current - 0.02);
       if (nextZ == null) return;
-      const { x, y } = clampPan(0, 0, nextZ);
+      const { x, y } = clampPan(WORLD_CX * (1 - nextZ), WORLD_CY * (1 - nextZ), nextZ);
       panRef.current  = { x, y };
       zoomRef.current = nextZ;
       applyTransform(x, y, nextZ);
       setZoom(nextZ);
     } else {
-      // Zoom-in — centre-anchored (matches wheel zoom-in behaviour)
-      const newZ = Math.min(MAX_ZOOM, zoomRef.current * factor);
+      const newZ  = Math.min(MAX_ZOOM, zoomRef.current * factor);
       const ratio = newZ / zoomRef.current;
-      const rawPX = panRef.current.x + WORLD_CX * (1 - ratio);
-      const rawPY = panRef.current.y + WORLD_CY * (1 - ratio);
-      const { x, y } = clampPan(rawPX, rawPY, newZ);
+      const { x, y } = clampPan(
+        WORLD_CX * (1 - ratio) + panRef.current.x * ratio,
+        WORLD_CY * (1 - ratio) + panRef.current.y * ratio,
+        newZ,
+      );
       panRef.current  = { x, y };
       zoomRef.current = newZ;
       applyTransform(x, y, newZ);
@@ -375,7 +378,7 @@ const GameInner = ({ profile }: { profile: PlayerProfile }) => {
           title="Zoom in"
         >+</button>
         <button
-          onClick={() => { panRef.current = { x: 0, y: 0 }; zoomRef.current = INITIAL_ZOOM; applyTransform(0, 0, INITIAL_ZOOM); setZoom(INITIAL_ZOOM); }}
+          onClick={() => { const rx = WORLD_CX*(1-INITIAL_ZOOM), ry = WORLD_CY*(1-INITIAL_ZOOM); panRef.current = { x: rx, y: ry }; zoomRef.current = INITIAL_ZOOM; applyTransform(rx, ry, INITIAL_ZOOM); setZoom(INITIAL_ZOOM); }}
           className="w-9 h-9 rounded-full shadow-lg text-xs font-black flex items-center justify-center active:scale-95 transition-transform"
           style={{ background: 'rgba(255,255,255,0.92)', border: '2px solid #c8a56a', color: '#5c3a21' }}
           title="Reset view"

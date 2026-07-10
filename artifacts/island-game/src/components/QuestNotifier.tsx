@@ -326,13 +326,12 @@ export const QuestNotifier = ({ onOpenPanel }: { onOpenPanel: (questId: string) 
     <div
       style={{
         position: 'absolute',
-        /* sit just above the 108 px bottom panel, flush with the right dock */
-        bottom: 112,
-        right: 4,
+        top: 92,
+        left: 8,
         zIndex: 20,
         display: 'flex',
-        flexDirection: 'column',      /* groups stack upward */
-        alignItems: 'flex-end',       /* pin to right edge */
+        flexDirection: 'column',
+        alignItems: 'flex-start',
         gap: 10,
         userSelect: 'none',
       }}
@@ -349,21 +348,6 @@ export const QuestNotifier = ({ onOpenPanel }: { onOpenPanel: (questId: string) 
             key={group.id}
             style={{ display: 'flex', alignItems: 'center', gap: 6 }}
           >
-            {/* NEW QUEST sign — purely decorative, never clickable */}
-            {newSigns.length > 0 && (
-              <div
-                style={{
-                  animation: 'questSignNudge 2.2s ease-in-out infinite',
-                  pointerEvents: 'none',   /* sign is NOT clickable */
-                  userSelect: 'none',
-                  /* flip horizontally so the arrow points right toward the dock */
-                  transform: 'scaleX(-1)',
-                }}
-              >
-                <QuestSign onClick={() => {}} />
-              </div>
-            )}
-
             {/* NPC icon — the ONLY clickable element */}
             <button
               onClick={() => {
@@ -394,6 +378,13 @@ export const QuestNotifier = ({ onOpenPanel }: { onOpenPanel: (questId: string) 
             >
               <NpcIcon />
             </button>
+
+            {/* NEW QUEST sign — decorative only, not clickable */}
+            {newSigns.length > 0 && (
+              <div style={{ animation: 'questSignNudge 2.2s ease-in-out infinite', pointerEvents: 'none', userSelect: 'none' }}>
+                <QuestSign onClick={() => {}} />
+              </div>
+            )}
           </div>
         );
       })}
