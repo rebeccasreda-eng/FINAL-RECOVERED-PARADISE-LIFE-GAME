@@ -33,7 +33,7 @@ function saveProfile(p: PlayerProfile) {
 }
 
 const TOP_H = 88;
-const BOT_H = 148;
+const BOT_H = 130;
 
 // Player start tile — centre of the 31×31 elliptical island
 const PLAYER_START = { x: 15, y: 15 };

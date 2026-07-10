@@ -787,14 +787,12 @@ export const NeighborPanel = ({
     <div
       className="absolute bottom-0 left-0 right-0 z-30 flex flex-col select-none"
       style={{
-        height: 148,
+        height: 130,
         fontFamily: "'Fredoka', sans-serif",
         boxShadow: '0 -4px 18px rgba(0,0,0,0.60)',
       }}
     >
       {/* ── Grass fence strip ──────────────────────────────────────────── */}
-      <GrassFence />
-
       {/* ── Main panel body ─────────────────────────────────────────────── */}
       <div
         className="flex flex-1 min-h-0"
