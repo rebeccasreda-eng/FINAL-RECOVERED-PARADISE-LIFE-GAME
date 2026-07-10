@@ -1030,6 +1030,123 @@ const ObjectSVG: React.FC<{ object: string; tileX: number; tileY: number }> = ({
       );
     }
 
+    /* ── BLUEBERRY BUSH ─────────────────────────────────────────────────── */
+    case 'BLUEBERRY_BUSH': {
+      return (
+        <svg viewBox="0 0 52 56" width="50" height="54" style={{ display:'block' }}>
+          <defs>
+            <radialGradient id={g('blb')} cx="30%" cy="25%" r="68%">
+              <stop offset="0%"   stopColor="#8898f8"/>
+              <stop offset="50%"  stopColor="#3a50d8"/>
+              <stop offset="100%" stopColor="#162898"/>
+            </radialGradient>
+          </defs>
+          {/* Shadow */}
+          <ellipse cx="26" cy="55" rx="21" ry="4" fill="rgba(0,0,0,0.22)"/>
+          {/* Leaf mass — back */}
+          <ellipse cx="26" cy="34" rx="21" ry="19" fill="#1e8012"/>
+          <ellipse cx="14" cy="38" rx="14" ry="12" fill="#187010"/>
+          <ellipse cx="38" cy="38" rx="14" ry="12" fill="#228818"/>
+          <ellipse cx="24" cy="24" rx="17" ry="12" fill="#2a9a1e"/>
+          <ellipse cx="34" cy="26" rx="14" ry="10" fill="#289818"/>
+          {/* Leaf lobes */}
+          <path d="M10,20 Q17,10 24,20 Q17,30 10,20Z" fill="#32a81e" opacity="0.85"/>
+          <path d="M21,15 Q28,5  35,15 Q28,25 21,15Z" fill="#2c9e1a" opacity="0.85"/>
+          <path d="M6,30  Q12,20 18,30 Q12,40 6,30Z"  fill="#28941a" opacity="0.80"/>
+          <path d="M30,20 Q37,10 44,20 Q37,30 30,20Z" fill="#30a01c" opacity="0.75"/>
+          {/* Berry clusters — back row */}
+          {([
+            {cx:12,cy:28,r:3.8},{cx:20,cy:25,r:4.2},{cx:29,cy:27,r:4.0},{cx:38,cy:28,r:3.6},
+            {cx:7, cy:37,r:4.4},{cx:16,cy:34,r:5.0},{cx:26,cy:33,r:5.2},{cx:36,cy:34,r:4.8},{cx:44,cy:36,r:4.0},
+            {cx:11,cy:44,r:4.8},{cx:22,cy:43,r:5.4},{cx:32,cy:44,r:5.0},{cx:41,cy:43,r:4.4},
+          ] as const).map((b, i) => (
+            <g key={i}>
+              <circle cx={b.cx} cy={b.cy} r={b.r} fill={`url(#${g('blb')})`}/>
+              <ellipse cx={b.cx} cy={b.cy - b.r + 1.2} rx={b.r * 0.40} ry={b.r * 0.24} fill="rgba(0,0,0,0.30)"/>
+              <circle cx={b.cx - b.r * 0.33} cy={b.cy - b.r * 0.38} r={b.r * 0.34} fill="rgba(255,255,255,0.58)"/>
+              <circle cx={b.cx + b.r * 0.15} cy={b.cy - b.r * 0.55} r={b.r * 0.16} fill="rgba(255,255,255,0.34)"/>
+            </g>
+          ))}
+          {/* Front leaf overhang */}
+          <path d="M5,50  Q12,40 19,50  Q12,60 5,50Z"  fill="#1e8412" opacity="0.75"/>
+          <path d="M28,49 Q35,39 42,49  Q35,59 28,49Z"  fill="#22901a" opacity="0.70"/>
+        </svg>
+      );
+    }
+
+    /* ── PINEAPPLE PLANT ─────────────────────────────────────────────────── */
+    case 'PINEAPPLE_PLANT': {
+      return (
+        <svg viewBox="0 0 60 62" width="56" height="58" style={{ display:'block' }}>
+          <defs>
+            <radialGradient id={g('pip')} cx="30%" cy="22%" r="72%">
+              <stop offset="0%"   stopColor="#ffe250"/>
+              <stop offset="52%"  stopColor="#d89a20"/>
+              <stop offset="100%" stopColor="#8a6008"/>
+            </radialGradient>
+            <clipPath id={g('pc1')}><ellipse cx="22" cy="46" rx="9"   ry="12"/></clipPath>
+            <clipPath id={g('pc2')}><ellipse cx="41" cy="42" rx="9.5" ry="13"/></clipPath>
+          </defs>
+          {/* Shadow */}
+          <ellipse cx="30" cy="61" rx="23" ry="4.5" fill="rgba(0,0,0,0.22)"/>
+          {/* Base leaf mass */}
+          <ellipse cx="30" cy="48" rx="26" ry="16" fill="#1a7a0e"/>
+          <ellipse cx="20" cy="50" rx="14" ry="11" fill="#187010"/>
+          <ellipse cx="42" cy="50" rx="14" ry="11" fill="#1e8014"/>
+          {/* ── Pineapple 1 — left, slightly behind ── */}
+          <ellipse cx="22" cy="46" rx="9"   ry="12" fill={`url(#${g('pip')})`}/>
+          <g clipPath={`url(#${g('pc1')})`}>
+            {[34,38,42,46,50,54].map(y => (
+              <line key={y} x1="11" y1={y} x2="33" y2={y} stroke="#7a5808" strokeWidth="1.1" opacity="0.55"/>
+            ))}
+            {[-8,-4,0,4,8,12].map(o => (
+              <line key={o}      x1={15+o} y1="34" x2={7+o}  y2="58" stroke="#7a5808" strokeWidth="0.9" opacity="0.40"/>
+            ))}
+            {[-8,-4,0,4,8,12].map(o => (
+              <line key={`r${o}`} x1={15+o} y1="34" x2={23+o} y2="58" stroke="#7a5808" strokeWidth="0.9" opacity="0.40"/>
+            ))}
+          </g>
+          <ellipse cx="19" cy="40" rx="3" ry="5.5" fill="rgba(255,255,255,0.34)"/>
+          {/* Crown 1 */}
+          <path d="M22,34 L15,17" stroke="#1a7a0a" strokeWidth="3.2" fill="none" strokeLinecap="round"/>
+          <path d="M22,34 L18,15" stroke="#228a14" strokeWidth="2.6" fill="none" strokeLinecap="round"/>
+          <path d="M22,34 L22,13" stroke="#1a7a0a" strokeWidth="3.4" fill="none" strokeLinecap="round"/>
+          <path d="M22,34 L26,15" stroke="#228a14" strokeWidth="2.6" fill="none" strokeLinecap="round"/>
+          <path d="M22,34 L29,17" stroke="#1a7a0a" strokeWidth="3.2" fill="none" strokeLinecap="round"/>
+          <path d="M22,34 L15,22" stroke="#2e9a1c" strokeWidth="2.0" fill="none" strokeLinecap="round"/>
+          <path d="M22,34 L29,22" stroke="#2e9a1c" strokeWidth="2.0" fill="none" strokeLinecap="round"/>
+          <path d="M15,17 L13,14" stroke="#4ab830" strokeWidth="1.8" fill="none" strokeLinecap="round"/>
+          <path d="M22,13 L22,10" stroke="#4ab830" strokeWidth="1.8" fill="none" strokeLinecap="round"/>
+          <path d="M29,17 L31,14" stroke="#4ab830" strokeWidth="1.8" fill="none" strokeLinecap="round"/>
+          {/* ── Pineapple 2 — right, front, larger ── */}
+          <ellipse cx="41" cy="42" rx="9.5" ry="13" fill={`url(#${g('pip')})`}/>
+          <g clipPath={`url(#${g('pc2')})`}>
+            {[29,33,37,41,45,49,53].map(y => (
+              <line key={y} x1="30" y1={y} x2="52" y2={y} stroke="#7a5808" strokeWidth="1.1" opacity="0.55"/>
+            ))}
+            {[-8,-4,0,4,8,12].map(o => (
+              <line key={o}      x1={34+o} y1="29" x2={26+o} y2="55" stroke="#7a5808" strokeWidth="0.9" opacity="0.40"/>
+            ))}
+            {[-8,-4,0,4,8,12].map(o => (
+              <line key={`r${o}`} x1={34+o} y1="29" x2={42+o} y2="55" stroke="#7a5808" strokeWidth="0.9" opacity="0.40"/>
+            ))}
+          </g>
+          <ellipse cx="38" cy="35" rx="3.2" ry="6" fill="rgba(255,255,255,0.36)"/>
+          {/* Crown 2 */}
+          <path d="M41,29 L34,12" stroke="#1a7a0a" strokeWidth="3.5" fill="none" strokeLinecap="round"/>
+          <path d="M41,29 L37,10" stroke="#228a14" strokeWidth="3.0" fill="none" strokeLinecap="round"/>
+          <path d="M41,29 L41,8"  stroke="#1a7a0a" strokeWidth="3.8" fill="none" strokeLinecap="round"/>
+          <path d="M41,29 L45,10" stroke="#228a14" strokeWidth="3.0" fill="none" strokeLinecap="round"/>
+          <path d="M41,29 L48,12" stroke="#1a7a0a" strokeWidth="3.5" fill="none" strokeLinecap="round"/>
+          <path d="M41,29 L33,19" stroke="#2e9a1c" strokeWidth="2.2" fill="none" strokeLinecap="round"/>
+          <path d="M41,29 L49,19" stroke="#2e9a1c" strokeWidth="2.2" fill="none" strokeLinecap="round"/>
+          <path d="M34,12 L32,9"  stroke="#4ab830" strokeWidth="1.9" fill="none" strokeLinecap="round"/>
+          <path d="M41,8  L41,5"  stroke="#4ab830" strokeWidth="2.0" fill="none" strokeLinecap="round"/>
+          <path d="M48,12 L50,9"  stroke="#4ab830" strokeWidth="1.9" fill="none" strokeLinecap="round"/>
+        </svg>
+      );
+    }
+
     default: return null;
   }
 };
@@ -1037,7 +1154,7 @@ const ObjectSVG: React.FC<{ object: string; tileX: number; tileY: number }> = ({
 /** Objects that use SVG art instead of emoji */
 const SVG_OBJECTS = new Set(['TREE_PALM', 'TREE_APPLE', 'ROCK', 'FLOWER_BUSH', 'DRIFTWOOD',
   'TREE_COCONUT', 'TREE_MANGO', 'GARDEN_PATCH', 'WEEDS', 'SUNFLOWER', 'PUDDLE', 'THORNS',
-  'BLUEBELL', 'PANSY', 'TULIP']);
+  'BLUEBELL', 'PANSY', 'TULIP', 'PINEAPPLE_PLANT', 'BLUEBERRY_BUSH']);
 /** Objects that sway in the breeze */
 const SWAY_OBJECTS = new Set(['TREE_PALM', 'TREE_APPLE', 'TREE_COCONUT', 'TREE_MANGO']);
 
