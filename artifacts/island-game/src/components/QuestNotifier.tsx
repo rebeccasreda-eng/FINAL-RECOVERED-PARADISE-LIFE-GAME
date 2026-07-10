@@ -326,11 +326,13 @@ export const QuestNotifier = ({ onOpenPanel }: { onOpenPanel: (questId: string) 
     <div
       style={{
         position: 'absolute',
-        top: 92,
-        left: 8,
+        /* sit just above the 108 px bottom panel, flush with the right dock */
+        bottom: 112,
+        right: 4,
         zIndex: 20,
         display: 'flex',
-        flexDirection: 'column',
+        flexDirection: 'column',      /* groups stack upward */
+        alignItems: 'flex-end',       /* pin to right edge */
         gap: 10,
         userSelect: 'none',
       }}
@@ -338,7 +340,6 @@ export const QuestNotifier = ({ onOpenPanel }: { onOpenPanel: (questId: string) 
       {activeGroups.map(group => {
         const NpcIcon = NPC_MAP[group.npcType] || ParrotNPC;
 
-        // Signs only for quests not yet accepted AND not yet completed
         const newSigns = group.quests
           .map(qid => QUESTS.find(q => q.id === qid))
           .filter((q): q is NonNullable<typeof q> => !!q && !state.quests[q.id]?.completed && !state.quests[q.id]?.accepted);
@@ -346,16 +347,30 @@ export const QuestNotifier = ({ onOpenPanel }: { onOpenPanel: (questId: string) 
         return (
           <div
             key={group.id}
-            style={{ display: 'flex', alignItems: 'center', gap: 8 }}
+            style={{ display: 'flex', alignItems: 'center', gap: 6 }}
           >
-            {/* NPC icon — tap to open quest; glows when new quests available */}
+            {/* NEW QUEST sign — purely decorative, never clickable */}
+            {newSigns.length > 0 && (
+              <div
+                style={{
+                  animation: 'questSignNudge 2.2s ease-in-out infinite',
+                  pointerEvents: 'none',   /* sign is NOT clickable */
+                  userSelect: 'none',
+                  /* flip horizontally so the arrow points right toward the dock */
+                  transform: 'scaleX(-1)',
+                }}
+              >
+                <QuestSign onClick={() => {}} />
+              </div>
+            )}
+
+            {/* NPC icon — the ONLY clickable element */}
             <button
               onClick={() => {
                 if (newSigns.length > 0) {
                   dispatch({ type: 'ACCEPT_QUEST', questId: newSigns[0].id });
                   onOpenPanel(newSigns[0].id);
                 } else {
-                  // No new quests — open the most recent accepted/active quest
                   const activeId = group.quests
                     .slice()
                     .reverse()
@@ -379,18 +394,6 @@ export const QuestNotifier = ({ onOpenPanel }: { onOpenPanel: (questId: string) 
             >
               <NpcIcon />
             </button>
-
-            {/* NEW QUEST badge — non-interactive nudge indicator */}
-            {newSigns.length > 0 && (
-              <div
-                style={{
-                  animation: 'questSignNudge 2.2s ease-in-out infinite',
-                  pointerEvents: 'none',
-                }}
-              >
-                <QuestSign onClick={() => {}} />
-              </div>
-            )}
           </div>
         );
       })}
