@@ -340,7 +340,12 @@ export const NeighborPanel = ({ playerName = 'Player', playerLevel = 1 }: Neighb
           flexShrink: 1,
         }}
       >
-        {/* Player card — no photo, keeps exact layout */}
+        {/* 5 empty Add Neighbor slots — come first */}
+        {Array.from({ length: 5 }).map((_, i) => (
+          <AddNeighborCard key={i} />
+        ))}
+
+        {/* Player card */}
         <NeighbourCard
           portrait={<PlayerPortrait />}
           name={playerName}
@@ -348,7 +353,7 @@ export const NeighborPanel = ({ playerName = 'Player', playerLevel = 1 }: Neighb
           stars={1}
         />
 
-        {/* Marina card — ❤️1 ⭐5 matching reference */}
+        {/* Marina card — ❤️1 ⭐5 */}
         {marina && (
           <div className="flex flex-col items-center gap-1">
             <NeighbourCard
@@ -358,7 +363,6 @@ export const NeighborPanel = ({ playerName = 'Player', playerLevel = 1 }: Neighb
               stars={5}
               onClick={() => handleVisit(marina)}
             />
-            {/* Hire button */}
             <button
               onClick={() => handleHire(marina)}
               className="text-[9px] font-black px-2 py-0.5 rounded border active:scale-95 transition-transform"
@@ -374,11 +378,6 @@ export const NeighborPanel = ({ playerName = 'Player', playerLevel = 1 }: Neighb
             </button>
           </div>
         )}
-
-        {/* 5 empty Add Neighbor slots */}
-        {Array.from({ length: 5 }).map((_, i) => (
-          <AddNeighborCard key={i} />
-        ))}
       </div>
 
       {/* ── NAV ARROWS (4 stacked) ── */}
