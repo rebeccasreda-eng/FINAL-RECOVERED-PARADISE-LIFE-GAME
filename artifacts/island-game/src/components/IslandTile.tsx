@@ -716,63 +716,99 @@ const ObjectSVG: React.FC<{ object: string; tileX: number; tileY: number; tileTy
 
     /* ── UNRIPE MANGO TREE ───────────────────────────────────────────────── */
     case 'TREE_MANGO_UNRIPE': return (
-      <svg viewBox="0 0 76 96" width="94" height="118" style={{ display:'block' }}>
+      <svg viewBox="0 0 88 106" width="108" height="130" style={{ display:'block' }}>
         <defs>
+          {/* Trunk — ring-banded, left-lit */}
           <linearGradient id={g('mgt')} x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%"   stopColor="#f0b870"/>
-            <stop offset="30%"  stopColor="#c08040"/>
-            <stop offset="72%"  stopColor="#885020"/>
-            <stop offset="100%" stopColor="#543010"/>
+            <stop offset="0%"   stopColor="#c89858"/>
+            <stop offset="22%"  stopColor="#8a5828"/>
+            <stop offset="65%"  stopColor="#5c3312"/>
+            <stop offset="100%" stopColor="#2e1808"/>
           </linearGradient>
-          <radialGradient id={g('mgc')} cx="30%" cy="22%" r="76%">
-            <stop offset="0%"   stopColor="#bcf060"/>
-            <stop offset="38%"  stopColor="#52c02a"/>
-            <stop offset="70%"  stopColor="#206e10"/>
-            <stop offset="100%" stopColor="#0e4808"/>
+          {/* Canopy — radial lit upper-left */}
+          <radialGradient id={g('mgc')} cx="28%" cy="22%" r="74%">
+            <stop offset="0%"   stopColor="#a8e050"/>
+            <stop offset="35%"  stopColor="#48b81c"/>
+            <stop offset="68%"  stopColor="#1e7408"/>
+            <stop offset="100%" stopColor="#0c4004"/>
           </radialGradient>
-          {/* Unripe mango — green teardrop */}
-          <radialGradient id={g('mgm')} cx="34%" cy="26%" r="68%">
-            <stop offset="0%"   stopColor="#cef070"/>
-            <stop offset="42%"  stopColor="#6ac020"/>
-            <stop offset="80%"  stopColor="#2a7808"/>
-            <stop offset="100%" stopColor="#184808"/>
+          {/* Unripe fruit — small green rounds */}
+          <radialGradient id={g('mgm')} cx="30%" cy="25%" r="70%">
+            <stop offset="0%"   stopColor="#d0f060"/>
+            <stop offset="40%"  stopColor="#6abc18"/>
+            <stop offset="78%"  stopColor="#267008"/>
+            <stop offset="100%" stopColor="#124804"/>
           </radialGradient>
         </defs>
-        <ellipse cx="38" cy="93" rx="18" ry="5" fill="rgba(80,50,10,0.32)"/>
-        <path d="M30,91 Q32,72 33,56 L41,56 Q42,72 44,91Z" fill={`url(#${g('mgt')})`}/>
-        <path d="M31.5,89 Q33.5,70 34.5,58" stroke="rgba(255,255,255,0.44)" strokeWidth="2.5" fill="none" strokeLinecap="round"/>
-        <path d="M42.5,89 Q43.5,70 43,58" stroke="rgba(0,0,0,0.22)" strokeWidth="2.2" fill="none" strokeLinecap="round"/>
-        {[65,73,82].map(y => (
-          <path key={y} d={`M31,${y} Q37,${y-2} 43,${y}`} stroke="rgba(0,0,0,0.18)" strokeWidth="1.6" fill="none" strokeLinecap="round"/>
-        ))}
-        <ellipse cx="38" cy="40" rx="36" ry="29" fill="#0c4006" opacity="0.70"/>
-        <circle cx="6"  cy="50" r="22" fill="#164e0c"/>
-        <circle cx="70" cy="50" r="22" fill="#1a560e"/>
-        <ellipse cx="38" cy="35" rx="33" ry="28" fill="#1e6e10"/>
-        <circle cx="8"  cy="40" r="21" fill="#267a14"/>
-        <circle cx="68" cy="40" r="21" fill="#2a8418"/>
-        <ellipse cx="38" cy="32" rx="30" ry="26" fill={`url(#${g('mgc')})`}/>
-        <circle cx="20" cy="24" r="18" fill="#38a81e"/>
-        <circle cx="56" cy="22" r="17" fill="#3cae22"/>
-        <circle cx="38" cy="14" r="20" fill="#4ec02a"/>
-        <circle cx="38" cy="8"  r="13" fill="#64d43a"/>
-        <ellipse cx="64" cy="32" rx="8" ry="14" fill="rgba(100,220,60,0.22)"/>
-        <ellipse cx="22" cy="12" rx="15" ry="9" fill="rgba(255,255,255,0.44)" transform="rotate(-14 22 12)"/>
-        <ellipse cx="25" cy="15" rx="7"  ry="4" fill="rgba(255,255,255,0.28)" transform="rotate(-14 25 15)"/>
-        {/* ── Unripe mangoes — small green teardrops, no red blush ── */}
-        <ellipse cx="10" cy="52" rx="6"   ry="8"   fill={`url(#${g('mgm')})`} transform="rotate(-20 10 52)"/>
-        <ellipse cx="7.5" cy="49" rx="2.4" ry="3.2" fill="rgba(255,255,255,0.48)" transform="rotate(-20 7.5 49)"/>
-        <ellipse cx="24" cy="47" rx="5.5" ry="7"   fill={`url(#${g('mgm')})`} transform="rotate(-12 24 47)"/>
-        <ellipse cx="22" cy="44" rx="2.2" ry="2.8" fill="rgba(255,255,255,0.44)" transform="rotate(-12 22 44)"/>
-        <ellipse cx="38" cy="58" rx="6"   ry="8"   fill={`url(#${g('mgm')})`} transform="rotate(6 38 58)"/>
-        <ellipse cx="35.5" cy="55" rx="2.4" ry="3.2" fill="rgba(255,255,255,0.46)" transform="rotate(6 35.5 55)"/>
-        <ellipse cx="52" cy="47" rx="5.5" ry="7"   fill={`url(#${g('mgm')})`} transform="rotate(14 52 47)"/>
-        <ellipse cx="49.5" cy="44" rx="2.2" ry="2.8" fill="rgba(255,255,255,0.42)" transform="rotate(14 49.5 44)"/>
-        <ellipse cx="66" cy="52" rx="6"   ry="8"   fill={`url(#${g('mgm')})`} transform="rotate(20 66 52)"/>
-        <ellipse cx="63.5" cy="49" rx="2.4" ry="3.2" fill="rgba(255,255,255,0.44)" transform="rotate(20 63.5 49)"/>
-        <path d="M10,43  Q10,38 14,36" stroke="#4a8020" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
-        <path d="M38,48  Q37,43 40,40" stroke="#4a8020" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
-        <path d="M66,43  Q67,38 62,36" stroke="#4a8020" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
+
+        {/* ── Trunk — ring-banded ── */}
+        <path d="M38,102 Q40,88 41,73 L47,73 Q48,88 50,102Z" fill={`url(#${g('mgt')})`}/>
+        <path d="M39.5,100 Q41,86 42,75" stroke="rgba(255,255,255,0.34)" strokeWidth="2.2" fill="none" strokeLinecap="round"/>
+        <path d="M43,100 Q44,86 44.5,75" stroke="rgba(255,255,255,0.10)" strokeWidth="1.0" fill="none" strokeLinecap="round"/>
+        <path d="M48,100 Q48.5,86 48.5,75" stroke="rgba(0,0,0,0.13)" strokeWidth="1.0" fill="none" strokeLinecap="round"/>
+        {[82,90,97].map(y => {
+          const lx = (41 - (y-73)/29*3).toFixed(1);
+          const rx = (47 + (y-73)/29*3).toFixed(1);
+          return (
+            <g key={y}>
+              <path d={`M${lx},${y-1} Q44,${y-3} ${rx},${y-1}`} stroke="rgba(255,255,255,0.22)" strokeWidth="1.4" fill="none" strokeLinecap="round"/>
+              <path d={`M${lx},${y+1} Q44,${y-1} ${rx},${y+1}`} stroke="rgba(0,0,0,0.32)" strokeWidth="1.6" fill="none" strokeLinecap="round"/>
+            </g>
+          );
+        })}
+        {/* Grass tufts */}
+        <path d="M31,101 Q28,93 32,86" stroke="#38901a" strokeWidth="2.2" fill="none" strokeLinecap="round"/>
+        <path d="M36,103 Q33,95 37,88" stroke="#2e8012" strokeWidth="2.0" fill="none" strokeLinecap="round"/>
+        <path d="M53,103 Q56,95 52,88" stroke="#38901a" strokeWidth="2.0" fill="none" strokeLinecap="round"/>
+        <path d="M58,101 Q61,93 57,86" stroke="#2e8012" strokeWidth="2.2" fill="none" strokeLinecap="round"/>
+
+        {/* ── Canopy — wide, round, bumpy ── */}
+        <ellipse cx="44" cy="54" rx="40" ry="26" fill="#083404"/>
+        <circle cx="7"  cy="62" r="24" fill="#0c4206"/>
+        <circle cx="81" cy="60" r="24" fill="#0e4608"/>
+        <circle cx="44" cy="72" r="24" fill="#0a3e06"/>
+        <circle cx="10" cy="50" r="24" fill="#165a0c"/>
+        <circle cx="78" cy="48" r="24" fill="#186010"/>
+        <ellipse cx="44" cy="44" rx="38" ry="32" fill={`url(#${g('mgc')})`}/>
+        <circle cx="16" cy="36" r="22" fill="#2e9218"/>
+        <circle cx="72" cy="34" r="22" fill="#309618"/>
+        <circle cx="30" cy="22" r="22" fill="#38a01e"/>
+        <circle cx="58" cy="20" r="22" fill="#3aa21e"/>
+        <circle cx="44" cy="14" r="22" fill="#46b024"/>
+        <circle cx="44" cy="6"  r="16" fill="#5ac82c"/>
+        {/* Leaf texture bumps */}
+        <circle cx="22" cy="28" r="10" fill="#28880e" opacity="0.60"/>
+        <circle cx="64" cy="26" r="10" fill="#2a8c10" opacity="0.58"/>
+        <circle cx="44" cy="38" r="11" fill="#267a0c" opacity="0.52"/>
+        <circle cx="10" cy="44" r="10" fill="#1e6c0a" opacity="0.55"/>
+        <circle cx="76" cy="42" r="10" fill="#1e6e0a" opacity="0.54"/>
+        {/* Specular */}
+        <ellipse cx="24" cy="14" rx="16" ry="10" fill="rgba(255,255,255,0.40)" transform="rotate(-14 24 14)"/>
+        <ellipse cx="28" cy="18" rx="8"  ry="5"  fill="rgba(255,255,255,0.26)" transform="rotate(-14 28 18)"/>
+
+        {/* ── Unripe fruits — small green rounds scattered in canopy ── */}
+        <circle cx="7"  cy="60" r="6.5" fill={`url(#${g('mgm')})`}/>
+        <ellipse cx="5.2" cy="56.5" rx="2.6" ry="2.9" fill="rgba(255,255,220,0.48)"/>
+        <circle cx="22" cy="53" r="6"   fill={`url(#${g('mgm')})`}/>
+        <ellipse cx="20.5" cy="50" rx="2.4" ry="2.7" fill="rgba(255,255,220,0.46)"/>
+        <circle cx="35" cy="67" r="6.5" fill={`url(#${g('mgm')})`}/>
+        <ellipse cx="33.2" cy="63.5" rx="2.6" ry="2.9" fill="rgba(255,255,220,0.48)"/>
+        <circle cx="53" cy="67" r="6.5" fill={`url(#${g('mgm')})`}/>
+        <ellipse cx="51.2" cy="63.5" rx="2.6" ry="2.9" fill="rgba(255,255,220,0.48)"/>
+        <circle cx="66" cy="53" r="6"   fill={`url(#${g('mgm')})`}/>
+        <ellipse cx="64.5" cy="50" rx="2.4" ry="2.7" fill="rgba(255,255,220,0.46)"/>
+        <circle cx="81" cy="60" r="6.5" fill={`url(#${g('mgm')})`}/>
+        <ellipse cx="79.2" cy="56.5" rx="2.6" ry="2.9" fill="rgba(255,255,220,0.48)"/>
+        <circle cx="44" cy="61" r="6.5" fill={`url(#${g('mgm')})`}/>
+        <ellipse cx="42.2" cy="57.5" rx="2.6" ry="2.9" fill="rgba(255,255,220,0.46)"/>
+        {/* Stems */}
+        <path d="M7,54  Q10,49 12,44"  stroke="#3a7018" strokeWidth="1.2" fill="none" strokeLinecap="round"/>
+        <path d="M22,47 Q24,42 26,38"  stroke="#3a7018" strokeWidth="1.2" fill="none" strokeLinecap="round"/>
+        <path d="M35,61 Q38,55 40,50"  stroke="#3a7018" strokeWidth="1.2" fill="none" strokeLinecap="round"/>
+        <path d="M53,61 Q52,55 50,50"  stroke="#3a7018" strokeWidth="1.2" fill="none" strokeLinecap="round"/>
+        <path d="M66,47 Q63,42 62,38"  stroke="#3a7018" strokeWidth="1.2" fill="none" strokeLinecap="round"/>
+        <path d="M81,54 Q78,49 76,44"  stroke="#3a7018" strokeWidth="1.2" fill="none" strokeLinecap="round"/>
+        <path d="M44,55 Q44,50 44,44"  stroke="#3a7018" strokeWidth="1.2" fill="none" strokeLinecap="round"/>
       </svg>
     );
 
@@ -894,95 +930,110 @@ const ObjectSVG: React.FC<{ object: string; tileX: number; tileY: number; tileTy
 
     /* ── MANGO TREE ─────────────────────────────────────────────────────── */
     case 'TREE_MANGO': return (
-      <svg viewBox="0 0 76 96" width="94" height="118" style={{ display:'block' }}>
+      <svg viewBox="0 0 88 106" width="108" height="130" style={{ display:'block' }}>
         <defs>
-          {/* Trunk — cylindrical left-lit */}
+          {/* Trunk — ring-banded, left-lit */}
           <linearGradient id={g('mgt')} x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%"   stopColor="#f0b870"/>
-            <stop offset="30%"  stopColor="#c08040"/>
-            <stop offset="72%"  stopColor="#885020"/>
-            <stop offset="100%" stopColor="#543010"/>
+            <stop offset="0%"   stopColor="#c89858"/>
+            <stop offset="22%"  stopColor="#8a5828"/>
+            <stop offset="65%"  stopColor="#5c3312"/>
+            <stop offset="100%" stopColor="#2e1808"/>
           </linearGradient>
-          {/* Canopy — radial sphere, lit upper-left */}
-          <radialGradient id={g('mgc')} cx="30%" cy="22%" r="76%">
-            <stop offset="0%"   stopColor="#bcf060"/>
-            <stop offset="38%"  stopColor="#52c02a"/>
-            <stop offset="70%"  stopColor="#206e10"/>
-            <stop offset="100%" stopColor="#0e4808"/>
+          {/* Canopy — radial lit upper-left */}
+          <radialGradient id={g('mgc')} cx="28%" cy="22%" r="74%">
+            <stop offset="0%"   stopColor="#a8e050"/>
+            <stop offset="35%"  stopColor="#48b81c"/>
+            <stop offset="68%"  stopColor="#1e7408"/>
+            <stop offset="100%" stopColor="#0c4004"/>
           </radialGradient>
-          {/* Mango fruit — lit upper-left, warm orange-gold */}
-          <radialGradient id={g('mgm')} cx="34%" cy="26%" r="68%">
-            <stop offset="0%"   stopColor="#fff080"/>
-            <stop offset="40%"  stopColor="#f0aa20"/>
-            <stop offset="78%"  stopColor="#c07010"/>
-            <stop offset="100%" stopColor="#804208"/>
-          </radialGradient>
-          {/* Mango red blush — on the sun side */}
-          <radialGradient id={g('mgr')} cx="70%" cy="30%" r="65%">
-            <stop offset="0%"   stopColor="rgba(220,60,20,0.55)"/>
-            <stop offset="100%" stopColor="rgba(180,40,10,0)"/>
+          {/* Ripe mango — golden yellow */}
+          <radialGradient id={g('mgm')} cx="30%" cy="25%" r="70%">
+            <stop offset="0%"   stopColor="#ffffc0"/>
+            <stop offset="32%"  stopColor="#f8d020"/>
+            <stop offset="68%"  stopColor="#d08010"/>
+            <stop offset="100%" stopColor="#844808"/>
           </radialGradient>
         </defs>
 
-        {/* Trunk — tapered, cylindrical */}
-        <path d="M30,91 Q32,72 33,56 L41,56 Q42,72 44,91Z" fill={`url(#${g('mgt')})`}/>
-        {/* Left specular */}
-        <path d="M31.5,89 Q33.5,70 34.5,58" stroke="rgba(255,255,255,0.44)" strokeWidth="2.5" fill="none" strokeLinecap="round"/>
-        {/* Right rim shadow */}
-        <path d="M42.5,89 Q43.5,70 43,58" stroke="rgba(0,0,0,0.22)" strokeWidth="2.2" fill="none" strokeLinecap="round"/>
-        {/* Bark rings */}
-        {[65,73,82].map(y => (
-          <path key={y} d={`M31,${y} Q37,${y-2} 43,${y}`} stroke="rgba(0,0,0,0.18)" strokeWidth="1.6" fill="none" strokeLinecap="round"/>
-        ))}
+        {/* ── Trunk — ring-banded ── */}
+        <path d="M38,102 Q40,88 41,73 L47,73 Q48,88 50,102Z" fill={`url(#${g('mgt')})`}/>
+        <path d="M39.5,100 Q41,86 42,75" stroke="rgba(255,255,255,0.34)" strokeWidth="2.2" fill="none" strokeLinecap="round"/>
+        <path d="M43,100 Q44,86 44.5,75" stroke="rgba(255,255,255,0.10)" strokeWidth="1.0" fill="none" strokeLinecap="round"/>
+        <path d="M48,100 Q48.5,86 48.5,75" stroke="rgba(0,0,0,0.13)" strokeWidth="1.0" fill="none" strokeLinecap="round"/>
+        {[82,90,97].map(y => {
+          const lx = (41 - (y-73)/29*3).toFixed(1);
+          const rx = (47 + (y-73)/29*3).toFixed(1);
+          return (
+            <g key={y}>
+              <path d={`M${lx},${y-1} Q44,${y-3} ${rx},${y-1}`} stroke="rgba(255,255,255,0.22)" strokeWidth="1.4" fill="none" strokeLinecap="round"/>
+              <path d={`M${lx},${y+1} Q44,${y-1} ${rx},${y+1}`} stroke="rgba(0,0,0,0.32)" strokeWidth="1.6" fill="none" strokeLinecap="round"/>
+            </g>
+          );
+        })}
+        {/* Grass tufts */}
+        <path d="M31,101 Q28,93 32,86" stroke="#38901a" strokeWidth="2.2" fill="none" strokeLinecap="round"/>
+        <path d="M36,103 Q33,95 37,88" stroke="#2e8012" strokeWidth="2.0" fill="none" strokeLinecap="round"/>
+        <path d="M53,103 Q56,95 52,88" stroke="#38901a" strokeWidth="2.0" fill="none" strokeLinecap="round"/>
+        <path d="M58,101 Q61,93 57,86" stroke="#2e8012" strokeWidth="2.2" fill="none" strokeLinecap="round"/>
 
-        {/* ── Canopy — layered for deep 3D volume ── */}
-        {/* Lower side blobs */}
-        <circle cx="6"  cy="50" r="22" fill="#164e0c"/>
-        <circle cx="70" cy="50" r="22" fill="#1a560e"/>
-        {/* Wide mid layer */}
-        <ellipse cx="38" cy="35" rx="33" ry="28" fill="#1e6e10"/>
-        {/* Side clusters — mid height */}
-        <circle cx="8"  cy="40" r="21" fill="#267a14"/>
-        <circle cx="68" cy="40" r="21" fill="#2a8418"/>
-        {/* Core canopy — radial gradient sphere */}
-        <ellipse cx="38" cy="32" rx="30" ry="26" fill={`url(#${g('mgc')})`}/>
-        {/* Upper lobes — add surface bumps */}
-        <circle cx="20" cy="24" r="18" fill="#38a81e"/>
-        <circle cx="56" cy="22" r="17" fill="#3cae22"/>
-        {/* Top dome — brightest */}
-        <circle cx="38" cy="14" r="20" fill="#4ec02a"/>
-        <circle cx="38" cy="8"  r="13" fill="#64d43a"/>
-        {/* Rim light on right edge — secondary light bounce */}
-        <ellipse cx="64" cy="32" rx="8" ry="14" fill="rgba(100,220,60,0.22)"/>
-        {/* Specular — upper-left */}
-        <ellipse cx="22" cy="12" rx="15" ry="9" fill="rgba(255,255,255,0.44)" transform="rotate(-14 22 12)"/>
-        <ellipse cx="25" cy="15" rx="7"  ry="4" fill="rgba(255,255,255,0.28)" transform="rotate(-14 25 15)"/>
+        {/* ── Canopy — wide, round, bumpy like reference ── */}
+        <ellipse cx="44" cy="54" rx="40" ry="26" fill="#083404"/>
+        <circle cx="7"  cy="62" r="24" fill="#0c4206"/>
+        <circle cx="81" cy="60" r="24" fill="#0e4608"/>
+        <circle cx="44" cy="72" r="24" fill="#0a3e06"/>
+        <circle cx="10" cy="50" r="24" fill="#165a0c"/>
+        <circle cx="78" cy="48" r="24" fill="#186010"/>
+        <ellipse cx="44" cy="44" rx="38" ry="32" fill={`url(#${g('mgc')})`}/>
+        <circle cx="16" cy="36" r="22" fill="#2e9218"/>
+        <circle cx="72" cy="34" r="22" fill="#309618"/>
+        <circle cx="30" cy="22" r="22" fill="#38a01e"/>
+        <circle cx="58" cy="20" r="22" fill="#3aa21e"/>
+        <circle cx="44" cy="14" r="22" fill="#46b024"/>
+        <circle cx="44" cy="6"  r="16" fill="#5ac82c"/>
+        {/* Leaf texture bumps */}
+        <circle cx="22" cy="28" r="10" fill="#28880e" opacity="0.60"/>
+        <circle cx="64" cy="26" r="10" fill="#2a8c10" opacity="0.58"/>
+        <circle cx="44" cy="38" r="11" fill="#267a0c" opacity="0.52"/>
+        <circle cx="10" cy="44" r="10" fill="#1e6c0a" opacity="0.55"/>
+        <circle cx="76" cy="42" r="10" fill="#1e6e0a" opacity="0.54"/>
+        {/* Specular */}
+        <ellipse cx="24" cy="14" rx="16" ry="10" fill="rgba(255,255,255,0.40)" transform="rotate(-14 24 14)"/>
+        <ellipse cx="28" cy="18" rx="8"  ry="5"  fill="rgba(255,255,255,0.26)" transform="rotate(-14 28 18)"/>
 
-        {/* ── Mangoes — teardrop 3D fruits ── */}
-        {/* Outer left */}
-        <ellipse cx="10" cy="52" rx="7.5" ry="10" fill={`url(#${g('mgm')})`} transform="rotate(-20 10 52)"/>
-        <ellipse cx="10" cy="52" rx="7.5" ry="10" fill={`url(#${g('mgr')})`} transform="rotate(-20 10 52)"/>
-        <ellipse cx="7.5" cy="49" rx="3" ry="4" fill="rgba(255,255,255,0.54)" transform="rotate(-20 7.5 49)"/>
-        {/* Inner left */}
-        <ellipse cx="24" cy="47" rx="6.5" ry="8.5" fill={`url(#${g('mgm')})`} transform="rotate(-12 24 47)"/>
-        <ellipse cx="24" cy="47" rx="6.5" ry="8.5" fill={`url(#${g('mgr')})`} transform="rotate(-12 24 47)"/>
-        <ellipse cx="22" cy="44" rx="2.6" ry="3.4" fill="rgba(255,255,255,0.50)" transform="rotate(-12 22 44)"/>
-        {/* Centre bottom */}
-        <ellipse cx="38" cy="58" rx="7.5" ry="10"  fill={`url(#${g('mgm')})`} transform="rotate(6 38 58)"/>
-        <ellipse cx="38" cy="58" rx="7.5" ry="10"  fill={`url(#${g('mgr')})`} transform="rotate(6 38 58)"/>
-        <ellipse cx="35.5" cy="55" rx="3" ry="4"   fill="rgba(255,255,255,0.52)" transform="rotate(6 35.5 55)"/>
-        {/* Inner right */}
-        <ellipse cx="52" cy="47" rx="6.5" ry="8.5" fill={`url(#${g('mgm')})`} transform="rotate(14 52 47)"/>
-        <ellipse cx="52" cy="47" rx="6.5" ry="8.5" fill={`url(#${g('mgr')})`} transform="rotate(14 52 47)"/>
-        <ellipse cx="49.5" cy="44" rx="2.6" ry="3.4" fill="rgba(255,255,255,0.48)" transform="rotate(14 49.5 44)"/>
-        {/* Outer right */}
-        <ellipse cx="66" cy="52" rx="7.5" ry="10"  fill={`url(#${g('mgm')})`} transform="rotate(20 66 52)"/>
-        <ellipse cx="66" cy="52" rx="7.5" ry="10"  fill={`url(#${g('mgr')})`} transform="rotate(20 66 52)"/>
-        <ellipse cx="63.5" cy="49" rx="3" ry="4"   fill="rgba(255,255,255,0.50)" transform="rotate(20 63.5 49)"/>
-        {/* Mango stems */}
-        <path d="M10,43  Q10,38 14,36" stroke="#4a8020" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
-        <path d="M38,48  Q37,43 40,40" stroke="#4a8020" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
-        <path d="M66,43  Q67,38 62,36" stroke="#4a8020" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
+        {/* ── Ripe mangoes — large golden round fruits ── */}
+        {/* Left side */}
+        <circle cx="7"  cy="60" r="9.5" fill={`url(#${g('mgm')})`}/>
+        <ellipse cx="4.8" cy="55.5" rx="3.8" ry="4.2" fill="rgba(255,255,210,0.56)"/>
+        <circle cx="22" cy="54" r="8.5" fill={`url(#${g('mgm')})`}/>
+        <ellipse cx="20" cy="50" rx="3.4" ry="3.8" fill="rgba(255,255,210,0.54)"/>
+        {/* Bottom */}
+        <circle cx="35" cy="68" r="9"   fill={`url(#${g('mgm')})`}/>
+        <ellipse cx="33" cy="64" rx="3.6" ry="4.0" fill="rgba(255,255,210,0.55)"/>
+        <circle cx="53" cy="68" r="9"   fill={`url(#${g('mgm')})`}/>
+        <ellipse cx="51" cy="64" rx="3.6" ry="4.0" fill="rgba(255,255,210,0.55)"/>
+        {/* Right side */}
+        <circle cx="66" cy="54" r="8.5" fill={`url(#${g('mgm')})`}/>
+        <ellipse cx="64" cy="50" rx="3.4" ry="3.8" fill="rgba(255,255,210,0.54)"/>
+        <circle cx="81" cy="60" r="9.5" fill={`url(#${g('mgm')})`}/>
+        <ellipse cx="78.8" cy="55.5" rx="3.8" ry="4.2" fill="rgba(255,255,210,0.56)"/>
+        {/* Upper */}
+        <circle cx="14" cy="40" r="7.5" fill={`url(#${g('mgm')})`}/>
+        <ellipse cx="12.5" cy="37" rx="3.0" ry="3.4" fill="rgba(255,255,210,0.52)"/>
+        <circle cx="74" cy="38" r="7.5" fill={`url(#${g('mgm')})`}/>
+        <ellipse cx="72.5" cy="35" rx="3.0" ry="3.4" fill="rgba(255,255,210,0.52)"/>
+        {/* Centre */}
+        <circle cx="44" cy="62" r="9"   fill={`url(#${g('mgm')})`}/>
+        <ellipse cx="42" cy="58" rx="3.6" ry="4.0" fill="rgba(255,255,210,0.54)"/>
+        {/* Stems */}
+        <path d="M7,51  Q10,46 12,42"  stroke="#3a7018" strokeWidth="1.3" fill="none" strokeLinecap="round"/>
+        <path d="M22,46 Q24,41 26,37"  stroke="#3a7018" strokeWidth="1.3" fill="none" strokeLinecap="round"/>
+        <path d="M35,59 Q38,53 40,48"  stroke="#3a7018" strokeWidth="1.3" fill="none" strokeLinecap="round"/>
+        <path d="M53,59 Q52,53 50,48"  stroke="#3a7018" strokeWidth="1.3" fill="none" strokeLinecap="round"/>
+        <path d="M66,46 Q63,41 62,37"  stroke="#3a7018" strokeWidth="1.3" fill="none" strokeLinecap="round"/>
+        <path d="M81,51 Q78,46 76,42"  stroke="#3a7018" strokeWidth="1.3" fill="none" strokeLinecap="round"/>
+        <path d="M14,33 Q16,28 18,24"  stroke="#3a7018" strokeWidth="1.2" fill="none" strokeLinecap="round"/>
+        <path d="M74,30 Q72,26 70,22"  stroke="#3a7018" strokeWidth="1.2" fill="none" strokeLinecap="round"/>
+        <path d="M44,53 Q44,47 44,42"  stroke="#3a7018" strokeWidth="1.3" fill="none" strokeLinecap="round"/>
       </svg>
     );
 

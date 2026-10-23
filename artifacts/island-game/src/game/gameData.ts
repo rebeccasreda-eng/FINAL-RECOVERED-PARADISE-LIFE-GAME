@@ -173,7 +173,6 @@ export const EMOJI_MAP: Record<string, string> = {
   BLUEBELL: '💜', PANSY: '🌼', TULIP: '🌷', PINEAPPLE_PLANT: '🍍', BLUEBERRY_BUSH: '🫐',
   TREE_COCONUT: '🌴', TREE_MANGO: '🥭', GARDEN_PATCH: '🍍',
   TREE_COCONUT_UNRIPE: '🌴', TREE_MANGO_UNRIPE: '🥭',
-  COCONUT_STUMP: '🪵', MANGO_STUMP: '🪵',
   CROP_PLOT: '🟫', CROP_GROWING: '🌱', CROP_READY: '🌽', CROP_WILTED: '🥀',
   FISH_SPOT: '', HUT: '🏚️', DOCK: '⛵', WELL: '💧', 
   FLOWER_POT: '🪴', FENCE: '🚧', LANTERN: '🏮', CRAB: '🦀', BOAR: '🐗', BABY_PARROT: '🦜', TALL_ROCK: '🪨',
