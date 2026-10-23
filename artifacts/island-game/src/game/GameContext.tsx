@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useEffect, useReducer, useRef, useState } from 'react';
 import { GameState, GameAction, GameContextType, ResourceType, ObjectType } from './types';
-import { generateIsland, QUESTS, QUEST_GROUPS, OBJECT_CONFIG, SCALED, WEATHER_TYPES, CROP_TYPES, INITIAL_NEIGHBORS, COLLECTIONS, COLLECTION_SETS, PREMIUM_ITEMS, COCONUT_RIPEN_TIME, MANGO_RIPEN_TIME, STUMP_REGROW_TIME } from './gameData';
+import { generateIsland, ensureIslandScenery, arrangeIslandNaturalDecorations, QUESTS, QUEST_GROUPS, OBJECT_CONFIG, SCALED, WEATHER_TYPES, CROP_TYPES, INITIAL_NEIGHBORS, COLLECTIONS, COLLECTION_SETS, PREMIUM_ITEMS, COCONUT_RIPEN_TIME, MANGO_RIPEN_TIME, STUMP_REGROW_TIME } from './gameData';
 
 // Quest IDs that require explicit acceptance before progress is tracked
 const GROUPED_QUEST_IDS = new Set(QUEST_GROUPS.flatMap(g => g.quests));
@@ -15,6 +15,20 @@ const TREE_CHOPS: Record<string, number> = {
 
 export const GameContext = createContext<(GameContextType & { plantingTile: string | null; setPlantingTile: (id: string | null) => void; }) | null>(null);
 
+const REMOVED_ISLAND_OBJECTS = new Set<ObjectType>(['WEEDS', 'THORNS', 'CRAB', 'ISLAND_HUT', 'PUDDLE', 'PINEAPPLE_PLANT']);
+const NATURAL_DECORATION_LAYOUT_VERSION = 3;
+
+const withoutRemovedIslandObjects = (tiles: GameState['tiles']): GameState['tiles'] => {
+  const cleanedTiles = { ...tiles };
+  for (const [tileId, tile] of Object.entries(cleanedTiles)) {
+    if (!tile.object || !REMOVED_ISLAND_OBJECTS.has(tile.object)) continue;
+    const cleanedTile = { ...tile };
+    delete cleanedTile.object;
+    cleanedTiles[tileId] = cleanedTile;
+  }
+  return cleanedTiles;
+};
+
 export const useGame = () => {
   const context = useContext(GameContext);
   if (!context) throw new Error("useGame must be inside GameProvider");
@@ -22,7 +36,10 @@ export const useGame = () => {
 };
 
 const getInitialState = (): GameState => ({
-  tiles: generateIsland(),
+  tiles: arrangeIslandNaturalDecorations(
+    withoutRemovedIslandObjects(ensureIslandScenery(generateIsland()))
+  ).tiles,
+  naturalDecorationLayoutVersion: NATURAL_DECORATION_LAYOUT_VERSION,
   inventory: { coins: 50, wood: 0, stone: 0, produce: 0, food: 0, shells: 0, HUT: 0, DOCK: 0, WELL: 0, FLOWER_POT: 0, FENCE: 0, LANTERN: 0 },
   energy: 20,
   maxEnergy: 20,
@@ -144,24 +161,6 @@ function gameReducer(state: GameState, action: GameAction): GameState {
       if (now >= nextState.nextWeatherAt) {
         const nextWeather = WEATHER_TYPES[Math.floor(Math.random() * WEATHER_TYPES.length)];
         nextState = { ...nextState, weather: nextWeather, nextWeatherAt: now + SCALED(120000) };
-        changed = true;
-      }
-
-      // Crab Spawning
-      let crabSpawnInterval = SCALED(180000);
-      if (nextState.weather === 'STORMY') crabSpawnInterval = SCALED(90000);
-      
-      if (now - nextState.lastCrabSpawn >= crabSpawnInterval) {
-        const crabs = Object.values(nextTiles).filter(t => t.object === 'CRAB').length;
-        if (crabs < 2) {
-          const emptyGrass = Object.values(nextTiles).filter(t => t.type === 'GRASS' && !t.object);
-          if (emptyGrass.length > 0) {
-            const spawnTile = emptyGrass[Math.floor(Math.random() * emptyGrass.length)];
-            if (!tilesChanged) { nextTiles = { ...nextState.tiles }; tilesChanged = true; }
-            nextTiles[spawnTile.id] = { ...spawnTile, object: 'CRAB', crabHp: 3 };
-          }
-        }
-        nextState = { ...nextState, lastCrabSpawn: now };
         changed = true;
       }
 
@@ -306,7 +305,11 @@ function gameReducer(state: GameState, action: GameAction): GameState {
         } else if (obj === 'TREE_MANGO_UNRIPE') {
           nextState.tiles[tileId] = { ...tile, object: 'MANGO_STUMP' as ObjectType, treeHp: undefined, growsAt: Date.now() + STUMP_REGROW_TIME };
         } else {
-          nextState.tiles[tileId] = { ...tile, object: undefined, treeHp: undefined };
+          nextState.tiles[tileId] = {
+            ...tile,
+            object: tile.cropPlotAfterTree ? 'CLEARED_LAND' : undefined,
+            treeHp: undefined,
+          };
         }
       } else if (obj === 'CRAB' || obj === 'BOAR') {
         const hp = (tile.crabHp || (obj === 'CRAB' ? 3 : 2)) - 1;
@@ -670,12 +673,23 @@ export const GameProvider: React.FC<{children: React.ReactNode}> = ({ children }
         const parsed = JSON.parse(saved);
         if (parsed && parsed.tiles) {
           const defaults = getInitialState();
+          const savedRespawns = Array.isArray(parsed.respawns)
+            ? parsed.respawns.filter((respawn: { object?: ObjectType }) =>
+                !respawn.object || !REMOVED_ISLAND_OBJECTS.has(respawn.object)
+              )
+            : [];
+          const sceneryTiles = withoutRemovedIslandObjects(ensureIslandScenery(parsed.tiles));
+          const arrangedDecorations = parsed.naturalDecorationLayoutVersion === NATURAL_DECORATION_LAYOUT_VERSION
+            ? { tiles: sceneryTiles, respawns: savedRespawns }
+            : arrangeIslandNaturalDecorations(sceneryTiles, savedRespawns);
           return {
             ...defaults,
             ...parsed,
+            tiles: arrangedDecorations.tiles,
+            naturalDecorationLayoutVersion: NATURAL_DECORATION_LAYOUT_VERSION,
             inventory: { ...defaults.inventory, ...(parsed.inventory || {}) },
             quests: parsed.quests || {},
-            respawns: Array.isArray(parsed.respawns) ? parsed.respawns : [],
+            respawns: arrangedDecorations.respawns,
             collections: parsed.collections || {},
             tradedSets: Array.isArray(parsed.tradedSets) ? parsed.tradedSets : [],
             stats: parsed.stats || { crabsKilled: 0, boarsShooD: 0 },
@@ -715,6 +729,7 @@ export const GameProvider: React.FC<{children: React.ReactNode}> = ({ children }
   const [questBanner, setQuestBanner] = useState<string | null>(null);
   const [activeChopTileId, setActiveChopTileId] = useState<string | null>(null);
   const [chopCount, setChopCount] = useState(0);
+  const [shovelCount, setShovelCount] = useState(0);
 
   useEffect(() => {
     localStorage.setItem('island-game-state-v25', JSON.stringify(state));
@@ -811,6 +826,7 @@ export const GameProvider: React.FC<{children: React.ReactNode}> = ({ children }
     }
 
     dispatch({ type: 'INTERACT', tileId, energyCost });
+    if (config.action === 'Clear') setShovelCount(c => c + 1);
 
     const TREE_CHOPS: Record<string, number> = {
       TREE_PALM: 5, TREE_APPLE: 5,
@@ -919,7 +935,7 @@ export const GameProvider: React.FC<{children: React.ReactNode}> = ({ children }
       plantingTile, setPlantingTile,
       questBanner, floatingTexts, coolBanners, tutorial,
       interact, plant, place,
-      activeChopTileId, chopCount
+      activeChopTileId, chopCount, shovelCount
     }}>
       {children}
     </GameContext.Provider>

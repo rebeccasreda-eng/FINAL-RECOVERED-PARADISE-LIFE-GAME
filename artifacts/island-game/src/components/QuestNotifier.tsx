@@ -12,6 +12,7 @@
 import React from 'react';
 import { useGame } from '../game/GameContext';
 import { QUESTS, QUEST_GROUPS } from '../game/gameData';
+import crabImage from '../assets/crab-reference.png';
 
 /* ── Parrot-bush NPC ──────────────────────────────────────────────────── */
 const ParrotNPC = () => (
@@ -90,39 +91,14 @@ const ParrotNPC = () => (
 
 /* ── Crab NPC ──────────────────────────────────────────────────────────── */
 const CrabNPC = () => (
-  <svg viewBox="0 0 84 84" xmlns="http://www.w3.org/2000/svg" width="46" height="46">
-    <ellipse cx="42" cy="80" rx="26" ry="5" fill="rgba(0,0,0,0.18)"/>
-    {/* Left big claw */}
-    <path d="M22 44 Q6 34 8 20 Q12 10 20 14" stroke="#bf2000" strokeWidth="6" fill="none" strokeLinecap="round"/>
-    <ellipse cx="13" cy="12" rx="9" ry="6" fill="#e03020" stroke="#bf1800" strokeWidth="1.5"/>
-    <ellipse cx="20" cy="17" rx="5" ry="4" fill="#e84030"/>
-    {/* Right big claw */}
-    <path d="M62 44 Q78 34 76 20 Q72 10 64 14" stroke="#bf2000" strokeWidth="6" fill="none" strokeLinecap="round"/>
-    <ellipse cx="71" cy="12" rx="9" ry="6" fill="#e03020" stroke="#bf1800" strokeWidth="1.5"/>
-    <ellipse cx="64" cy="17" rx="5" ry="4" fill="#e84030"/>
-    {/* Legs */}
-    <line x1="26" y1="52" x2="14" y2="66" stroke="#c82000" strokeWidth="3.5" strokeLinecap="round"/>
-    <line x1="30" y1="56" x2="18" y2="70" stroke="#c82000" strokeWidth="3.5" strokeLinecap="round"/>
-    <line x1="34" y1="58" x2="24" y2="72" stroke="#c82000" strokeWidth="3.5" strokeLinecap="round"/>
-    <line x1="58" y1="52" x2="70" y2="66" stroke="#c82000" strokeWidth="3.5" strokeLinecap="round"/>
-    <line x1="54" y1="56" x2="66" y2="70" stroke="#c82000" strokeWidth="3.5" strokeLinecap="round"/>
-    <line x1="50" y1="58" x2="60" y2="72" stroke="#c82000" strokeWidth="3.5" strokeLinecap="round"/>
-    {/* Body */}
-    <ellipse cx="42" cy="48" rx="22" ry="16" fill="#e03020"/>
-    <ellipse cx="42" cy="44" rx="20" ry="14" fill="#e84030"/>
-    {/* Shell highlight */}
-    <ellipse cx="42" cy="42" rx="14" ry="8" fill="rgba(255,100,60,0.35)"/>
-    {/* Eye stalks */}
-    <line x1="34" y1="34" x2="30" y2="26" stroke="#bf1800" strokeWidth="3" strokeLinecap="round"/>
-    <line x1="50" y1="34" x2="54" y2="26" stroke="#bf1800" strokeWidth="3" strokeLinecap="round"/>
-    {/* Eyes */}
-    <circle cx="29" cy="24" r="6" fill="white" stroke="#bf1800" strokeWidth="1.5"/>
-    <circle cx="55" cy="24" r="6" fill="white" stroke="#bf1800" strokeWidth="1.5"/>
-    <circle cx="29" cy="24" r="3.5" fill="#111"/>
-    <circle cx="55" cy="24" r="3.5" fill="#111"/>
-    <circle cx="30.5" cy="22.5" r="1.5" fill="white"/>
-    <circle cx="56.5" cy="22.5" r="1.5" fill="white"/>
-  </svg>
+  <img
+    src={crabImage}
+    alt=""
+    width={46}
+    height={41}
+    draggable={false}
+    style={{ display: 'block', objectFit: 'contain' }}
+  />
 );
 
 /* ── Axe NPC (chop-tree group icon) ────────────────────────────────────── */

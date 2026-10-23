@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import { useGame } from '../game/GameContext';
-import { EMOJI_MAP } from '../game/gameData';
 import { ResourceType } from '../game/types';
+import addNeighborPortraitsA from '@assets/add_neighbor_1792759025285.JPG';
+import addNeighborPortraitsB from '@assets/add_neighbor_1792759074044.JPG';
+import islandPanelHeaderReference from '@assets/topsds_1792760359613.JPG';
 
 type QuickTab = 'player' | 'market' | 'marina' | null;
 
@@ -279,49 +281,16 @@ const NavArrowBtn = ({ symbol, title, onClick }: { symbol: React.ReactNode; titl
     title={title}
     className="active:scale-90 transition-transform"
     style={{
-      width: 44, height: 34,
-      borderRadius: 17,
-      background: 'linear-gradient(180deg, #d8cdb4 0%, #b0a488 100%)',
-      border: '2px solid #8a7a5a',
-      borderBottom: '3px solid #6a5a3a',
-      boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.55), 0 2px 4px rgba(0,0,0,0.35)',
+      width: 36, height: 22,
+      borderRadius: 5,
+      background: 'linear-gradient(180deg, #e6e0d5 0%, #a9a49c 100%)',
+      border: '2px solid #6d665c',
+      borderBottom: '3px solid #4f4a43',
+      boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.65), 0 2px 3px rgba(0,0,0,0.35)',
       display: 'flex', alignItems: 'center', justifyContent: 'center',
-      cursor: 'pointer', color: '#5a4a2a', fontSize: 13, fontWeight: 900,
+      cursor: 'pointer', color: '#514a40', fontSize: 11, fontWeight: 900,
     }}
   >{symbol}</button>
-);
-
-/* ─── Quick-tab button (PLAYER / MARKET) ───────────────────────────────── */
-const QuickTabBtn = ({
-  label, emoji, active, onClick,
-}: {
-  label: string; emoji: string; active: boolean; onClick: () => void;
-}) => (
-  <button
-    onClick={onClick}
-    style={{
-      width: 62, flexShrink: 0, height: '100%',
-      border: active ? '2px solid #d8e060' : '2px solid #3a4820',
-      borderBottom: active ? '3px solid #a0a830' : '3px solid #242e10',
-      borderRadius: 8,
-      background: active
-        ? 'linear-gradient(180deg, #8aaa40 0%, #506820 100%)'
-        : 'linear-gradient(180deg, #5a6838 0%, #3a4820 100%)',
-      display: 'flex', flexDirection: 'column',
-      alignItems: 'center', justifyContent: 'center',
-      gap: 3, cursor: 'pointer',
-      boxShadow: active
-        ? 'inset 0 0 8px rgba(220,240,60,0.35), 0 2px 6px rgba(0,0,0,0.4)'
-        : 'inset 0 1px 0 rgba(255,255,255,0.15), 0 2px 4px rgba(0,0,0,0.4)',
-      transition: 'all 0.12s',
-      position: 'relative', overflow: 'hidden',
-    }}
-  >
-    {/* Sheen */}
-    <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '40%', background: 'linear-gradient(180deg, rgba(255,255,255,0.18), transparent)', borderRadius: '6px 6px 0 0', pointerEvents: 'none' }}/>
-    <span style={{ fontSize: 18, lineHeight: 1 }}>{emoji}</span>
-    <span style={{ fontSize: 8, fontWeight: 900, color: active ? '#e8f880' : '#b8c880', letterSpacing: '0.06em', textShadow: '0 1px 2px rgba(0,0,0,0.6)' }}>{label}</span>
-  </button>
 );
 
 /* ─── Marina destination illustration ──────────────────────────────────────── */
@@ -412,21 +381,39 @@ const MarinaCharIllus = () => (
   </svg>
 );
 
-/* ─── Add-neighbor placeholder illustration ─────────────────────────────── */
-const AddNeighborIllus = () => (
-  <svg viewBox="0 0 72 54" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%' }}>
-    <defs>
-      <linearGradient id="anSky" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0%" stopColor="#a0d870"/><stop offset="100%" stopColor="#c8f090"/>
-      </linearGradient>
-    </defs>
-    <rect width="72" height="54" fill="url(#anSky)"/>
-    <ellipse cx="36" cy="44" rx="26" ry="10" fill="#68b830" opacity="0.55"/>
-    <ellipse cx="36" cy="42" rx="18" ry="7"  fill="#88d840" opacity="0.45"/>
-    {/* Big + */}
-    <rect x="29" y="22" width="14" height="14" rx="3" fill="rgba(255,255,255,0.88)"/>
-    <path d="M36,25 L36,33 M32,29 L40,29" stroke="#1e8a08" strokeWidth="3" strokeLinecap="round"/>
-  </svg>
+const BlankPlayerAvatar = () => (
+  <div style={{
+    position: 'absolute', inset: 0,
+    display: 'flex', alignItems: 'center', justifyContent: 'center',
+    background: 'linear-gradient(180deg, #f6f4ef 0%, #e9e6df 100%)',
+  }}>
+    <svg width="46" height="46" viewBox="0 0 64 64" role="img" aria-label="Blank player avatar">
+      <circle cx="32" cy="21" r="12" fill="#b6b6b6" />
+      <path d="M9 59c1.7-13.3 10.6-21 23-21s21.3 7.7 23 21c.2 1.8-1.2 3-3 3H12c-1.8 0-3.2-1.2-3-3Z" fill="#b6b6b6" />
+    </svg>
+  </div>
+);
+
+const PlayerRatingBadges = ({ hearts, stars }: { hearts: number; stars: number }) => (
+  <div style={{
+    position: 'absolute', inset: 0, zIndex: 2, pointerEvents: 'none',
+    display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between',
+  }}>
+    <svg width="26" height="23" viewBox="0 0 30 28" role="img" aria-label={`${hearts} heart`}>
+      <path
+        d="M15 26C12.5 23.8 2 17.1 2 9.7 2 2.6 10.6.5 15 6.5 19.4.5 28 2.6 28 9.7 28 17.1 17.5 23.8 15 26Z"
+        fill="#e63a33" stroke="#a91d21" strokeWidth="1.5"
+      />
+      <text x="15" y="16" textAnchor="middle" fontSize="9" fontWeight="900" fill="#fff7df">{hearts}</text>
+    </svg>
+    <svg width="26" height="23" viewBox="0 0 30 28" role="img" aria-label={`${stars} stars`}>
+      <path
+        d="M15 1.2 18.7 9 27.4 9.9 20.9 15.7 22.7 24.2 15 19.8 7.3 24.2 9.1 15.7 2.6 9.9 11.3 9Z"
+        fill="#ffd33f" stroke="#a97b1d" strokeWidth="1.5" strokeLinejoin="round"
+      />
+      <text x="15" y="16.5" textAnchor="middle" fontSize="8" fontWeight="900" fill="#4d3a1f">{stars}</text>
+    </svg>
+  </div>
 );
 
 /* ─── Grass fence strip ─────────────────────────────────────────────────── */
@@ -512,72 +499,71 @@ const ToolTile = ({
 
 /* ─── Neighbor card ─────────────────────────────────────────────────────── */
 const NeighborCard = ({
-  name, illus, hearts = 1, stars = 5,
+  name, illus, hearts = 1, stars = 5, showStats = true,
 }: {
-  name: string; illus: React.ReactNode; hearts?: number; stars?: number;
+  name: string; illus?: React.ReactNode; hearts?: number; stars?: number; showStats?: boolean;
 }) => (
   <div
     className="active:scale-95 transition-transform"
     style={{
-      width: 80, flexShrink: 0, height: '100%',
-      border: '2px solid #c8880a',
-      borderBottom: '3px solid #8a5004',
-      borderRadius: 8,
-      background: 'linear-gradient(180deg, #f5dea0 0%, #d4b060 100%)',
+      width: 64, flexShrink: 0, height: 85, alignSelf: 'center',
+      border: '2px solid #e4d3ab',
+      borderBottom: '3px solid #96794a',
+      borderRadius: 5,
+      background: 'linear-gradient(180deg, #f1e2c0 0%, #d5c092 100%)',
       display: 'flex', flexDirection: 'column', overflow: 'hidden', cursor: 'pointer',
-      boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.35), 0 2px 6px rgba(0,0,0,0.35)',
+      boxShadow: 'inset 0 1px 0 rgba(255,255,255,.65), 0 2px 5px rgba(0,0,0,.3)',
     }}
   >
     {/* Name tab */}
     <div style={{
-      background: 'linear-gradient(180deg, #3e2008 0%, #2a1404 100%)',
+      background: 'linear-gradient(180deg, #eadbb7 0%, #d3be8e 100%)',
       padding: '2px 4px', textAlign: 'center',
-      fontSize: 9, fontWeight: 900, color: '#f5e0a0', letterSpacing: '0.06em',
+      fontSize: 9, fontWeight: 900, color: '#3d3828', letterSpacing: '0.04em',
       flexShrink: 0, lineHeight: '14px',
     }}>{name}</div>
     {/* Illustration */}
-    <div style={{ flex: 1, position: 'relative', overflow: 'hidden' }}>
+    <div style={{ flex: 1, position: 'relative', overflow: 'hidden', background: 'linear-gradient(180deg, #f6eedb, #e5d6b4)' }}>
       {illus}
-    </div>
-    {/* Hearts + Stars */}
-    <div style={{
-      display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 8,
-      padding: '3px 0', background: 'rgba(0,0,0,0.28)', flexShrink: 0,
-    }}>
-      <span style={{ fontSize: 9, color: '#ff8080', fontWeight: 900, display: 'flex', alignItems: 'center', gap: 1 }}>
-        ♥<span style={{ color: '#ffe0e0' }}>{hearts}</span>
-      </span>
-      <span style={{ fontSize: 9, color: '#ffe820', fontWeight: 900, display: 'flex', alignItems: 'center', gap: 1 }}>
-        ★<span style={{ color: '#fff4a0' }}>{stars}</span>
-      </span>
+      {showStats && <PlayerRatingBadges hearts={hearts} stars={stars} />}
     </div>
   </div>
 );
 
+/* ─── Marina card — the source image includes its matching frame and ratings ─ */
+const MarinaSnapshotCard = () => (
+  <div
+    style={{
+      width: 64, flexShrink: 0, height: 85, alignSelf: 'center',
+      overflow: 'hidden',
+      borderRadius: 5,
+      boxShadow: '0 2px 5px rgba(0,0,0,.3)',
+    }}
+  >
+    <img
+      src="/marina.jpg"
+      alt="Marina, one heart and five stars"
+      draggable={false}
+      style={{ display: 'block', width: '100%', height: '100%', objectFit: 'contain' }}
+    />
+  </div>
+);
+
 /* ─── Add-neighbor card — flex-fill so 5 cards span the available width ── */
-const AddNeighborCard = () => (
+const AddNeighborCard = ({ image }: { image: string }) => (
   <div
     className="active:scale-95 transition-transform"
     style={{
       flex: 1, minWidth: 0, height: '100%',
-      border: '2px solid #3a8a0e',
-      borderBottom: '3px solid #246004',
-      borderRadius: 8,
-      background: 'linear-gradient(180deg, #d0eca0 0%, #a8d060 100%)',
-      display: 'flex', flexDirection: 'column', overflow: 'hidden', cursor: 'pointer',
-      boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.40), 0 2px 6px rgba(0,0,0,0.30)',
-      position: 'relative',
+      display: 'flex', overflow: 'hidden', cursor: 'pointer',
     }}
   >
-    <div style={{
-      background: 'linear-gradient(180deg, #2a6008 0%, #1a4004 100%)',
-      padding: '2px 2px', textAlign: 'center',
-      fontSize: 8, fontWeight: 900, color: '#c8f060', letterSpacing: '0.07em',
-      flexShrink: 0, lineHeight: '13px',
-    }}>ADD NEIGHBOR</div>
-    <div style={{ flex: 1, position: 'relative', overflow: 'hidden' }}>
-      <AddNeighborIllus />
-    </div>
+    <img
+      src={image}
+      alt="Add neighbor invitation"
+      draggable={false}
+      style={{ display: 'block', width: '100%', height: '100%', objectFit: 'contain' }}
+    />
   </div>
 );
 
@@ -647,44 +633,35 @@ const InlineMarketGrid = ({ onOpenShop, onOpenQuests, onOpenCollections }: {
   onOpenCollections?: () => void;
 }) => {
   const cell: React.CSSProperties = {
-    width: 52, height: 44,
-    borderRadius: 8,
-    background: 'linear-gradient(180deg, #c8a870 0%, #9a7840 100%)',
-    border: '2px solid #7a5820',
-    borderBottom: '3px solid #5a3c10',
+    width: 52, height: 38,
+    borderRadius: 4,
+    background: 'linear-gradient(180deg, #eee4cd 0%, #c1b391 100%)',
+    border: '2px solid #74654d',
+    borderBottom: '3px solid #4e4435',
     display: 'flex', flexDirection: 'column',
     alignItems: 'center', justifyContent: 'center',
-    gap: 2, cursor: 'pointer',
-    boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.30), 0 2px 4px rgba(0,0,0,0.30)',
+    gap: 0, cursor: 'pointer', padding: 0,
+    boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.45), 0 2px 3px rgba(0,0,0,0.35)',
     position: 'relative', overflow: 'hidden',
     transition: 'transform 0.08s',
   };
-  const lbl: React.CSSProperties = {
-    fontSize: 7, fontWeight: 900, color: '#3a2008',
-    letterSpacing: '0.03em', lineHeight: 1,
-    textShadow: '0 1px 0 rgba(255,255,255,0.4)',
-  };
   const tiles = [
-    { icon: <IcoCursor />,     label: 'SELECT', cb: () => {} },
-    { icon: <IcoMarketSign />, label: 'MARKET', cb: onOpenShop },
-    { icon: <IcoCharacter />,  label: 'PROFILE', cb: () => {} },
-    { icon: <IcoFish />,       label: 'FISH',   cb: () => {} },
-    { icon: <IcoGift />,       label: 'GIFTS',  cb: () => {} },
-    { icon: <IcoScreen />,     label: 'DISPLAY', cb: () => {} },
+    { icon: <IcoCursor />,     label: 'Select',      cb: () => {} },
+    { icon: <IcoMarketSign />, label: 'Market',      cb: onOpenShop },
+    { icon: <IcoCharacter />,  label: 'Profile',     cb: onOpenCollections ?? (() => {}) },
+    { icon: <IcoQuest />,      label: 'Quests',      cb: onOpenQuests ?? (() => {}) },
+    { icon: <IcoGift />,       label: 'Collections', cb: onOpenCollections ?? (() => {}) },
+    { icon: <IcoPlant />,      label: 'Garden',      cb: onOpenCollections ?? (() => {}) },
   ];
   return (
     <div style={{
       flexShrink: 0,
-      background: 'linear-gradient(180deg, #b89050 0%, #8a6830 100%)',
-      border: '2px solid #5a3c10',
-      borderRadius: 10,
-      padding: '4px 5px',
+      padding: '0 5px',
       display: 'grid',
       gridTemplateColumns: 'repeat(3, 52px)',
-      gridTemplateRows: 'repeat(2, 44px)',
+      gridTemplateRows: 'repeat(2, 38px)',
       gap: 4,
       alignSelf: 'center',
-      boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.15), 0 2px 8px rgba(0,0,0,0.4)',
     }}>
       {tiles.map(({ icon, label, cb }) => (
         <button
@@ -694,10 +671,12 @@ const InlineMarketGrid = ({ onOpenShop, onOpenQuests, onOpenCollections }: {
           onMouseEnter={e => (e.currentTarget.style.transform = 'scale(0.94)')}
           onMouseLeave={e => (e.currentTarget.style.transform = 'scale(1)')}
           title={label}
+          aria-label={label}
         >
-          <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '40%', background: 'linear-gradient(180deg, rgba(255,255,255,0.28), transparent)', borderRadius: '6px 6px 0 0', pointerEvents: 'none' }}/>
-          {icon}
-          <span style={lbl}>{label}</span>
+          <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '40%', background: 'linear-gradient(180deg, rgba(255,255,255,0.35), transparent)', borderRadius: '4px 4px 0 0', pointerEvents: 'none' }}/>
+          <div style={{
+            height: 30, width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center',
+          }}>{icon}</div>
         </button>
       ))}
     </div>
@@ -726,7 +705,7 @@ const MarketCard = ({ onClick }: { onClick: () => void }) => (
       flexShrink: 0, lineHeight: '13px',
     }}>MARKET</div>
     <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 26 }}>
-      🛒
+      <IcoMarketSign />
     </div>
   </button>
 );
@@ -749,7 +728,7 @@ const MarketBtn = ({ onClick }: { onClick: () => void }) => (
       display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 4,
     }}
   >
-    🛒 MARKET
+    <IcoMarketSign /> MARKET
   </button>
 );
 
@@ -762,7 +741,6 @@ interface NeighborPanelProps {
 }
 
 const EMPTY_SLOTS = 5;
-
 export const NeighborPanel = ({
   playerName = 'Player',
   playerLevel = 1,
@@ -787,81 +765,121 @@ export const NeighborPanel = ({
     <div
       className="absolute bottom-0 left-0 right-0 z-30 flex flex-col select-none"
       style={{
-        height: 130,
+        height: 'calc(105px + min(36px, 4.12vw))',
         fontFamily: "'Fredoka', sans-serif",
-        boxShadow: '0 -4px 18px rgba(0,0,0,0.60)',
+        boxShadow: '0 -4px 18px rgba(0,0,0,0.48)',
+        border: '1px solid #242b33',
+        boxSizing: 'border-box',
       }}
     >
-      {/* ── Grass fence strip ──────────────────────────────────────────── */}
+      {/* Supplied Player's Island strip and icons; the earlier-removed Cancel button stays hidden. */}
+      <div
+        role="img"
+        aria-label="Player's Island header with navigation, help, and settings icons"
+        style={{
+          position: 'relative',
+          width: '100%',
+          height: 'min(36px, 4.12vw)',
+          flexShrink: 0,
+          overflow: 'hidden',
+        }}
+      >
+        <img
+          src={islandPanelHeaderReference}
+          alt=""
+          draggable={false}
+          style={{ display: 'block', width: '100%', height: '100%' }}
+        />
+        <span
+          aria-hidden="true"
+          style={{
+            position: 'absolute',
+            left: '76.4%',
+            top: '8%',
+            width: '10.2%',
+            height: '80%',
+            background: '#2aa0f4',
+          }}
+        />
+      </div>
+
       {/* ── Main panel body ─────────────────────────────────────────────── */}
       <div
         className="flex flex-1 min-h-0"
         style={{
-          background: 'linear-gradient(180deg, #c4a56a 0%, #9a7838 100%)',
-          borderTop: '2px solid #5a3a10',
+          background: 'repeating-linear-gradient(90deg, rgba(96,66,28,.05) 0 2px, transparent 2px 24px), linear-gradient(180deg, #e2d0a6 0%, #c3a878 100%)',
         }}
       >
         {/* ── Neighbor strip (flex-1) ────────────────────────────────────── */}
-        <div className="flex flex-col flex-1 min-w-0">
-          {/* Header */}
-          <div
-            style={{
-              height: 20, flexShrink: 0,
-              background: 'linear-gradient(180deg, #2e1c08 0%, #3e2c18 100%)',
-              borderBottom: '2px solid #5a3a10',
-              display: 'flex', alignItems: 'center',
-              padding: '0 6px', gap: 5,
-            }}
-          >
-            <span style={{ fontSize: 12 }}>🏝️</span>
-            <span style={{ color: '#f5e0a0', fontSize: 11, fontWeight: 900, letterSpacing: '0.06em', textShadow: '0 1px 3px rgba(0,0,0,0.7)' }}>
-              PLAYER'S ISLAND
-            </span>
-          </div>
-
-          {/* Card row: [◀ left arrows] | divider | 5×AddNeighbor | divider | [nav arrows] | AddNeighbor | MarketGrid */}
-          <div className="flex flex-1 min-h-0" style={{ padding: '4px', gap: 4, alignItems: 'stretch' }}>
+        <div className="flex flex-1 min-w-0">
+          {/* Card row: neighbors, blank Jake profile, Marina, then paging arrows */}
+          <div className="flex flex-1 min-h-0 min-w-0" style={{ padding: '4px', gap: 4, alignItems: 'center' }}>
 
             {/* Left-pointing arrows replacing the island cards */}
-            <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 3, flexShrink: 0 }}>
-              <NavArrowBtn symbol="◀" title="Back" />
-              <NavArrowBtn symbol="◀" title="Back" />
-              <NavArrowBtn symbol="◀" title="Back" />
+            <div className="hidden sm:flex" style={{ height: '100%', flexShrink: 0 }}>
+              <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 3, flexShrink: 0 }}>
+                <NavArrowBtn symbol="◀" title="Back" />
+                <NavArrowBtn symbol="◀" title="Back" />
+                <NavArrowBtn symbol="◀" title="Back" />
+              </div>
             </div>
 
             {/* Thin divider */}
-            <div style={{ width: 2, background: 'rgba(0,0,0,0.28)', borderRadius: 1, flexShrink: 0, margin: '2px 4px' }} />
+            <div className="hidden sm:block" style={{ width: 2, height: '82%', background: 'rgba(94,68,37,.45)', borderRadius: 1, flexShrink: 0, margin: '0 4px' }} />
 
-            {/* 5 Add-Neighbor cards — flex-fill */}
-            {Array.from({ length: 5 }, (_, i) => <AddNeighborCard key={i} />)}
+            {/* Five repeated two-person neighbor invitation cards */}
+            <div
+              className="flex min-w-0"
+              style={{
+                width: 'min(44vw, 450px)', flexShrink: 1, gap: 3,
+                alignItems: 'center', justifyContent: 'center',
+              }}
+            >
+              {Array.from({ length: EMPTY_SLOTS }, (_, i) => (
+                <div
+                  key={i}
+                  className={i >= 3 ? 'hidden sm:flex' : 'flex min-w-0'}
+                  style={{ flex: 1, minWidth: 0, height: 85 }}
+                >
+                  <AddNeighborCard image={i % 2 === 0 ? addNeighborPortraitsA : addNeighborPortraitsB} />
+                </div>
+              ))}
+            </div>
 
             {/* Thin divider before tabs */}
-            <div style={{ width: 2, background: 'rgba(0,0,0,0.28)', borderRadius: 1, flexShrink: 0, margin: '2px 4px' }} />
+            <div className="hidden sm:block" style={{ width: 2, height: '82%', background: 'rgba(94,68,37,.45)', borderRadius: 1, flexShrink: 0, margin: '0 4px' }} />
 
             {/* PLAYER / MARKET / MARINA tabs */}
-            <NeighborCard name="Player" illus={<PlayerBlankIllus />} hearts={1} stars={2} />
-            <NeighborCard name="Marina" illus={<MarinaCharIllus />} hearts={1} stars={5} />
+            <div className="hidden sm:flex" style={{ height: '100%', alignItems: 'center' }}>
+              <NeighborCard name={playerName} illus={<BlankPlayerAvatar />} hearts={1} stars={1} />
+            </div>
+            <div style={{ height: '100%', display: 'flex', alignItems: 'center', flexShrink: 0 }}>
+              <MarinaSnapshotCard />
+            </div>
 
             {/* Right-pointing arrows after MARINA */}
-            <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 3, flexShrink: 0 }}>
-              <NavArrowBtn symbol="▶" title="Next" />
-              <NavArrowBtn symbol="▶" title="Next" />
-              <NavArrowBtn symbol="▶" title="Next" />
+            <div className="hidden sm:flex" style={{ height: '100%', flexShrink: 0 }}>
+              <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 3, flexShrink: 0 }}>
+                <NavArrowBtn symbol="▶" title="Next" />
+                <NavArrowBtn symbol="▶" title="Next" />
+                <NavArrowBtn symbol="▶" title="Next" />
+              </div>
             </div>
           </div>
         </div>
 
         {/* ── Separator ──────────────────────────────────────────────────── */}
-        <div style={{ width: 2, background: 'rgba(0,0,0,0.30)', alignSelf: 'stretch', margin: '4px 0' }}/>
+        <div className="hidden sm:block" style={{ width: 2, background: 'rgba(94,68,37,.55)', alignSelf: 'stretch', margin: '5px 0' }}/>
 
         {/* ── Right dock — market grid ────────────────────────────────────── */}
         <div
+          className="hidden sm:flex"
           style={{
             flexShrink: 0,
-            background: 'linear-gradient(180deg, #7a5c30 0%, #4a3010 100%)',
-            borderLeft: '2px solid #3a2008',
+            background: 'repeating-linear-gradient(90deg, rgba(96,66,28,.05) 0 2px, transparent 2px 24px), linear-gradient(180deg, #e2d0a6 0%, #c3a878 100%)',
+            borderLeft: '2px solid #80603a',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
-            padding: '0 10px',
+            padding: '0 5px',
           }}
         >
           <InlineMarketGrid
@@ -901,7 +919,9 @@ export const NeighborPanel = ({
                   border: `3px solid ${activeBuildItem === item ? '#d4a020' : '#c0a070'}`,
                 }}
               >
-                <span style={{ fontSize: 22 }}>{EMOJI_MAP[item]}</span>
+                <span style={{ color: '#70502a', fontSize: 9, fontWeight: 900, letterSpacing: '.04em' }}>
+                  {item.replace('_', ' ')}
+                </span>
                 <span
                   className="absolute -top-2 -right-2 text-white text-[9px] font-black px-1 rounded-full border border-white"
                   style={{ background: '#e84040' }}

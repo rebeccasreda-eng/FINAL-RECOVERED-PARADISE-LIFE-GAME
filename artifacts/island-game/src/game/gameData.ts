@@ -56,7 +56,7 @@ export const QUESTS: QuestDef[] = [
     targetType: 'none',
     targetCount: 1,
     objectives: [
-      { description: 'Harvest 1 mango tree',   targetType: 'harvest_mango',     targetCount: 1, icon: '🥭' },
+      { description: 'Harvest 1 orange tree',  targetType: 'harvest_mango',     targetCount: 1, icon: '🍊' },
       { description: 'Feed 1 parrot',           targetType: 'feed_parrot',       targetCount: 1, icon: '🦜' },
       { description: 'Harvest 3 pineapples',    targetType: 'harvest_pineapple', targetCount: 3, icon: '🍍' },
     ],
@@ -140,6 +140,7 @@ export const OBJECT_CONFIG: Record<string, any> = {
   TREE_APPLE: { action: 'Harvest', energy: 1, coins: 5, xp: 10, drops: { wood: 1, food: 2 }, respawn: SCALED(60000) },
   ROCK: { action: 'Mine', energy: 1, coins: 8, xp: 15, drops: { stone: 1 }, respawn: SCALED(90000) },
   FLOWER_BUSH: { action: 'Harvest', energy: 1, coins: 3, xp: 8, respawn: SCALED(45000) },
+  BRANCH_CLUSTER: { action: 'Clear', energy: 1, coins: 2, xp: 5, respawn: SCALED(90000) },
   SUNFLOWER:   { action: 'Harvest', energy: 1, coins: 6, xp: 12, respawn: SCALED(90000) },
   BLUEBELL:       { action: 'Harvest', energy: 1, coins: 4, xp: 8,  respawn: SCALED(60000) },
   PANSY:          { action: 'Harvest', energy: 1, coins: 4, xp: 8,  respawn: SCALED(60000) },
@@ -169,10 +170,10 @@ export const OBJECT_CONFIG: Record<string, any> = {
 };
 
 export const EMOJI_MAP: Record<string, string> = {
-  TREE_PALM: '🌴', TREE_APPLE: '🍎', ROCK: '🪨', FLOWER_BUSH: '🌸', DRIFTWOOD: '🪵', SUNFLOWER: '🌻', PUDDLE: '💧', THORNS: '🌵',
+  TREE_PALM: '🍌', TREE_APPLE: '🍊', ROCK: '🪨', FLOWER_BUSH: '🌸', DRIFTWOOD: '🪵', SUNFLOWER: '🌻', PUDDLE: '💧', THORNS: '🌵',
   BLUEBELL: '💜', PANSY: '🌼', TULIP: '🌷', PINEAPPLE_PLANT: '🍍', BLUEBERRY_BUSH: '🫐',
-  TREE_COCONUT: '🌴', TREE_MANGO: '🥭', GARDEN_PATCH: '🍍',
-  TREE_COCONUT_UNRIPE: '🌴', TREE_MANGO_UNRIPE: '🥭',
+  TREE_COCONUT: '🍌', TREE_MANGO: '🍊', GARDEN_PATCH: '🍍',
+  TREE_COCONUT_UNRIPE: '🍌', TREE_MANGO_UNRIPE: '🍊',
   CROP_PLOT: '🟫', CROP_GROWING: '🌱', CROP_READY: '🌽', CROP_WILTED: '🥀',
   FISH_SPOT: '', HUT: '🏚️', DOCK: '⛵', WELL: '💧', 
   FLOWER_POT: '🪴', FENCE: '🚧', LANTERN: '🏮', CRAB: '🦀', BOAR: '🐗', BABY_PARROT: '🦜', TALL_ROCK: '🪨',
@@ -183,50 +184,78 @@ export const INITIAL_NEIGHBORS = [
   { id: 'n1', name: 'Marina', avatar: 'marina', level: 1, favorPoints: 0, wishlist: ['starfish'] },
 ];
 
+const ISLAND_GRID_SIZE = 31;
+const ISLAND_CENTER = 15;
+const gaussian = (value: number, sigma: number) => Math.exp(-(value * value) / (2 * sigma * sigma));
+
+function classifyReferenceTerrain(x: number, y: number): TileType | null {
+  const dx = x - ISLAND_CENTER;
+  const dy = y - ISLAND_CENTER;
+  const contour =
+    1 - (dx * dx) / (13.5 * 13.5) - (dy * dy) / (11.5 * 11.5) +
+    0.026 * Math.sin((x + y * 0.7) * 0.52) +
+    0.018 * Math.cos((x * 0.4 - y) * 0.66);
+
+  if (contour < -0.38) return null;
+  if (contour <= 0) return 'WATER';
+
+  const screenU = x - y;
+  const screenV = x + y;
+  const inletReach = Math.max(0, Math.min(1, (-screenU - 1) / 4.5));
+  const inletCenterV = 30 + 1.1 * Math.sin((screenU + 6) * 0.27);
+  const leftInlet = gaussian(screenV - inletCenterV, 1.6) * 0.92 * inletReach;
+  const lagoon = gaussian(screenU - 3.5, 1.6) * gaussian(screenV - 24, 1.15) * 0.95;
+  const terrainValue = contour - Math.max(leftInlet, lagoon);
+
+  if (terrainValue > 0.45) return 'GRASS';
+  // Keep beaches to a narrow coastal band while maintaining a broad grassy island.
+  if (terrainValue > 0.28) return 'SAND';
+  return 'WATER';
+}
+
+function updateShoreDepth(tiles: Record<string, TileData>) {
+  for (const tile of Object.values(tiles)) {
+    if (tile.shoreDepth === undefined) continue;
+    const updated = { ...tile };
+    delete updated.shoreDepth;
+    tiles[tile.id] = updated;
+  }
+
+  const queue: Array<{ id: string; depth: number }> = [];
+  for (const tile of Object.values(tiles)) {
+    if (tile.type === 'WATER') continue;
+    for (const [dx, dy] of [[-1, 0], [1, 0], [0, -1], [0, 1]] as const) {
+      const neighbor = tiles[`${tile.x + dx},${tile.y + dy}`];
+      if (neighbor?.type === 'WATER' && neighbor.shoreDepth === undefined) {
+        tiles[neighbor.id] = { ...neighbor, shoreDepth: 1 };
+        queue.push({ id: neighbor.id, depth: 1 });
+      }
+    }
+  }
+
+  let index = 0;
+  while (index < queue.length) {
+    const { id, depth } = queue[index++];
+    const [x, y] = id.split(',').map(Number);
+    for (const [dx, dy] of [[-1, 0], [1, 0], [0, -1], [0, 1]] as const) {
+      const neighbor = tiles[`${x + dx},${y + dy}`];
+      if (neighbor?.type === 'WATER' && neighbor.shoreDepth === undefined) {
+        tiles[neighbor.id] = { ...neighbor, shoreDepth: depth + 1 };
+        queue.push({ id: neighbor.id, depth: depth + 1 });
+      }
+    }
+  }
+}
+
 export function generateIsland(): Record<string, TileData> {
-  const GRID = 31;
-  const CX = 15, CY = 15; // island centre tile
-
-  // ── Terrain value ───────────────────────────────────────────────────────
-  // Two explicit Gaussian channels carve clear river gaps through the island:
-  //   • Horizontal channel:  runs left→right at y ≈ CY-2  (upper third)
-  //   • Vertical channel:    runs top→bottom at x ≈ CX+3  (right third)
-  // Together they form a ⌐ shape, splitting the island into three sections.
-  const G = (v: number, sigma: number) => Math.exp(-(v * v) / (2 * sigma * sigma));
-
-  const terrainVal = (x: number, y: number): number => {
-    const dx = x - CX, dy = y - CY;
-    const distSq = (dx * dx) / (13.5 * 13.5) + (dy * dy) / (11.5 * 11.5);
-    const radial  = 1.0 - distSq;
-
-    // Horizontal channel — reduced depth so centre tiles become sand (connected)
-    // while channel mouths at island edges remain water
-    const hRiver = G(dy + 2, 1.35) * 0.68;
-
-    // Vertical channel — likewise shallower so middle is sandy
-    const vRiver = dy > -5 ? G(dx - 3, 1.15) * 0.60 : 0;
-
-    return radial - Math.max(hRiver, vRiver);
-  };
-
-  // ── Classify terrain ────────────────────────────────────────────────────
-  const classifyTile = (x: number, y: number): TileType | null => {
-    const dx = x - CX, dy = y - CY;
-    const distSq = (dx * dx) / (13.5 * 13.5) + (dy * dy) / (11.5 * 11.5);
-    const radial  = 1.0 - distSq;
-    if (radial < -0.38) return null;    // outside render range
-    if (radial <= 0)    return 'WATER'; // outer ocean
-    const tv = terrainVal(x, y);
-    if (tv > 0.55) return 'GRASS';
-    if (tv > 0.18) return 'SAND';
-    return 'WATER'; // river/channel carved by Gaussian trough
-  };
+  const GRID = ISLAND_GRID_SIZE;
+  const CX = ISLAND_CENTER, CY = ISLAND_CENTER;
 
   // ── Build tile map ──────────────────────────────────────────────────────
   const tiles: Record<string, TileData> = {};
   for (let y = 0; y < GRID; y++) {
     for (let x = 0; x < GRID; x++) {
-      const type = classifyTile(x, y);
+      const type = classifyReferenceTerrain(x, y);
       if (!type) continue;
       const id = `${x},${y}`;
       tiles[id] = { id, x, y, type };
@@ -261,14 +290,16 @@ export function generateIsland(): Record<string, TileData> {
   for (let y = 0; y < GRID; y++) {
     for (let x = 0; x < GRID; x++) {
       if (x === CX && y === CY) continue;
+      if (Math.hypot(x - CX, y - CY) < 4.4) continue;
       const tile = tiles[`${x},${y}`];
       if (!tile) continue;
       const ff = forestFactor(x, y);
 
       // Isometric "back" = small x+y (upper-screen area). Centre sum = CX+CY = 30.
       const diagSum    = x + y;
-      const isDeepBack = diagSum < 22;            // dense-but-spaced forest zone
-      const isMidBack  = diagSum >= 22 && diagSum < 28; // light transition strip
+      const isDeepBack = diagSum < 23;
+      const isMidBack  = diagSum >= 23 && diagSum < 29;
+      const isSideGrove = Math.abs(x - y) >= 7 && diagSum >= 29 && diagSum <= 40;
 
       // Adjacent to water → eligible for a waterside coconut palm
       const adjToWater = [[-1,0],[1,0],[0,-1],[0,1]].some(([dx,dy]) => {
@@ -280,9 +311,8 @@ export function generateIsland(): Record<string, TileData> {
         const r = rand();
 
         if (isDeepBack) {
-          // ── Back forest: high probability but minDist=1 → no two trees touch ──
-          // treePct: 45–62 % raw chance; spacing thins it to ~35–45 % actual fill
-          const treePct = 0.45 + ff * 0.17;
+          // Dense back tree line, with spacing so each imported canopy stays distinct.
+          const treePct = 0.64 + ff * 0.08;
           if (r < treePct) {
             const tr = rand();
             const type = tr < 0.25 ? 'TREE_COCONUT_UNRIPE'
@@ -292,14 +322,26 @@ export function generateIsland(): Record<string, TileData> {
             const ripenOffset = type === 'TREE_COCONUT_UNRIPE' ? COCONUT_RIPEN_TIME
                              : type === 'TREE_MANGO_UNRIPE'   ? MANGO_RIPEN_TIME : 0;
             const extras = ripenOffset > 0 ? { ripensAt: Date.now() + Math.floor(rand() * ripenOffset) } : undefined;
-            placeTree(tile, type, 1, extras); // minDist=1
+            placeTree(tile, type, 1, extras); // denser back line with distinct canopies
           } else if (r < treePct + 0.04) {
             tile.object = 'FLOWER_BUSH';
           }
 
+        } else if (isSideGrove) {
+          const treePct = 0.15 + ff * 0.05;
+          if (r < treePct) {
+            const tr = rand();
+            const type = tr < 0.45 ? 'TREE_COCONUT_UNRIPE'
+                       : tr < 0.78 ? 'TREE_MANGO_UNRIPE'
+                       :             'TREE_APPLE';
+            const ripenOffset = type === 'TREE_COCONUT_UNRIPE' ? COCONUT_RIPEN_TIME
+                              : type === 'TREE_MANGO_UNRIPE'   ? MANGO_RIPEN_TIME : 0;
+            const extras = ripenOffset > 0 ? { ripensAt: Date.now() + Math.floor(rand() * ripenOffset) } : undefined;
+            placeTree(tile, type, 2, extras);
+          }
+
         } else if (isMidBack) {
-          // ── Mid zone: more trees to fill the transition band ──────────
-          const treePct = 0.30 + ff * 0.14;
+          const treePct = 0.34 + ff * 0.10;
           if (r < treePct) {
             const tr = rand();
             const type = tr < 0.35 ? 'TREE_MANGO_UNRIPE'
@@ -308,15 +350,15 @@ export function generateIsland(): Record<string, TileData> {
             const ripenOffset2 = type === 'TREE_COCONUT_UNRIPE' ? COCONUT_RIPEN_TIME
                                : type === 'TREE_MANGO_UNRIPE'   ? MANGO_RIPEN_TIME : 0;
             const extras2 = ripenOffset2 > 0 ? { ripensAt: Date.now() + Math.floor(rand() * ripenOffset2) } : undefined;
-            placeTree(tile, type, 2, extras2); // minDist=2
+            placeTree(tile, type, 1, extras2); // nearer, but still distinct canopies
           } else if (r < treePct + 0.03) {
             tile.object = 'FLOWER_BUSH';
           }
 
         } else {
-          // ── Front / open: scattered palms, not just waterside ─────────
-          const palmChance  = adjToWater ? 0.14 : 0.06;
-          const mangoChance = 0.05;
+          // Keep the central walking area open; only the outer edge gets sparse palms.
+          const palmChance  = adjToWater ? 0.04 : 0.015;
+          const mangoChance = 0.01;
           if (r < palmChance) {
             placeTree(tile, 'TREE_COCONUT_UNRIPE', 3, { ripensAt: Date.now() + Math.floor(rand() * COCONUT_RIPEN_TIME) }); // minDist=3
           } else if (r < palmChance + mangoChance) {
@@ -337,12 +379,16 @@ export function generateIsland(): Record<string, TileData> {
   // ── Special game objects ────────────────────────────────────────────────
   const pick = (arr: TileData[]) => arr.splice(Math.floor(rand() * arr.length), 1)[0];
 
-  const emptyGrass = Object.values(tiles).filter(t => t.type === 'GRASS' && !t.object);
+  const emptyGrass = Object.values(tiles).filter(t =>
+    t.type === 'GRASS' &&
+    !t.object &&
+    Math.hypot(t.x - CX, t.y - CY) >= 4.4
+  );
   const inner = emptyGrass.filter(t => forestFactor(t.x, t.y) < 0.40);
   const outer = emptyGrass.filter(t => forestFactor(t.x, t.y) >= 0.40);
 
-  // ── Near-mango section: GARDEN_PATCH, PINEAPPLE_PLANT, BLUEBERRY_BUSH ──
-  // All three only spawn within 5 tiles of a mango (yellow fruit) tree
+  // ── Near-mango section: fenced GARDEN_PATCH and BLUEBERRY_BUSH ──────────
+  // These spawn within 5 tiles of a mango (yellow fruit) tree.
   const mangoTiles = Object.values(tiles).filter(t =>
     t.object === 'TREE_MANGO' || t.object === 'TREE_MANGO_UNRIPE'
   );
@@ -358,7 +404,6 @@ export function generateIsland(): Record<string, TileData> {
     }
   };
   placeNearMango('GARDEN_PATCH',    4);
-  placeNearMango('PINEAPPLE_PLANT', 4);
   placeNearMango('BLUEBERRY_BUSH',  3);
 
   for (let i = 0; i < 3 && inner.length; i++) pick(inner).object = 'CROP_PLOT';
@@ -378,7 +423,7 @@ export function generateIsland(): Record<string, TileData> {
 
   const waterTiles = Object.values(tiles).filter(t => t.type === 'WATER');
 
-  // ── Marina dock — place on the interior channel water tile closest to centre ─
+  // ── Marina dock — anchor it on the left inlet beside the player's vertical band ─
   const interiorWater = waterTiles.filter(t => {
     const dirs = [[-1,0],[1,0],[0,-1],[0,1]] as const;
     return dirs.some(([dx,dy]) => {
@@ -386,8 +431,8 @@ export function generateIsland(): Record<string, TileData> {
       return nb && (nb.type === 'SAND' || nb.type === 'GRASS');
     });
   }).sort((a, b) => {
-    const da = (a.x - CX) ** 2 + (a.y - CY) ** 2;
-    const db = (b.x - CX) ** 2 + (b.y - CY) ** 2;
+    const da = (a.x - 12) ** 2 + (a.y - 18) ** 2;
+    const db = (b.x - 12) ** 2 + (b.y - 18) ** 2;
     return da - db;
   });
   if (interiorWater.length && !interiorWater[0].object) {
@@ -427,9 +472,9 @@ export function generateIsland(): Record<string, TileData> {
   );
   for (let i = 0; i < 2 && drumWater.length; i++) pick(drumWater).object = 'TOXIC_DRUM';
 
-  // ── Driftwood logs on left-side shore tiles adjacent to water ────────────
+  // ── Driftwood logs on the screen-left shore beside the inlet ─────────────
   const leftShore = Object.values(tiles).filter(t =>
-    t.type === 'SAND' && !t.object && t.x < CX - 2 &&
+    t.type === 'SAND' && !t.object && t.x - t.y < -2 &&
     ([[-1,0],[1,0],[0,-1],[0,1]] as const).some(([dx,dy]) => {
       const nb = tiles[`${t.x+dx},${t.y+dy}`];
       return nb?.type === 'WATER';
@@ -437,18 +482,10 @@ export function generateIsland(): Record<string, TileData> {
   );
   for (let i = 0; i < 3 && leftShore.length; i++) pick(leftShore).object = 'DRIFTWOOD';
 
-  // ── Puddles near trees — small water pools under the canopy ─────────────
+  // ── Tree-neighbor set for standing rocks around the canopy ───────────────
   const ALL_TREE_TYPES: ObjectType[] = ['TREE_COCONUT', 'TREE_MANGO', 'TREE_APPLE', 'TREE_PALM', 'TREE_COCONUT_UNRIPE', 'TREE_MANGO_UNRIPE'];
   const treeTiles = Object.values(tiles).filter(t => t.object && ALL_TREE_TYPES.includes(t.object as ObjectType));
   const TREE_NEIGHBORS = [[-1,0],[1,0],[0,-1],[0,1],[-1,-1],[1,-1],[-1,1],[1,1]] as const;
-  for (const tree of treeTiles) {
-    for (const [dx, dy] of TREE_NEIGHBORS) {
-      const nb = tiles[`${tree.x + dx},${tree.y + dy}`];
-      if (nb && nb.type === 'GRASS' && !nb.object && rand() < 0.28) {
-        nb.object = 'PUDDLE';
-      }
-    }
-  }
 
   // ── Tall rocks near trees — mossy standing stones beside the canopy ──────
   for (const tree of treeTiles) {
@@ -502,32 +539,500 @@ export function generateIsland(): Record<string, TileData> {
     }
   }
 
-  // ── Shore-depth BFS — stamp every WATER tile with distance to nearest land ─
-  // Seed: water tiles directly adjacent to a non-water tile get depth 1
-  const bfsQueue: Array<{ id: string; depth: number }> = [];
-  for (const tile of Object.values(tiles)) {
-    if (tile.type === 'WATER') continue;
-    for (const [dx, dy] of [[-1,0],[1,0],[0,-1],[0,1]] as const) {
-      const nb = tiles[`${tile.x + dx},${tile.y + dy}`];
-      if (nb?.type === 'WATER' && nb.shoreDepth === undefined) {
-        nb.shoreDepth = 1;
-        bfsQueue.push({ id: nb.id, depth: 1 });
-      }
+  updateShoreDepth(tiles);
+
+  return tiles;
+}
+
+/**
+ * Applies the reference terrain and scenery layout to new worlds and older
+ * saves while preserving object state, and keeps initial crop plots usable.
+ */
+export function ensureIslandScenery(sourceTiles: Record<string, TileData>): Record<string, TileData> {
+  const tiles = { ...sourceTiles };
+  const values = () => Object.values(tiles);
+  const isLand = (tile: TileData) => tile.type === 'GRASS' || tile.type === 'SAND';
+  const distance = (a: TileData, b: TileData) => Math.abs(a.x - b.x) + Math.abs(a.y - b.y);
+  const centerDistance = (tile: TileData) => Math.hypot(tile.x - 15, tile.y - 15);
+  const inSceneryView = (tile: TileData) =>
+    tile.x + tile.y >= 20 &&
+    tile.x + tile.y <= 27 &&
+    Math.abs(tile.x - tile.y) <= 12;
+  const adjacentToWater = (tile: TileData) =>
+    [[-1, 0], [1, 0], [0, -1], [0, 1]].some(([dx, dy]) =>
+      tiles[`${tile.x + dx},${tile.y + dy}`]?.type === 'WATER'
+    );
+  const treeTypes = new Set<ObjectType>([
+    'TREE_PALM',
+    'TREE_APPLE',
+    'TREE_COCONUT',
+    'TREE_MANGO',
+    'TREE_COCONUT_UNRIPE',
+    'TREE_MANGO_UNRIPE',
+  ]);
+
+  // Convert the earlier visual soil marker to a gameplay-only flag before
+  // scenery is moved, so these saved plots remain in their original positions.
+  for (const tile of values()) {
+    const legacyTile = tile as TileData & { soilPatch?: boolean };
+    if (!legacyTile.soilPatch) continue;
+    const migratedTile = { ...tile, cropPlotAfterTree: true } as TileData & { soilPatch?: boolean };
+    delete migratedTile.soilPatch;
+    tiles[tile.id] = migratedTile;
+  }
+
+  // Rebuild only the base terrain field. Existing objects and gameplay state
+  // stay in the save; water objects are moved to the nearest matching water.
+  const waterObjectsToRelocate: TileData[] = [];
+  const waterOnlyObjects = new Set<ObjectType>(['DOCK', 'FISH_SPOT', 'TOXIC_DRUM']);
+  for (const tile of values()) {
+    const plannedType = classifyReferenceTerrain(tile.x, tile.y) ?? 'WATER';
+    if (tile.object && waterOnlyObjects.has(tile.object) && plannedType !== 'WATER') {
+      const cleared = { ...tile, type: plannedType, object: undefined };
+      delete cleared.shoreDepth;
+      tiles[tile.id] = cleared;
+      waterObjectsToRelocate.push({ ...tile, type: 'WATER' });
+      continue;
+    }
+
+    const preserveLandUnderObject =
+      Boolean(tile.object) &&
+      !waterOnlyObjects.has(tile.object as ObjectType) &&
+      plannedType === 'WATER';
+    const nextType = preserveLandUnderObject ? (isLand(tile) ? tile.type : 'GRASS') : plannedType;
+    if (tile.type !== nextType) tiles[tile.id] = { ...tile, type: nextType };
+  }
+
+  for (const objectTile of waterObjectsToRelocate) {
+    const destination = values()
+      .filter(tile => tile.type === 'WATER' && !tile.object)
+      .sort((a, b) =>
+        ((a.x - objectTile.x) ** 2 + (a.y - objectTile.y) ** 2) -
+        ((b.x - objectTile.x) ** 2 + (b.y - objectTile.y) ** 2)
+      )[0];
+    if (!destination) {
+      const source = tiles[objectTile.id];
+      if (source) tiles[source.id] = { ...source, type: 'WATER', object: objectTile.object };
+      continue;
+    }
+    const moved = {
+      ...objectTile,
+      id: destination.id,
+      x: destination.x,
+      y: destination.y,
+      type: 'WATER' as const,
+    };
+    delete moved.shoreDepth;
+    tiles[destination.id] = moved;
+  }
+
+  // Keep the dock at the left inlet, beside the player's vertical band.
+  const existingDock = values().find(tile => tile.object === 'DOCK');
+  if (existingDock && Math.hypot(existingDock.x - 12, existingDock.y - 18) > 1) {
+    const dockSpot = values()
+      .filter(tile =>
+        tile.type === 'WATER' &&
+        !tile.object &&
+        [[-1, 0], [1, 0], [0, -1], [0, 1]].some(([dx, dy]) =>
+          isLand(tiles[`${tile.x + dx},${tile.y + dy}`] ?? tile)
+        )
+      )
+      .sort((a, b) =>
+        ((a.x - 12) ** 2 + (a.y - 18) ** 2) -
+        ((b.x - 12) ** 2 + (b.y - 18) ** 2)
+      )[0];
+    if (dockSpot) {
+      tiles[existingDock.id] = { ...existingDock, object: undefined };
+      tiles[dockSpot.id] = { ...dockSpot, object: 'DOCK' };
     }
   }
-  // Propagate outward
-  let qi = 0;
-  while (qi < bfsQueue.length) {
-    const { id, depth } = bfsQueue[qi++];
-    const [tx, ty] = id.split(',').map(Number);
-    for (const [dx, dy] of [[-1,0],[1,0],[0,-1],[0,1]] as const) {
-      const nb = tiles[`${tx + dx},${ty + dy}`];
-      if (nb?.type === 'WATER' && nb.shoreDepth === undefined) {
-        nb.shoreDepth = depth + 1;
-        bfsQueue.push({ id: nb.id, depth: depth + 1 });
+
+  // Bring natural trees out of the spawn clearing without losing their
+  // harvest/chop timers or health; the back line and side groves stay full.
+  const centralTrees = values().filter(tile =>
+    tile.object &&
+    treeTypes.has(tile.object) &&
+    centerDistance(tile) < 4.4 &&
+    !tile.cropPlotAfterTree
+  );
+  for (const source of centralTrees) {
+    const candidates = values()
+      .filter(tile =>
+        isLand(tile) &&
+        !tile.object &&
+        !tile.cropPlotAfterTree &&
+        centerDistance(tile) >= 4.4 &&
+        (tile.x + tile.y <= 27 || Math.abs(tile.x - tile.y) >= 7) &&
+        !values().some(neighbor =>
+          neighbor.object &&
+          treeTypes.has(neighbor.object) &&
+          Math.abs(neighbor.x - tile.x) <= 1 &&
+          Math.abs(neighbor.y - tile.y) <= 1
+        )
+      )
+      .sort((a, b) => {
+        const score = (tile: TileData) =>
+          Math.abs(tile.x + tile.y - 23) +
+          Math.max(0, 5 - Math.abs(tile.x - tile.y)) +
+          distance(tile, source) * 0.15;
+        return score(a) - score(b);
+      });
+    const destination = candidates[0];
+    if (!destination || !source.object) continue;
+
+    tiles[destination.id] = {
+      ...destination,
+      object: source.object,
+      treeHp: source.treeHp,
+      ripensAt: source.ripensAt,
+      growsAt: source.growsAt,
+      layoutDecoration: source.layoutDecoration,
+    };
+    tiles[source.id] = {
+      ...source,
+      type: classifyReferenceTerrain(source.x, source.y) ?? 'WATER',
+      object: undefined,
+      treeHp: undefined,
+      ripensAt: undefined,
+      growsAt: undefined,
+      layoutDecoration: undefined,
+    };
+  }
+
+  // Keep most natural fruit trees in a readable line along the back of the island.
+  const naturalTrees = values().filter(tile =>
+    tile.object && treeTypes.has(tile.object) && !tile.cropPlotAfterTree
+  );
+  const targetBackTreeCount = Math.ceil(naturalTrees.length * 0.85);
+  let backTreeCount = naturalTrees.filter(tile => tile.x + tile.y <= 30).length;
+  const sideTrees = naturalTrees
+    .filter(tile => tile.x + tile.y > 30)
+    .sort((a, b) => (b.x + b.y) - (a.x + a.y) || a.id.localeCompare(b.id));
+
+  for (const source of sideTrees) {
+    if (backTreeCount >= targetBackTreeCount || !source.object) break;
+    const destination = values()
+      .filter(tile =>
+        isLand(tile) &&
+        !tile.object &&
+        !tile.cropPlotAfterTree &&
+        centerDistance(tile) >= 4.4 &&
+        tile.x + tile.y <= 30
+      )
+      .sort((a, b) => {
+        const score = (tile: TileData) =>
+          Math.abs(tile.x + tile.y - 22) +
+          Math.abs(tile.x - tile.y) * 0.04 +
+          distance(tile, source) * 0.08;
+        return score(a) - score(b) || a.id.localeCompare(b.id);
+      })[0];
+    if (!destination) break;
+
+    tiles[destination.id] = {
+      ...destination,
+      object: source.object,
+      treeHp: source.treeHp,
+      ripensAt: source.ripensAt,
+      growsAt: source.growsAt,
+      layoutDecoration: source.layoutDecoration,
+    };
+    tiles[source.id] = {
+      ...source,
+      type: classifyReferenceTerrain(source.x, source.y) ?? 'WATER',
+      object: undefined,
+      treeHp: undefined,
+      ripensAt: undefined,
+      growsAt: undefined,
+      layoutDecoration: undefined,
+    };
+    backTreeCount += 1;
+  }
+
+  // Remove the pre-placed decorative hut from new and saved islands.
+  for (const tile of values()) {
+    if (tile.object === 'ISLAND_HUT') {
+      tiles[tile.id] = { ...tile, object: undefined };
+    }
+  }
+
+  // Keep the fixed decorative trees in the area the player sees at spawn.
+  for (const tile of values()) {
+    if (
+      (tile.object === 'PINE_TREE' || tile.object === 'PALM_TRUNK') &&
+      !inSceneryView(tile)
+    ) {
+      tiles[tile.id] = { ...tile, object: undefined };
+    }
+  }
+
+  // A player-built hut remains valid scenery anchor; never add one automatically.
+  const home = values().find(tile => tile.object === 'HUT');
+
+  if (home) {
+    for (const tile of values()) {
+      const pineIsInPlace =
+        tile.object === 'PINE_TREE' &&
+        inSceneryView(tile) &&
+        distance(tile, home) <= 3 &&
+        tile.x - tile.y < home.x - home.y;
+      const trunkIsInPlace =
+        tile.object === 'PALM_TRUNK' &&
+        inSceneryView(tile) &&
+        distance(tile, home) <= 7 &&
+        tile.x - tile.y > home.x - home.y;
+      if ((tile.object === 'PINE_TREE' && !pineIsInPlace) || (tile.object === 'PALM_TRUNK' && !trunkIsInPlace)) {
+        tiles[tile.id] = { ...tile, object: undefined };
       }
     }
   }
 
+  const placeIfMissing = (
+    object: ObjectType,
+    preferred: (tile: TileData) => boolean,
+    score: (tile: TileData) => number,
+  ) => {
+    if (values().some(tile => tile.object === object)) return;
+    const available = values().filter(tile => isLand(tile) && !tile.object);
+    const preferredSpot = available.filter(preferred).sort((a, b) => score(a) - score(b))[0];
+    const fallbackSpot = preferredSpot ?? available.sort((a, b) => score(a) - score(b))[0];
+    if (fallbackSpot) tiles[fallbackSpot.id] = { ...fallbackSpot, object };
+  };
+
+  placeIfMissing(
+    'PINE_TREE',
+    tile =>
+      isLand(tile) &&
+      inSceneryView(tile) &&
+      (home
+        ? distance(tile, home) <= 3 && tile.x - tile.y < home.x - home.y
+        : tile.x - tile.y < -3),
+    tile => {
+      const nearHome = home
+        ? distance(tile, home)
+        : Math.abs(tile.x + tile.y - 23) + Math.abs(tile.x - tile.y + 7) * 0.4;
+      const sitsBehind = home && tile.x + tile.y < home.x + home.y;
+      const sitsLeftOfHome = home && tile.x - tile.y < home.x - home.y;
+      return nearHome +
+        (tile.type === 'GRASS' ? 0 : 0.35) +
+        (sitsBehind ? 0 : 0.4) +
+        (sitsLeftOfHome ? 0 : 4);
+    },
+  );
+
+  placeIfMissing(
+    'PALM_TRUNK',
+    tile =>
+      adjacentToWater(tile) &&
+      inSceneryView(tile) &&
+      (home ? distance(tile, home) <= 7 : tile.x - tile.y >= 3),
+    tile => {
+      const nearHome = home
+        ? distance(tile, home)
+        : Math.abs(tile.x + tile.y - 25) + Math.abs(tile.x - tile.y - 5) * 0.4;
+      const sitsRightOfHome = home && tile.x - tile.y > home.x - home.y;
+      return nearHome + (sitsRightOfHome ? 0 : 4);
+    },
+  );
+
+  // Add a few low branch clusters beside tropical flowers. This decoration is
+  // also applied to saved islands without resetting any existing progress.
+  const branchClusters = values().filter(tile => tile.object === 'BRANCH_CLUSTER');
+  const tropicalFlowers = values().filter(tile => tile.object === 'FLOWER_BUSH');
+  const targetBranchClusterCount = 3;
+  while (branchClusters.length < targetBranchClusterCount) {
+    const destination = values()
+      .filter(tile =>
+        tile.type === 'GRASS' &&
+        !tile.object &&
+        centerDistance(tile) >= 5 &&
+        tropicalFlowers.some(flower => distance(tile, flower) <= 2) &&
+        branchClusters.every(cluster => distance(tile, cluster) >= 3)
+      )
+      .sort((a, b) => {
+        const nearestFlower = (tile: TileData) =>
+          Math.min(...tropicalFlowers.map(flower => distance(tile, flower)));
+        return nearestFlower(a) - nearestFlower(b) || a.id.localeCompare(b.id);
+      })[0];
+    if (!destination) break;
+    const cluster: TileData = { ...destination, object: 'BRANCH_CLUSTER' };
+    tiles[destination.id] = cluster;
+    branchClusters.push(cluster);
+  }
+
+  // Add a small row of leafy palms behind the open center, spread across the
+  // island to match the supplied layout rather than concentrating them at spawn.
+  const backPalmAnchors = [{ x: 4, y: 18 }, { x: 8, y: 12 }, { x: 19, y: 8 }];
+  const backPalmCount = 4;
+  const palmTiles = values().filter(tile => tile.object === 'PALM_TRUNK');
+  for (const anchor of backPalmAnchors) {
+    if (palmTiles.length >= backPalmCount) break;
+    if (palmTiles.some(tile => Math.hypot(tile.x - anchor.x, tile.y - anchor.y) < 2.5)) continue;
+
+    const destination = values()
+      .filter(tile =>
+        isLand(tile) &&
+        !tile.object &&
+        tile.x + tile.y <= 27 &&
+        Math.abs(tile.x - tile.y) <= 15 &&
+        centerDistance(tile) >= 6 &&
+        palmTiles.every(palm => Math.hypot(palm.x - tile.x, palm.y - tile.y) >= 3)
+      )
+      .sort((a, b) => {
+        const score = (tile: TileData) =>
+          Math.hypot(tile.x - anchor.x, tile.y - anchor.y) * 2 +
+          (tile.type === 'GRASS' ? 0 : 1.25);
+        return score(a) - score(b) || a.id.localeCompare(b.id);
+      })[0];
+    if (!destination) continue;
+
+    const palm: TileData = { ...destination, object: 'PALM_TRUNK' };
+    tiles[destination.id] = palm;
+    palmTiles.push(palm);
+  }
+
+  // Move one existing fruit tree onto each untouched initial crop plot.
+  // The tile keeps its grass/sand ground, and tree interactions stay unchanged.
+  const brownPlots = values().filter(tile => tile.type === 'GRASS' && tile.object === 'CROP_PLOT');
+  for (const plot of brownPlots) {
+    const source = values()
+      .filter(tile => tile.type === 'GRASS' && treeTypes.has(tile.object as ObjectType) && !tile.cropPlotAfterTree)
+      .sort((a, b) => distance(a, plot) - distance(b, plot) || a.id.localeCompare(b.id))[0];
+    if (!source || !source.object) continue;
+
+    tiles[plot.id] = {
+      ...plot,
+      object: source.object,
+      treeHp: source.treeHp,
+      ripensAt: source.ripensAt,
+      growsAt: source.growsAt,
+      cropPlotAfterTree: true,
+    };
+    tiles[source.id] = {
+      ...source,
+      object: undefined,
+      treeHp: undefined,
+      ripensAt: undefined,
+      growsAt: undefined,
+    };
+  }
+
+  updateShoreDepth(tiles);
   return tiles;
+}
+
+type DecorationRespawn = { tileId: string; object: ObjectType; respawnAt: number };
+
+const NATURAL_DECORATION_ANCHORS: Partial<Record<ObjectType, Array<{ x: number; y: number }>>> = {
+  FLOWER_BUSH: [{ x: 6, y: 12 }, { x: 10, y: 17 }, { x: 22, y: 11 }, { x: 17, y: 22 }, { x: 22, y: 16 }],
+  SUNFLOWER: [{ x: 12, y: 8 }, { x: 22, y: 16 }, { x: 22, y: 21 }],
+  BLUEBELL: [{ x: 13, y: 7 }, { x: 17, y: 22 }, { x: 6, y: 12 }, { x: 22, y: 11 }],
+  PANSY: [{ x: 16, y: 8 }, { x: 22, y: 16 }, { x: 21, y: 21 }, { x: 10, y: 17 }],
+  TULIP: [{ x: 10, y: 17 }, { x: 24, y: 16 }, { x: 17, y: 22 }, { x: 12, y: 8 }],
+  ROCK: [{ x: 11, y: 20 }, { x: 24, y: 10 }, { x: 24, y: 16 }, { x: 17, y: 22 }, { x: 21, y: 21 }],
+  TALL_ROCK: [{ x: 24, y: 16 }, { x: 11, y: 20 }, { x: 21, y: 21 }, { x: 16, y: 8 }, { x: 17, y: 22 }],
+};
+
+/**
+ * Groups naturally spawned flowers and rocks into reference-style clusters.
+ * Existing object counts and queued respawns are preserved for saved islands.
+ */
+export function arrangeIslandNaturalDecorations(
+  sourceTiles: Record<string, TileData>,
+  sourceRespawns: DecorationRespawn[] = [],
+): { tiles: Record<string, TileData>; respawns: DecorationRespawn[] } {
+  const tiles = { ...sourceTiles };
+  const respawns = sourceRespawns.map(respawn => ({ ...respawn }));
+  const entriesByType = new Map<ObjectType, Array<{
+    object: ObjectType;
+    sourceId: string;
+    sourceTile?: TileData;
+    respawnIndex?: number;
+  }>>();
+
+  const addEntry = (object: ObjectType, entry: {
+    object: ObjectType;
+    sourceId: string;
+    sourceTile?: TileData;
+    respawnIndex?: number;
+  }) => {
+    const entries = entriesByType.get(object) ?? [];
+    entries.push(entry);
+    entriesByType.set(object, entries);
+  };
+
+  for (const tile of Object.values(tiles)) {
+    if (!tile.object || !NATURAL_DECORATION_ANCHORS[tile.object]) continue;
+    addEntry(tile.object, { object: tile.object, sourceId: tile.id, sourceTile: tile });
+    tiles[tile.id] = {
+      ...tile,
+      type: classifyReferenceTerrain(tile.x, tile.y) ?? 'WATER',
+      object: undefined,
+      placedAt: undefined,
+    };
+  }
+
+  respawns.forEach((respawn, respawnIndex) => {
+    if (!NATURAL_DECORATION_ANCHORS[respawn.object]) return;
+    addEntry(respawn.object, { object: respawn.object, sourceId: respawn.tileId, respawnIndex });
+  });
+
+  const reservedTileIds = new Set<string>();
+  const isLand = (tile: TileData) => tile.type === 'GRASS' || tile.type === 'SAND';
+  const scoreTile = (tile: TileData, anchor: { x: number; y: number }, preferredType: TileType) => {
+    const du = (tile.x - tile.y) - (anchor.x - anchor.y);
+    const dv = (tile.x + tile.y) - (anchor.x + anchor.y);
+    const terrainPenalty = tile.type === preferredType ? 0 : 2;
+    return du * du + dv * dv * 0.12 + terrainPenalty;
+  };
+
+  for (const [object, entries] of entriesByType) {
+    const anchors = NATURAL_DECORATION_ANCHORS[object];
+    if (!anchors?.length || !entries.length) continue;
+    entries.sort((a, b) =>
+      a.sourceId.localeCompare(b.sourceId) ||
+      (a.respawnIndex ?? -1) - (b.respawnIndex ?? -1)
+    );
+
+    const clusterCount = Math.min(anchors.length, Math.max(1, Math.ceil(entries.length / 4)));
+    const preferredType: TileType = object === 'ROCK' || object === 'TALL_ROCK' ? 'SAND' : 'GRASS';
+
+    entries.forEach((entry, index) => {
+      const clusterIndex = Math.min(clusterCount - 1, Math.floor(index * clusterCount / entries.length));
+      const anchor = anchors[clusterIndex];
+      const candidates = Object.values(tiles)
+        .filter(tile =>
+          isLand(tile) &&
+          !tile.object &&
+          !tile.cropPlotAfterTree &&
+          Math.hypot(tile.x - 15, tile.y - 15) >= 6.2 &&
+          !reservedTileIds.has(tile.id)
+        )
+        .sort((a, b) =>
+          scoreTile(a, anchor, preferredType) - scoreTile(b, anchor, preferredType) ||
+          a.id.localeCompare(b.id)
+        );
+      const destination = candidates[0];
+
+      if (!destination) {
+        if (entry.sourceTile && !tiles[entry.sourceTile.id]?.object) {
+          tiles[entry.sourceTile.id] = { ...entry.sourceTile };
+        }
+        return;
+      }
+
+      reservedTileIds.add(destination.id);
+      if (entry.respawnIndex !== undefined) {
+        respawns[entry.respawnIndex] = { ...respawns[entry.respawnIndex], tileId: destination.id };
+        return;
+      }
+
+      tiles[destination.id] = {
+        ...destination,
+        object: entry.object,
+        ...(entry.sourceTile?.placedAt !== undefined ? { placedAt: entry.sourceTile.placedAt } : {}),
+      };
+    });
+  }
+
+  return { tiles, respawns };
 }

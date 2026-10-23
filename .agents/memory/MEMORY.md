@@ -1,6 +1,7 @@
-- [Island game character system](char-system.md) — CustomizableCharSVG uses CharAppearance; fro hair must render before the head circle (SVG paint order); all 12 dressing room tabs are now functional.
-- [Island game WelcomeScreen profile](welcome-profile.md) — PlayerProfile uses CharAppearance (not raw skinTone/hairColor strings); characterId derived via pickCharacterId(gender, hairStyle).
-- [Island game world layout](island-layout.md) — 31×31 grid; sinusoidal terrain channels; WORLD_W=2200,WORLD_H=1000; localStorage key v16 (bump when world gen changes).
+- [Island game character system](char-system.md) — Welcome-selected cutouts must remain the in-world player portraits; fro hair must render behind the head in CustomizableCharSVG.
+- [Island game WelcomeScreen profile](welcome-profile.md) — PlayerProfile keeps CharAppearance plus stable IDs for the four fixed welcome character presets.
+- [Island game world layout](island-layout.md) — Match the reference composition: an open center, left-side dock at the player's vertical band, and a denser tree line at the back.
 - [Island game crop-timer crash](crop-timer-crash.md) — IslandTile crop-timer path crashes if cropType from localStorage isn't in CROP_TYPES; always guard cc existence before accessing cc.growTime/wiltTime.
 - [Island game quest system](quest-system.md) — NPC quest groups (parrot/crab/tree) with QUEST_GROUPS; acceptance gates progress; ACCEPT_QUEST action + clear_driftwood tracking added.
 - [Island game chop system](chop-system.md) — 5 chops for all trees; activeChopTileId/chopCount in context; ChopProgressBar HUD; chopFacing in IslandGrid; char-chop-swing CSS animation.
+- [Island game neighbor-panel style](neighbor-panel-style.md) — Use paired Add Neighbor portraits without green fill, a default Player avatar, and Marina’s framed rating card.

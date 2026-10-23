@@ -3,25 +3,113 @@ import { useGame } from '../game/GameContext';
 import { TileData } from '../game/types';
 import { OBJECT_CONFIG, EMOJI_MAP, CROP_TYPES } from '../game/gameData';
 import { useToast } from '@/hooks/use-toast';
+import bananaTreeImage from '@assets/generated_images/banana_tree_trim.png';
+import orangeTreeImage from '@assets/generated_images/orange_tree_trim.png';
+import tropicalHutImage from '@assets/generated_images/tropical_hut_trim.png';
+import evergreenPineImage from '@assets/generated_images/evergreen_pine_tree_trim.png';
+import ringedPalmTrunkImage from '@assets/generated_images/ringed_palm_trunk_trim.png';
+import palmCanopyImage from '../assets/palm-canopy.png';
+import grassTexture from '../assets/grass-reference.png';
+import waterTexture from '../assets/water-reference.png';
+import fishReference from '../assets/fish-reference-cutout.png';
+import blueberryBushReference from '../assets/blueberry-sprite.png';
+import bluebellReference from '../assets/bluebell-sprite.png';
+import flowerBushReference from '../assets/flower-bush-upscaled-cutout.png';
+import gardenPatchReference from '../assets/garden-sprite.png';
+import pansyReference from '../assets/pansy-sprite.png';
+import pineapplePlantReference from '../assets/pineapple-sprite.png';
+import rockReference from '../assets/rock-sprite.png';
+import dockReference from '../assets/dock-integrated-trimmed.png';
+import branchClusterReference from '../assets/branch-flower-cluster.png';
+import edgeGrassReference from '../assets/edge-grass-cutout.png';
 
-/* ── Diamond colour palette — matches HTML reference ────────────────────── */
-const COLORS = {
-  GRASS:   { top: '#5cb828', sideL: '#2e8008', sideR: '#3a9810' },
-  SAND:    { top: '#f0e8cc', sideL: '#d4c49a', sideR: '#dccca4' },
-  WATER:   { top: '#52C8E4', sideL: null,       sideR: null      },
-  CLEARED: { top: '#8b5a2b', sideL: '#5a3a18',  sideR: '#6a4420' },
-};
+const GRASS_BASE_COLOR = '#79ad23';
+const GRASS_BASE_RGB = '121,173,35';
+const GRASS_PATCH_COLORS = ['#68bd3d'];
+const WATER_PATCH_COLORS = ['#55c1ed', '#68cbed', '#45b5e5', '#7bd3f2', '#4bbbe9'];
 
-/** Lighten a #rrggbb hex colour by `amount` per channel */
-function lightenHex(hex: string, amount = 22): string {
-  try {
-    const n = parseInt(hex.slice(1), 16);
-    const r = Math.min(255, ((n >> 16) & 0xff) + amount);
-    const g = Math.min(255, ((n >>  8) & 0xff) + amount);
-    const b = Math.min(255, ( n        & 0xff) + amount);
-    return `#${((r << 16) | (g << 8) | b).toString(16).padStart(6, '0')}`;
-  } catch { return hex; }
+const positiveModulo = (value: number, divisor: number) => ((value % divisor) + divisor) % divisor;
+
+function getTerrainPatternOffset(tileX: number, tileY: number, width: number, height: number) {
+  const worldX = (tileX - tileY) * 40;
+  const worldY = (tileX + tileY) * 14;
+  return {
+    x: -positiveModulo(worldX, width),
+    y: -positiveModulo(worldY, height),
+  };
 }
+
+function getTexturePatches(
+  tileX: number,
+  tileY: number,
+  colors: string[],
+  seedOffset = 0,
+  curved = false,
+  opacityScale = 1,
+) {
+  const seed = tileX * 73.31 + tileY * 151.7 + seedOffset;
+  const random = (index: number) => {
+    const value = Math.sin(seed + index * 127.1) * 43758.5453;
+    return value - Math.floor(value);
+  };
+
+  return Array.from({ length: 5 }, (_, index) => {
+    const width = 12 + random(index * 5) * 12;
+    const height = 5 + random(index * 5 + 1) * 5;
+    const x = 2 + random(index * 5 + 2) * (80 - width - 4);
+    const y = 1 + random(index * 5 + 3) * (44 - height - 2);
+    const cutA = 1.5 + random(index * 5 + 4) * 3;
+    const cutB = 1.5 + random(index * 5 + 5) * 3;
+    let d: string;
+    if (curved) {
+      const points: Array<[number, number]> = [
+        [x + width * (0.18 + random(index * 11 + 8) * 0.10), y + height * (0.02 + random(index * 11 + 9) * 0.12)],
+        [x + width * (0.58 + random(index * 11 + 10) * 0.18), y + height * (0.00 + random(index * 11 + 11) * 0.12)],
+        [x + width * (0.88 + random(index * 11 + 12) * 0.12), y + height * (0.16 + random(index * 11 + 13) * 0.20)],
+        [x + width * (0.87 + random(index * 11 + 14) * 0.13), y + height * (0.54 + random(index * 11 + 15) * 0.20)],
+        [x + width * (0.62 + random(index * 11 + 16) * 0.18), y + height * (0.84 + random(index * 11 + 17) * 0.16)],
+        [x + width * (0.22 + random(index * 11 + 18) * 0.20), y + height * (0.88 + random(index * 11 + 19) * 0.12)],
+        [x + width * (0.00 + random(index * 11 + 20) * 0.14), y + height * (0.56 + random(index * 11 + 21) * 0.18)],
+        [x + width * (0.02 + random(index * 11 + 22) * 0.13), y + height * (0.18 + random(index * 11 + 23) * 0.20)],
+      ];
+      d = `M ${points[0][0]} ${points[0][1]}`;
+      points.forEach((point, pointIndex) => {
+        const next = points[(pointIndex + 1) % points.length];
+        const previous = points[(pointIndex + points.length - 1) % points.length];
+        const afterNext = points[(pointIndex + 2) % points.length];
+        const control1: [number, number] = [
+          point[0] + (next[0] - previous[0]) / 6,
+          point[1] + (next[1] - previous[1]) / 6,
+        ];
+        const control2: [number, number] = [
+          next[0] - (afterNext[0] - point[0]) / 6,
+          next[1] - (afterNext[1] - point[1]) / 6,
+        ];
+        d += ` C ${control1[0]} ${control1[1]} ${control2[0]} ${control2[1]} ${next[0]} ${next[1]}`;
+      });
+      d += ' Z';
+    } else {
+      d = [
+        `M ${x + cutA} ${y}`,
+        `H ${x + width - cutB}`,
+        `L ${x + width} ${y + cutB}`,
+        `V ${y + height - cutA}`,
+        `L ${x + width - cutA} ${y + height}`,
+        `H ${x + cutB}`,
+        `L ${x} ${y + height - cutB}`,
+        `V ${y + cutA}`,
+        'Z',
+      ].join(' ');
+    }
+
+    return {
+      d,
+      fill: colors[Math.floor(random(index * 5 + 6) * colors.length)],
+      opacity: (0.12 + random(index * 5 + 7) * 0.12) * opacityScale,
+    };
+  });
+}
+
 /** Darken a #rrggbb hex colour by `amount` per channel */
 function darkenHex(hex: string, amount = 22): string {
   try {
@@ -37,8 +125,118 @@ function darkenHex(hex: string, amount = 22): string {
 const PETAL_COLORS  = ['#e03818', '#e8628a', '#f59420', '#f0e018', '#c040d0'] as const;
 const PETAL_DARKS   = ['#981408', '#b03060', '#c06810', '#c8a400', '#8020a0'] as const;
 const FLOWER_ANGS   = [0, 72, 144, 216, 288] as const;
+const TREE_SPRITE_HEIGHT = 180;
+const TREE_SPRITE_SCALE = TREE_SPRITE_HEIGHT / 360;
+const PALM_TREE_WIDTH = 164;
+const PALM_CANOPY_HEIGHT = 137;
+const PALM_TRUNK_WIDTH = 58;
+const SCENERY_IMAGES: Record<string, { src: string; width: number; height: number }> = {
+  HUT: { src: tropicalHutImage, width: 260, height: 266 },
+  ISLAND_HUT: { src: tropicalHutImage, width: 260, height: 266 },
+  DOCK: { src: dockReference, width: 190, height: 163 },
+  PINE_TREE: { src: evergreenPineImage, width: 226 * TREE_SPRITE_SCALE, height: TREE_SPRITE_HEIGHT },
+  ROCK: { src: rockReference, width: 62, height: 45 },
+  TALL_ROCK: { src: rockReference, width: 78, height: 56 },
+  FLOWER_BUSH: { src: flowerBushReference, width: 70, height: 55 },
+  BLUEBELL: { src: bluebellReference, width: 62, height: 66 },
+  PANSY: { src: pansyReference, width: 62, height: 60 },
+  TULIP: { src: flowerBushReference, width: 65, height: 53 },
+  SUNFLOWER: { src: pansyReference, width: 62, height: 60 },
+  GARDEN_PATCH: { src: gardenPatchReference, width: 154, height: 104 },
+  BLUEBERRY_BUSH: { src: blueberryBushReference, width: 83, height: 75 },
+  PINEAPPLE_PLANT: { src: pineapplePlantReference, width: 90, height: 85 },
+  BRANCH_CLUSTER: { src: branchClusterReference, width: 72, height: 54 },
+};
 
 const ObjectSVG: React.FC<{ object: string; tileX: number; tileY: number; tileType?: string }> = ({ object, tileX: tx, tileY: ty, tileType }) => {
+  if (object === 'PALM_TRUNK') {
+    return (
+      <div style={{ position: 'relative', display: 'block', width: PALM_TREE_WIDTH, height: TREE_SPRITE_HEIGHT }}>
+        <img
+          src={ringedPalmTrunkImage}
+          alt=""
+          draggable={false}
+          style={{
+            position: 'absolute',
+            left: '50%',
+            bottom: 0,
+            zIndex: 1,
+            width: PALM_TRUNK_WIDTH,
+            height: TREE_SPRITE_HEIGHT,
+            objectFit: 'contain',
+            objectPosition: 'center bottom',
+            transform: 'translateX(-50%)',
+            filter: 'brightness(0.67) saturate(0.68) contrast(1.04)',
+            userSelect: 'none',
+          }}
+        />
+        <img
+          src={palmCanopyImage}
+          alt=""
+          draggable={false}
+          style={{
+            position: 'absolute',
+            left: '50%',
+            top: 0,
+            zIndex: 2,
+            width: PALM_TREE_WIDTH,
+            height: PALM_CANOPY_HEIGHT,
+            objectFit: 'contain',
+            objectPosition: 'center top',
+            transform: 'translateX(-50%)',
+            userSelect: 'none',
+          }}
+        />
+      </div>
+    );
+  }
+
+  const sceneryImage = SCENERY_IMAGES[object];
+  if (sceneryImage) {
+    return (
+      <img
+        src={sceneryImage.src}
+        alt=""
+        draggable={false}
+        style={{
+          display: 'block',
+          width: sceneryImage.width,
+          height: sceneryImage.height,
+          maxWidth: object === 'GARDEN_PATCH' ? 'none' : undefined,
+          objectFit: 'contain',
+          objectPosition: 'center bottom',
+          userSelect: 'none',
+        }}
+      />
+    );
+  }
+
+  const treeImage = (
+    object === 'TREE_PALM' || object === 'TREE_COCONUT' || object === 'TREE_COCONUT_UNRIPE'
+      ? bananaTreeImage
+      : object === 'TREE_APPLE' || object === 'TREE_MANGO' || object === 'TREE_MANGO_UNRIPE'
+        ? orangeTreeImage
+        : null
+  );
+  if (treeImage) {
+    const baseWidth = (treeImage === orangeTreeImage ? 355 : 316) * TREE_SPRITE_SCALE;
+    return (
+      <img
+        src={treeImage}
+        alt=""
+        draggable={false}
+        style={{
+          display: 'block',
+          width: baseWidth,
+          height: TREE_SPRITE_HEIGHT,
+          objectFit: 'contain',
+          objectPosition: 'center bottom',
+          userSelect: 'none',
+        }}
+      />
+    );
+  }
+
   // Build a unique gradient-ID prefix per tile to avoid SVG id collisions
   const g = (s: string) => `${s}${tx}x${ty}`;
 
@@ -363,6 +561,18 @@ const ObjectSVG: React.FC<{ object: string; tileX: number; tileY: number; tileTy
               <stop offset="100%" stopColor="#8a6c3c"/>
             </linearGradient>
           </defs>
+          {/* Fine tropical grass sprigs belong to the flower itself, not to
+              the removed standalone weed/thorn object set. */}
+          <g strokeLinecap="round" strokeLinejoin="round">
+            <path d="M9 49 C6 43 5 37 7 31 C12 38 12 44 11 49 Z" fill="#3d8b22"/>
+            <path d="M13 49 C10 42 11 36 15 32 C17 39 16 45 15 49 Z" fill="#60ad2d"/>
+            <path d="M17 49 C15 44 16 39 19 35 C21 41 20 46 19 49 Z" fill="#347b1c"/>
+            <path d="M27 49 C29 43 29 36 26 31 C23 38 23 44 25 49 Z" fill="#4c9a25"/>
+            <path d="M31 49 C34 42 33 36 30 32 C28 39 29 45 29 49 Z" fill="#69b833"/>
+            <path d="M35 49 C38 43 39 37 37 33 C33 39 33 45 34 49 Z" fill="#367f1d"/>
+            <path d="M7 33 Q9 41 10 47 M15 34 Q14 41 14 47 M27 33 Q27 41 26 47 M37 35 Q35 42 35 47"
+              fill="none" stroke="#8bd34a" strokeWidth="0.65" opacity="0.65"/>
+          </g>
           {/* Leaf base */}
           <ellipse cx="22" cy="44" rx="16" ry="6.5" fill="#246a18"/>
           <ellipse cx="11" cy="41" rx="11" ry="5.5" fill="#2e8020" transform="rotate(-20 11 41)"/>
@@ -1982,16 +2192,14 @@ const ObjectSVG: React.FC<{ object: string; tileX: number; tileY: number; tileTy
   }
 };
 
-/** Trees that trigger the axe-chop hint on hover */
-const CHOP_TREES = new Set(['TREE_PALM', 'TREE_APPLE']);
-
 /** Objects that use SVG art instead of emoji */
 const SVG_OBJECTS = new Set(['TREE_PALM', 'TREE_APPLE', 'ROCK', 'FLOWER_BUSH', 'DRIFTWOOD',
   'TREE_COCONUT', 'TREE_MANGO', 'TREE_COCONUT_UNRIPE', 'TREE_MANGO_UNRIPE',
+  'HUT', 'ISLAND_HUT', 'PINE_TREE', 'PALM_TRUNK',
   'COCONUT_STUMP', 'MANGO_STUMP',
   'GARDEN_PATCH', 'WEEDS', 'SUNFLOWER', 'PUDDLE', 'THORNS',
   'BLUEBELL', 'PANSY', 'TULIP', 'PINEAPPLE_PLANT', 'BLUEBERRY_BUSH', 'BABY_PARROT', 'TALL_ROCK', 'DOCK',
-  'TOXIC_DRUM']);
+  'TOXIC_DRUM', 'BRANCH_CLUSTER']);
 /** Objects that sway in the breeze */
 const SWAY_OBJECTS = new Set(['TREE_PALM', 'TREE_APPLE', 'TREE_COCONUT', 'TREE_MANGO', 'TREE_COCONUT_UNRIPE', 'TREE_MANGO_UNRIPE']);
 
@@ -2020,15 +2228,27 @@ function shoreScatter(
 ): React.ReactNode[] {
   const out: React.ReactNode[] = [];
   const edges = [
-    { active: nN, bcx: 14, bcy:  7  },
-    { active: nE, bcx: 66, bcy:  7  },
-    { active: nS, bcx: 66, bcy: 21  },
-    { active: nW, bcx: 14, bcy: 21  },
+    { active: nN, bcx: 14, bcy:  7, d: 'M40,-1 Q20,4 -1,14' },
+    { active: nE, bcx: 66, bcy:  7, d: 'M40,-1 Q60,4 81,14' },
+    { active: nS, bcx: 66, bcy: 21, d: 'M81,14 Q60,25 40,29' },
+    { active: nW, bcx: 14, bcy: 21, d: 'M40,29 Q20,25 -1,14' },
   ];
 
   edges.forEach(({ active, bcx, bcy }, ei) => {
     if (!active) return;
-    const count = 3 + Math.floor(tileRng(tx, ty, ei * 7) * 3); // 3–5 blobs
+    const edge = edges[ei];
+    out.push(
+      <path
+        key={`shore-wave-${ei}`}
+        d={edge.d}
+        fill="none"
+        stroke="#e7faff"
+        strokeWidth="1.6"
+        strokeLinecap="round"
+        opacity="0.72"
+      />
+    );
+    const count = 2 + Math.floor(tileRng(tx, ty, ei * 7) * 2);
     for (let i = 0; i < count; i++) {
       const base = ei * 100 + i;
       const ox   = (tileRng(tx, ty, base + 11) - 0.5) * 16;
@@ -2040,14 +2260,12 @@ function shoreScatter(
       const rx   = 2.2 + tileRng(tx, ty, base + 23) * 3.2;
       const ry   = (1.0 + tileRng(tx, ty, base + 29) * 1.6) * 0.65;
       const rot  = (tileRng(tx, ty, base + 37) - 0.5) * 60;
-      const op   = 0.28 + tileRng(tx, ty, base + 41) * 0.28;
-      // colours range from pale cream (#ede4c8) to warm buff (#dcd0b0)
-      const sand = tileRng(tx, ty, base + 53) > 0.5 ? '#e8dcc0' : '#dcd0aa';
+      const op   = 0.28 + tileRng(tx, ty, base + 41) * 0.22;
       out.push(
         <ellipse
           key={`sh-${ei}-${i}`}
           cx={cx} cy={cy} rx={rx} ry={ry}
-          fill={sand} opacity={op}
+          fill="#e7faff" opacity={op}
           transform={`rotate(${rot.toFixed(1)} ${cx.toFixed(1)} ${cy.toFixed(1)})`}
         />
       );
@@ -2087,8 +2305,6 @@ export const IslandTile: React.FC<IslandTileProps> = ({
   const { toast } = useToast();
 
   const [now, setNow] = useState(Date.now());
-  const [hovered, setHovered] = useState(false);
-
   useEffect(() => {
     if (tile.object === 'CROP_GROWING' || tile.object === 'CROP_READY') {
       const id = setInterval(() => setNow(Date.now()), 1000);
@@ -2131,21 +2347,20 @@ export const IslandTile: React.FC<IslandTileProps> = ({
   const shS = isWater && isLand(nbS);
   const shW = isWater && isLand(nbW);
   const isShore = shN || shE || shS || shW;
+  const grassSandEdges = tile.type === 'GRASS'
+    ? [
+        nbN === 'SAND' ? 'NW' : null,
+        nbE === 'SAND' ? 'NE' : null,
+        nbS === 'SAND' ? 'SE' : null,
+        nbW === 'SAND' ? 'SW' : null,
+      ].filter((edge): edge is 'NW' | 'NE' | 'SE' | 'SW' => edge !== null)
+    : [];
+  const edgeGrassDirection = grassSandEdges.length > 0 && tileRng(tile.x, tile.y, 313) < 0.68
+    ? grassSandEdges[Math.floor(tileRng(tile.x, tile.y, 317) * grassSandEdges.length)]
+    : null;
   // Shallow water is 1–2 tiles from land — check 2nd-order neighbours too (approximated by
   // checking whether any neighbour is itself shore-adjacent, which we can't easily do here,
   // so we simply extend to tiles that share a diagonal land neighbour via type check)
-  const isShallow = isShore; // used for colour shift
-
-  /* ── Diamond colours ── */
-  const palette = isCleared ? COLORS.CLEARED : (COLORS[tile.type] ?? COLORS.GRASS);
-
-  let topFill = palette.top;
-  if (!isWater && hovered) {
-    if (activeTool === 'plant' && isCleared)      topFill = '#6acd5a';
-    else if (activeTool === 'build' && isCleared) topFill = '#6aabdd';
-    else                                           topFill = lightenHex(palette.top);
-  }
-
   /* ── Object rendering — SVG art or emoji ── */
   const hasSvg = !isCleared && tile.object && SVG_OBJECTS.has(tile.object);
   // (sway intentionally disabled — keeping SWAY_OBJECTS for future use)
@@ -2193,6 +2408,7 @@ export const IslandTile: React.FC<IslandTileProps> = ({
   /* ── Render ── */
   return (
     <div
+      data-island-tile
       style={{
         position: 'absolute',
         left: screenX,
@@ -2205,8 +2421,6 @@ export const IslandTile: React.FC<IslandTileProps> = ({
         cursor: (isWater && tile.object !== 'DOCK') ? 'default' : 'pointer',
       }}
       onClick={(isWater && tile.object !== 'DOCK') ? undefined : handleClick}
-      onMouseEnter={() => !(isWater && tile.object !== 'DOCK') && setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
       title={tooltip}
     >
 
@@ -2220,86 +2434,101 @@ export const IslandTile: React.FC<IslandTileProps> = ({
           const gid = `lg-${tile.x}-${tile.y}`;
 
           if (isWater) {
-            // No per-tile gradient — flat colour prevents seaming between adjacent water tiles
-            return null;
+            const waterPatternId = `water-tile-${tile.x}-${tile.y}`;
+            const waterPatternOffset = getTerrainPatternOffset(tile.x, tile.y, 80, 44);
+            const waterPatches = getTexturePatches(0, 0, WATER_PATCH_COLORS, 43);
+            return (
+              <defs>
+                <pattern
+                  id={waterPatternId}
+                  x={waterPatternOffset.x}
+                  y={waterPatternOffset.y}
+                  width="80"
+                  height="44"
+                  patternUnits="userSpaceOnUse"
+                >
+                  <image href={waterTexture} x="0" y="0" width="80" height="44" preserveAspectRatio="none" />
+                  {waterPatches.map((patch, index) => (
+                    <path key={`water-patch-${index}`} d={patch.d} fill={patch.fill} opacity={patch.opacity} />
+                  ))}
+                  <path
+                    d="M0,6 C20,3 20,9 40,6 C60,3 60,9 80,6"
+                    stroke="rgba(255,255,255,0.22)"
+                    strokeWidth="1.5"
+                    fill="none"
+                    strokeLinecap="round"
+                  />
+                  <path
+                    d="M0,13 C20,10 20,16 40,13 C60,10 60,16 80,13"
+                    stroke="rgba(255,255,255,0.16)"
+                    strokeWidth="1.1"
+                    fill="none"
+                    strokeLinecap="round"
+                  />
+                  <path
+                    d="M0,20 C20,17 20,23 40,20 C60,17 60,23 80,20"
+                    stroke="rgba(255,255,255,0.11)"
+                    strokeWidth="0.9"
+                    fill="none"
+                    strokeLinecap="round"
+                  />
+                </pattern>
+              </defs>
+            );
           }
 
-          // No per-tile brightness nudge — keeps adjacent tiles blended seamlessly
-          const v = 0;
-
-          type RGB = [number, number, number];
-          const hx = (r: number, g: number, b: number) =>
-            `#${[r,g,b].map(c => Math.max(0,Math.min(255,c)).toString(16).padStart(2,'0')).join('')}`;
-          const shift = ([r,g,b]: RGB, d: number): string => hx(r+d, g+d, b+d);
-
-          let hi: RGB, lo: RGB;
-          let sL: string, sR: string;
-          if (isCleared) {
-            hi = [0xaa, 0x78, 0x42]; lo = [0x6a, 0x40, 0x18];
-            sL = '#5a3a18'; sR = '#6a4420';
-          } else if (tile.type === 'SAND') {
-            hi = [0xf4, 0xe0, 0xb0]; lo = [0xd8, 0xbc, 0x84];
-            sL = '#d4c49a'; sR = '#dccca4';
-          } else {
-            // GRASS — medium bright green matching reference
-            hi = [0x70, 0xd0, 0x30]; lo = [0x3a, 0x90, 0x10];
-            sL = '#2e8008'; sR = '#3a9810';
-          }
-
-          const isGrass = !isCleared && tile.type === 'GRASS';
-          const isSand  = !isCleared && tile.type === 'SAND';
+          const isGrass = tile.type === 'GRASS';
+          const isSand  = tile.type === 'SAND';
+          const baseTerrainColor = isSand ? '#f0dfb4' : GRASS_BASE_COLOR;
           const gpid = `gp-${tile.x}-${tile.y}`;
           const spid = `sp-${tile.x}-${tile.y}`;
+          const grassPatches = isGrass ? getTexturePatches(0, 0, GRASS_PATCH_COLORS, 0, true, 0.35) : [];
+          const grassPatternOffset = getTerrainPatternOffset(tile.x, tile.y, 80, 44);
+          const sandPatternOffset = getTerrainPatternOffset(tile.x, tile.y, 32, 22);
           return (
             <defs>
-              {/* Top face gradient.
-                  Sand: consistent LINEAR direction across every tile so adjacent tiles
-                  share the same gradient direction — no per-tile bright spots, no gridlines.
-                  Everything else: radial lit from upper-left as before. */}
-              {isSand ? (
-                <linearGradient id={gid} x1="20%" y1="0%" x2="80%" y2="100%">
-                  <stop offset="0%"   stopColor="#f8f2e0"/>
-                  <stop offset="100%" stopColor="#e8dcc4"/>
-                </linearGradient>
-              ) : (
-                <radialGradient id={gid} cx="30%" cy="22%" r="84%">
-                  <stop offset="0%"   stopColor={shift(hi, v + 20)} />
-                  <stop offset="55%"  stopColor={shift(hi, v)} />
-                  <stop offset="100%" stopColor={shift(lo, -v)} />
-                </radialGradient>
-              )}
-              {/* Sand stipple + ripple texture */}
+              {/* Uniform bases prevent terrain gradients from restarting at tile edges. */}
+              <linearGradient id={gid} x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stopColor={baseTerrainColor} />
+                <stop offset="100%" stopColor={baseTerrainColor} />
+              </linearGradient>
+              {/* Fine, irregular sand grains — no repeated wind-ripple lines */}
               {isSand && (
-                <pattern id={spid} x="0" y="0" width="16" height="11" patternUnits="userSpaceOnUse">
-                  {/* grain dots — irregular scatter */}
-                  <circle cx="2"  cy="3"   r="0.9" fill="rgba(160,130,90,0.13)"/>
-                  <circle cx="7"  cy="8"   r="0.8" fill="rgba(170,140,95,0.10)"/>
-                  <circle cx="12" cy="2"   r="0.9" fill="rgba(155,125,85,0.12)"/>
-                  <circle cx="5"  cy="10"  r="0.7" fill="rgba(165,132,90,0.09)"/>
-                  <circle cx="14" cy="7"   r="0.8" fill="rgba(158,128,88,0.10)"/>
-                  <circle cx="9"  cy="4.5" r="0.7" fill="rgba(150,122,84,0.11)"/>
-                  <circle cx="3"  cy="7"   r="0.8" fill="rgba(172,138,92,0.08)"/>
-                  <circle cx="11" cy="9.5" r="0.7" fill="rgba(162,130,88,0.09)"/>
-                  {/* subtle wind-ripple lines */}
-                  <path d="M0,9 Q4,7.5 8,9 Q12,10.5 16,9"
-                        stroke="rgba(148,118,80,0.07)" strokeWidth="0.7" fill="none"/>
-                  <path d="M0,4.5 Q4,3 8,4.5 Q12,6 16,4.5"
-                        stroke="rgba(148,118,80,0.05)" strokeWidth="0.6" fill="none"/>
+                <pattern
+                  id={spid}
+                  x={sandPatternOffset.x}
+                  y={sandPatternOffset.y}
+                  width="32"
+                  height="22"
+                  patternUnits="userSpaceOnUse"
+                >
+                  <circle cx="2.5" cy="3.5" r="0.55" fill="rgba(146,112,64,0.23)"/>
+                  <ellipse cx="7.5" cy="8" rx="0.8" ry="0.42" fill="rgba(183,145,88,0.24)"/>
+                  <circle cx="12.5" cy="2.2" r="0.45" fill="rgba(255,250,224,0.48)"/>
+                  <ellipse cx="18" cy="5.5" rx="0.58" ry="0.35" fill="rgba(151,119,71,0.18)"/>
+                  <circle cx="26" cy="4" r="0.5" fill="rgba(255,250,224,0.40)"/>
+                  <ellipse cx="29" cy="10.5" rx="0.72" ry="0.38" fill="rgba(164,127,75,0.2)"/>
+                  <circle cx="4" cy="16" r="0.45" fill="rgba(255,250,224,0.42)"/>
+                  <ellipse cx="11" cy="13.5" rx="0.76" ry="0.4" fill="rgba(160,124,71,0.2)"/>
+                  <circle cx="17" cy="19" r="0.52" fill="rgba(255,250,224,0.44)"/>
+                  <ellipse cx="22" cy="12" rx="0.68" ry="0.4" fill="rgba(177,137,79,0.2)"/>
+                  <circle cx="28" cy="18" r="0.48" fill="rgba(150,115,64,0.18)"/>
                 </pattern>
               )}
-              {/* Grass — subtle organic mottling, no blades */}
+              {/* Grass — subtle curved patches aligned across tile boundaries */}
               {isGrass && (
-                <pattern id={gpid} x="0" y="0" width="20" height="16" patternUnits="userSpaceOnUse">
-                  {/* Slightly darker blobs */}
-                  <ellipse cx="3"  cy="4"  rx="4.5" ry="3.5" fill="rgba(0,60,0,0.07)"/>
-                  <ellipse cx="13" cy="3"  rx="5"   ry="3"   fill="rgba(0,60,0,0.06)"/>
-                  <ellipse cx="8"  cy="10" rx="5.5" ry="3.5" fill="rgba(0,60,0,0.07)"/>
-                  <ellipse cx="18" cy="11" rx="4"   ry="3"   fill="rgba(0,60,0,0.05)"/>
-                  <ellipse cx="1"  cy="13" rx="3.5" ry="2.5" fill="rgba(0,60,0,0.06)"/>
-                  {/* Slightly lighter highlights */}
-                  <ellipse cx="6"  cy="7"  rx="3.5" ry="2.5" fill="rgba(255,255,255,0.06)"/>
-                  <ellipse cx="16" cy="7"  rx="4"   ry="2.5" fill="rgba(255,255,255,0.05)"/>
-                  <ellipse cx="11" cy="14" rx="3"   ry="2"   fill="rgba(255,255,255,0.05)"/>
+                <pattern
+                  id={gpid}
+                  x={grassPatternOffset.x}
+                  y={grassPatternOffset.y}
+                  width="80"
+                  height="44"
+                  patternUnits="userSpaceOnUse"
+                >
+                  <image href={grassTexture} x="0" y="0" width="80" height="44" preserveAspectRatio="none" opacity="0.14" />
+                  {grassPatches.map((patch, index) => (
+                    <path key={`grass-patch-${index}`} d={patch.d} fill={patch.fill} opacity={patch.opacity} />
+                  ))}
                 </pattern>
               )}
             </defs>
@@ -2310,36 +2539,10 @@ export const IslandTile: React.FC<IslandTileProps> = ({
         <polygon
           points="40,-1 81,14 40,29 -1,14"
           fill={isWater
-            ? (isShallow ? '#28bce0' : '#1fa8e8')
-            : hovered ? topFill : `url(#lg-${tile.x}-${tile.y})`}
+            ? `url(#water-tile-${tile.x}-${tile.y})`
+            : `url(#lg-${tile.x}-${tile.y})`}
           stroke="none"
         />
-
-        {/* ── Water wave curves — bezier ripples across the tile diamond ── */}
-        {isWater && (() => {
-          const wid = `wv-${tile.x}-${tile.y}`;
-          const yo  = (tile.x * 3 + tile.y * 7) % 3 - 1; // -1 | 0 | +1
-          return (
-            <>
-              <defs>
-                <clipPath id={wid}>
-                  <polygon points="40,-1 81,14 40,29 -1,14"/>
-                </clipPath>
-              </defs>
-              <g clipPath={`url(#${wid})`}>
-                <path
-                  d={`M-1,${6+yo} Q10,${3+yo} 20,${6+yo} Q30,${9+yo} 40,${6+yo} Q50,${3+yo} 61,${6+yo} Q71,${9+yo} 81,${6+yo}`}
-                  stroke="rgba(255,255,255,0.22)" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
-                <path
-                  d={`M-1,${13+yo} Q10,${10+yo} 20,${13+yo} Q31,${16+yo} 41,${13+yo} Q52,${10+yo} 62,${13+yo} Q71,${16+yo} 81,${13+yo}`}
-                  stroke="rgba(255,255,255,0.16)" strokeWidth="1.1" fill="none" strokeLinecap="round"/>
-                <path
-                  d={`M-1,${20+yo} Q11,${17+yo} 21,${20+yo} Q32,${23+yo} 41,${20+yo} Q51,${17+yo} 62,${20+yo} Q71,${23+yo} 81,${20+yo}`}
-                  stroke="rgba(255,255,255,0.11)" strokeWidth="0.9" fill="none" strokeLinecap="round"/>
-              </g>
-            </>
-          );
-        })()}
 
         {/* ── Shore scatter: sandy blobs on water tiles adjacent to land ── */}
         {isShore && shoreScatter(tile.x, tile.y, shN, shE, shS, shW)}
@@ -2357,7 +2560,7 @@ export const IslandTile: React.FC<IslandTileProps> = ({
         })()}
 
         {/* ── Sand stipple texture overlay ── */}
-        {!isWater && !isCleared && tile.type === 'SAND' && (
+        {!isWater && tile.type === 'SAND' && (
           <polygon
             points="40,-1 81,14 40,29 -1,14"
             fill={`url(#sp-${tile.x}-${tile.y})`}
@@ -2365,44 +2568,12 @@ export const IslandTile: React.FC<IslandTileProps> = ({
         )}
 
         {/* ── Grass blade texture overlay ── */}
-        {!isWater && !isCleared && tile.type === 'GRASS' && (
+        {!isWater && tile.type === 'GRASS' && (
           <polygon
             points="40,-1 81,14 40,29 -1,14"
             fill={`url(#gp-${tile.x}-${tile.y})`}
           />
         )}
-
-        {/* ── Curvy grass outline — 2 bezier bumps per edge, per-tile variation ── */}
-        {!isWater && !isCleared && tile.type === 'GRASS' && (() => {
-          // 8 independent bump amplitudes — each 1.8–4 px outward from edge midpoint
-          const bh = (n: number) => 1.8 + tileRng(tile.x, tile.y, 50 + n) * 2.2;
-          // Outward normals per edge (perpendicular, pointing away from diamond centre)
-          // NE (top→right):  (0.343, -0.939)
-          // SE (right→bot):  (0.343,  0.939)
-          // SW (bot→left):  (-0.343,  0.939)
-          // NW (left→top):  (-0.343, -0.939)
-          const h = [bh(0),bh(1),bh(2),bh(3),bh(4),bh(5),bh(6),bh(7)];
-          // Segment midpoints (half-edge midpoints) and their control offsets
-          const cp = [
-            [50.25 + 0.343*h[0],  2.75 - 0.939*h[0]],  // NE seg1
-            [70.75 + 0.343*h[1], 10.25 - 0.939*h[1]],  // NE seg2
-            [70.75 + 0.343*h[2], 17.75 + 0.939*h[2]],  // SE seg1
-            [50.25 + 0.343*h[3], 25.25 + 0.939*h[3]],  // SE seg2
-            [29.75 - 0.343*h[4], 25.25 + 0.939*h[4]],  // SW seg1
-            [ 9.25 - 0.343*h[5], 17.75 + 0.939*h[5]],  // SW seg2
-            [ 9.25 - 0.343*h[6], 10.25 - 0.939*h[6]],  // NW seg1
-            [29.75 - 0.343*h[7],  2.75 - 0.939*h[7]],  // NW seg2
-          ].map(([x,y]) => `${x.toFixed(1)},${y.toFixed(1)}`);
-          return (
-            <path
-              d={`M40,-1 Q${cp[0]} 60.5,6.5 Q${cp[1]} 81,14 Q${cp[2]} 60.5,21.5 Q${cp[3]} 40,29 Q${cp[4]} 19.5,21.5 Q${cp[5]} -1,14 Q${cp[6]} 19.5,6.5 Q${cp[7]} 40,-1 Z`}
-              fill="none"
-              stroke="rgba(28,95,8,0.52)"
-              strokeWidth="2.2"
-              strokeLinejoin="round"
-            />
-          );
-        })()}
 
         {/* ── Terrain edge blends ─────────────────────────────────────────────
             For each edge where the neighbour is a different terrain type, draw
@@ -2413,7 +2584,7 @@ export const IslandTile: React.FC<IslandTileProps> = ({
               NW (nbN) = (19.5,6.5)   NE (nbE) = (60.5,6.5)
               SW (nbW) = (19.5,21.5)  SE (nbS) = (60.5,21.5)           ── */}
         {(() => {
-          const myType = isCleared ? 'CLEARED' : tile.type;
+          const myType = tile.type;
           const edges = [
             { dir:'NW', nb:nbN, pts:'40,-1 -1,14 40,14',  ex:19.5, ey:6.5  },
             { dir:'NE', nb:nbE, pts:'40,-1 81,14 40,14',  ex:60.5, ey:6.5  },
@@ -2427,7 +2598,7 @@ export const IslandTile: React.FC<IslandTileProps> = ({
             if (!t || t === myType) return null;
             if (myType === 'WATER' || t === 'WATER') return null;
             if (t === 'SAND')  return '232,214,168';
-            if (t === 'GRASS') return '78,186,34';
+            if (t === 'GRASS') return GRASS_BASE_RGB;
             return null;
           };
 
@@ -2450,6 +2621,27 @@ export const IslandTile: React.FC<IslandTileProps> = ({
               </React.Fragment>
             );
           });
+        })()}
+
+        {/* Decorative tropical grass along selected grass-to-sand boundaries. */}
+        {edgeGrassDirection && (() => {
+          const edgePosition = {
+            NW: { x: -12, y: -21 },
+            NE: { x: 24, y: -21 },
+            SE: { x: 24, y: -9 },
+            SW: { x: -12, y: -9 },
+          }[edgeGrassDirection];
+          return (
+            <image
+              href={edgeGrassReference}
+              x={edgePosition.x}
+              y={edgePosition.y}
+              width="68"
+              height="40"
+              preserveAspectRatio="xMidYMax meet"
+              pointerEvents="none"
+            />
+          );
         })()}
 
         {/* Danger zone red pulse — same expanded points as base diamond */}
@@ -2485,12 +2677,14 @@ export const IslandTile: React.FC<IslandTileProps> = ({
         const isFishSpot = tile.object === 'FISH_SPOT';
         const delay  = (tile.x * 5 + tile.y * 7) % 16;
         const goRight = (tile.x + tile.y) % 2 === 0;
-        const cls   = goRight ? 'fish-swim' : 'fish-swim-r';
-        const flip  = goRight ? 'none' : 'scaleX(-1)';
-        // FISH_SPOT: bigger fish centred on the tile; ambient: small, near edge
-        const w   = isFishSpot ? 34 : 20;
-        const h   = isFishSpot ? 17 : 10;
-        const top = isFishSpot ? 8  : 18;
+        const cls = isFishSpot
+          ? (goRight ? 'fish-spot-swim' : 'fish-spot-swim-r')
+          : (goRight ? 'fish-swim' : 'fish-swim-r');
+        const flip  = goRight ? 'scaleX(-1)' : 'none';
+        // Keep every fish the same compact size; fish spots stay centered while swimming.
+        const w = 23;
+        const h = 15;
+        const top = 15;
 
         return (
           <div
@@ -2503,23 +2697,24 @@ export const IslandTile: React.FC<IslandTileProps> = ({
               zIndex: tileZIndex + 2,
             }}
           >
-            <svg
-              viewBox="0 0 22 11" width={w} height={h}
-              style={{ display: 'block', transform: flip }}
-            >
-              <polygon points="1,1 7,5.5 1,10" fill="#3aa8d8"/>
-              <ellipse cx="13" cy="5.5" rx="9.5" ry="4.5" fill="#55c8f0"/>
-              <ellipse cx="13" cy="7.8" rx="6" ry="1.6" fill="#b8eeff" opacity="0.60"/>
-              <polygon points="8,1.5 11,5 14,1.5" fill="#2e90c0" opacity="0.85"/>
-              <ellipse cx="11" cy="4.5" rx="3.5" ry="1.8" fill="rgba(255,255,255,0.28)" transform="rotate(-10 11 4.5)"/>
-              <circle cx="20" cy="4.2" r="1.4" fill="white"/>
-              <circle cx="20.4" cy="4.2" r="0.7" fill="#0a2a40"/>
-              <circle cx="20.1" cy="3.9" r="0.35" fill="rgba(255,255,255,0.8)"/>
-              {/* extra ripple rings on the prominent dock fish */}
-              {isFishSpot && <>
-                <ellipse cx="4" cy="5.5" rx="2.5" ry="1.2" fill="none" stroke="#a0dff8" strokeWidth="0.5" opacity="0.7"/>
-              </>}
-            </svg>
+            <img
+              src={fishReference}
+              alt=""
+              width={w}
+              height={h}
+              draggable={false}
+              style={{
+                display: 'block',
+                width: w,
+                height: h,
+                objectFit: 'contain',
+                transform: flip,
+                mixBlendMode: isFishSpot ? 'normal' : 'multiply',
+                opacity: isFishSpot ? 1 : 0.78,
+                filter: isFishSpot ? 'drop-shadow(0 1px 1px rgba(8, 40, 74, 0.75))' : undefined,
+                pointerEvents: 'none',
+              }}
+            />
           </div>
         );
       })()}
@@ -2549,35 +2744,45 @@ export const IslandTile: React.FC<IslandTileProps> = ({
         </div>
       )}
 
-      {/* ── Axe badge: shown when hovering a choppable tree with the clear tool ── */}
-      {hovered && activeTool === 'clear' && tile.object && CHOP_TREES.has(tile.object) && (
-        <div
+      {/* Low curved grass pads around rocks and the tropical flower base. */}
+      {!isCleared && tile.type === 'GRASS' &&
+        (tile.object === 'ROCK' || tile.object === 'TALL_ROCK' || tile.object === 'FLOWER_BUSH') && (
+        <svg
+          viewBox="0 0 80 38"
+          width="80"
+          height="38"
+          aria-hidden="true"
           style={{
             position: 'absolute',
-            left: '68%',
-            top: -42,
-            transform: 'translateX(-50%)',
+            inset: 0,
+            overflow: 'visible',
             pointerEvents: 'none',
-            background: 'rgba(255,250,240,0.94)',
-            borderRadius: '50%',
-            width: 36,
-            height: 36,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            border: '2.5px solid #c08840',
-            animation: 'axe-pop 0.14s ease-out',
-            zIndex: tileZIndex + 10,
+            zIndex: tileZIndex + 1,
           }}
         >
-          <svg viewBox="0 0 30 30" width="22" height="22">
-            <path d="M27,4 Q26,6 21,13 L16,21 Q14,24 13,26" stroke="#7a4e1c" strokeWidth="4.5" fill="none" strokeLinecap="round"/>
-            <path d="M27,4 Q26,6 21,13 L16,21 Q14,24 13,26" stroke="#c08840" strokeWidth="2.5" fill="none" strokeLinecap="round" opacity="0.55"/>
-            <path d="M8,3 Q4,5 3,10 Q2,16 5,20 Q8,25 13,21 Q18,23 20,15 Q22,8 16,5 Q12,3 8,3Z" fill="#8898B4"/>
-            <path d="M8,3 Q4,5 3,10 Q2,16 5,20 Q8,25 13,21" stroke="#6070A0" strokeWidth="1.1" fill="none" opacity="0.7"/>
-            <path d="M9.5,5.5 Q7,9 7,15" stroke="rgba(210,225,255,0.55)" strokeWidth="2.2" fill="none" strokeLinecap="round"/>
-          </svg>
-        </div>
+          <defs>
+            <clipPath id={`ground-grass-clip-${tile.x}-${tile.y}`}>
+              <polygon points="40,0 80,14 40,28 0,14" />
+            </clipPath>
+          </defs>
+          <g clipPath={`url(#ground-grass-clip-${tile.x}-${tile.y})`}>
+            <path
+              d="M1 20 C5 16 10 15 14 17 C18 16 22 18 25 21 C22 24 18 24 14 22 C9 25 4 23 1 20 Z"
+              fill="#83ce48"
+              opacity="0.72"
+            />
+            <path
+              d="M55 21 C59 17 63 16 67 18 C71 16 76 18 79 21 C75 24 71 24 67 22 C63 25 58 24 55 21 Z"
+              fill="#74c43e"
+              opacity="0.72"
+            />
+            <path
+              d="M30 26 C34 23 38 22 41 24 C45 21 49 22 52 25 C49 28 45 28 41 26 C37 29 33 28 30 26 Z"
+              fill="#8bd652"
+              opacity="0.66"
+            />
+          </g>
+        </svg>
       )}
 
       {/* ── Emoji object (crops, fish, structures, enemies, neighbour) ── */}
@@ -2594,7 +2799,7 @@ export const IslandTile: React.FC<IslandTileProps> = ({
         >
           <div
             style={{
-              fontSize: 28,
+              fontSize: tile.object === 'CROP_GROWING' || tile.object === 'CROP_READY' || tile.object === 'CROP_WILTED' ? 34 : 28,
               lineHeight: 1,
               filter: tile.object === 'CROP_WILTED' ? 'grayscale(80%) sepia(40%)' : undefined,
             }}

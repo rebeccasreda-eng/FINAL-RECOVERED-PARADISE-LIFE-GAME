@@ -20,6 +20,19 @@ description: NPC-grouped quest progression — parrot/crab/tree NPCs, acceptance
 - Crab (grp_crab): prereqs q_fishing + q_clear; quest: q_crab (300 coins, 15 XP, 2 FENCE)
 - Tree (grp_tree): prereqs q_fishing + q_clear; quest: q_chop (150 coins, 10 XP, 3 wood)
 
+## Island crab enemies
+Island crab enemies should not spawn or remain in saved island tiles; keep crab quest and NPC content intact.
+
+**Why:** The user requested removing only island crab enemies, while explicitly keeping quests and NPC content.
+
+**How to apply:** Exclude crab objects from island generation, spawns, saved tiles, and pending respawns without deleting the crab NPC or quest definitions.
+
+Use the supplied red crab sprite for the remaining quest NPC; do not re-enable island crab enemies as part of an art update.
+
+**Why:** The user asked to change the crab's appearance while the existing scope still removes only island crab enemies.
+
+**How to apply:** Replace the quest notifier's crab artwork while preserving the crab quest group, NPC behavior, and enemy-removal migration.
+
 ## Key patterns
 
 **Why acceptance gating matters:** Without it, a player could complete q_fishing by accidentally fishing 3 times before ever seeing the NPC, and the parrot NPC signs would never appear.

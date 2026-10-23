@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useRef, useEffect, useLayoutEffect } from 'react';
 import { GameProvider, useGame } from '../game/GameContext';
-import { IslandGrid, WORLD_W, WORLD_H } from '../components/IslandGrid';
+import { IslandGrid, WORLD_W, WORLD_H, isoWorldToTile } from '../components/IslandGrid';
 import { HUD } from '../components/HUD';
 import { TopNav } from '../components/TopNav';
 import { useBgm } from '../hooks/useBgm';
@@ -38,6 +38,79 @@ const BOT_H = 130;
 // Player start tile — centre of the 31×31 elliptical island
 const PLAYER_START = { x: 15, y: 15 };
 const MOVE_SPEED = 8.5; // tiles per second (free movement)
+type TilePosition = { x: number; y: number };
+
+const WALK_NEIGHBORS: ReadonlyArray<readonly [number, number]> = [
+  [1, 0], [0, 1], [-1, 0], [0, -1],
+  [1, 1], [-1, 1], [1, -1], [-1, -1],
+];
+const INTERACTION_NEIGHBORS = WALK_NEIGHBORS;
+const WALK_THROUGH_OBJECTS = new Set(['CLEARED_LAND', 'CROP_PLOT']);
+
+function isWalkableTile(tile: { type: string; object?: string } | undefined): boolean {
+  return !!tile
+    && (tile.type === 'GRASS' || tile.type === 'SAND')
+    && (!tile.object || WALK_THROUGH_OBJECTS.has(tile.object));
+}
+
+function findWalkPath(
+  tiles: Record<string, { type: string; object?: string }>,
+  start: TilePosition,
+  goals: TilePosition[],
+): TilePosition[] {
+  if (!goals.length) return [];
+
+  const startTile = { x: Math.round(start.x), y: Math.round(start.y) };
+  const startKey = `${startTile.x},${startTile.y}`;
+  const goalKeys = new Set(goals.map(({ x, y }) => `${x},${y}`));
+  const queue = [startTile];
+  const parent = new Map<string, string | null>([[startKey, null]]);
+  let foundKey: string | null = goalKeys.has(startKey) ? startKey : null;
+
+  const canEnter = (x: number, y: number) => {
+    if (x === startTile.x && y === startTile.y) return true;
+    return isWalkableTile(tiles[`${x},${y}`]);
+  };
+
+  for (let cursor = 0; cursor < queue.length && !foundKey; cursor++) {
+    const current = queue[cursor];
+    const currentKey = `${current.x},${current.y}`;
+
+    for (const [dx, dy] of WALK_NEIGHBORS) {
+      const x = current.x + dx;
+      const y = current.y + dy;
+      const key = `${x},${y}`;
+      if (parent.has(key) || !canEnter(x, y)) continue;
+
+      // Do not squeeze diagonally through the corner of a tree, fence, or prop.
+      if (dx !== 0 && dy !== 0 && (!canEnter(current.x + dx, current.y) || !canEnter(current.x, current.y + dy))) {
+        continue;
+      }
+
+      parent.set(key, currentKey);
+      queue.push({ x, y });
+      if (goalKeys.has(key)) {
+        foundKey = key;
+        break;
+      }
+    }
+  }
+
+  if (!foundKey) return [];
+  const path: TilePosition[] = [];
+  for (let key: string | null = foundKey; key && key !== startKey; key = parent.get(key) ?? null) {
+    const [x, y] = key.split(',').map(Number);
+    path.push({ x, y });
+  }
+  return path.reverse();
+}
+
+const facingFromIsoDelta = (dx: number, dy: number): 'front' | 'back' | 'left' | 'right' => {
+  const screenX = dx - dy;
+  const screenY = dx + dy;
+  if (Math.abs(screenX) >= Math.abs(screenY)) return screenX >= 0 ? 'right' : 'left';
+  return screenY >= 0 ? 'front' : 'back';
+};
 
 // World centre (used to offset the world container so island is centred on load)
 const WORLD_CX = WORLD_W / 2;
@@ -47,7 +120,7 @@ const WORLD_CY = WORLD_H / 2;
 
 /* ── GameInner ─────────────────────────────────────────────────────────── */
 const GameInner = ({ profile }: { profile: PlayerProfile }) => {
-  const { shopOpen, tutorial, state, dispatch, interact } = useGame();
+  const { shopOpen, setShopOpen, tutorial, state, dispatch, interact } = useGame();
   const [collectionsOpen,  setCollectionsOpen]  = useState(false);
   const [weatherOpen,      setWeatherOpen]      = useState(false);
   const [questPanelOpen,   setQuestPanelOpen]   = useState(false);
@@ -59,17 +132,31 @@ const GameInner = ({ profile }: { profile: PlayerProfile }) => {
   // Float tile-space position (supports sub-tile interpolation)
   const playerPosRef = useRef<{ x: number; y: number }>({ x: PLAYER_START.x, y: PLAYER_START.y });
   const [playerPos, setPlayerPos] = useState(playerPosRef.current);
-  const [isWalking, setIsWalking] = useState(false);
+  const [isMoving, setIsMoving] = useState(false);
+  const isMovingRef = useRef(false);
   const [facing,    setFacing]    = useState<'front' | 'back' | 'left' | 'right'>('front');
 
   // Click-to-glide destination; null = no pending target
-  const targetRef = useRef<{ x: number; y: number } | null>(null);
+  const targetRef = useRef<TilePosition | null>(null);
+  const routeRef = useRef<TilePosition[]>([]);
 
   // rAF bookkeeping
   const rafRef       = useRef<number | null>(null);
   const lastTimeRef  = useRef<number | null>(null);
-  const wasWalkRef   = useRef(false);
   const facingRef    = useRef<'front' | 'back' | 'left' | 'right'>('front');
+  const updateFacing = useCallback((dx: number, dy: number) => {
+    if (dx === 0 && dy === 0) return;
+    const nextFacing = facingFromIsoDelta(dx, dy);
+    if (nextFacing !== facingRef.current) {
+      facingRef.current = nextFacing;
+      setFacing(nextFacing);
+    }
+  }, []);
+  const updateMoving = useCallback((moving: boolean) => {
+    if (moving === isMovingRef.current) return;
+    isMovingRef.current = moving;
+    setIsMoving(moving);
+  }, []);
 
   // Pending interact — tileId to interact with when the player arrives
   const pendingInteractTileRef = useRef<string | null>(null);
@@ -81,10 +168,10 @@ const GameInner = ({ profile }: { profile: PlayerProfile }) => {
   const tilesRef = useRef(state.tiles);
   useLayoutEffect(() => { tilesRef.current = state.tiles; }, [state.tiles]);
 
-  /** True if the tile at (x, y) is walkable land (GRASS or SAND only). */
+  /** Live movement checks the tile grid; sprite footprints are handled by pathfinding. */
   const canWalk = useCallback((x: number, y: number): boolean => {
-    const t = tilesRef.current[`${Math.round(x)},${Math.round(y)}`];
-    return !!t && (t.type === 'GRASS' || t.type === 'SAND');
+    const tile = tilesRef.current[`${Math.round(x)},${Math.round(y)}`];
+    return isWalkableTile(tile);
   }, []);
 
   // Main game loop — runs every animation frame
@@ -95,25 +182,34 @@ const GameInner = ({ profile }: { profile: PlayerProfile }) => {
 
     const pos  = playerPosRef.current;
     let vx = 0, vy = 0;
+    let didMove = false;
 
     if (targetRef.current) {
-      const ddx = targetRef.current.x - pos.x;
-      const ddy = targetRef.current.y - pos.y;
-      const dist = Math.hypot(ddx, ddy);
+      let ddx = targetRef.current.x - pos.x;
+      let ddy = targetRef.current.y - pos.y;
+      let dist = Math.hypot(ddx, ddy);
       if (dist < 0.06) {
-        targetRef.current = null;         // arrived
-        if (pendingInteractTileRef.current) {
-          const tid = pendingInteractTileRef.current;
-          pendingInteractTileRef.current = null;
-          interactRef.current(tid);
+        const next = routeRef.current.shift();
+        if (next) {
+          targetRef.current = next;
+          ddx = next.x - pos.x;
+          ddy = next.y - pos.y;
+          dist = Math.hypot(ddx, ddy);
+        } else {
+          targetRef.current = null;
+          if (pendingInteractTileRef.current) {
+            const tid = pendingInteractTileRef.current;
+            pendingInteractTileRef.current = null;
+            interactRef.current(tid);
+          }
         }
-      } else {
+      }
+      if (targetRef.current && dist > 0) {
         vx = ddx / dist; vy = ddy / dist;
       }
     }
 
     // ── Apply movement with slide collision ───────────────────────────────
-    let moved = false;
     if (vx !== 0 || vy !== 0) {
       const step = MOVE_SPEED * dt;
       const nx = pos.x + vx * step;
@@ -124,33 +220,23 @@ const GameInner = ({ profile }: { profile: PlayerProfile }) => {
       if (canWalk(fx, ny))    fy = ny;   // try Y axis
 
       if (fx !== pos.x || fy !== pos.y) {
+        didMove = true;
         playerPosRef.current = { x: fx, y: fy };
         setPlayerPos({ x: fx, y: fy });
-        moved = true;
 
-        // 4-way facing from screen-space velocity components:
-        //   svx = vx−vy  (screen horizontal)  svx>0 → right, svx<0 → left
-        //   svy = vx+vy  (screen vertical)    svy>0 → front, svy<0 → back
-        const svx = vx - vy;
-        const svy = vx + vy;
-        let nf: 'front' | 'back' | 'left' | 'right';
-        if (Math.abs(svx) >= Math.abs(svy)) {
-          nf = svx > 0 ? 'right' : 'left';
-        } else {
-          nf = svy > 0 ? 'front' : 'back';
-        }
-        if (nf !== facingRef.current) { facingRef.current = nf; setFacing(nf); }
+        // Track the actual isometric screen-space direction of movement.
+        updateFacing(vx, vy);
+      } else {
+        // A newly placed object may have blocked the current route.
+        targetRef.current = null;
+        routeRef.current = [];
+        pendingInteractTileRef.current = null;
       }
     }
 
-    // Only update walk animation state when it changes
-    if (moved !== wasWalkRef.current) {
-      wasWalkRef.current = moved;
-      setIsWalking(moved);
-    }
-
+    updateMoving(didMove);
     rafRef.current = requestAnimationFrame(tick);
-  }, [canWalk]);
+  }, [canWalk, updateFacing, updateMoving]);
 
   // Start loop on mount, cancel on unmount
   useEffect(() => {
@@ -166,42 +252,38 @@ const GameInner = ({ profile }: { profile: PlayerProfile }) => {
     // Helper: fully cancel any pending movement + interact
     const cancel = () => {
       targetRef.current = null;
+      routeRef.current = [];
       pendingInteractTileRef.current = null;
     };
 
     if (!dest) { cancel(); return; }
 
-    // Walkable land — go directly
-    if (dest.type === 'GRASS' || dest.type === 'SAND') {
-      targetRef.current = { x: tx, y: ty };
-      pendingInteractTileRef.current = interactTileId ?? null;
+    const tiles = tilesRef.current;
+    const { x: px, y: py } = playerPosRef.current;
+    const start = { x: Math.round(px), y: Math.round(py) };
+    let goals: TilePosition[] = [];
+
+    if (isWalkableTile(dest)) {
+      goals = [{ x: tx, y: ty }];
+    } else if (dest.type === 'GRASS' || dest.type === 'SAND' || dest.object === 'DOCK') {
+      // Stop beside scenery instead of entering its occupied tile.
+      goals = INTERACTION_NEIGHBORS
+        .map(([dx, dy]) => ({ x: tx + dx, y: ty + dy }))
+        .filter(({ x, y }) => isWalkableTile(tiles[`${x},${y}`]));
+    }
+
+    const path = findWalkPath(tiles, start, goals);
+    if (!path.length) {
+      cancel();
       return;
     }
 
-    // DOCK sits on a WATER tile — redirect to the closest adjacent land tile
-    // relative to the player's current position so the path feels natural.
-    if (dest.object === 'DOCK') {
-      const { x: px, y: py } = playerPosRef.current;
-      const landNeighbours = ([ [-1,0],[1,0],[0,-1],[0,1] ] as const)
-        .map(([dx, dy]) => {
-          const nb = tilesRef.current[`${tx+dx},${ty+dy}`];
-          return nb && (nb.type === 'GRASS' || nb.type === 'SAND')
-            ? { x: tx+dx, y: ty+dy, d: (tx+dx-px)**2 + (ty+dy-py)**2 }
-            : null;
-        })
-        .filter(Boolean) as { x: number; y: number; d: number }[];
-
-      if (landNeighbours.length) {
-        landNeighbours.sort((a, b) => a.d - b.d);
-        targetRef.current = { x: landNeighbours[0].x, y: landNeighbours[0].y };
-        pendingInteractTileRef.current = interactTileId ?? null;
-        return;
-      }
-    }
-
-    // Water or anything else — cancel both target and pending action
-    cancel();
-  }, []);
+    const firstStep = path.shift()!;
+    updateFacing(firstStep.x - px, firstStep.y - py);
+    targetRef.current = firstStep;
+    routeRef.current = path;
+    pendingInteractTileRef.current = interactTileId ?? null;
+  }, [updateFacing]);
 
   /* ── Discrete zoom — island always centred, no panning ── */
   const worldRef  = useRef<HTMLDivElement>(null);
@@ -219,6 +301,20 @@ const GameInner = ({ profile }: { profile: PlayerProfile }) => {
         `translate(${-WORLD_CX * z}px, ${-WORLD_CY * z}px) scale(${z})`;
     }
   }, []);
+
+  // Let clicks in the small gaps between tile hit areas move to the nearest
+  // ground tile too. Tile clicks keep their existing interactions/pathfinding.
+  const handleViewportClick = useCallback((event: React.MouseEvent<HTMLDivElement>) => {
+    if (event.target instanceof Element && event.target.closest('[data-island-tile]')) return;
+    const worldRect = worldRef.current?.getBoundingClientRect();
+    if (!worldRect) return;
+
+    const zoom = ZOOM_LEVELS[zoomIdxRef.current];
+    const worldX = (event.clientX - worldRect.left) / zoom;
+    const worldY = (event.clientY - worldRect.top) / zoom;
+    const destination = isoWorldToTile(worldX, worldY);
+    moveTo(destination.x, destination.y);
+  }, [moveTo]);
 
   useEffect(() => { applyZoom(0); }, [applyZoom]);
 
@@ -246,6 +342,7 @@ const GameInner = ({ profile }: { profile: PlayerProfile }) => {
       <div
         ref={viewRef}
         className="absolute"
+        onClick={handleViewportClick}
         style={{
           top: TOP_H, bottom: BOT_H, left: 0, right: 0,
           overflow: 'hidden',
@@ -268,8 +365,8 @@ const GameInner = ({ profile }: { profile: PlayerProfile }) => {
             playerX={playerPos.x}
             playerY={playerPos.y}
             characterId={profile.characterId || 'mia'}
-            isWalking={isWalking}
             facing={facing}
+            isMoving={isMoving}
             onTileClick={moveTo}
           />
         </div>
@@ -282,13 +379,13 @@ const GameInner = ({ profile }: { profile: PlayerProfile }) => {
       {/* ── Fixed HUD chrome ── */}
       <TopNav
         playerName={profile.name}
-        onOpenCollections={() => setCollectionsOpen(true)}
-        onOpenShop={() => {}}
+        onOpenShop={() => setShopOpen(true)}
         bgmMuted={bgmMuted}
         onToggleBgm={toggleBgm}
       />
       <HUD
         onOpenCollections={() => setCollectionsOpen(true)}
+        onOpenShop={() => setShopOpen(true)}
         onOpenWeather={() => setWeatherOpen(true)}
         playerName={profile.name}
       />
@@ -345,7 +442,7 @@ export default function Game() {
             >
               <IslandGrid
                 playerX={-999} playerY={-999}
-                characterId="" isWalking={false} facing="front"
+                characterId="" facing="front"
                 onTileClick={() => {}}
               />
             </div>

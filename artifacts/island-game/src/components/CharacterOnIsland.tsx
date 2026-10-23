@@ -1,62 +1,119 @@
 /**
  * CharacterOnIsland — places the player sprite on the isometric grid.
- * Includes a 3D block arrow that bounces above the character's head.
  */
-import React from 'react';
-import { ChPlayer } from './CharacterSprites';
+import React, { useEffect, useRef, useState } from 'react';
+import girlSundressImage from '@assets/girl_sundress_cutout(2)(1)_1792655405137.png';
+import blondBoyImage from '@assets/blond_boy_cutout(2)(1)_1792655405137.png';
+import brunetteBoyImage from '@assets/brunette_boy_cutout(2)(1)_1792655405137.png';
+import pinkDressGirlImage from '@assets/girl_asset_dress_no_bg_1792655854378.png';
+import girlSundressBackImage from '@assets/generated_images/girl_sundress_back_sized.png';
+import blondBoyBackImage from '@assets/generated_images/blond_boy_back_sized.png';
+import brunetteBoyBackImage from '@assets/generated_images/brunette_boy_back_sized.png';
+import pinkDressGirlBackImage from '@assets/generated_images/pink_dress_girl_back_sized.png';
 
 const TH_HALF = 14;
 
 type Facing = 'front' | 'back' | 'left' | 'right';
+export type CharacterWalkFrames = Partial<Record<'front' | 'back', readonly string[]>>;
+const WALK_FRAME_INTERVAL_MS = 120;
+const EMPTY_WALK_FRAMES: readonly string[] = [];
+
+const CHARACTER_PORTRAITS: Record<string, string> = {
+  'girl-sundress': girlSundressImage,
+  'blond-boy': blondBoyImage,
+  'brunette-boy': brunetteBoyImage,
+  'pink-dress-girl': pinkDressGirlImage,
+  // Keep older saved profiles on a matching updated portrait.
+  mia: girlSundressImage,
+  ava: girlSundressImage,
+  nora: girlSundressImage,
+  leo: blondBoyImage,
+  kai: brunetteBoyImage,
+  player: blondBoyImage,
+};
+
+const BACK_PORTRAITS: Record<string, string> = {
+  'girl-sundress': girlSundressBackImage,
+  'blond-boy': blondBoyBackImage,
+  'brunette-boy': brunetteBoyBackImage,
+  'pink-dress-girl': pinkDressGirlBackImage,
+  mia: girlSundressBackImage,
+  ava: girlSundressBackImage,
+  nora: girlSundressBackImage,
+  leo: blondBoyBackImage,
+  kai: brunetteBoyBackImage,
+  player: blondBoyBackImage,
+};
 
 interface Props {
   screenX: number;
   screenY: number;
   tileZIndex: number;
   characterId: string;
-  isWalking: boolean;
   facing: Facing;
+  isMoving?: boolean;
+  walkingFrames?: CharacterWalkFrames;
   isChopping?: boolean;
+  isShoveling?: boolean;
 }
-
-/**
- * 3-D block arrow — extrusion layer + right side face + bright top face.
- * viewBox 32×26, rendered at 26×20 so it reads as compact and chunky.
- */
-const PlayerArrow = () => (
-  <svg viewBox="0 0 32 26" width="26" height="20" xmlns="http://www.w3.org/2000/svg" style={{ display: 'block' }}>
-    {/* ── Extrusion (depth) layer, offset +3,+3 — darkest green ── */}
-    <rect    x="14" y="3" width="9" height="12" fill="#0a6a0a"/>
-    <polygon points="4,14 32,14 18,26"           fill="#0a6a0a"/>
-    {/* ── Side / connecting faces — medium green ── */}
-    {/* Stem right face */}
-    <path d="M20,0 L23,3 L23,15 L20,12Z"         fill="#1aaa1a"/>
-    {/* Head right face */}
-    <path d="M29,11 L32,14 L18,26 L15,23Z"       fill="#1aaa1a"/>
-    {/* Top face of stem (parallelogram seen from above) */}
-    <path d="M11,0 L14,3 L23,3 L20,0Z"           fill="#28c028"/>
-    {/* ── Front (top) face — bright green ── */}
-    <rect    x="11" y="0" width="9" height="12"  fill="#2ecc2e"/>
-    <polygon points="1,11 29,11 15,23"            fill="#2ecc2e"/>
-    {/* ── Highlights ── */}
-    <rect    x="12.5" y="1.5" width="3" height="7" rx="1" fill="rgba(255,255,255,0.44)"/>
-    <polygon points="3,11 11,11 6,17"             fill="rgba(255,255,255,0.16)"/>
-    {/* ── Edge lines to sharpen faces ── */}
-    <line x1="1"  y1="11" x2="29" y2="11" stroke="#0a6a0a" strokeWidth="0.8"/>
-    <line x1="11" y1="0"  x2="20" y2="0"  stroke="rgba(0,0,0,0.18)" strokeWidth="0.6"/>
-  </svg>
-);
 
 export const CharacterOnIsland: React.FC<Props> = ({
   screenX,
   screenY,
   tileZIndex,
-  isWalking,
+  characterId,
   facing,
+  isMoving = false,
+  walkingFrames,
   isChopping,
+  isShoveling,
 }) => {
-  const SIZE = 58;
-  const scaleX = facing === 'left' ? -1 : 1;
+  const WIDTH = 68;
+  const HEIGHT = 92;
+  const activeFacing = facing;
+  const portrait = CHARACTER_PORTRAITS[characterId] ?? girlSundressImage;
+  const backPortrait = BACK_PORTRAITS[characterId] ?? girlSundressBackImage;
+  const scaleX = activeFacing === 'left' ? -1 : 1;
+  const idlePortrait = activeFacing === 'back' ? backPortrait : portrait;
+  const activeWalkFrames = activeFacing === 'back'
+    ? walkingFrames?.back ?? EMPTY_WALK_FRAMES
+    : walkingFrames?.front ?? EMPTY_WALK_FRAMES;
+  const hasWalkingFrames = Boolean(walkingFrames?.front?.length || walkingFrames?.back?.length);
+  const activeWalkFramesRef = useRef(activeWalkFrames);
+  activeWalkFramesRef.current = activeWalkFrames;
+  const [walkFrameIndex, setWalkFrameIndex] = useState(0);
+
+  // Use elapsed time rather than render count, and keep the cycle running across
+  // direction changes. With no real pose frames, the original PNG stays still.
+  useEffect(() => {
+    if (!isMoving || !hasWalkingFrames) {
+      setWalkFrameIndex(0);
+      return;
+    }
+
+    let startTime: number | null = null;
+    let lastFrameIndex = -1;
+    let animationFrame = 0;
+    const advanceFrame = (now: number) => {
+      if (startTime === null) startTime = now;
+      const frames = activeWalkFramesRef.current;
+      if (frames.length > 0) {
+        const nextFrame = Math.floor((now - startTime) / WALK_FRAME_INTERVAL_MS) % frames.length;
+        if (nextFrame !== lastFrameIndex) {
+          lastFrameIndex = nextFrame;
+          setWalkFrameIndex(nextFrame);
+        }
+      }
+      animationFrame = requestAnimationFrame(advanceFrame);
+    };
+
+    animationFrame = requestAnimationFrame(advanceFrame);
+    return () => cancelAnimationFrame(animationFrame);
+  }, [hasWalkingFrames, isMoving]);
+
+  const activePortrait = isMoving && activeWalkFrames.length > 0
+    ? activeWalkFrames[walkFrameIndex % activeWalkFrames.length] ?? idlePortrait
+    : idlePortrait;
 
   return (
     <div
@@ -69,31 +126,27 @@ export const CharacterOnIsland: React.FC<Props> = ({
         transformOrigin: 'bottom center',
         pointerEvents: 'none',
         willChange: 'left, top',
+        overflow: 'visible',
       }}
     >
-      {/* 3-D block arrow — centred above head */}
       <div
+        key={isChopping ? 'chop' : isShoveling ? 'shovel' : 'idle'}
+        className={isChopping ? 'char-chop-swing' : isShoveling ? 'char-shovel-swing' : undefined}
         style={{
-          position: 'absolute',
-          top: -30,
-          left: '50%',
-          transform: 'translateX(-50%)',
-          animation: 'none',
-          pointerEvents: 'none',
+          transformOrigin: 'bottom center',
+          position: 'relative',
+          width: WIDTH,
+          height: HEIGHT,
+          overflow: 'visible',
         }}
       >
-        <PlayerArrow />
-      </div>
-
-      {/* Character sprite — chop-swing wrapper */}
-      <div
-        key={isChopping ? 'chop' : 'idle'}
-        className={isChopping ? 'char-chop-swing' : undefined}
-        style={{ transformOrigin: 'bottom center' }}
-      >
-        <div style={{ filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.40))' }}>
-          <ChPlayer size={SIZE} isWalking={isWalking} facing={facing} />
-        </div>
+        {activeFacing !== 'back' && <span className="player-portrait-ground-shadow" aria-hidden="true" />}
+        <img
+          className="player-portrait-image"
+          src={activePortrait}
+          alt=""
+          draggable={false}
+        />
       </div>
     </div>
   );

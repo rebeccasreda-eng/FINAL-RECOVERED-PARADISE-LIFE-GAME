@@ -6,17 +6,17 @@ import React from 'react';
 import { useGame } from '../game/GameContext';
 
 const TREE_NAMES: Record<string, string> = {
-  TREE_PALM:    'Palm Tree',
-  TREE_COCONUT: 'Coconut',
-  TREE_MANGO:   'Mango Tree',
-  TREE_APPLE:   'Apple Tree',
+  TREE_PALM:    'Banana Tree',
+  TREE_COCONUT: 'Banana Tree',
+  TREE_MANGO:   'Orange Tree',
+  TREE_APPLE:   'Orange Tree',
 };
 
 const TREE_ICONS: Record<string, string> = {
-  TREE_PALM:    '🌴',
-  TREE_COCONUT: '🌴',
-  TREE_MANGO:   '🥭',
-  TREE_APPLE:   '🍎',
+  TREE_PALM:    '🍌',
+  TREE_COCONUT: '🍌',
+  TREE_MANGO:   '🍊',
+  TREE_APPLE:   '🍊',
 };
 
 const MAX_CHOPS = 5;

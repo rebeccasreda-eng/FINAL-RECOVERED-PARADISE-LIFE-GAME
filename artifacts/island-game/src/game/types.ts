@@ -10,8 +10,9 @@ export type ObjectType =
   | 'BLUEBELL' | 'PANSY' | 'TULIP' | 'PINEAPPLE_PLANT' | 'BLUEBERRY_BUSH'
   | 'HUT' | 'DOCK' | 'WELL' | 'FLOWER_POT' | 'FENCE' | 'LANTERN'
   | 'CRAB' | 'BOAR' | 'BABY_PARROT' | 'TALL_ROCK'
+  | 'ISLAND_HUT' | 'PINE_TREE' | 'PALM_TRUNK'
   | 'TREE_COCONUT_UNRIPE' | 'TREE_MANGO_UNRIPE'
-  | 'COCONUT_STUMP' | 'MANGO_STUMP'
+  | 'COCONUT_STUMP' | 'MANGO_STUMP' | 'BRANCH_CLUSTER'
   | 'TOXIC_DRUM';
 
 export type WeatherType = 'SUNNY' | 'RAINY' | 'CLOUDY' | 'STORMY' | 'WINDY';
@@ -28,8 +29,10 @@ export interface TileData {
   treeHp?: number;        // chops remaining before tree falls
   ripensAt?: number;      // timestamp when unripe fruit tree becomes harvestable
   growsAt?: number;       // timestamp when a stump regrows into a sapling
+  cropPlotAfterTree?: boolean; // restore a moved tree's original plot as cleared land when felled
   unwitherRequestedAt?: number;
   shoreDepth?: number;   // BFS distance from nearest land tile (GRASS/SAND); water only
+  layoutDecoration?: 'back-tree' | 'left-grove-tree' | 'right-grove-tree';
 }
 
 export interface QuestObjective {
@@ -67,6 +70,7 @@ export interface Neighbor {
 
 export interface GameState {
   tiles: Record<string, TileData>;
+  naturalDecorationLayoutVersion: number;
   inventory: Record<ResourceType, number>;
   energy: number;
   maxEnergy: number;
@@ -130,4 +134,5 @@ export interface GameContextType {
   place: (tileId: string, obj: ObjectType) => void;
   activeChopTileId: string | null;
   chopCount: number;
+  shovelCount: number;
 }
