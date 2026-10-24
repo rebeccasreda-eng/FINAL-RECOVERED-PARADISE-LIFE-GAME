@@ -1,9 +1,6 @@
 import React, { useState } from 'react';
 import { useGame } from '../game/GameContext';
 import { ResourceType } from '../game/types';
-import addNeighborPortraitsA from '@assets/add_neighbor_1792759025285.JPG';
-import addNeighborPortraitsB from '@assets/add_neighbor_1792759074044.JPG';
-import islandPanelHeaderReference from '@assets/topsds_1792760359613.JPG';
 
 type QuickTab = 'player' | 'market' | 'marina' | null;
 

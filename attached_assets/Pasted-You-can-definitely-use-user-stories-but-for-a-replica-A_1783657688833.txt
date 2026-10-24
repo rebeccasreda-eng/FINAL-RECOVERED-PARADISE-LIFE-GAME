@@ -1,0 +1,531 @@
+You can definitely use user stories, but for a replica AI you'll get much better results if you **separate the project into two prompts**:
+
+1. **A Project Specification** (what to build)
+2. **User Stories** (how it should behave)
+
+One important thing though: asking an AI to **copy every asset, exact UI, exact characters, exact colors, exact avatars, and recreate the game exactly** is requesting a near-identical reproduction of copyrighted game assets and design. A better approach is to tell it to **use the screenshots as visual reference** while creating original artwork and UI with the same nostalgic social farming/island feel.
+
+Here's a version you can give another AI.
+
+---
+
+# PROJECT SPECIFICATION
+
+## Project Name
+
+Island Life Social Farming Game
+
+## Goal
+
+Create a browser-based social island farming game inspired by classic Facebook games from the early 2010s.
+
+The screenshots are visual references for layout, gameplay flow, and overall aesthetic.
+
+Do not simply recreate copyrighted artwork or assets. Instead, recreate the same nostalgic experience using original artwork while matching the overall style, proportions, UI organization, and gameplay.
+
+---
+
+## Overall Style
+
+The game should have
+
+* hand-painted/cartoon artwork
+* bright tropical colours
+* cute stylized characters
+* smooth UI animations
+* Flash-game nostalgia
+* 2D isometric island
+
+---
+
+## Camera
+
+The island should:
+
+* be draggable with the mouse
+* click and drag to pan
+* smooth movement
+* stop at map boundaries
+* support zoom later
+
+---
+
+## Welcome Screen
+
+Before entering the island, display a character selection screen.
+
+Include:
+
+* multiple male characters
+* multiple female characters
+* hairstyles inspired by the screenshots
+* tropical background
+* animated idle poses
+
+Player selects:
+
+* avatar
+* name
+
+Then enters their island.
+
+---
+
+## Island
+
+Replicate the overall layout shown.
+
+Include
+
+* beach
+* water
+* docks
+* grass
+* cliffs
+* decorations
+* buildings
+* crops
+* trees
+* animals
+
+Every object should be individually placeable.
+
+---
+
+## Top Navigation Bar
+
+Recreate the overall layout using original artwork.
+
+Buttons:
+
+* Play
+* Free Gifts
+* Invite Friends
+* Neighbours
+* Get Shells
+* Forums
+
+Top resource bars:
+
+* Coins
+* Wood
+* Food
+* Energy
+* Level
+* Premium Currency
+
+Animated hover effects.
+
+---
+
+## Bottom Navigation
+
+Left side
+
+Neighbour list
+
+Each neighbour card contains
+
+* avatar
+* name
+* level
+* friendship
+
+Scrolling arrows
+
+Add Neighbour button
+
+---
+
+Right side
+
+Action buttons
+
+Include
+
+* Mail
+* Market
+* Inventory
+* Crafting
+* Decorations
+* Settings
+
+Exactly the same organization as shown, but with original artwork.
+
+---
+
+## Market
+
+Large popup window.
+
+Tabs
+
+* Crops
+* Animals
+* Terrain
+* Trees
+* Decorations
+* Buildings
+* Energy
+* Debris
+
+Each item displays
+
+* icon
+* name
+* cost
+* XP
+* harvest time
+* buy button
+
+Locked items display
+
+Required level
+
+---
+
+## Buildings
+
+Examples
+
+Storehouse
+
+Barn
+
+House
+
+Workshop
+
+Dock
+
+Storage
+
+---
+
+## Crops
+
+Examples
+
+Pumpkin
+
+Cabbage
+
+Pineapple
+
+Sunflower
+
+Pepper
+
+Blueberries
+
+Carrots
+
+Wheat
+
+Each grows over time.
+
+---
+
+## Gameplay
+
+Players can
+
+* plant crops
+* water crops
+* harvest
+* earn coins
+* earn XP
+* expand island
+* decorate
+* visit neighbours
+* send gifts
+
+---
+
+## Mouse Controls
+
+Left click
+
+Select
+
+Plant
+
+Harvest
+
+Open UI
+
+Drag
+
+Move camera
+
+Hover
+
+Highlight objects
+
+---
+
+## Visual Effects
+
+Growing crops
+
+Floating XP
+
+Coin animations
+
+Building construction
+
+Water animation
+
+Trees swaying
+
+Cloud movement
+
+---
+
+## UI Style
+
+Rounded buttons
+
+Wood textures
+
+Gold borders
+
+Bright icons
+
+Soft shadows
+
+High quality HD artwork
+
+Responsive UI
+
+---
+
+# USER STORIES
+
+---
+
+Epic-1: Player Onboarding
+
+US-1: Character Selection
+
+Story:
+
+As a new player, I want to choose my avatar before entering the island, so that my character represents me.
+
+Acceptance Criteria:
+
+Scenario 1: First Launch
+
+Given the player launches the game,
+
+When the welcome screen appears,
+
+Then multiple male and female avatars are displayed.
+
+Scenario 2: Avatar Selection
+
+Given an avatar is selected,
+
+When the player presses Start,
+
+Then the selected avatar becomes their permanent character until changed later.
+
+---
+
+Epic-2: Island Navigation
+
+US-2: Move Around Island
+
+Story:
+
+As a player, I want to drag the island with my mouse so that I can explore every area.
+
+Acceptance Criteria:
+
+Scenario 1: Drag Map
+
+Given the island is visible,
+
+When the player holds the left mouse button and drags,
+
+Then the camera smoothly pans.
+
+Scenario 2: Map Boundary
+
+Given the player reaches the edge,
+
+When dragging continues,
+
+Then the camera cannot move outside the map.
+
+---
+
+Epic-3: Farming
+
+US-3: Plant Crops
+
+Story:
+
+As a player, I want to plant crops so that I can harvest resources.
+
+Acceptance Criteria:
+
+Scenario 1: Plant Crop
+
+Given an empty farming tile,
+
+When Pumpkin is selected,
+
+Then the crop is planted and a timer starts.
+
+Scenario 2: Harvest Crop
+
+Given the timer has completed,
+
+When the crop is clicked,
+
+Then coins and XP are awarded.
+
+---
+
+Epic-4: Market
+
+US-4: Purchase Items
+
+Story:
+
+As a player, I want to buy items from the market so that I can improve my island.
+
+Acceptance Criteria:
+
+Scenario 1: Buy Item
+
+Given sufficient coins,
+
+When Buy is clicked,
+
+Then the item is added to inventory.
+
+Scenario 2: Locked Item
+
+Given the player's level is too low,
+
+When selecting the item,
+
+Then a Locked message displays the required level.
+
+---
+
+Epic-5: Neighbours
+
+US-5: Visit Friends
+
+Story:
+
+As a player, I want to visit neighbours so that I can interact with other islands.
+
+Acceptance Criteria:
+
+Scenario 1: Open Friend List
+
+Given neighbours exist,
+
+When the Neighbours button is clicked,
+
+Then the neighbour list opens.
+
+Scenario 2: Visit Island
+
+Given a neighbour is selected,
+
+When Visit is pressed,
+
+Then their island loads.
+
+---
+
+Epic-6: Resource Management
+
+US-6: Resource Tracking
+
+Story:
+
+As a player, I want to monitor my resources so that I can plan my gameplay.
+
+Acceptance Criteria:
+
+Scenario 1: Earn Coins
+
+Given a crop is harvested,
+
+When harvesting finishes,
+
+Then the coin counter increases.
+
+Scenario 2: Energy Use
+
+Given an action costs energy,
+
+When the action is performed,
+
+Then the energy bar decreases.
+
+---
+
+Epic-7: Buildings
+
+US-7: Construct Buildings
+
+Story:
+
+As a player, I want to construct buildings so that my island becomes more productive.
+
+Acceptance Criteria:
+
+Scenario 1: Build Structure
+
+Given sufficient resources,
+
+When a building is placed,
+
+Then construction begins.
+
+Scenario 2: Construction Complete
+
+Given the timer finishes,
+
+When construction ends,
+
+Then the building becomes usable.
+
+---
+
+Epic-8: Island Decoration
+
+US-8: Decorate Island
+
+Story:
+
+As a player, I want to place decorations anywhere so that I can personalize my island.
+
+Acceptance Criteria:
+
+Scenario 1: Place Decoration
+
+Given a decoration is selected,
+
+When an empty tile is clicked,
+
+Then the decoration is placed.
+
+Scenario 2: Move Decoration
+
+Given edit mode is active,
+
+When a decoration is dragged,
+
+Then it moves to the new valid location.
+
+---
+
+This approach gives the AI a complete functional specification while avoiding asking it to duplicate copyrighted assets exactly. It should still produce a game with the same nostalgic gameplay, layout, and feel as the Paradise Life screenshots.
